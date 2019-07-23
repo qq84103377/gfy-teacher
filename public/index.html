@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <!--      <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">-->
+  <!--      <meta name="format-detection" content="telephone=no">-->
+  <!--      <meta name="msapplication-tap-highlight" content="no">-->
+  <!--      <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">-->
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=FTK34s3WCTfvdCmc8UbEj2ldjxFcDaRH"></script>
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>parent-community</title>
+  <script type="text/javascript" src="cordova.js"></script>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but parent-community doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+<script
+  src="//g.alicdn.com/fdilab/lib3rd/viewport-units-buggyfill/0.6.2/??viewport-units-buggyfill.hacks.min.js,viewport-units-buggyfill.min.js">
+</script>
+<script>
+  // /(iPhone|iPad|iPhone OS|Phone|iPod|iOS)/i.test(navigator.userAgent) && (head = document.getElementsByTagName('head'),
+  //   viewport = document.createElement('meta'), viewport.name = 'viewport', viewport.content =
+  //   'target-densitydpi=device-dpi, width=375px, user-scalable=no', head.length > 0 && head[head.length - 1]
+  //   .appendChild(viewport));
+
+  window.onload = function () {
+    window.viewportUnitsBuggyfill.init({
+      hacks: window.viewportUnitsBuggyfillHacks
+    });
+  }
+</script>
+
+</html>

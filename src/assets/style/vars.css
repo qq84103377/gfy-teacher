@@ -1,0 +1,50 @@
+.gfy-scroll-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+.gfy-scroll-container .gfy-scroll-view {
+  position: relative;
+  flex: 1;
+}
+.flex {
+  display: flex;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.column-justify-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.column-align-center {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+.column-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.align-center {
+  display: flex;
+  align-items: center;
+}
+.justify-center {
+  display: flex;
+  justify-content: center;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
