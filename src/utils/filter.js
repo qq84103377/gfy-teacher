@@ -31,4 +31,16 @@ let formatSeconds = (s) => {
   s = (s.length == 1) ? '0' + s : s;
   return h + ':' + s;
 };
-export {ellipsis, formatSeconds}
+
+// 时间戳转换为yyyyMMdd
+let generateTimeReqestNumber = (data) => {
+  // var date = new Date()
+  let d = data
+  return d.getFullYear().toString() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+}
+let pad2 = (n) => {
+  return n < 10 ? '0' + n : n
+}
+
+
+export {ellipsis, formatSeconds, generateTimeReqestNumber}

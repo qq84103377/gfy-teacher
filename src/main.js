@@ -6,6 +6,7 @@ import store from './store/store'
 // import fundebugVue from 'fundebug-vue'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
+import VConsole from 'vconsole/dist/vconsole.min.js'
 
 // 引入vant组件
 import {
@@ -46,18 +47,21 @@ import {
   Radio,
   Checkbox,
   CheckboxGroup,
-  ImagePreview
+  ImagePreview,
+  SwipeCell,
+  DatetimePicker
 } from 'vant'
 Vue.use(Navigation, {
   router
 })
+let vConsole = new VConsole()
 
 Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)
   .use(Tabs).use(Swipe).use(SwipeItem).use(Cell).use(CellGroup).use(Collapse).use(CollapseItem)
   .use(List).use(PullRefresh).use(Search).use(Tag).use(Popup).use(IndexBar).use(IndexAnchor).use(Row).use(Col).use(Divider)
-  .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview)
+  .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview).use(SwipeCell).use(DatetimePicker )
 
 // 配置fundebug
 // fundebug.apikey = 'cfa2bb54f98fa9956f7bf365ac408cc085faaab93013d5ffbd1394a508eb380e'

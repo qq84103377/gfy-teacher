@@ -31,24 +31,30 @@ export default {
   data() {
     return {
       tabData: [
-        // {
-        //   title: "首页",
-        //   normal: require("../../assets/img/icon-home-gray.png"),
-        //   active: require("../../assets/img/icon-home-blue.png"),
-        //   path: "/index"
-        // },
-        // {
-        //   title: "课程 & 活动",
-        //   normal: require("../../assets/img/icon-Course-activities-gray.png"),
-        //   active: require("../../assets/img/icon-Course-activities-blue.png"),
-        //   path: "/activity"
-        // },
-        // {
-        //   title: "我的",
-        //   normal: require("../../assets/img/icon-personal-gray.png"),
-        //   active: require("../../assets/img/icon-personal-blue.png"),
-        //   path: "/mine"
-        // }
+        {
+          title: "课程",
+          normal: require("../../assets/img/icon-home.png"),
+          active: require("../../assets/img/icon-home-active.png"),
+          path: "/index"
+        },
+        {
+          title: "资源中心",
+          normal: require("../../assets/img/icon-res1.png"),
+          active: require("../../assets/img/icon-res1-active.png"),
+          path: "/activity"
+        },
+        {
+          title: "教学统计",
+          normal: require("../../assets/img/icon-linear.png"),
+          active: require("../../assets/img/icon-linear-aactive.png"),
+          path: "/mine"
+        },
+        {
+          title: "我的",
+          normal: require("../../assets/img/icon-mine.png"),
+          active: require("../../assets/img/icon-mine-active.png"),
+          path: "/mine"
+        }
       ],
     };
   },

@@ -1,0 +1,76 @@
+<template>
+  <section class="exam-view-wrap">
+    <van-nav-bar
+      title="安顺达会计师大家开始打卡机sad啊是的的"
+      @click-left="$router.back()"
+      left-arrow>
+    </van-nav-bar>
+    <div class="exam-view-wrap__tab">
+      <div @click="handleToggle(true)" :class="{active:classView}">班级查看</div>
+      <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
+    </div>
+    <div class="exam-view-wrap__body">
+      <score-table id="ha" :classView="true" v-show="classView"></score-table>
+      <score-table v-for="a in 3" :key="a" :id="'ha' + a" :classView="false" v-show="!classView"></score-table>
+    </div>
+  </section>
+</template>
+
+<script>
+  import scoreTable from '../../components/scoreTable'
+  export default {
+    name: "examView",
+    data() {
+      return {
+        classView: true, //按班级查看
+      }
+    },
+    components: {scoreTable},
+    methods: {
+      handleToggle(bol) {
+        this.classView = bol
+      },
+    }
+  }
+</script>
+
+<style lang="less" scoped>
+  .exam-view-wrap {
+    flex-direction: column;
+    display: flex;
+
+    &__tab {
+      flex: 0 0 48px;
+      padding: 0 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      > div {
+        border-radius: 15px;
+        font-size: 15px;
+        color: #999;
+        background: #F5F6FA;
+        margin-right: 20px;
+        line-height: 30px;
+        padding: 0 15px;
+
+        &.active {
+          background: linear-gradient(0deg, rgba(140, 247, 238, 1), rgba(57, 240, 221, 1));
+          color: #fff;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    &__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 10px 10px;
+
+    }
+  }
+</style>
