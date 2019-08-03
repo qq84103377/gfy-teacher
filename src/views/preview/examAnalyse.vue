@@ -1,16 +1,16 @@
 <template>
-  <section class="analyse-wrap">
-    <div class="analyse-wrap__tab">
+  <section class="exam-analyse-wrap">
+    <div class="exam-analyse-wrap__tab">
       <div :class="{active:isExam}" @click="isExam=true">试题分析</div>
       <div :class="{active:!isExam}" @click="isExam=false">得分分析</div>
     </div>
     <div style="flex: 1;overflow-y: auto" v-show="isExam">
-      <div class="analyse-wrap__pie">
-        <div class="analyse-wrap__pie-label divider">题型分布</div>
+      <div class="exam-analyse-wrap__pie">
+        <div class="exam-analyse-wrap__pie-label divider">题型分布</div>
         <div id="myChart1" ref="myChart1" class="chart-pie"></div>
       </div>
-      <div class="analyse-wrap__histogram van-hairline--bottom">
-        <div class="analyse-wrap__histogram-label divider">知识点分布</div>
+      <div class="exam-analyse-wrap__histogram van-hairline--bottom">
+        <div class="exam-analyse-wrap__histogram-label divider">知识点分布</div>
         <div id="myChart2" ref="myChart2" class="chart-histogram"></div>
       </div>
       <div id="myChart3" ref="myChart3" class="chart-histogram"></div>
@@ -52,7 +52,7 @@
   import echarts from "echarts";
 
   export default {
-    name: "analyse",
+    name: "examAnalyse",
     data() {
       return {
         isExam: true,
@@ -374,7 +374,7 @@
 </script>
 
 <style lang="less" scoped>
-  .analyse-wrap {
+  .exam-analyse-wrap {
     display: flex;
     flex-direction: column;
 
@@ -452,15 +452,37 @@
 
     .score-table {
       border-top: 2px solid @blue;
+      overflow-x: hidden;
       width: 100%;
       display: flex;
       font-size: 12px;
       color: #333;
-
+      position: relative;
+      /*&::after {*/
+      /*  z-index: -1;*/
+      /*  position: absolute;*/
+      /*  content: ' ';*/
+      /*  width: 100%;*/
+      /*  height: 86px;*/
+      /*  bottom: 0;*/
+      /*  left: 0;*/
+      /*  background: #e0fffc;*/
+      /*}*/
+      /*&::before {*/
+      /*  z-index: -1;*/
+      /*  position: absolute;*/
+      /*  content: ' ';*/
+      /*  width: 100%;*/
+      /*  height: 43px;*/
+      /*  top: 0;*/
+      /*  left: 0;*/
+      /*  background: #e0fffc;*/
+      /*}*/
       .col {
         flex: 0 0 89px;
 
         > div {
+          background: #fff;
           line-height: 44px;
           text-align: center;
 

@@ -4,7 +4,7 @@
       title="安顺达会计师大家开始打卡机sad啊是的的"
       @click-left="$router.back()"
       left-arrow>
-      <div slot="right" class="fs12 blue" @click="$router.push(`/analyse`)">试卷分析</div>
+      <div slot="right" class="fs12 blue" @click="$router.push(`/examAnalyse`)">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll">
       <div v-for="(item,index) in classList" :key="index" @click="handleSelectTab(item)"
@@ -59,7 +59,7 @@
           </div>
         </div>
         <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
-        <div id="myChart3" ref="myChart3" class="objective-pie"></div>
+        <div id="myChart3" ref="myChart3" class="subject-pie"></div>
 
       </div>
     </div>
@@ -189,11 +189,6 @@
         var myChart = echarts.init(document.getElementById('myChart2'));
         // 指定图表的配置项和数据
         var paperOption = {
-          // title: {
-          //   text: '试卷统计',
-          //   x: 4,
-          //   y: 2
-          // },
           calculable: true,
           // tooltip: {
           //   trigger: 'item',
@@ -223,25 +218,9 @@
                 normal: {
                   color: '#FEB524'
                 },
-                // emphasis: {
-                //   color: '#00A2E5'
-                // }
               }
             }
           ],
-          // toolbox: {
-          //   show: true,
-          //   feature: {
-          //     mark: {show: true},
-          //     dataView: {show: true, readOnly: false},
-          //     magicType: {
-          //       show: true,
-          //       type: ['pie', 'funnel']
-          //     },
-          //     restore: {show: true},
-          //     saveAsImage: {show: true}
-          //   }
-          // }
         };
         myChart.setOption(paperOption);
       },
@@ -288,6 +267,11 @@
         };
 
         myChart.setOption(questionOption);
+
+        myChart.on('click', params => {
+          console.log(params, '=3=3=');
+          this.$router.push(`/subjectAnalyse`)
+        })
       }
     },
     mounted() {
@@ -310,7 +294,7 @@
       margin: 0 auto;
     }
 
-    .objective-pie {
+    .subject-pie {
       width: 100%;
       margin: 0 auto;
     }

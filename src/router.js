@@ -50,13 +50,27 @@ export default new Router({
           component: () => import('./views/preview/examView.vue'),
         },
         {
-          path: '/analyse',
-          name: 'analyse',
-          component: () => import('./views/preview/analyse.vue'),
+          path: '/examAnalyse',
+          name: 'examAnalyse',
+          component: () => import('./views/preview/examAnalyse.vue'),
           meta: {
             isShowHeader: true,
             title: '试卷分析'
           }
+        },
+        {
+          path: '/subjectAnalyse',
+          name: 'subjectAnalyse',
+          component: () => import('./views/preview/subjectAnalyse.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '题目分析'
+          }
+        },
+        {
+          path: '/stuAnalyse',
+          name: 'stuAnalyse',
+          component: () => import('./views/preview/stuAnalyse.vue'),
         }
       ]
     },

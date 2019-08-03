@@ -14,7 +14,7 @@
       <td v-show="!classView">89</td>
       <td>G7101</td>
       <td>20分30秒</td>
-      <td>89 ></td>
+      <td @click="$router.push(`/stuAnalyse`)">89 ></td>
     </tr>
   </table>
 </template>
