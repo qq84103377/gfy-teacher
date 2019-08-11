@@ -71,6 +71,48 @@ export default new Router({
           path: '/stuAnalyse',
           name: 'stuAnalyse',
           component: () => import('./views/preview/stuAnalyse.vue'),
+        },
+        {
+          path: '/addSubScore',
+          name: 'addSubScore',
+          component: () => import('./views/preview/addSubScore.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '加分/减分'
+          }
+        },
+        {
+          path: '/briefing',
+          name: 'briefing',
+          component: () => import('./views/preview/briefing.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '简报'
+          }
+        },
+        {
+          path: '/subjectList',
+          name: 'subjectList',
+          component: () => import('./views/preview/subjectList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '题目分析'
+          }
+        },
+        {
+          path: '/subjectCorrect',
+          name: 'subjectCorrect',
+          component: () => import('./views/preview/subjectCorrect.vue')
+        },
+        {
+          path: '/imgCorrect',
+          name: 'imgCorrect',
+          component: () => import('./views/preview/imgCorrect.vue')
+        },
+        {
+          path: '/spokenAnalyse',
+          name: 'spokenAnalyse',
+          component: () => import('./views/preview/spokenAnalyse.vue')
         }
       ]
     },

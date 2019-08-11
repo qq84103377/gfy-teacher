@@ -14,7 +14,7 @@
       <td v-show="!classView">89</td>
       <td>G7101</td>
       <td>20分30秒</td>
-      <td @click="$router.push(`/stuAnalyse`)">89 ></td>
+      <td @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">89 ></td>
     </tr>
   </table>
 </template>
@@ -22,7 +22,7 @@
 <script>
   export default {
     name: "scoreTable",
-    props: ['id', 'classView', 'list'],
+    props: ['id', 'classView', 'list','isSpoken'],
     mounted() {
         if(!this.classView) {
          this.$nextTick(() => {

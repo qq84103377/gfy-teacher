@@ -10,7 +10,7 @@
           label="名称:"
           @click-right-icon="filterShow=true">
           <div slot="input" class="input-wrap">
-            <input maxlength="64"  v-model="form.name" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
+            <input maxlength="64" v-model="form.name" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
             <span class="num-tip">{{64 - form.name.length}}</span>
             <van-icon @click="form.name = ''" class="close" name="close"/>
           </div>
@@ -21,7 +21,9 @@
         <div class="search-wrap" v-show="form.name">
           <van-cell v-for="a in 10" :key="a">
             <div slot="title" class="aic jcsb search-wrap__item">
-              <div class="search-wrap__item-title">jksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsd</div>
+              <div class="search-wrap__item-title">
+                jksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsd
+              </div>
               <div class="jcsb aic fs10" style="flex: 0 0 25%">
                 <span class="tag">人教版</span>
                 <span class="tag">初一</span>
@@ -29,6 +31,10 @@
             </div>
           </van-cell>
         </div>
+<!--        <van-overlay-->
+<!--          :show="showMask"-->
+<!--          @click="showMask = false"-->
+<!--        />-->
       </div>
       <van-cell v-if="!isEdit" class="class-group">
         <div slot="title">
@@ -95,13 +101,16 @@
           <span class="mgr10">共享:</span>
           <van-radio-group style="display: flex;" v-model="form.share">
             <van-radio :disabled="!isEdit" name="2" class="mgr10"><i slot="icon" slot-scope="props"
-                                                 :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked&&isEdit},{'icon-radio-disable':!isEdit}]"></i> 个人
+                                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked&&isEdit},{'icon-radio-disable':!isEdit}]"></i>
+              个人
             </van-radio>
             <van-radio v-if="isEdit" name="3" class="mgr10"><i slot="icon" slot-scope="props"
-                                                 :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i> 校内
+                                                               :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              校内
             </van-radio>
             <van-radio v-if="isEdit" name="4"><i slot="icon" slot-scope="props"
-                                                 :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i> 共享
+                                                 :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              共享
             </van-radio>
           </van-radio-group>
         </div>
@@ -112,7 +121,8 @@
             <span>描述:</span>
             <span style="color: red">{{200 - form.desc.length}}</span>
           </div>
-          <textarea placeholder="请输入描述，字数在200字内" maxlength="200" v-model="form.desc" class="gfy-textarea" rows="3"></textarea>
+          <textarea placeholder="请输入描述，字数在200字内" maxlength="200" v-model="form.desc" class="gfy-textarea"
+                    rows="3"></textarea>
         </div>
       </van-cell>
       <van-popup
@@ -135,6 +145,7 @@
     <div class="add-course-wrap__footer" v-else>
       <van-button class="submit-btn" type="info">提交</van-button>
     </div>
+    <div class="mask" @click="form.name = ''" v-show="form.name"></div>
 
     <course-filter :visible.sync="filterShow"></course-filter>
   </section>
@@ -142,7 +153,8 @@
 
 <script>
   import {generateTimeReqestNumber} from '@/utils/filter'
-import courseFilter from '../../components/courseFilter'
+  import courseFilter from '../../components/courseFilter'
+
   export default {
     name: "addCourse",
     props: ['isEdit'],
@@ -163,6 +175,18 @@ import courseFilter from '../../components/courseFilter'
         result: [],
         currentDate: new Date(),
         className: '电话的的的',
+      }
+    },
+    computed: {
+      showMask: {
+        get() {
+          return this.form.name ? true : false
+        },
+        set(v) {
+          if (!v) {
+            this.form.name = ''
+          }
+        }
       }
     },
     components: {courseFilter},
@@ -202,20 +226,22 @@ import courseFilter from '../../components/courseFilter'
         top: 44px;
         left: 0;
         z-index: 2;
-        box-shadow:0px 5px 9px 0px rgba(204,204,204,1);
-        border-radius:0px 0px 10px 10px;
+        box-shadow: 0px 5px 9px 0px rgba(204, 204, 204, 1);
+        border-radius: 0px 0px 10px 10px;
         max-height: 176px;
         overflow-y: auto;
-        @{deep} .van-cell__title{
+
+        @{deep} .van-cell__title {
           width: 100%;
         }
+
         &__item {
-         &-title {
-           flex: 0 0 70%;
-           overflow : hidden;
-           text-overflow: ellipsis;
-           white-space: nowrap;
-         }
+          &-title {
+            flex: 0 0 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
 
           .tag {
             color: @blue;
@@ -229,6 +255,7 @@ import courseFilter from '../../components/courseFilter'
 
 
       }
+
 
     }
 
@@ -342,11 +369,13 @@ import courseFilter from '../../components/courseFilter'
       display: flex;
       align-items: center;
       justify-content: center;
+
       .submit-btn {
         flex: 1;
         border-radius: 21px;
         font-size: 16px;
       }
+
       .edit-btn {
         flex: 0 0 125px;
         border-radius: 21px;
@@ -354,10 +383,20 @@ import courseFilter from '../../components/courseFilter'
         margin-right: 20px;
         line-height: 30px;
         height: 30px;
-        &:last-child{
+
+        &:last-child {
           margin-right: 0;
         }
       }
+    }
+    .mask {
+      width: 100%;
+      height: calc(100% - 44px);
+      position: absolute;
+      background: rgba(0, 0, 0, .3);
+      z-index: 1;
+      left: 0;
+      top: 44px;
     }
   }
 </style>

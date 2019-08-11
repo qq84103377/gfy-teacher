@@ -1,0 +1,47 @@
+@charset "utf-8";
+
+/* 标签元素的预设值 */
+body, div, dl, dt, dd, ul, ol, li, pre, form, fieldset, input, textarea, p, blockquote, th, td {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: '微软雅黑', SimSun, Arial;
+    background-color: #fff;
+    font-size: 12px;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+fieldset, img {
+    border: 0;
+}
+ol, ul {
+    list-style: none;
+}
+a {
+    text-decoration: none;
+    outline: none;
+}
+
+/* 清除浮动 */
+.clearfix:before, .clearfix:after {
+    content: "";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+    overflow: hidden;
+}
+.clearfix {
+    zoom: 1;    /* for ie6 & ie7 */
+}
+.clear {
+    clear: both;
+    display: block;
+    font-size: 0;
+    height: 0;
+    line-height: 0;
+    overflow: hidden;
+}

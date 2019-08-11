@@ -1,0 +1,118 @@
+html,
+body,
+.wrapper {
+    height: 100%
+}
+
+.wrapper {
+    position: relative;
+    box-sizing: border-box
+}
+
+.wrapper .offCanvas,
+.wrapper .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /*height: calc(100% - 60px);*/
+    height: 100%;
+    width: 100%;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    box-shadow: 0 0 10px 3px #e2e2e2;
+    overflow: hidden;
+}
+
+.footer .control-button {
+    display: flex;
+    height: 100%
+}
+
+.control-button .item {
+    flex: 1;
+    text-align: center
+}
+
+.control-button .item img {
+    width: 22px;
+    height: 22px;
+    margin: 8px auto 5px;
+    display: block;
+}
+
+.control-button .item span {
+    color: #2e344a;
+    font-size: 12px
+}
+
+
+
+/*后面添加*/
+/*笔触设置*/
+.footer .pop-up{display:none;height:130px;padding:0 15px}
+.pop-up .title{font-size:14px;color:#eb4985;margin:10px 0 15px;text-align:center}
+.pop-up .title .closeBtn{background:url("../../assets/img/icon-bell.png") no-repeat;background-size:100%;width:20px;height:20px;float:right}
+.pop-up .colors{overflow:hidden}
+.pop-up .lineColors div{width:20%;float:left;margin:6px 0}
+.pop-up .lineColors span{display:block;width:28px;height:28px;margin:auto;border-radius:50%}
+.pop-up .lineColors span.red{background-color:#f00}
+.pop-up .lineColors span.blue{background-color:#00f}
+.pop-up .lineColors span.green{background-color:#0f0}
+.pop-up .lineColors span.black{background-color:#000}
+.pop-up .lineColors span.orange{background-color:#ff6302}
+.pop-up .sizes{margin-top:20px}
+.pop-up .sizes .lineSizes{height:30px;cursor:pointer}
+.pop-up .sizes .big{display:block;height:10px;width:100%;background-color:#eb4985;border-radius:3px}
+.pop-up .sizes .middle{display:block;height:6px;width:100%;background-color:#eb4985;border-radius:3px}
+.pop-up .sizes .small{display:block;height:3px;width:100%;background-color:#eb4985;border-radius:3px}
+.pop-up .list{height:80px;line-height:80px}
+.pop-up .list img{width:20%;float:left;padding:5px;box-sizing:border-box}
+/*橡皮檫样式*/
+.rubbers {
+    display: flex;
+    color: #2e344a;
+    font-size: 14px;
+    margin-top: 40px;
+}
+.rubbers div {
+    flex: 1;
+}
+.rubbers .second {
+    flex: 5;
+}
+.rubbers .second input { /*滑动条的样式*/
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 5px;
+    vertical-align: super;
+    background-color: #2e344a;
+}
+.rubbers .second input::-webkit-slider-thumb { /*滑动条的样式*/
+    -webkit-appearance: none;
+    height: 25px;
+    width: 25px;
+    background-color: #eb4985;
+    border-radius: 50%;
+}
+.rubbers .last {
+    text-align: right;
+}
+
+
+.history-panel .history {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+.history-panel .lineBox img {
+    width: 70px;
+    height: 70px;
+    border: 1px solid #2e344a;
+    margin-right: 8px;
+}

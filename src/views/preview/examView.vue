@@ -10,8 +10,8 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table id="ha" :classView="true" v-show="classView"></score-table>
-      <score-table v-for="a in 3" :key="a" :id="'ha' + a" :classView="false" v-show="!classView"></score-table>
+      <score-table :isSpoken="isSpoken" id="ha" :classView="true" v-show="classView"></score-table>
+      <score-table :isSpoken="isSpoken" v-for="a in 3" :key="a" :id="'ha' + a" :classView="false" v-show="!classView"></score-table>
     </div>
   </section>
 </template>
@@ -23,11 +23,14 @@
     data() {
       return {
         classView: true, //按班级查看
+        isSpoken: true
       }
     },
     components: {scoreTable},
     methods: {
       handleToggle(bol) {
+        //班级未分组时,无法切换小组查看 弹出toast
+        // this.$toast('该班级未分组,无法进行小组查看')
         this.classView = bol
       },
     }

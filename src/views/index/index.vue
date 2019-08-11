@@ -1,9 +1,27 @@
 <template>
     <section class="index-content-wrap">
       <div class="index-content-wrap__header">
-        <div>
-          <span>语文</span>
-          <van-icon class="fs16 black" name="arrow-down" />
+        <div id="gfy_dropdown">
+          <div @click="subjectShow = true">
+            <span>语文</span>
+            <van-icon class="fs16 black" name="arrow-down" />
+          </div>
+
+          <van-popup :overlay="false" v-model="subjectShow" get-container="#gfy_dropdown" class="score-pop">
+            <div style="position: relative;">
+              <div class="score-pop-wrap">
+                <div class="score-pop-wrap__item" @click="handleClosePop">数学</div>
+                <div class="score-pop-wrap__item" @click="handleClosePop">语文</div>
+                <div class="score-pop-wrap__item" @click="handleClosePop">英语</div>
+                <div class="score-pop-wrap__item" @click="handleClosePop">体育</div>
+                <div class="score-pop-wrap__item" @click="handleClosePop">美术</div>
+              </div>
+              <div class="parent">
+                <div class="child"></div>
+              </div>
+            </div>
+          </van-popup>
+
         </div>
         <i class="iconGFY icon-bell"></i>
       </div>
@@ -80,8 +98,14 @@
       components: {listItem},
       data() {
           return {
-            fold:false
+            fold:false,
+            subjectShow:false,
           }
+      },
+      methods: {
+        handleClosePop() {
+          this.subjectShow = false
+        },
       }
     }
 </script>
@@ -99,6 +123,62 @@
       align-items: center;
       font-weight: 600;
       color: @black;
+      #gfy_dropdown {
+        position: relative;
+        .score-pop {
+          left: -10%;
+          position: absolute;
+          max-height: inherit;
+          top: 140%;
+          transform: none;
+          overflow-y: inherit;
+          box-shadow:0px 5px 9px 0px rgba(83,167,163,1);
+          &-wrap {
+
+            &__item {
+              background: #fff;
+              text-align: center;
+              width: 108px;
+              line-height: 44px;
+              font-size: 14px;
+              border-top: 1px solid #eee;
+            }
+          }
+          .parent {
+              top: -10px;
+              left: 50%;
+            width: 0px;
+            height: 0px;
+            border-width: 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent #eee;
+            position: absolute;
+              transform: translateX(-50%);
+          }
+          .child {
+            width: 0px;
+            height: 0px;
+            border-width:0 9px 9px;
+            border-style:solid;
+            border-color:transparent transparent #fff;
+            position: absolute;
+            top: 1px;
+            left: -9px;
+          }
+          /*&::after {*/
+          /*  width: 0;*/
+          /*  height: 0;*/
+          /*  border-width: 0 10px 10px;*/
+          /*  border-style: solid;*/
+          /*  border-color: transparent transparent #fff;*/
+          /*  content: ' ';*/
+          /*  position: absolute;*/
+          /*  top: -10px;*/
+          /*  left: 50%;*/
+          /*  transform: translateX(-50%);*/
+          /*}*/
+        }
+      }
     }
     &__body {
       flex: 1;

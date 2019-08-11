@@ -5,8 +5,8 @@
           <div class="scroll-tab__item" v-for="a in 15" :key="a">{{a}}</div>
         </div>
         <div class="subject-analyse__body">
-          <div class="subject-analyse__body-top">
-            <div>山lǎng  rùn（     ）起来了，水涨起来了，太阳的脸红起来了。</div>
+          <div class="subject-analyse__body-top fs14">
+            <div class="fs16">山lǎng  rùn（     ）起来了，水涨起来了，太阳的脸红起来了。</div>
             <div>A 朗润</div>
             <div>A 朗润</div>
             <div>A 朗润</div>

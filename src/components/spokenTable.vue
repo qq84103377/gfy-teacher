@@ -1,0 +1,107 @@
+<template>
+  <div class="spoken-table" :class="{sticky:type=='analyse' || type == 'personal'}">
+    <div class="row table-head">
+      <div class="col">序号</div>
+      <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">词汇/句子</div>
+      <div class="col" v-if="type == 'statistic'">平均分</div>
+      <div class="col ex-width" v-if="type == 'analyse'">学生姓名</div>
+      <div class="col" v-if="type == 'analyse' || type == 'personal'">得分</div>
+      <div class="col" v-if="type == 'analyse' || type == 'personal'">学生录音</div>
+    </div>
+    <div class="scroll-area">
+      <div class="row" v-for="(item,index) in list" :key="index">
+        <div class="col">{{index+1}}</div>
+        <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">{{item.word}}</div>
+        <div class="col blue" v-if="type == 'statistic'" @click="$router.push(`/spokenAnalyse?type=analyse`)">{{item.average}} ></div>
+        <div class="col ex-width" v-if="type == 'analyse'">{{item.name}}</div>
+        <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
+        <div class="col" v-if="type == 'analyse' || type == 'personal'">
+          <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>
+          <audio :id="'audio'+ index" style="display: none;" :src="item.src"></audio>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+    export default {
+        name: "spokenTable",
+      props: ['type'], //statistic 统计页面  analyse 题目分析  personal 个人分析
+      data() {
+          return {
+            playIndex: null,
+            list: [
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+            ]
+          }
+      },
+      methods: {
+          play(index,item) {
+            this.$set(item,'play',!item.play)
+            document.getElementById('audio' + index).pause()
+            if(this.playIndex !== null) {
+              document.getElementById('audio' + this.playIndex).pause()
+              this.$set(this.list[this.playIndex],'play',false)
+            }
+            this.playIndex = index
+            document.getElementById('audio' + index).play()
+          }
+      }
+    }
+</script>
+
+<style lang="less" scoped>
+  .spoken-table {
+    border: 1px solid #F5F6FA;
+    border-top: 2px solid @blue;
+    border-bottom: none;
+    color: #333;
+    font-size: 12px;
+    width: 100%;
+
+    &.sticky {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      .scroll-area {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .table-head {
+        flex: 0 0 44px;
+      }
+    }
+
+    .row {
+      display: flex;
+      .col {
+        flex: 1;
+        text-align: center;
+        /*line-height: 44px;*/
+        height: 44px;
+        border-right: 1px solid #F5F6FA;
+        border-bottom: 1px solid #F5F6FA;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:last-child {
+          border-right: none;
+        }
+        &.ex-width {
+          flex: 2.5;
+        }
+      }
+    }
+    .audio-icon {
+      font-size: 22px;
+      vertical-align: middle;
+    }
+  }
+</style>

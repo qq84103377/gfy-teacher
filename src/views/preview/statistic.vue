@@ -14,11 +14,11 @@
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button type="info" class="notice-btn">一键提醒</van-button>
+          <van-button type="info" class="notice-btn" v-if="!isWk">一键提醒</van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
-      <div class="statistic-wrap__achievement">
+      <div class="statistic-wrap__achievement" v-if="!isWk&&!isSpoken">
         <div class="statistic-wrap__achievement-label divider">全班成绩概况:</div>
         <div class="statistic-wrap__achievement-score">
           <div>
@@ -35,38 +35,60 @@
           </div>
         </div>
       </div>
-      <div class="statistic-wrap__histogram">
+      <div class="statistic-wrap__histogram" v-if="!isWk&&!isSpoken">
         <div class="statistic-wrap__histogram-label">
           <span class="divider">试卷统计:</span>
           <span class="tag">人数</span>
         </div>
         <div id="myChart2" ref="myChart2" class="histogram-chart"></div>
       </div>
-      <div class="statistic-wrap__view">
+      <div class="statistic-wrap__view" v-if="!isWk">
         <div class="statistic-wrap__view-tab">
           <div class="active">按题目查看</div>
           <div @click="$router.push(`/examView`)">按学生查看</div>
         </div>
-        <div class="fs12 black statistic-wrap__view-label">主观题</div>
-        <div class="statistic-wrap__view-subject">
-          <div class="statistic-wrap__view-subject-item" v-for="a in 8" :key="a">
-            <div class="pd5">
-              <div>主观题(1题)</div>
-              <div>平均分: 0.00</div>
-              <div>总分:5</div>
+        <div v-if="!isSpoken">
+          <div class="fs12 black statistic-wrap__view-label">主观题</div>
+          <div class="statistic-wrap__view-subject">
+            <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="a in 8" :key="a">
+              <div class="pd5">
+                <div>主观题(1题)</div>
+                <div>平均分: 0.00</div>
+                <div>总分:5</div>
+              </div>
+              <div class="status">已批改</div>
             </div>
-            <div class="status">已批改</div>
+          </div>
+          <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
+          <div id="myChart3" ref="myChart3" class="subject-pie"></div>
+        </div>
+        <div v-else>
+          <spoken-table type="statistic"></spoken-table>
+        </div>
+      </div>
+      <div class="statistic-wrap__view" v-else>
+        <div class="statistic-wrap__view-tab">
+          <div :class="{active:!tabIndex}" @click="tabIndex=0">微课详情</div>
+          <div :class="{active:tabIndex}" @click="tabIndex=1">学生心得详情</div>
+        </div>
+        <div v-if="!tabIndex">
+          <video style="width: 100%;" controls src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718090841_X3NZH_测试.MP4"></video>
+          <div class="statistic-wrap__view-desc">
+            <div class="statistic-wrap__view-desc-cover"></div>
+            <div class="statistic-wrap__view-desc-content">
+              <div class="statistic-wrap__view-desc-content-title fs14">我只是个标题我只是个标题我只是个标题我只是我只是个标题我只是个标题我</div>
+              <div class="grey6 fs12">发布者:高分云教育1</div>
+              <div class="grey6 fs12 aic"><van-icon name="clock-o" />2019-06-03 14:51:45<van-icon class="pdlt10" name="points" />0</div>
+            </div>
           </div>
         </div>
-        <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
-        <div id="myChart3" ref="myChart3" class="subject-pie"></div>
-
+        <stu-exp v-else></stu-exp>
       </div>
     </div>
 
     <div class="statistic-wrap__footer">
-      <van-button class="btn" type="info">加分/减分</van-button>
-      <van-button class="btn" type="info">分享报告</van-button>
+      <van-button class="btn" type="info" @click="$router.push(`/addSubScore`)">加分/减分</van-button>
+      <van-button class="btn" type="info" @click="$router.push(`/briefing`)">分享报告</van-button>
     </div>
 
 
@@ -77,26 +99,31 @@
           <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false"/>
         </div>
         <div class="stat-dialog-wrap__body">
-          <span v-for="(item,index) in stuStatInfo.stu" :key="index">{{item}},</span>
+          <div v-for="(item,index) in stuStatInfo.stu" :key="index">{{item}}</div>
         </div>
-        <div class="stat-dialog-wrap__footer">
-          <van-button class="dialog-btn" type="info" @click="stuStatInfo.statDialog=false">确定</van-button>
-        </div>
+<!--        <div class="stat-dialog-wrap__footer">-->
+<!--          <van-button class="dialog-btn" type="info" @click="stuStatInfo.statDialog=false">确定</van-button>-->
+<!--        </div>-->
       </div>
     </van-dialog>
   </section>
 </template>
 
 <script>
+  import spokenTable from '../../components/spokenTable'
   import echarts from "echarts";
-
+  import stuExp from '../../components/stuExp'
   export default {
     name: "statistic",
+    components: {stuExp,spokenTable},
     data() {
       return {
+        isSpoken: true,
+        tabIndex: 0,
+        isWk: false,
         stuStatInfo: {
           title: '',
-          stu: ['撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊', '撒大声地阿达阿萨德as啊',],
+          stu: ['撒大声地阿达', '撒大声', '撒大', '撒大声地阿', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达',],
           statDialog: false
         },
         classList: [{name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'},],
@@ -276,8 +303,10 @@
     },
     mounted() {
       this.drawPie()
-      this.drawHistogram()
-      this.drawObjectivePie()
+      if(!this.isWk&&!this.isSpoken) {
+        this.drawHistogram()
+        this.drawObjectivePie()
+      }
     }
   }
 </script>
@@ -432,6 +461,10 @@
       padding: 15px 10px;
       margin-top: 5px;
       background: #fff;
+      >video {
+        width: 100%;
+        height: 200px;
+      }
 
       &-tab {
         display: flex;
@@ -489,6 +522,23 @@
           }
         }
       }
+
+      &-desc {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        &-cover {
+          flex: 0 0 69px;
+          height: 74px;
+          border-radius: 5px;
+          background: #b9fff8;
+          margin-right: 4px;
+        }
+        &-content {
+
+        }
+      }
     }
 
     &__footer {
@@ -542,6 +592,13 @@
         font-size: 14px;
         color: #666;
         padding: 10px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        div {
+          flex: 0 0 66px;
+          padding: 4px;
+          text-align: center;
+        }
       }
 
       &__footer {
