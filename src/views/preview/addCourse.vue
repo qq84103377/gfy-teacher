@@ -12,7 +12,7 @@
           <div slot="input" class="input-wrap">
             <input maxlength="64" v-model="form.name" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
             <span class="num-tip">{{64 - form.name.length}}</span>
-            <van-icon @click="form.name = ''" class="close" name="close"/>
+            <van-icon @click="form.name = ''" class="close" name="clear"/>
           </div>
           <div v-if="!isEdit" slot="right-icon" class="fs14 blue">
             筛选
@@ -87,7 +87,7 @@
             </van-radio-group>
           </div>
           <div class="time-group">
-            <span class=" fs12">{{className}}</span>
+            <span class=" fs14 mgr10 class-name" :style="{width:className.length>6?'100%':'auto'}">{{className}}</span>
             <div style="display: flex;align-items: center;flex: 1">
               <div @click="showTime=true" class="time-view">{{form.time1}}</div>
               <span class="divider">~</span>
@@ -174,7 +174,7 @@
         list: ['a', 'b', 'c'],
         result: [],
         currentDate: new Date(),
-        className: '电话的的的',
+        className: '电话的的的123',
       }
     },
     computed: {
@@ -313,21 +313,22 @@
     .time-group {
       align-items: center;
       background: #f5f6fa;
-      border-radius: 10px 10px 0px 0px;
+      border-radius: 10px;
       display: flex;
       padding: 10px;
       justify-content: space-between;
       flex-wrap: wrap;
       margin-bottom: 5px;
-      padding-right: 0;
+      .class-name {
 
+      }
       .divider {
         margin: 0 5px;
       }
 
       .time-view {
         flex: 1;
-        width: 120px;
+        /*width: 120px;*/
         height: 18px;
         background: #fff;
         border-radius: 10px;
@@ -335,6 +336,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: 10px;
       }
     }
 

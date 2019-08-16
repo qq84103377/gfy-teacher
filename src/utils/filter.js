@@ -42,5 +42,20 @@ let pad2 = (n) => {
   return n < 10 ? '0' + n : n
 }
 
-
-export {ellipsis, formatSeconds, generateTimeReqestNumber}
+// 时间戳转换为yyyyMMddhhmmss
+let fillZero = (n) => {
+  let result = (n).toString().length === 1 ? ('0' + n): n;
+  return result;
+}
+let formatTime = (t = new Date()) => {
+  let d = new Date(t);
+  let year = d.getFullYear();
+  let month = d.getMonth() + 1;
+  let date = d.getDate();
+  let hours = d.getHours();
+  let minutes = d.getMinutes();
+  let seconds = d.getSeconds();
+  let result = `${year}-${fillZero(month)}-${fillZero(date)} ${fillZero(hours)}:${fillZero(minutes)}:${fillZero(seconds)}`;
+  return result;
+}
+export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime}

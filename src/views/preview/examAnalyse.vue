@@ -20,21 +20,21 @@
       <div class="score-table">
         <div class="col">
           <div>#</div>
-          <div v-for="a in 25" :key="a" @click="handleCharts(a)">陈超怀</div>
+          <div v-for="(item,index) in list" :key="index" @click="handleCharts(index,item,0)" :class="{blue:item.active}">{{item.name}}</div>
           <div>平均分</div>
           <div>得分率</div>
         </div>
         <div class="scroll-content">
-          <div v-for="a in 5" :key="a" class="col">
-            <div @click="handleCharts(a)">第一题</div>
-            <div v-for="a in 25" :key="a">5</div>
+          <div v-for="(item,index) in list[0].exam.arr" :key="index" class="col" :class="{'one-item':list[0].exam.arr.length==1}">
+            <div @click="handleCharts(index,item,1)" :class="{blue:item.active}">第{{index+1}}题</div>
+            <div v-for="(a,i) in list" :key="i">{{a.exam.arr[index].point}}</div>
             <div>33%</div>
             <div>10%</div>
           </div>
         </div>
         <div class="col">
           <div>总分</div>
-          <div v-for="a in 25" :key="a">6</div>
+          <div v-for="(item,index) in list" :key="index">{{item.total}}</div>
           <div>-</div>
           <div>-</div>
         </div>
@@ -57,14 +57,35 @@
       return {
         isExam: true,
         scoreChartShow: false,
+        stuIndex: 0,
+        examIndex: 0,
+        list: [
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
+        ]
       }
     },
     methods: {
       backTop() {
         this.$refs['scrollCtn'].scrollTo(0, 0)
       },
-      handleCharts(index) {
+      handleCharts(index,item,flag) {
         this.scoreChartShow = true
+        if(flag) {
+          //点击题目
+          this.$set(this.list[this.examIndex],'active',false)
+          this.examIndex = index
+        }else {
+          //点击学生
+          this.$set(this.list[this.stuIndex],'active',false)
+          this.stuIndex = index
+        }
+        this.$set(item,'active',true)
         this.$nextTick(() => {
           this.drawHistogramScore(index)
           this.$refs['scrollCtn'].scrollTo(0, this.$refs['scrollCtn'].scrollHeight)
@@ -197,7 +218,7 @@
             }
           ],
           grid: {
-            top: '15%',
+            top: '25%',
             left: '3%',
             right: '2%',
             bottom: '1%',
@@ -406,7 +427,7 @@
         padding: 0 15px;
 
         &.active {
-          background: linear-gradient(0deg, rgba(140, 247, 238, 1), rgba(57, 240, 221, 1));
+          background: linear-gradient(0deg,  rgba(57, 240, 221, 1),rgba(140, 247, 238, 1));
           color: #fff;
         }
 
@@ -422,6 +443,7 @@
         font-size: 15px;
         padding-left: 10px;
         line-height: 26px;
+        margin-bottom: 10px;
       }
 
       .chart-pie {
@@ -431,13 +453,13 @@
     }
 
     &__histogram {
-      padding-bottom: 10px;
+      padding-bottom: 30px;
       margin-bottom: 10px;
     }
 
     .chart-histogram {
       width: 100%;
-      height: 200px;
+      height: 250px;
     }
 
     .desc {
@@ -489,6 +511,9 @@
           &:first-child, &:nth-last-child(2), &:last-child {
             background: #e0fffc;
           }
+        }
+        &.one-item {
+          flex: 1;
         }
       }
 

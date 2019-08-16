@@ -181,6 +181,7 @@
             height: 10px;
             display: inline-block;
             vertical-align: middle;
+            margin-right: 5px;
           }
         }
         @{deep} .van-dropdown-item__content {

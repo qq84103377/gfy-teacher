@@ -17,7 +17,7 @@
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">
           <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>
-          <audio :id="'audio'+ index" style="display: none;" :src="item.src"></audio>
+          <audio :id="'audio'+ index" :src="item.src"></audio>
         </div>
       </div>
     </div>
@@ -36,23 +36,56 @@
               {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
               {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
               {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
             ]
           }
       },
       methods: {
           play(index,item) {
-            this.$set(item,'play',!item.play)
-            document.getElementById('audio' + index).pause()
-            if(this.playIndex !== null) {
-              document.getElementById('audio' + this.playIndex).pause()
-              this.$set(this.list[this.playIndex],'play',false)
+            this.$emit('play')
+            if(item.play) {
+              this.$set(item,'play',false)
+              document.getElementById('audio' + index).pause()
+            } else {
+              if(this.playIndex !== null) {
+                // 上一个正在播放的音频暂停
+                document.getElementById('audio' + this.playIndex).pause()
+                this.$set(this.list[this.playIndex],'play',false)
+              }
+              this.playIndex = index
+              this.$set(item,'play',true)
+              document.getElementById('audio' + index).play()
+              document.getElementById('audio' + index).removeEventListener('ended', this.playEndedHandler, false)
+              document.getElementById('audio' + index).addEventListener('ended', () => {
+                this.$set(item,'play',false)
+              }, false)
             }
-            this.playIndex = index
-            document.getElementById('audio' + index).play()
+          },
+        playAll() {
+          if(this.playIndex !== null) {
+            // 上一个正在播放的音频暂停
+            document.getElementById('audio' + this.playIndex).pause()
+            this.$set(this.list[this.playIndex],'play',false)
           }
+          this.playIndex = 0
+          const audio = document.getElementById('audio' + this.playIndex)
+          this.$set(this.list[this.playIndex],'play',true)
+          audio.play()
+          audio.addEventListener('ended', this.playEndedHandler, false)
+        },
+        playEndedHandler() {
+          this.$set(this.list[this.playIndex],'play',false)
+          this.playIndex++
+          if (this.playIndex > this.list.length - 1) return
+          const audio = document.getElementById('audio' + this.playIndex)
+          audio.play()
+          this.$set(this.list[this.playIndex],'play',true)
+          audio.addEventListener('ended', this.playEndedHandler, false)
+        },
+        pauseAll() {
+          this.$set(this.list[this.playIndex],'play',false)
+          document.getElementById('audio' + this.playIndex).removeEventListener('ended', this.playEndedHandler, false)
+          document.getElementById('audio' + this.playIndex).pause()
+        }
       }
     }
 </script>
@@ -67,7 +100,7 @@
     width: 100%;
 
     &.sticky {
-      height: 100%;
+      max-height: 100%;
       display: flex;
       flex-direction: column;
       .scroll-area {

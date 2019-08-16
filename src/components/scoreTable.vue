@@ -1,34 +1,52 @@
 <template>
-  <table :id="id" class="score-table">
-    <tr>
-      <th v-show="!classView" class="team-th">组名</th>
-      <th v-show="!classView">平均分</th>
-      <th>学生姓名</th>
-      <th>用时</th>
-      <th>测试得分</th>
-    </tr>
-    <tr v-for="a in 5" :key="a">
-      <td v-show="!classView">
-        <div class="team-td">容桂初一智慧一班第一组</div>
-      </td>
-      <td v-show="!classView">89</td>
-      <td>G7101</td>
-      <td>20分30秒</td>
-      <td @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">89 ></td>
-    </tr>
-  </table>
+
+  <div class="score-table">
+    <div class="header">
+      <span class="header-item team-col" v-if="!classView">组名</span>
+      <span class="header-item average" v-if="!classView">平均分</span>
+      <span class="header-item">学生姓名</span>
+      <span class="header-item">用时</span>
+      <span class="header-item score">测试得分</span>
+    </div>
+    <div class="row">
+      <div class="row-item team-col" v-if="!classView">桂容桂容桂</div>
+      <div class="row-item average" v-if="!classView">89</div>
+      <div class="row-item">
+        <div v-for="a in 3" :key="a">欧阳锋</div>
+      </div>
+      <div class="row-item">
+        <div v-for="a in 3" :key="a">20分30秒</div>
+      </div>
+      <div class="row-item  score blue">
+        <div v-for="a in 3" :key="a" @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">89 ></div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
   export default {
     name: "scoreTable",
     props: ['id', 'classView', 'list','isSpoken'],
+    data() {
+      return {
+        tableData: [
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
+        ]
+      }
+    },
     mounted() {
         if(!this.classView) {
          this.$nextTick(() => {
            //要先从后面的列开始合并 不然会出错
-           this.mergeCell(this.id,0,0,1)
-           this.mergeCell(this.id,0,0,0)
+           // this.mergeCell(this.id,0,0,1)
+           // this.mergeCell(this.id,0,0,0)
          })
         }
     },
@@ -43,6 +61,21 @@
     //   }
     // },
     methods: {
+      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex === 0) {
+          if (rowIndex % 2 === 0) {
+            return {
+              rowspan: 2,
+              colspan: 1
+            };
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            };
+          }
+        }
+      },
       mergeCell(table1, startRow, endRow, col) {
         let tb = document.getElementById(table1);
         if (!tb || !tb.rows || tb.rows.length <= 0) {
@@ -79,29 +112,66 @@
     border-collapse: collapse;
     margin-bottom: 15px;
 
-    tr {
-      th, td {
+    .header {
+      line-height: 44px;
+      display: flex;
+      align-items: center;
+      .header-item {
+        flex: 1;
         text-align: center;
-        line-height: 44px;
         border-right: 1px solid #F5F6FA;
         border-bottom: 1px solid #F5F6FA;
+        &.team-col {
+          flex: 0 0 10%;
+        }
+        &.average {
+          flex: 0 0 15%;
+        }
 
+        &.score {
+          flex: 0 0 18%;
+        }
         &:last-child {
           border-right: none;
         }
       }
+    }
+    .row {
+      display: flex;
+      .row-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-right: 1px solid #F5F6FA;
+        border-bottom: 1px solid #F5F6FA;
+        &.team-col {
+          flex: 0 0 10%;
+          padding: 0 10px;
+        }
 
-      td:last-child {
-        color: @blue;
-      }
-
-      .team-th {
-        width: 70px;
-      }
-
-      .team-td {
-        width: 12px;
-        margin: 0 auto;
+        &.average {
+          flex: 0 0 15%;
+        }
+        &.score {
+          flex: 0 0 18%;
+        }
+        &:last-child {
+          border-right: none;
+        }
+        >div {
+          width: 100%;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 44px;
+          border-bottom: 1px solid #F5F6FA;
+          &:last-child {
+            border-bottom: none;
+          }
+        }
       }
     }
   }

@@ -1,5 +1,10 @@
 <template>
     <section class="index-content-wrap">
+      <van-overlay
+        :show="subjectShow"
+        @click="subjectShow = false"
+        z-index="99"
+      />
       <div class="index-content-wrap__header">
         <div id="gfy_dropdown">
           <div @click="subjectShow = true">
@@ -36,7 +41,7 @@
             <div class="icon-wrap green"><i class="iconGFY icon-play"></i></div>
             <div>课中</div>
           </div>
-          <div class="index-content-wrap__body__main-icon-item">
+          <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/resource`)">
             <div class="icon-wrap yellow"><i class="iconGFY icon-res"></i></div>
             <div>资源</div>
           </div>
@@ -46,10 +51,10 @@
           </div>
         </div>
         <div class="jcsb aic mgb10">
-          <span class="fs16 black">未完成任务</span>
+          <span class="fs16 black">未结束任务</span>
           <span class="blue fs12">查看更多></span>
         </div>
-        <div class="index-content-wrap__body__unfinish-wrap">
+        <div v-for="a in 2" :key="a" class="index-content-wrap__body__unfinish-wrap">
           <list-item :fold="fold">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="fold=!fold">
@@ -206,16 +211,16 @@
             align-items: center;
             justify-content: center;
             &.blue {
-              background: linear-gradient(0deg,rgba(149,249,238,1),rgba(37,219,241,1));
+              background: linear-gradient(0deg,rgba(37,219,241,1),rgba(149,249,238,1));
             }
             &.green {
-              background: linear-gradient(0deg,rgba(190,243,89,1),rgba(107,218,33,1));
+              background: linear-gradient(0deg,rgba(107,218,33,1),rgba(190,243,89,1));
             }
             &.yellow {
-              background: linear-gradient(0deg,rgba(247,220,64,1),rgba(255,173,30,1));
+              background: linear-gradient(0deg,rgba(255,173,30,1),rgba(247,220,64,1));
             }
             &.orange {
-              background: linear-gradient(0deg,rgba(252,164,99,1),rgba(232,118,35,1));
+              background: linear-gradient(0deg,rgba(232,118,35,1),rgba(252,164,99,1));
             }
           }
         }
@@ -223,6 +228,7 @@
       &__unfinish-wrap {
         border: 1px solid #eee;
         border-radius: 5px;
+        margin-bottom: 10px;
       }
       .divider-title{
         margin: 30px 0 15px;

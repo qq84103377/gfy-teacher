@@ -59,7 +59,7 @@
         padding: 0 15px;
 
         &.active {
-          background: linear-gradient(0deg, rgba(140, 247, 238, 1), rgba(57, 240, 221, 1));
+          background: linear-gradient(0deg, rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
           color: #fff;
         }
 

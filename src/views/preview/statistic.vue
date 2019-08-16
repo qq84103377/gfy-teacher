@@ -18,7 +18,7 @@
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
-      <div class="statistic-wrap__achievement" v-if="!isWk&&!isSpoken">
+      <div class="statistic-wrap__achievement">
         <div class="statistic-wrap__achievement-label divider">全班成绩概况:</div>
         <div class="statistic-wrap__achievement-score">
           <div>
@@ -78,7 +78,7 @@
             <div class="statistic-wrap__view-desc-content">
               <div class="statistic-wrap__view-desc-content-title fs14">我只是个标题我只是个标题我只是个标题我只是我只是个标题我只是个标题我</div>
               <div class="grey6 fs12">发布者:高分云教育1</div>
-              <div class="grey6 fs12 aic"><van-icon name="clock-o" />2019-06-03 14:51:45<van-icon class="pdlt10" name="points" />0</div>
+              <div class="grey6 fs12 aic desc"><van-icon name="clock-o" />2019-06-03 14:51:45<i class="iconGFY icon-points mglt10"></i>0</div>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@
       return {
         isSpoken: true,
         tabIndex: 0,
-        isWk: false,
+        isWk: true,
         stuStatInfo: {
           title: '',
           stu: ['撒大声地阿达', '撒大声', '撒大', '撒大声地阿', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达',],
@@ -163,9 +163,9 @@
                   // normal: {
                   //   show: true
                   // },
-                  // emphasis: {
-                  //   show: true
-                  // },
+                  emphasis: {
+                    show: true
+                  },
                   position: 'outside',
                   formatter: `{b}{d}%>\n({c}人)`,
                   align: 'left'
@@ -180,8 +180,8 @@
                 },
                 itemStyle: {
                   emphasis: {
-                    shadowBlur: 30,
-                    shadowColor: '#000'
+                    shadowBlur: 10,
+                    shadowColor: '#ccc',
                   }
                 },
                 data: [
@@ -367,7 +367,7 @@
         /*}*/
 
         &.active {
-          background: linear-gradient(0deg, rgba(140, 247, 238, 1), rgba(57, 240, 221, 1));
+          background: linear-gradient(0deg, rgba(57, 240, 221, 1),rgba(140, 247, 238, 1));
           color: #fff;
         }
       }
@@ -536,7 +536,11 @@
           margin-right: 4px;
         }
         &-content {
-
+          .desc {
+            i {
+              margin-right: 3px;
+            }
+          }
         }
       }
     }

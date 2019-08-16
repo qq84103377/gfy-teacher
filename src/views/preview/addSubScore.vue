@@ -54,7 +54,7 @@
         scoreShow: false,
         checkbox: 0,
         list: [{
-          name: '满分',
+          name: '满分100',
           stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]
         }, {name: '90-99分', stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'},]}, {
           name: '80-89分',

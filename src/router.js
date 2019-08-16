@@ -9,7 +9,7 @@ export default new Router({
     {
       path: '/',
       component: Home,
-      // component: () => import('./views/login/Index.vue')
+      // component: () => import('./views/login/index.vue')
       redirect: '/index',
       children: [
         {
@@ -113,13 +113,128 @@ export default new Router({
           path: '/spokenAnalyse',
           name: 'spokenAnalyse',
           component: () => import('./views/preview/spokenAnalyse.vue')
+        },
+        {
+          path: '/resource',
+          name: 'resource',
+          component: () => import('./views/resource/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '资源'
+          }
+        },
+        {
+          path: '/lessonList',
+          name: 'lessonList',
+          component: () => import('./views/resource/lessonList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '微课'
+          }
+        },
+        {
+          path: '/uploadLesson',
+          name: 'uploadLesson',
+          component: () => import('./views/resource/uploadLesson.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '上传微课'
+          }
+        },
+        {
+          path: '/teamSelect',
+          name: 'teamSelect',
+          component: () => import('./views/resource/teamSelect.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '选择发布范围'
+          }
+        },
+        {
+          path: '/taskDetail',
+          name: 'taskDetail',
+          component: () => import('./views/resource/taskDetail.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '任务详情'
+          }
+        },
+        {
+          path: '/materialList',
+          name: 'materialList',
+          component: () => import('./views/resource/materialList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '素材'
+          }
+        },
+        {
+          path: '/uploadImg',
+          name: 'uploadImg',
+          component: () => import('./views/resource/uploadImg.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '上传图片'
+          }
+        },
+        {
+          path: '/uploadWare',
+          name: 'uploadWare',
+          component: () => import('./views/resource/uploadWare.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '上传课件'
+          }
+        },
+        {
+          path: '/examList',
+          name: 'examList',
+          component: () => import('./views/resource/examList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '试卷'
+          }
+        },
+        {
+          path: '/questionList',
+          name: 'questionList',
+          component: () => import('./views/resource/questionList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '试题'
+          }
+        },
+        {
+          path: '/examDetail',
+          name: 'examDetail',
+          component: () => import('./views/resource/examDetail.vue')
+        },
+        {
+          path: '/materialDetail',
+          name: 'materialDetail',
+          component: () => import('./views/resource/materialDetail.vue')
+        },
+        {
+          path: '/addTask',
+          name: 'addTask',
+          component: () => import('./views/resource/addTask.vue')
         }
       ]
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('./views/login/Index.vue')
+      component: () => import('./views/login/index.vue')
+    },
+    {
+      path: '/forgetPwd',
+      name: 'forgetPwd',
+      component: () => import('./views/login/forgetPwd.vue')
+    },
+    {
+      path: '/resetPwd',
+      name: 'resetPwd',
+      component: () => import('./views/login/resetPwd.vue')
     }
   ]
 })

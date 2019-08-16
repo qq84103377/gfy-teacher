@@ -79,11 +79,11 @@ Object.keys(myFilter).forEach(key => {
 Vue.config.productionTip = false
 //
 router.beforeEach((to, from, next) => {
-  if (to.path == '/login') {
-    if (store.getters.getThirdInfo) {
-      next('/index')
-    }
-  }
+  // if (to.path == '/login') {
+  //   if (store.getters.getThirdInfo) {
+  //     next('/index')
+  //   }
+  // }
   next()
 })
 new Vue({

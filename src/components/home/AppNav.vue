@@ -41,7 +41,7 @@ export default {
           title: "资源中心",
           normal: require("../../assets/img/icon-res1.png"),
           active: require("../../assets/img/icon-res1-active.png"),
-          path: "/activity"
+          path: "/resource"
         },
         {
           title: "教学统计",
@@ -90,7 +90,7 @@ export default {
         height: 22px;
       }
       .actived {
-        color: #57c3fe;
+        color: @blue;
       }
     }
   }

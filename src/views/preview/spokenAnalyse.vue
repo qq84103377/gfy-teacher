@@ -6,9 +6,9 @@
         left-arrow>
       </van-nav-bar>
       <div class="spoken-analyse__topic" v-if="$route.query.type == 'analyse'">app</div>
-     <div class="play-all-wrap"> <div class="play-all" v-if="$route.query.type == 'personal'">播放全部</div></div>
+     <div class="play-all-wrap" v-if="$route.query.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>
       <div class="spoken-analyse__body">
-        <spoken-table :type="$route.query.type"></spoken-table>
+        <spoken-table @play="isPlay = false" ref="spoken" :type="$route.query.type"></spoken-table>
       </div>
       <div class="spoken-analyse__footer"  v-if="$route.query.type == 'analyse'">
         <van-button class="btn mgr10" type="info">上一题</van-button>
@@ -21,8 +21,22 @@
   import spokenTable from '../../components/spokenTable'
     export default {
         name: "spokenAnalyse",
+      data() {
+        return {
+          isPlay: false,
+        }
+      },
       components: {spokenTable},
-      computed: {
+      methods: {
+          playAll() {
+            if(this.isPlay) {
+              this.isPlay=false
+              this.$refs['spoken'].pauseAll()
+            }else {
+              this.isPlay=true
+              this.$refs['spoken'].playAll()
+            }
+          }
       }
     }
 </script>
@@ -39,10 +53,8 @@
       align-items: center;
       justify-content: center;
       font-size: 18px;
-      margin-bottom: 10px;
     }
     .play-all-wrap {
-      margin-top: 24px;
       padding: 10px 10px 0;
       background: #fff;
       .play-all {
@@ -65,6 +77,12 @@
           position: absolute;
           left: 8px;
           top: 50%;
+        }
+        &.is-play::before {
+          content: '||';
+          border: none;
+          transform: none;
+          top: auto;
         }
       }
 

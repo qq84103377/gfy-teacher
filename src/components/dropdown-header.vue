@@ -6,7 +6,7 @@
         <div style="flex: 1;overflow-y: auto" class="pd10">
           <div v-for="(item,index) in list" :key="index" class="list-wrap">
             <list-item :fold="item.fold" class="mgt10" style="background: #fff;">
-              <div @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right">●●●</div>
+              <div @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right"><i class="iconGFY icon-ellipsis"></i></div>
             </list-item>
           </div>
         </div>

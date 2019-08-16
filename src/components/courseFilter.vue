@@ -5,6 +5,10 @@
     position="bottom"
     :style="{ height: '93%' }">
     <div class="course-filter-wrap">
+      <van-overlay
+        :show="gradeDropdown||termDropdown||versionDropdown"
+        @click="gradeDropdown = false;termDropdown=false;versionDropdown=false"/>
+
       <div class="course-filter-wrap__header van-hairline--bottom">
         <div class="course-filter-wrap__header-tab">
           <span :class="{'active':item.active}" v-for="(item,index) in subjectList" :key="index"
@@ -50,7 +54,7 @@
               <van-icon @click="$set(item,'fold',!item.fold)" class="down-arrow"
                         :name="item.fold?'arrow-up':'arrow-down'"/>
             </div>
-            <div @click="$set(c,'check',!c.check)" :class="['course-sec',{active:c.check}]" v-show="item.fold"
+            <div @click="handleSelect(c)" :class="['course-sec',{active:c.check}]" v-show="item.fold"
                  v-for="(c,ci) in item.child" :key="ci">说和做——记闻一多先生言行片段
               <van-icon v-show="c.check" class="check blue" name="success"/>
             </div>
@@ -92,6 +96,14 @@
       }
     },
     methods: {
+      handleSelect(item) {
+        this.courseList.forEach(v => {
+          v.child.forEach(_v => {
+            this.$set(_v,'check',false)
+          })
+        })
+        this.$set(item,'check',!item.check)
+      },
       handleSubject(item) {
         if (item.active) return
         this.subjectList.forEach(v => {
