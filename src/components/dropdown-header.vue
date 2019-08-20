@@ -2,16 +2,18 @@
   <div class="dropdown-header van-hairline--bottom">
     <slot name="left"></slot>
     <van-dropdown-menu active-color="none" class="dropdown-btn">
-      <van-dropdown-item title="筛选" ref="dropdown">
+      <van-dropdown-item ref="dropdown" :title="courseName" :value="tchCourseId">
         <div style="flex: 1;overflow-y: auto" class="pd10">
           <div v-for="(item,index) in list" :key="index" class="list-wrap">
-            <list-item :fold="item.fold" class="mgt10" style="background: #fff;">
+            <list-item :fold="item.fold" class="mgt10" style="background: #fff;"  :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" >
               <div @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right"><i class="iconGFY icon-ellipsis"></i></div>
             </list-item>
+
           </div>
         </div>
         <div class="folder-btn" @click="$refs['dropdown'].toggle({show:false})"><i class="iconGFY icon-fold"></i></div>
       </van-dropdown-item>
+
     </van-dropdown-menu>
     <slot name="right"></slot>
   </div>
@@ -21,8 +23,20 @@
   import listItem from './list-item'
     export default {
         name: "dropdown-header",
-      props: ['list'],
-      components: {listItem}
+      props: ['list','courseName','tchCourseId'],
+      components: {listItem},
+      data(){
+          return {
+            courseList: this.list
+          }
+      },
+      methods:{
+        chooseCourse(obj){
+          console.log({"选择课程":obj})
+          console.log(obj.tchCourseInfo.tchCourseId)
+          this.$parent.getCourseTaskList(obj.tchCourseInfo.courseName,obj.tchCourseInfo.tchCourseId)
+        }
+      }
     }
 </script>
 

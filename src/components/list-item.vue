@@ -5,12 +5,14 @@
       <div class="aic mgb15" @click="$emit('clickTo')">
         <div class="icon-wrap" v-if="$slots.cover"><slot name="cover"></slot></div>
         <div style="flex: 1">
-          <div class="title"><i class="iconGFY icon-comment"></i>
-            我是邓稼先的微课程标题我是邓稼先的微课程标题我是邓稼先fsdfsdsfsdf微课程标题我是邓稼先微课程标题我是邓稼先微课程标题我是邓稼先
+          <div class="title" @click="choose"><i class="iconGFY " :class="{'icon-comment':taskType=='T01','icon-exam':taskType=='T02',
+          'icon-test':taskType=='T03','icon-learn-res':taskType =='T04' && testPaperId!=0,
+          'icon-learn-res-exp':taskType =='T04' && testPaperId==0,'icon-discuss':taskType =='T06','icon-spoken':taskType =='T13'}"></i>
+            {{itemTitle}}
           </div>
           <div v-if="$slots.desc"><slot name="desc"></slot></div>
           <div v-else class="mgt15">
-            <div class="time" v-for="(item,index) in 5" :key="item" v-if="(index<2&&!fold) || fold">龙江智慧一班:2019-07-04 14:42:00 -- 2019-07-31 14:42:00</div>
+            <div class="time" v-for="(item,index) in classInfoList" :key="index" v-if="(index<2&&!fold) || fold">{{item.className}}:{{item.startDate}} -- {{item.endDate}}</div>
           </div>
         </div>
       </div>
@@ -37,9 +39,14 @@
 <script>
     export default {
         name: "list-item",
-      props: ['canSlide','fold'],
+        props: ['canSlide','fold','itemTitle','taskType','testPaperId','classInfoList'],
       data() {
           return {
+
+          }
+      },
+      methods:{
+          choose(){
 
           }
       }

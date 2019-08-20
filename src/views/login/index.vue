@@ -96,7 +96,7 @@
         disabled: false,
         loginDisabled: true,
         isLanding: false,// 是否登录ing
-        isMobileLogin: true,
+        isMobileLogin: false,
         username: '',
         password: '',
         loginDisabled2: true,
@@ -209,9 +209,9 @@
           'interUser': 'runLfb',
           'interPwd': '25d55ad283aa400af464c76d713c07ad',
           'phoneNo': this.mobile,
-          'sysType': '502',
+          'sysType': 'S03',
           'validateCode': this.vailcode,
-          'roleType': 'A04'
+          'roleType': 'A02'
         }
 
         let params = {
@@ -259,8 +259,9 @@
           'interUser': 'runLfb',
           'interPwd': '25d55ad283aa400af464c76d713c07ad',
           'phoneNoOrName': this.username,
-          'sysType': '502',
+          'sysType': 'S03',
           'passwordNo': hex_md5(this.password),
+          'roleType':'A02'
         }
 
         let params = {
@@ -271,22 +272,15 @@
           this.loginBtnLoading = false
           console.log(res)
           if (res.flag) {
+            console.log(res.data[0].loginInfoVo.usrInfo.roleType);
+            if (res.data[0].loginInfoVo.usrInfo.roleType != 'A02') {
+              this.$toast("请输入老师账号");
+              return;
+            }
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
 
-             this.$store.commit('SET_LOGININFO',res.data[0].loginInfoVo.usrInfo);
+            this.$router.replace('/index')
 
-            if (!res.data[0].loginInfoVo.usrThirdPartyInfo) {
-              this.$toast('请先绑定手机！')
-              this.$router.push({
-                name: 'bindMobile',
-                params: { way: 'normal', accountNo: res.data[0].loginInfoVo.usrInfo.accountNo }
-              })
-            } else {
-              // 如果是第三方登录,返回了第三方信息
-              this.$store.commit('seThirdInfo', res.data[0].loginInfoVo.usrThirdPartyInfo)
-
-              this.$router.replace('/index')
-            }
           } else {
             console.log(res.msg)
             this.$toast(res.msg)

@@ -33,3 +33,7 @@ export const bindMobile = params => {
 export const thirtPartyLogin = params => {
   return axios.post(`/user/thirtPartyLogin`, qs.stringify(params))
 }
+//忘记密码
+export const findUserPassWd = (params) => {
+  return axios.get(`user/findUserPassWd`, { params})
+}

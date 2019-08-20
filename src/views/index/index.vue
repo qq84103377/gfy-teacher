@@ -8,18 +8,14 @@
       <div class="index-content-wrap__header">
         <div id="gfy_dropdown">
           <div @click="subjectShow = true">
-            <span>语文</span>
+            <span>{{currentSubjectType}}</span>
             <van-icon class="fs16 black" name="arrow-down" />
           </div>
 
           <van-popup :overlay="false" v-model="subjectShow" get-container="#gfy_dropdown" class="score-pop">
             <div style="position: relative;">
               <div class="score-pop-wrap">
-                <div class="score-pop-wrap__item" @click="handleClosePop">数学</div>
-                <div class="score-pop-wrap__item" @click="handleClosePop">语文</div>
-                <div class="score-pop-wrap__item" @click="handleClosePop">英语</div>
-                <div class="score-pop-wrap__item" @click="handleClosePop">体育</div>
-                <div class="score-pop-wrap__item" @click="handleClosePop">美术</div>
+                <div class="score-pop-wrap__item" v-for="(value, key) in subjectTypeList" :key="key" @click="handleClosePop(key)">{{value}}</div>
               </div>
               <div class="parent">
                 <div class="child"></div>
@@ -54,11 +50,11 @@
           <span class="fs16 black">未结束任务</span>
           <span class="blue fs12">查看更多></span>
         </div>
-        <div v-for="a in 2" :key="a" class="index-content-wrap__body__unfinish-wrap">
-          <list-item :fold="fold">
+        <div v-for="item in taskList" :key="item.taskId"  class="index-content-wrap__body__unfinish-wrap">
+          <list-item :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="fold=!fold">
-                <i class="iconGFY icon-arrow" :class="{fold:fold}"></i>
+              <div @click="$set(item,'fold',!item.fold)">
+                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
                 <span>班级查看</span>
               </div>
               <div>
@@ -67,7 +63,7 @@
               </div>
               <div>
                 <i class="iconGFY icon-statistics"></i>
-                <span>5/100</span>
+                <span>{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>
@@ -98,19 +94,134 @@
 
 <script>
   import listItem from '../../components/list-item'
-    export default {
+  import { getUnFinishCourseTask,getMySchoolInfo } from '@/api/index'
+
+  export default {
         name: "index",
       components: {listItem},
       data() {
           return {
             fold:false,
             subjectShow:false,
+            taskList:[],
+            subjectTypeList:{},
+            currentSubjectType:''
           }
       },
-      methods: {
-        handleClosePop() {
+    mounted() {
+      this.getMySchoolInfo()
+
+    },
+    methods: {
+        handleClosePop(key) {
           this.subjectShow = false
+          this.currentSubjectType = this.subjectTypeList[key]
+          localStorage.setItem("currentSubjectType", key);
         },
+        getUnFinishCourseTask(){
+          let obj = {
+            operateAccountNo:this.$store.getters.getUserInfo.accountNo,
+            currentPage:1,
+            pageSize:2
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          getUnFinishCourseTask(params).then(res=>{
+            console.log(res)
+            if (res.flag){
+              this.taskList = res.data;
+              if (localStorage.getItem("classMap")){
+                let classMap = JSON.parse(localStorage.getItem("classMap"))
+                this.taskList.forEach(item=>{
+                  if (item.tchCourseClassInfo){
+                    item.tchCourseClassInfo.forEach(obj=>{
+                      if (!classMap[obj.classId] || !classMap[obj.classId].className) {
+                        obj['className'] = "--"
+                      } else{
+                        obj['className']= classMap[obj.classId].className
+                      }
+                    })
+                  }
+                })
+              }
+            } else{
+              this.$toast(res.msg)
+            }
+          })
+        },
+        getMySchoolInfo(){
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "userType": "A02"
+          };
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+
+          getMySchoolInfo(params).then(res =>{
+            console.log(res)
+            if (res.flag){
+              //重构数据
+              if (!res.data){
+                this.$toast("该老师未配置学校信息")
+                return
+              }
+              let mySchool = res.data[0].mySchoolInfo
+              if (!mySchool){
+                this.$toast("该老师未配置学校信息")
+                return
+              }
+              let schoolMap = {}
+              let classMap = {}
+              let hisClassMap={}
+              let that = this
+              mySchool.forEach(item=>{
+                schoolMap[item.schoolId] = {
+                  schoolId:item.schoolId,
+                  schoolName:item.schoolName,
+                  schoolType:item.schoolType
+                }
+                if (item.myClassInfo) {
+                  item.myClassInfo.forEach(obj=>{
+                    classMap[obj.classId] = obj
+                    if (obj.teacherInfoList) {
+                      obj.teacherInfoList.forEach(obj2=>{
+                        that.subjectTypeList[obj2.subjectType] = obj2.subjectName
+                      })
+
+                    }
+                  })
+                }
+                if (item.myHisClassInfo) {
+                  item.myHisClassInfo.forEach(obj=>{
+                    hisClassMap[obj.classId] = obj
+                  })
+                }
+              })
+              console.log(that.subjectTypeList)
+              console.log(hisClassMap)
+              console.log(classMap)
+              console.log(schoolMap)
+              for(let key in that.subjectTypeList){
+                console.log("属性：" + key + ",值：" + that.subjectTypeList[key]);
+                that.currentSubjectType = that.subjectTypeList[key];
+                localStorage.setItem("currentSubjectType", key);
+                break
+              }
+
+              console.log(that.currentSubjectType)
+              localStorage.setItem("classMap", JSON.stringify(classMap))
+              localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
+              localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
+              this.getUnFinishCourseTask()
+            } else {
+              this.$toast.error(res.msg)
+            }
+          })
+        }
       }
     }
 </script>

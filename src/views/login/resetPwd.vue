@@ -16,7 +16,11 @@
 </template>
 
 <script>
-    export default {
+  import { findUserPassWd } from '@/api/login'
+  import { hex_md5 } from '@/utils/md5'
+
+
+  export default {
         name: "resetPwd",
       data() {
           return {
@@ -31,7 +35,40 @@
           }else {
             this.$toast('两次密码不一致,请重新输入')
           }
+
+          let params ={
+            operate: 'modifyPassword',
+            interUser: 'runLfb',
+            interPwd: '25d55ad283aa400af464c76d713c07ad',
+            loginName: this.$route.query.loginName,
+            phoneNo: this.$route.query.phoneNo,
+            validateCode: this.$route.query.validateCode,
+            newPasswordNo: hex_md5(this.pwd2)
+          }
+          findUserPassWd(params).then(res=>{
+            if (res.flag){
+              const toast =  this.$toast.loading({
+                duration: 0,       // 持续展示 toast
+                forbidClick: true, // 禁用背景点击
+                loadingType: 'spinner',
+                message: '设置成功，3 秒后去登录'
+              });
+              let second = 3;
+              const timer = setInterval(() => {
+                second--;
+                if (second) {
+                  toast.message = `设置成功，${second} 秒后去登录`;
+                } else {
+                  this.$toast.clear();
+                  clearInterval(timer);
+                  this.$router.replace(`login`);                }
+              }, 1000);
+            } else {
+              this.$toast(res.msg);
+            }
+          })
         }
+
       }
     }
 </script>

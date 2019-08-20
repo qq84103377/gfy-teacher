@@ -1,6 +1,6 @@
 <template>
   <section class="preview-wrap">
-    <dropdown-header :list="list">
+    <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" >
       <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
 <!--      <div slot="right" ><i class="iconGFY icon-edit-blue"></i> 编辑</div>-->
 
@@ -14,7 +14,7 @@
 
     </dropdown-header>
     <div class="preview-wrap__body">
-      <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in list" :key="index" :can-slide="true">
+      <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" :key="index" :can-slide="true" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo">
         <div slot="btn" class="btn-group van-hairline--top">
           <div @click="$set(item,'fold',!item.fold)">
             <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
@@ -26,7 +26,7 @@
           </div>
           <div @click="$router.push(`/statistic`)">
             <i class="iconGFY icon-statistics"></i>
-            <span>5/100</span>
+            <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
           </div>
         </div>
       </list-item>
@@ -43,15 +43,106 @@
   import listItem from '../../components/list-item'
   import dropdownHeader from '../../components/dropdown-header'
   import editCourse from './addCourse'
+  import { getClassTeachCourseInfo,getCourseTaskList } from '@/api/index'
+
   export default {
     name: "index",
     components: {listItem,dropdownHeader,editCourse},
+
     data () {
       return {
         show:false,
-        list: [{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},]
+        list: [{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},{name:1},],
+        courseList:[],
+        courseIndex:0,
+        courseTaskList:[],
+        courseName:'',
+        tchCourseId:''
+      }
+    },
+    mounted(){
+      this.getClassTeachCourseInfo()
+    },
+    methods:{
+
+      getClassTeachCourseInfo(){
+        let obj={
+          "interUser":"runLfb",
+          "interPwd":"25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId":24,
+          "operateRoleType":"A02",
+          "accountNo":this.$store.getters.getUserInfo.accountNo,
+          "subjectType":localStorage.getItem("currentSubjectType"),
+          "classGrade":"",
+          "termType":"",
+          "pageSize":"20",
+          "courseType":"C01",
+          "classId":"",
+          "currentPage":1
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeachCourseInfo(params).then(res=>{
+          console.log(res);
+          if (res.flag){
+            this.courseList = res.data
+            if (this.courseList){
+              this.getCourseTaskList(this.courseList[0].tchCourseInfo.courseName,this.courseList[0].tchCourseInfo.tchCourseId)
+
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      getCourseTaskList(name,id){
+        console.log(id)
+        this.courseName = name;
+        this.tchCourseId = id;
+        let obj = {
+          "interUser":"runLfb",
+          "interPwd":"7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId":24,
+          "operateRoleType":"A02",
+          "accountNo":this.$store.getters.getUserInfo.accountNo,
+          "tchCourseId":id,
+          "pageSize":"10",
+          "currentPage":1
+        }
+        let params = {
+          requestJson:JSON.stringify(obj)
+        }
+        getCourseTaskList(params).then(res=>{
+          console.log(res)
+          if (res.flag && res.data && res.data[0]){
+            this.courseTaskList = res.data[0].tchCourseTaskInfo
+
+            //设置班级名称
+            if (localStorage.getItem("classMap")){
+              let classMap = JSON.parse(localStorage.getItem("classMap"))
+              this.courseTaskList.forEach(item=>{
+                if (item.tchClassTastInfo){
+                  item.tchClassTastInfo.forEach(obj=>{
+                    if (!classMap[obj.classId] || !classMap[obj.classId].className) {
+                      obj['className'] = "--"
+                    } else{
+                      obj['className']= classMap[obj.classId].className
+                    }
+                  })
+                }
+              })
+            }
+
+          } else {
+            this.$toast(res.msg)
+          }
+        })
       }
     }
+
   }
 </script>
 

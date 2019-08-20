@@ -23,13 +23,21 @@
             </van-button>
           </div>
         </div>
-        <van-button @click="$router.push(`/resetPwd`)" type="info" class="next">下一步</van-button>
+        <van-button @click="toNext" type="info" class="next">下一步</van-button>
       </div>
     </section>
 </template>
 
 <script>
-  import { getVailCode, doMobileLogin, doUserLogin } from '@/api/login'
+  import { getVailCode, doMobileLogin, doUserLogin,findUserPassWd } from '@/api/login'
+  function isPoneAvailable (phoneNum) {
+    var reg = /^[1][3,4,5,7,8][0-9]{9}$/
+    if (!reg.test(phoneNum)) {
+      return false
+    } else {
+      return true
+    }
+  }
   export default {
         name: "forgetPwd",
       data() {
@@ -82,6 +90,46 @@
             }
           })
         },
+
+        toNext (){
+          if (!this.userName){
+            this.$toast('请输入账号！');
+            return;
+          }
+          if (!this.tel) {
+            this.$toast('请输入手机号!')
+            return
+          }
+          if (!isPoneAvailable(this.tel)) {
+            this.$toast('请输入合法手机号!')
+            return
+          }
+
+          if (!this.vailcode){
+            this.$toast('请输入验证码!')
+            return
+          }
+          let params ={
+            operate: 'validate',
+            interUser: 'runLfb',
+            interPwd: '25d55ad283aa400af464c76d713c07ad',
+            loginName: this.userName,
+            phoneNo: this.tel,
+            validateCode: this.vailcode
+          }
+          findUserPassWd(params).then(res=>{
+            if (res.flag){
+              let p ={
+                loginName: this.userName,
+                validateCode: this.vailcode,
+                phoneNo: this.tel
+              }
+              this.$router.push({name:'resetPwd',query: p});
+            } else {
+              this.$toast(res.msg);
+            }
+          })
+        }
       }
     }
 </script>

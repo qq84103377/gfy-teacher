@@ -45,3 +45,24 @@ export const getHotWord = (params) => {
 export const getSearchResult = (params) => {
   return axios.post('oprInformationPublish/searchParentInfomation', qs.stringify(params))
 }
+
+//获取学校信息
+export const getMySchoolInfo =(params)=>{
+  return axios.post('school/getMySchoolInfo', qs.stringify(params))
+}
+
+
+// 获取未结束任务
+export const getUnFinishCourseTask =(params)=>{
+  return axios.post('teach/getUnFinishCourseTask', qs.stringify(params))
+}
+
+//获取课程列表
+export const getClassTeachCourseInfo = (params)=>{
+  return axios.post('teach/getClassTeachCourseInfo', qs.stringify(params))
+}
+
+//获取任务列表
+export const getCourseTaskList =(params)=>{
+  return axios.post('teach/getCourseTaskList', qs.stringify(params))
+}
