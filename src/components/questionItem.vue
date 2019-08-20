@@ -14,7 +14,7 @@
       <div class="aic" style="flex: 1;justify-content: flex-end">
         <div v-if="isSend" class="btn-item" @click="$emit('correct')">纠错</div>
         <div class="btn-item" :class="{active:analyseShow}" @click="analyseShow=!analyseShow">查看解析</div>
-        <div v-if="isQuestion" class="btn-item" :class="{active:collect}" @click="collect=!collect">取消收藏</div>
+        <div v-if="isQuestion" class="btn-item" :class="{active:collect}" @click="collect=!collect">{{collect?'取消':'添加'}}收藏</div>
         <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint')">设置分数</div>
         <div v-if="!isSend" class="btn-item" :class="{active:!isRemove}" @click="isRemove=!isRemove">{{isRemove?'添加':'移除'}}试题</div>
       </div>

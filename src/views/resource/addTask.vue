@@ -1,7 +1,7 @@
 <template>
   <section class="add-task">
     <van-nav-bar
-      :title="handleTitle()+'任务'"
+      :title="handleTitle()"
       @click-left="$router.back()"
       left-arrow>
     </van-nav-bar>
@@ -21,7 +21,7 @@
           <span class="grey9">分钟</span>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="$route.query.type != 'exam'">
+      <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)">
         <div slot="title">
           <div class="add-task__body__cell-ctn mgl5">
             <div><span class="red">*</span>{{handleLabel()}}:</div>
@@ -40,7 +40,7 @@
           </van-checkbox>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell">
+      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)">
         <div slot="title">
           <div class="add-task__body__cell-ctn" :class="{ccc:form.comment}">
             <div>试卷:</div>
@@ -63,7 +63,7 @@
         </div>
 
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="$route.query.type != 'exam'">
+      <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)">
         <div slot="title">
           <div class="add-task__body__cell-ctn" :class="{ccc:form.exam}">
             <div>心得:</div>
@@ -259,11 +259,15 @@
       },
       handleTitle() {
         if (this.$route.query.type === 'lesson') {
-          return '微课'
+          return '微课任务'
         } else if (this.$route.query.type === 'material') {
-          return '学资源'
+          return '学资源任务'
         } else if (this.$route.query.type === 'exam') {
-          return '试卷'
+          return '试卷任务'
+        } else if (this.$route.query.type === 'discuss') {
+          return '讨论'
+        }else if (this.$route.query.type === 'spoken') {
+          return '口语'
         }
       },
       handleCheckChild(group, classItem) {

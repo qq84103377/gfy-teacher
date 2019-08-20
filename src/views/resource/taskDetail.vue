@@ -63,18 +63,22 @@
         </div>
       </div>
       <div class="task-detail__footer">
-        <van-button type="info" class="btn">分享给家长</van-button>
+        <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
         <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
       </div>
+      <share-bar :show.sync="shareBarShow"></share-bar>
     </section>
 </template>
 
 <script>
-    export default {
+  import shareBar from '../../components/shareBar'
+  export default {
         name: "taskDetail",
-      data() {
+    components: {shareBar},
+    data() {
           return {
-            remark: ''
+            remark: '',
+            shareBarShow: false
           }
       }
     }

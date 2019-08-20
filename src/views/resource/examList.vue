@@ -4,7 +4,7 @@
       <list-item @clickTo="$router.push(`/examDetail?type=${item.send?1:0}`)" class="mgt10" style="background: #fff;"
                  v-for="(item,index) in list" :key="index"
                  :can-slide="true">
-        <div slot="badge" v-if="item.send"><i class="iconGFY icon-send"></i></div>
+<!--        <div slot="badge" v-if="item.send"><i class="iconGFY icon-send"></i></div>-->
         <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
         <div slot="desc">
           <div class="desc-top">
@@ -20,25 +20,24 @@
             <div><i class="iconGFY icon-star"></i>10</div>
           </div>
         </div>
-        <div slot="btn" class="btn-group van-hairline--top">
-          <div @click="$set(item,'see',!item.see)">
-            <!--            <i class="iconGFY icon-edit"></i>-->
-            <van-icon :name="item.see?'eye':'closed-eye'" class="eye"></van-icon>
-            <span>{{item.see?'':'不'}}可见</span>
-          </div>
-          <div @click="addExam.title = '编辑';addExam.show = true">
-            <i class="iconGFY icon-edit-orange"></i>
-            <span>编辑</span>
-          </div>
-          <div @click="addExam.title = '复制';addExam.show = true">
-            <i class="iconGFY icon-copy-orange"></i>
-            <span>复制</span>
-          </div>
-          <div @click="$router.push(`/addTask?type=material`)">
-            <i class="iconGFY icon-plane"></i>
-            <span>发任务</span>
-          </div>
-        </div>
+<!--        <div slot="btn" class="btn-group van-hairline&#45;&#45;top">-->
+<!--          <div @click="$set(item,'see',!item.see)">-->
+<!--            <van-icon :name="item.see?'eye':'closed-eye'" class="eye"></van-icon>-->
+<!--            <span>{{item.see?'':'不'}}可见</span>-->
+<!--          </div>-->
+<!--          <div @click="addExam.title = '编辑';addExam.show = true">-->
+<!--            <i class="iconGFY icon-edit-orange"></i>-->
+<!--            <span>编辑</span>-->
+<!--          </div>-->
+<!--          <div @click="addExam.title = '复制';addExam.show = true">-->
+<!--            <i class="iconGFY icon-copy-orange"></i>-->
+<!--            <span>复制</span>-->
+<!--          </div>-->
+<!--          <div @click="$router.push(`/addTask?type=material`)">-->
+<!--            <i class="iconGFY icon-plane"></i>-->
+<!--            <span>发任务</span>-->
+<!--          </div>-->
+<!--        </div>-->
       </list-item>
 
     </div>

@@ -6,7 +6,7 @@
       left-arrow>
       <div slot="right" class="fs12 blue" @click="$router.push(`/examAnalyse`)">试卷分析</div>
     </van-nav-bar>
-    <div class="statistic-wrap__tab-scroll">
+    <div class="statistic-wrap__tab-scroll" v-if="$route.query.type != 'inClass'">
       <div v-for="(item,index) in classList" :key="index" @click="handleSelectTab(item)"
            class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.name}}
       </div>
@@ -14,7 +14,7 @@
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button type="info" class="notice-btn" v-if="!isWk">一键提醒</van-button>
+          <van-button type="info" class="notice-btn" v-if="!isWk&&$route.query.type != 'inClass'">一键提醒</van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>

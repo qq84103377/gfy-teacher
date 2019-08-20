@@ -3,7 +3,7 @@
       <div class="material-list-wrap__body">
         <list-item @clickTo="$router.push(`/materialDetail`)" class="mgt10" style="background: #fff;" v-for="(item,index) in list" :key="index"
                    :can-slide="true">
-          <div slot="badge"><i class="iconGFY icon-send"></i></div>
+<!--          <div slot="badge"><i class="iconGFY icon-send"></i></div>-->
           <div slot="cover" class="cover"><i class="iconGFY icon-video"></i></div>
           <div slot="desc">
             <div class="desc-top">
@@ -17,21 +17,20 @@
               <div><i class="iconGFY icon-star"></i>10</div>
             </div>
           </div>
-          <div slot="btn" class="btn-group van-hairline--top">
-            <div @click="$set(item,'see',!item.see)">
-              <!--            <i class="iconGFY icon-edit"></i>-->
-              <van-icon :name="item.see?'eye':'closed-eye'" class="eye"></van-icon>
-              <span>{{item.see?'':'不'}}可见</span>
-            </div>
-            <div @click="">
-              <i class="iconGFY icon-download-orange"></i>
-              <span>下载</span>
-            </div>
-            <div @click="$router.push(`/addTask?type=material`)">
-              <i class="iconGFY icon-plane"></i>
-              <span>发任务</span>
-            </div>
-          </div>
+<!--          <div slot="btn" class="btn-group van-hairline&#45;&#45;top">-->
+<!--            <div @click="$set(item,'see',!item.see)">-->
+<!--              <van-icon :name="item.see?'eye':'closed-eye'" class="eye"></van-icon>-->
+<!--              <span>{{item.see?'':'不'}}可见</span>-->
+<!--            </div>-->
+<!--            <div @click="">-->
+<!--              <i class="iconGFY icon-download-orange"></i>-->
+<!--              <span>下载</span>-->
+<!--            </div>-->
+<!--            <div @click="$router.push(`/addTask?type=material`)">-->
+<!--              <i class="iconGFY icon-plane"></i>-->
+<!--              <span>发任务</span>-->
+<!--            </div>-->
+<!--          </div>-->
         </list-item>
 
       </div>

@@ -22,6 +22,7 @@
 <!--          <span>5/100</span>-->
 <!--        </div>-->
         <slot name="btn"></slot>
+        <slot name="remark"></slot>
       </div>
     </div>
     <template v-if="canSlide" slot="right">
@@ -62,6 +63,7 @@
         vertical-align: middle;
       }
       font-size: 14px;
+      font-weight: bold;
       color: #333;
       width: 100%;
       overflow : hidden;

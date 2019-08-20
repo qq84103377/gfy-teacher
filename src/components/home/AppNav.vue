@@ -41,7 +41,7 @@ export default {
           title: "资源中心",
           normal: require("../../assets/img/icon-res1.png"),
           active: require("../../assets/img/icon-res1-active.png"),
-          path: "/resource"
+          path: "/resCentre"
         },
         {
           title: "教学统计",

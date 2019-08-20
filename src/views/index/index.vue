@@ -37,7 +37,7 @@
             <div class="icon-wrap blue"><i class="iconGFY icon-book"></i></div>
             <div>预习</div>
           </div>
-          <div class="index-content-wrap__body__main-icon-item">
+          <div @click="$router.push(`/inClass`)" class="index-content-wrap__body__main-icon-item">
             <div class="icon-wrap green"><i class="iconGFY icon-play"></i></div>
             <div>课中</div>
           </div>

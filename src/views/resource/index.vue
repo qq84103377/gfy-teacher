@@ -12,12 +12,12 @@
 
     </dropdown-header>
     <div class="resource-wrap__body">
-      <van-cell title="微课" is-link to="lessonList" />
-      <van-cell title="素材" is-link to="materialList" />
-      <van-cell title="试卷" is-link to="examList" />
-      <van-cell title="试题" is-link to="questionList" />
-      <van-cell title="讨论" is-link to="lessonList" />
-      <van-cell title="口语" is-link to="lessonList" />
+      <van-cell class="fs16" title="微课" is-link to="lessonList" />
+      <van-cell class="fs16" title="素材" is-link to="materialList" />
+      <van-cell class="fs16" title="试卷" is-link to="examList" />
+      <van-cell class="fs16" title="试题" is-link to="questionList" />
+      <van-cell class="fs16" title="讨论" is-link to="discussList" />
+      <van-cell class="fs16" title="口语" is-link to="spokenList" />
     </div>
   </section>
 </template>
@@ -44,9 +44,6 @@
     display: flex;
     flex-direction: column;
     &__header {
-      /*width: 100%;*/
-      /*position: absolute;*/
-      /*height: 55px;*/
       flex: 0 0 55px;
       padding: 8px 9px;
       color: #16AAB7;

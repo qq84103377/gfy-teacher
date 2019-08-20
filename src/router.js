@@ -205,6 +205,38 @@ export default new Router({
           }
         },
         {
+          path: '/discussList',
+          name: 'discussList',
+          component: () => import('./views/resource/discussList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '讨论'
+          }
+        },
+        {
+          path: '/discussDetail',
+          name: 'discussDetail',
+          component: () => import('./views/resource/discussDetail.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '讨论详情'
+          }
+        },
+        {
+          path: '/spokenList',
+          name: 'spokenList',
+          component: () => import('./views/resource/spokenList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '口语'
+          }
+        },
+        {
+          path: '/spokenDetail',
+          name: 'spokenDetail',
+          component: () => import('./views/resource/spokenDetail.vue')
+        },
+        {
           path: '/examDetail',
           name: 'examDetail',
           component: () => import('./views/resource/examDetail.vue')
@@ -218,7 +250,56 @@ export default new Router({
           path: '/addTask',
           name: 'addTask',
           component: () => import('./views/resource/addTask.vue')
-        }
+        },
+        {
+          path: '/inClass',
+          name: 'inClass',
+          component: () => import('./views/inClass/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '课中'
+          }
+        },
+        {
+          path: '/lectureList',
+          name: 'lectureList',
+          component: () => import('./views/inClass/lectureList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '讲义'
+          }
+        },
+        {
+          path: '/boardList',
+          name: 'boardList',
+          component: () => import('./views/inClass/boardList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '白板'
+          }
+        },
+        {
+          path: '/classStatList',
+          name: 'classStatList',
+          component: () => import('./views/inClass/classStatList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '堂测统计'
+          }
+        },
+        {
+          path: '/boardDetail',
+          name: 'boardDetail',
+          component: () => import('./views/inClass/boardDetail.vue')
+        },
+        {
+          path: '/resCentre',
+          name: 'resCentre',
+          component: () => import('./views/resCentre/index.vue'),
+          meta: {
+            isShowNav: true
+          }
+        },
       ]
     },
     {

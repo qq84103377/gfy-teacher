@@ -16,8 +16,11 @@
         </div>
         <question-item :can-move="a>1&&a<20" :is-send="isSend" v-for="a in 20" :key="a" @setPoint="setPointShow=true" @correct="correctShow=true" :index="a"></question-item>
       </div>
+      <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
       <exam-bar type="task" v-if="!isSend"></exam-bar>
+      <!--  纠错弹窗-->
       <correct-pop :show.sync="correctShow"></correct-pop>
+<!--      设置分数-->
       <set-point-dialog :show.sync="setPointShow"></set-point-dialog>
     </section>
 </template>
@@ -32,7 +35,7 @@
       components: {questionItem,examBar,correctPop,setPointDialog},
       computed: {
           isSend() {
-            return this.$route.query.type == 1
+            return this.$route.query.type == 1   // 0 未发 1 已发
           }
       },
       data() {

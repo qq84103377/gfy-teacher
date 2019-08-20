@@ -18,16 +18,12 @@
 <!--            />-->
           </div>
           <draggable class="img-group" v-model="list" :options="{handle:'.img-group-item'}">
-<!--            <transition-group>-->
-<!--              <div class="img-group">-->
                 <div class="img-group-item" v-for="(item,index) in list" :key="index">
                   <img :src="item.src" alt="">
                   <div class="img-group-item__name" v-if="!item.edit" @click="changeName(item)">{{item.name}}</div>
                   <div class="img-group-item__input" v-if="item.edit"><input @blur="$set(item,'edit',false)" maxlength="20" v-model="item.name" v-focus="item.edit" type="text"><span class="red">{{20 - item.name.length}}</span></div>
                   <van-icon @click="" class="clear" name="clear"/>
                 </div>
-<!--              </div>-->
-<!--            </transition-group>-->
           </draggable>
         </div>
       </van-cell>
