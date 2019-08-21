@@ -46,8 +46,8 @@
         <van-collapse-item title="微课" name="1">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2"
-                       :key="a">
+                       v-for="(item,index) in arr"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -61,8 +61,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -88,8 +88,8 @@
         <van-collapse-item title="素材" name="2">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2"
-                       :key="a">
+                       v-for="(item,index) in arr"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -103,8 +103,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -134,8 +134,8 @@
         <van-collapse-item title="试卷" name="3">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2"
-                       :key="a">
+                       v-for="(item,index) in arr"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -149,8 +149,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -174,12 +174,13 @@
           </div>
         </van-collapse-item>
       </van-collapse>
+<!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
       <van-collapse class="res-centre-wrap__body__collapse" v-show="tabIndex" v-model="activeNames1">
         <van-collapse-item title="微课" name="1">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2" :can-slide="true"
-                       :key="a">
+                       v-for="(item,index) in arr" :can-slide="true"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -193,8 +194,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -220,8 +221,8 @@
         <van-collapse-item title="素材" name="2">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2" :can-slide="true"
-                       :key="a">
+                       v-for="(item,index) in arr" :can-slide="true"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -235,8 +236,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -266,8 +267,8 @@
         <van-collapse-item title="试卷" name="3">
           <div>
             <list-item @clickTo="$router.push(`/spokenDetail`)" class="mgt10 list-item" style="background: #fff;"
-                       v-for="a in 2" :can-slide="true"
-                       :key="a">
+                       v-for="(item,index) in arr" :can-slide="true"
+                       :key=index>
               <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -281,8 +282,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="">
-                  <van-icon class="fs15 yellow" name="star-o"></van-icon>
+                <div @click="$set(item,'collect',!item.collect)">
+                  <van-icon class="fs15 yellow" :name="item.collect?'star':'star-o'"></van-icon>
                   <span>收藏</span>
                 </div>
                 <div @click="addPop=true">
@@ -346,7 +347,7 @@
     components: {listItem, filterPanel},
     data() {
       return {
-        arr: ['',''],
+        arr: [{},{}],
         addCourseList: [
           {name:'asdx',child:[{name:'csasac'},{name:'是大V是'},]},
           {name:'床单asas啊',child:[{name:'官方发布'},{name:'胜多负少的'},{name:'无'},]},

@@ -4,12 +4,16 @@
     <van-dropdown-menu active-color="none" class="dropdown-btn">
       <van-dropdown-item ref="dropdown" :title="courseName" :value="tchCourseId">
         <div style="flex: 1;overflow-y: auto" class="pd10">
-          <div v-for="(item,index) in list" :key="index" class="list-wrap">
-            <list-item :fold="item.fold" class="mgt10" style="background: #fff;"  :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" >
-              <div @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right"><i class="iconGFY icon-ellipsis"></i></div>
-            </list-item>
+          <van-pull-refresh v-model="refLoad" @refresh="onRefresh">
+            <van-list v-model="listLoad" :finished="finished" finished-text="" @load="onLoad" :offset='80'>
+              <div v-for="(item,index) in list" :key="index" class="list-wrap">
+                <list-item @clickTo="selectCourse(item.tchCourseInfo)" :fold="item.fold" class="mgt10" style="background: #fff;"  :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" >
+                  <div @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right"><i class="iconGFY icon-ellipsis"></i></div>
+                </list-item>
+              </div>
+            </van-list>
+          </van-pull-refresh>
 
-          </div>
         </div>
         <div class="folder-btn" @click="$refs['dropdown'].toggle({show:false})"><i class="iconGFY icon-fold"></i></div>
       </van-dropdown-item>
@@ -23,14 +27,45 @@
   import listItem from './list-item'
     export default {
         name: "dropdown-header",
-      props: ['list','courseName','tchCourseId'],
+      props: ['list','courseName','tchCourseId','refLoading','listLoading','finished'],
       components: {listItem},
       data(){
           return {
-            courseList: this.list
+            courseList: this.list,
+            // refLoading: false,
+            // listLoading: false,
+            // finished: false,
           }
       },
+      computed: {
+        refLoad: {
+          get() {
+            return this.refLoading
+          },
+          set(v) {
+            this.$emit('update:refLoading',v)
+          }
+        },
+        listLoad: {
+          get() {
+            return this.listLoading
+          },
+          set(v) {
+            this.$emit('update:listLoading',v)
+          }
+        },
+      },
       methods:{
+        selectCourse(tchCourseInfo) {
+          this.$emit('selectCourse',tchCourseInfo)
+          this.$refs['dropdown'].toggle({show:false})
+        },
+        onLoad() {
+          this.$emit('onLoad')
+        },
+        onRefresh() {
+          this.$emit('refresh')
+        },
         chooseCourse(obj){
           console.log({"选择课程":obj})
           console.log(obj.tchCourseInfo.tchCourseId)
