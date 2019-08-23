@@ -82,3 +82,11 @@ export const createCourseSummitInfoList =(params)=>{
 export const deleteCourseTask =(params)=>{
   return axios.post('teachNew/deleteCourseTask', qs.stringify(params))
 }
+//删除课中资源(微课、素材、试卷、试题、口语、讨论)
+export const modifyTeachCourseRes =(params)=>{
+  return axios.post('teach/modifyTeachCourseRes', qs.stringify(params))
+}
+//添加课中资源(微课、素材、试卷、试题、口语、讨论)
+export const addCourseWare =(params)=>{
+  return axios.post('resource/addCourseWare', qs.stringify(params))
+}

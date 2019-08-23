@@ -7,6 +7,7 @@ import store from './store/store'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
 import VConsole from 'vconsole/dist/vconsole.min.js'
+import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
 import {
@@ -58,6 +59,9 @@ import {
 // Vue.use(AlloyFingerPlugin,{
 //   AlloyFinger
 // })
+viewportUnitsBuggyfill.init({
+  hacks: viewportUnitsBuggyfill.hacks
+})
 Vue.use(Navigation, {
   router
 })

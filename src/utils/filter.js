@@ -33,7 +33,7 @@ let formatSeconds = (s) => {
 };
 
 // 时间戳转换为yyyyMMdd
-let generateTimeReqestNumber = (data) => {
+let generateTimeReqestNumber = (data=new Date()) => {
   // var date = new Date()
   let d = data
   return d.getFullYear().toString() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())

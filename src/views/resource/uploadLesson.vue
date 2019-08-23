@@ -27,15 +27,15 @@
       </van-cell>
       <van-cell class="upload-lesson__body__cell">
         <div slot="title">
-          <div class="jcsb">
+          <div class="jcsb" @click="showSheet">
             <div>封面图:</div>
             <span style="flex: 1" class="pdlt10 grey9">轻触此添加封面图</span>
             <van-icon @click="" class="add" name="add"/>
           </div>
           <div class="img-group">
-            <div class="img-wrap">
-              <img src="../../assets/img/banner.png" alt="">
-              <van-icon @click="" name="clear"/>
+            <div class="img-wrap" v-for="(item,index) in imgList" :key="index">
+              <img :src="item.url" alt="">
+              <van-icon @click="imgList.splice(index, 1)" name="clear"/>
             </div>
           </div>
         </div>
@@ -83,10 +83,21 @@
     <div class="upload-lesson__footer">
       <van-button type="info" class="submit">提交</van-button>
     </div>
+
+    <van-action-sheet
+      v-model="showActionSheet"
+      :actions="actions"
+      cancel-text="取消"
+      @select="handleSelect"
+      @cancel="showActionSheet=false"
+    />
   </section>
 </template>
 
 <script>
+  import {generateTimeReqestNumber, randomString} from "@/utils/filter";
+  import * as uploadApi from "@/api/upload";
+
   export default {
     name: "uploadLesson",
     data() {
@@ -96,8 +107,130 @@
           relate: '2',
           name: '',
           desc: '',
-        }
+        },
+        actions: [{name: "从相册选取"}, {name: "拍照"}],
+        showActionSheet: false,
+        photoList: [],
+        curFile: null,
+        oSSObject: null,
+        imgList: [],
       }
+    },
+    mounted() {
+      this.getOSSKey();
+    },
+    methods: {
+      getOSSKey() {
+        let json = {
+          requestJson: JSON.stringify({
+            interUser: "runLfb",
+            interPwd: "25d55ad283aa400af464c76d713c07ad",
+            operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+            belongSchoolId: this.$store.getters.schoolId,
+            docTypeCd: "T16",
+            sysTypeCd: "T01"
+          })
+        };
+        console.log('getOSSKey json',json);
+        uploadApi.stsAuthCoverAccessUrl(json).then(data => {
+          console.log('stsAuthCoverAccessUrl',data.data[0]);
+          var obj = data.data[0].tokenInfo;
+          var tmpSignatureObj = {
+            host: obj.host,
+            policyBase64: obj.policy,
+            accessid: obj.accessid,
+            signature: obj.signature,
+            expire: parseInt(obj.expire),
+            key: obj.dir + "/",
+            size: obj.sizelimit
+          };
+          this.oSSObject = tmpSignatureObj;
+        });
+      },
+      showSheet() {
+        if(this.imgList.length) {
+          this.$toast('只能上传一张图片!')
+          return
+        }
+        this.showActionSheet = !this.showActionSheet
+      },
+      uploadIMG(curFile) {
+        console.log("开始上传")
+        console.log(this.oSSObject)
+        var filetime = generateTimeReqestNumber();
+        let randomStr = randomString(5);
+        let formData = new FormData();
+        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
+          filetime +
+          randomStr + ".jpeg"
+        );
+        formData.append('policy', this.oSSObject.policyBase64)
+        console.log(formData)
+        formData.append('OSSAccessKeyId', this.oSSObject.accessid)
+        formData.append('signature', this.oSSObject.signature)
+        formData.append('file', curFile)
+        formData.append('success_action_status', '200')
+        console.log(formData)
+        uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+          console.log('doUpLoad', data);
+          var imgUrl =
+            this.oSSObject.host +
+            "/" +
+            this.oSSObject.key +
+            this.$store.getters.GET_LOGININFO.accountNo +
+            filetime +
+            randomStr + ".jpeg";
+          var imgObj = {
+            url: imgUrl
+          };
+          this.imgList.push(imgObj);
+        });
+      },
+      handleSelect(item, index) {
+        // index 0 相册  1 拍照
+        this.showActionSheet = false;
+        // this.cropperData.visible = true
+        navigator.camera.getPicture(
+          imageData => {
+            let imgBase = "data:image/jpeg;base64," + imageData;
+            try {
+              this.photoList = [...this.photoList, {base64: imgBase}];
+              var arr = imgBase.split(","),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+              while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+              }
+              this.curFile = new Blob([u8arr], {type: mime});
+              // if (this.oSSObject == null) {
+              //   this.getOSSKey();
+              // }
+              console.log("file");
+
+              console.log(this.curFile);
+              this.uploadIMG(this.curFile);
+            } catch (e) {
+              console.log(e)
+            }
+
+          },
+          failMsg => {
+            this.$toast.fail(failMsg);
+          },
+          {
+            quality: 50, //像素质量[0,100]
+            destinationType: Camera.DestinationType.DATA_URL,
+
+            sourceType:
+              index == 1
+                ? Camera.PictureSourceType.CAMERA
+                : Camera.PictureSourceType.SAVEDPHOTOALBUM
+            // sourceType : Camera.PictureSourceType.CAMERA,
+          }
+        );
+      },
     }
   }
 </script>

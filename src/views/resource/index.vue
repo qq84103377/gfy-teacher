@@ -1,6 +1,9 @@
 <template>
   <section class="resource-wrap">
-    <dropdown-header :list="list">
+    <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
+                     :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
+                     :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
+                     @selectCourse="selectCourse">
       <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
       <div slot="right" class="resource-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
@@ -12,7 +15,7 @@
 
     </dropdown-header>
     <div class="resource-wrap__body">
-      <van-cell class="fs16" title="微课" is-link to="lessonList" />
+      <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
       <van-cell class="fs16" title="素材" is-link to="materialList" />
       <van-cell class="fs16" title="试卷" is-link to="examList" />
       <van-cell class="fs16" title="试题" is-link to="questionList" />
@@ -24,16 +27,102 @@
 
 <script>
   import dropdownHeader from '../../components/dropdown-header'
+  import {getClassTeachCourseInfo} from '@/api/index'
 
   export default {
     name: "index",
     components: {dropdownHeader},
     data() {
       return {
-        show: false,
-        list: [{name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1},]
+        courseList: [],
+        dropdownPage: 0,
+        dropdownListLoading: false,
+        dropdownFinish: false,
+        dropdownRefLoading: false,
+        courseName: '',
+        tchCourseId: '',
+        sysCourseId: '',
+        relationCourseId: '',
+        subjectType: '',
+        classId: '',
+        tchClassCourseInfo: [],
       }
-    }
+    },
+    methods: {
+      goto(path) {
+        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo} = this
+        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo}})
+      },
+      selectCourse(tchCourseInfo, index) {
+        this.index = index
+        this.courseName = tchCourseInfo.courseName
+        this.tchCourseId = tchCourseInfo.tchCourseId
+        this.sysCourseId = tchCourseInfo.sysCourseId
+        this.relationCourseId = tchCourseInfo.relationCourseId
+        this.subjectType = tchCourseInfo.subjectType
+        this.classId = tchCourseInfo.tchClassCourseInfo[0].classId
+        this.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo
+      },
+      async dropdownOnLoad() {
+        this.dropdownPage++
+
+        await this.getClassTeachCourseInfo()
+      },
+      async dropdownRefresh() {
+        this.dropdownListLoading = false
+        this.dropdownFinish = false
+        this.dropdownPage = 1
+        await this.getClassTeachCourseInfo()
+        this.$toast('刷新成功')
+      },
+      async getClassTeachCourseInfo() {
+
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectType": localStorage.getItem("currentSubjectType"),
+          "classGrade": "",
+          "termType": "",
+          "pageSize": "20",
+          "courseType": "C01",
+          "classId": "",
+          "currentPage": this.dropdownPage
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getClassTeachCourseInfo(params).then(res => {
+          this.dropdownListLoading = false
+          this.dropdownRefLoading = false
+          this.total = res.total
+          if (res.flag) {
+            this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
+            if (!this.courseName) {
+              //首次取第一条课程的信息
+              this.courseName = this.courseList[0].tchCourseInfo.courseName
+              this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
+              this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
+              this.relationCourseId = this.courseList[0].tchCourseInfo.relationCourseId
+              this.subjectType = this.courseList[0].tchCourseInfo.subjectType
+              this.classId = this.courseList[0].tchCourseInfo.tchClassCourseInfo[0].classId
+              this.tchClassCourseInfo = this.courseList[0].tchCourseInfo.tchClassCourseInfo
+            }
+            if (this.dropdownPage >= res.total) {
+              this.dropdownFinish = true
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+    },
+    created() {
+      this.dropdownOnLoad()
+    },
   }
 </script>
 
