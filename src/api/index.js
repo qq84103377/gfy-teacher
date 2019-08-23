@@ -66,3 +66,19 @@ export const getClassTeachCourseInfo = (params)=>{
 export const getCourseTaskList =(params)=>{
   return axios.post('teach/getCourseTaskList', qs.stringify(params))
 }
+//删除讲义/课件
+export const deleteCourseSummitInfo =(params)=>{
+  return axios.post('teach/deleteCourseSummitInfo', qs.stringify(params))
+}
+//上下移动讲义/课件
+export const setDataTaskOrder =(params)=>{
+  return axios.post('teach/setDataTaskOrder', qs.stringify(params))
+}
+//批量选择课件
+export const createCourseSummitInfoList =(params)=>{
+  return axios.post('teach/createCourseSummitInfoList', qs.stringify(params))
+}
+//删除堂测统计
+export const deleteCourseTask =(params)=>{
+  return axios.post('teachNew/deleteCourseTask', qs.stringify(params))
+}

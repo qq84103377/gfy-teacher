@@ -18,7 +18,7 @@
     </dropdown-header>
     <div class="preview-wrap__body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="" @load="onLoad" :offset='80'>
+        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
                      :key="index" :can-slide="true" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
                      :taskType="item.taskType" :class-info-list="item.tchClassTastInfo">
@@ -57,7 +57,6 @@
   export default {
     name: "index",
     components: {listItem, dropdownHeader, editCourse},
-
     data() {
       return {
         show: false,
@@ -102,10 +101,10 @@
         this.$toast('刷新成功')
       },
       async onLoad() {
-        if(this.currentPage >= this.total && this.currentPage > 1) {
+        this.currentPage++
+        if(this.currentPage > this.total && this.currentPage > 1) {
           return
         }
-        this.currentPage++
 
         if (!this.courseList.length) {
           //首次加载
@@ -124,12 +123,12 @@
         this.$toast('刷新成功')
       },
       async getClassTeachCourseInfo() {
-
+        const page = this.dropdownPage
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": 24,
+          "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "subjectType": localStorage.getItem("currentSubjectType"),
@@ -138,7 +137,7 @@
           "pageSize": "20",
           "courseType": "C01",
           "classId": "",
-          "currentPage": this.dropdownPage
+          "currentPage": page
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -146,13 +145,14 @@
         await getClassTeachCourseInfo(params).then(res => {
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
-          if (res.flag) {
-            this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
-            if (this.dropdownPage >= res.total) {
+          if (res.flag && res.data && res.data[0]) {
+            this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            if (page >= res.total) {
               this.dropdownFinish = true
             }
           } else {
-            this.$toast(res.msg)
+            this.courseList = page === 1 ? [] : this.courseList.concat([])
+            this.dropdownFinish = true
           }
         })
       },
@@ -162,7 +162,7 @@
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": 24,
+          "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "tchCourseId": this.tchCourseId,
@@ -201,6 +201,7 @@
             }
           } else {
             this.courseTaskList = page === 1 ? [] : this.courseTaskList.concat([])
+            this.finished = true
           }
         })
       }

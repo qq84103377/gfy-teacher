@@ -1,8 +1,8 @@
 <template>
   <van-swipe-cell class="list-item-wrap">
-    <div class="pd10" style="padding-bottom: 0;">
+    <div class="pd10">
       <div class="badge"><slot name="badge"></slot></div>
-      <div class="aic mgb15" @click="$emit('clickTo')">
+      <div class="aic" @click="$emit('clickTo')">
         <div class="icon-wrap" v-if="$slots.cover"><slot name="cover"></slot></div>
         <div style="flex: 1">
           <div class="title" @click="choose"><i class="iconGFY " :class="{'icon-comment':taskType=='T01','icon-exam':taskType=='T02',
@@ -17,21 +17,15 @@
         </div>
       </div>
       <div class="content">
-<!--        <van-icon name="play" class="arrow"/>-->
-<!--        <i class="iconGFY icon-location edit"></i>-->
-<!--        <div class="fs10 aic jcsb">-->
-<!--          <i class="iconGFY icon-location"></i>-->
-<!--          <span>5/100</span>-->
-<!--        </div>-->
         <slot name="btn"></slot>
         <slot name="remark"></slot>
       </div>
     </div>
     <template v-if="canSlide" slot="right">
-          <van-button style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
-          <van-button style="background: #FFCD6B;height: 100%;border: none;color: #fff" square text="上移"/>
-          <van-button style="background: #FEC147;height: 100%;border: none;color: #fff" square text="下移"/>
-          <van-button style="background: #FEB524;height: 100%;border: none;color: #fff" square text="置顶"/>
+          <van-button @click="$emit('del')" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
+          <van-button v-if="up" @click="$emit('up')" style="background: #FFCD6B;height: 100%;border: none;color: #fff" square text="上移"/>
+          <van-button v-if="down" @click="$emit('down')" style="background: #FEC147;height: 100%;border: none;color: #fff" square text="下移"/>
+          <van-button v-if="top" style="background: #FEB524;height: 100%;border: none;color: #fff" square text="置顶"/>
     </template>
   </van-swipe-cell>
 </template>
@@ -39,7 +33,7 @@
 <script>
     export default {
         name: "list-item",
-        props: ['canSlide','fold','itemTitle','taskType','testPaperId','classInfoList'],
+        props: ['canSlide','fold','itemTitle','taskType','testPaperId','classInfoList','up','down','top'],
       data() {
           return {
 
@@ -55,6 +49,10 @@
 
 <style lang="less" scoped>
   .list-item-wrap {
+    .content {
+      margin-top: 15px;
+      margin-bottom: -10px;
+    }
     .badge {
       position: absolute;
       right: 0;
@@ -69,6 +67,7 @@
       i {
         vertical-align: middle;
       }
+      word-break: break-all;
       font-size: 14px;
       font-weight: bold;
       color: #333;

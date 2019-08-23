@@ -12,55 +12,78 @@
       </div>
       <div class="ware-filter-wrap__dropdown van-hairline--bottom">
         <div>
-          <div @click="all=!all;personal=false;school=false;share=false" :class="{blue:all}">全部
-          </div>
-        </div>
-        <div >
-          <div @click="personal=!personal;all=false;school=false;share=false" :class="{blue:personal}">个人
+          <div @click="selectTab('all')" :class="{blue:largeClass.all}">全部
           </div>
         </div>
         <div>
-          <div @click="school=!school;personal=false;all=false;share=false" :class="{blue:school}">校内
+          <div @click="selectTab('personal')" :class="{blue:largeClass.personal}">个人
           </div>
         </div>
         <div>
-          <div @click="share=!share;personal=false;school=false;all=false" :class="{blue:share}">共享
+          <div @click="selectTab('school')" :class="{blue:largeClass.school}">校内
+          </div>
+        </div>
+        <div>
+          <div @click="selectTab('share')" :class="{blue:largeClass.share}">共享
           </div>
         </div>
       </div>
       <div class="ware-filter-wrap__body">
         <div class="ware-filter-wrap__body-left">
-          <div @click="handleType(item)" v-for="(item,index) in typeList" :key="index" :class="{active:item.active}">{{item.name}}</div>
+          <div @click="handleType(item)" v-for="(item,index) in typeList" :key="index" :class="{active:item.active}">
+            {{item.name}}
+          </div>
         </div>
         <div class="ware-filter-wrap__body-right">
-          <div class="" v-for="(item,index) in courseList" :key="index">
-            <div @click="handleSelect(c)" :class="['cell__item',{active:c.check}]"
-                 v-for="(c,ci) in item.child" :key="ci">说和做——记闻一多先生言行片段
-              <van-icon v-show="c.check" class="check blue" name="success"/>
-            </div>
+          <div v-for="(item,index) in courseList" :key="index" @click="handleSelect(item)"
+               :class="['cell__item',{active:item.check}]">
+            {{item.coursewareName || item.testPaperName}}
+            <van-icon v-show="item.check" class="check blue" name="success"/>
           </div>
         </div>
       </div>
       <div class="ware-filter-wrap__footer">
-        <van-button type="info" class="confirm-btn" @click="show=false">确定</van-button>
+        <van-button type="info" class="confirm-btn" @click="confirm">确定</van-button>
       </div>
     </div>
   </van-popup>
 </template>
 
 <script>
+  import {teachApi} from '@/api/parent-GFY'
+
   export default {
     name: "wareFilter",
     props: ['visible'],
     data() {
       return {
-        all: false,
-        personal: false,
-        school: false,
-        share: false,
-        typeList: [{name:'课件'},{name:'视频'},{name:'试卷'}],
-        courseList: [{child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]},]
+        largeClass: {
+          all: true,
+          personal: false,
+          school: false,
+          share: false,
+        },
+        typeList: [{name: '课件', active: true, coursewareClassify: 'C03', resourceType: 'R01'}, {
+          name: '视频',
+          coursewareClassify: 'C01|C04',
+          resourceType: 'R01'
+        }, {name: '试卷', coursewareClassify: '', resourceType: 'R02'}],
+        courseList: [],
+        selectArr: []
       }
+    },
+    watch: {
+      visible(v) {
+        if (!v) {
+          this.selectArr = []
+          this.courseList.forEach(v => {
+            this.$set(v,'check',false)
+          })
+        }
+      }
+    },
+    created() {
+      this.getList()
     },
     computed: {
       show: {
@@ -70,18 +93,100 @@
         set() {
           this.$emit('update:visible', false)
         }
+      },
+      activeType() {
+        return this.typeList.filter(v => v.active)[0]
       }
     },
     methods: {
+      confirm() {
+        this.show = false
+        this.$emit('confirm',this.selectArr)
+      },
+      getList() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": this.activeType.resourceType,
+          "shareType": this.largeClass.all ? '' : this.largeClass.personal ? 'S01' : this.largeClass.school ? 'S02' : 'S03',
+          "sourceName": "",
+          "pageSize": "999",
+          "coursewareClassify": this.activeType.coursewareClassify,
+          "currentPage": 1
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        teachApi.getTeachCourseResDetail(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          const key = this.activeType.coursewareClassify ? 'courseware' : 'testPaperInfo'
+          if (res.flag && res.data.length && res.data[0][key]) {
+            res.data[0][key].forEach(v => {
+              // 选中已经保存在selectArr的数据
+              this.$set(v, 'check', this.selectArr.some(s => s.resourceId === (this.activeType.coursewareClassify ? v.coursewareId : v.testPaperId)))
+            })
+            this.courseList = res.data[0][key]
+          }
+        })
+      },
+      selectTab(type) {
+        if (this.largeClass[type]) return
+        for (let k in this.largeClass) {
+          this.largeClass[k] = false
+        }
+        this.largeClass[type] = true
+        this.getList()
+      },
       handleSelect(item) {
-        this.$set(item,'check',!item.check)
+        this.$set(item, 'check', !item.check)
+        if (item.check) {
+          // const {}
+          let dataType = "D05";
+          if (item.url) {
+            let suf = item.url.substring(item.url.lastIndexOf(".") + 1).toLowerCase();
+            if (suf == "mp4" || suf == "mp3" || suf == "avi" || suf == "wmv") {
+              dataType = "D03";
+            } else if (suf == "jpg" || suf == "png" || suf == "jpeg" || suf == "bmp" || suf == "gif") {
+              dataType = "D01";
+            } else {
+              dataType = "D04";
+            }
+          }
+          this.selectArr.push({
+            operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+            accountNo: this.$store.getters.getUserInfo.accountNo,
+            accountType: 'A02',
+            belongSchoolId: this.$store.getters.schoolId,
+            dataUrl: item.url,
+            dataType,
+            resourceType: this.activeType.resourceType,
+            resourceClass: 'C01',
+            resourceId: this.activeType.coursewareClassify ? item.coursewareId : item.testPaperId,
+            majorLevel: 'M01',
+            tchCourseId: this.$route.query.tchCourseId,
+            subjectType: this.$route.query.subjectType,
+            classId: this.$route.query.classId,
+          })
+        } else {
+          const index = this.selectArr.findIndex(v => v.resourceId === (this.activeType.coursewareClassify ? item.coursewareId : item.testPaperId))
+          this.selectArr.splice(index, 1)
+        }
       },
       handleType(item) {
         if (item.active) return
         this.typeList.forEach(v => {
-          this.$set(v,'active',false)
+          this.$set(v, 'active', false)
         })
-        this.$set(item,'active',true)
+        this.$set(item, 'active', true)
+        this.getList()
       },
     }
   }
@@ -104,6 +209,7 @@
         flex: 1;
         text-align: center;
         position: relative;
+
         span {
           font-weight: bold;
           font-size: 18px;
@@ -118,6 +224,7 @@
             font-size: 18px;
           }
         }
+
         .icon-close {
           font-size: 22px;
           color: #ccc;
@@ -175,14 +282,17 @@
     &__body {
       display: flex;
       flex: 1;
+
       &-left {
         flex: 0 0 95px;
         overflow-y: auto;
-        >div {
+
+        > div {
           text-align: center;
           line-height: 44px;
           font-size: 15px;
           border-left: 2.5px solid transparent;
+
           &.active {
             color: @blue;
             border-left: 2.5px solid #16aab7;
@@ -193,7 +303,6 @@
       &-right {
         flex: 1;
         overflow-y: auto;
-
 
 
         .cell__item {
@@ -207,6 +316,7 @@
           word-break: break-all;
           border-bottom: 1px solid #ebedf0;
           padding: 0 20px;
+
           .check {
             flex: 0 0 20px;
             text-align: right;
@@ -218,9 +328,11 @@
         }
       }
     }
-    &__footer{
+
+    &__footer {
       flex: 0 0 55px;
       padding: 6px 10px;
+
       .confirm-btn {
         width: 100%;
         color: #fff;

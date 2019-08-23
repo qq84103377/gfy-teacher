@@ -2,7 +2,7 @@
   <div class="container gfy-scroll-container">
     <app-header v-show="$route.meta.isShowHeader"></app-header>
     <section class="gfy-scroll-view">
-      <div class="loading-box" v-show="vanLoading">
+      <div class="loading-wrap" style="z-index: 9999" v-show="vanLoading">
         <van-loading class="inline-loading" type="spinner" color="#1989fa" />
       </div>
       <router-view class="gfy-router-view"></router-view>
@@ -43,7 +43,7 @@ export default {
   height: 100%;
   overflow-y: auto;
 }
-.loading-box {
+.loading-wrap {
   height: calc(100% - 50px);
   position: fixed;
   flex: 1;
@@ -54,7 +54,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
   // background: rgba(255, 255, 255, .9);
   .inline-loading {
     margin-top: -100px;
