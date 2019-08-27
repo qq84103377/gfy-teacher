@@ -66,7 +66,7 @@
       </van-cell>
     </div>
     <div class="upload-img__footer">
-      <van-button type="info" class="btn" @click="submit">提交</van-button>
+      <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
 
     <van-action-sheet
@@ -106,7 +106,8 @@
       return {
         form: {
           share: 'S02',
-          relate: '2'
+          relate: '2',
+          btnLoading: false
         },
         showActionSheet: false,
         actions: [{name: "从相册选取"}, {name: "拍照"}],
@@ -235,6 +236,7 @@
           this.$toast('请添加图片')
           return
         }
+        this.form.btnLoading = true
         let courseWareList = []
         this.imgList.forEach(v => {
           // let arr = [{name:'haha'}]
@@ -272,16 +274,19 @@
           requestJson: JSON.stringify(obj)
         }
         addCourseWare(params).then(res => {
+          this.form.btnLoading = false
           if (res.flag) {
             if (this.form.relate === '3') {
               // 关联课中
               // this.addTeachCourseResList(res.coursewareIdList)
               // this.createCourseSummitInfoList(res.coursewareIdList)
+              this.form.btnLoading = true
 
               Promise.all([this.addTeachCourseResList(res.coursewareIdList), this.createCourseSummitInfoList(res.coursewareInfoList)]).then(respone => {
                 if(respone.every(v => v.flag)) {
                   this.$toast('添加成功')
                   this.$store.commit('setIsAddWare', true)
+                  this.form.btnLoading = false
                   this.$router.back()
                 }
               }).catch(err => {

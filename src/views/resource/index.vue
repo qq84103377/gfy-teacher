@@ -17,7 +17,7 @@
     <div class="resource-wrap__body">
       <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
       <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
-      <van-cell class="fs16" title="试卷" is-link to="examList" />
+      <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
       <van-cell class="fs16" title="试题" is-link to="questionList" />
       <van-cell class="fs16" title="讨论" is-link to="discussList" />
       <van-cell class="fs16" title="口语" is-link to="spokenList" />
@@ -46,12 +46,13 @@
         subjectType: '',
         classId: '',
         tchClassCourseInfo: [],
+        classGrade: '',
       }
     },
     methods: {
       goto(path) {
-        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo} = this
-        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo}})
+        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade} = this
+        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade}})
       },
       selectCourse(tchCourseInfo, index) {
         this.index = index
@@ -62,6 +63,7 @@
         this.subjectType = tchCourseInfo.subjectType
         this.classId = tchCourseInfo.tchClassCourseInfo[0].classId
         this.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo
+        this.classGrade = tchCourseInfo.classGrade
       },
       async dropdownOnLoad() {
         this.dropdownPage++
@@ -111,6 +113,7 @@
               this.subjectType = this.courseList[0].tchCourseInfo.subjectType
               this.classId = this.courseList[0].tchCourseInfo.tchClassCourseInfo[0].classId
               this.tchClassCourseInfo = this.courseList[0].tchCourseInfo.tchClassCourseInfo
+              this.classGrade = this.courseList[0].tchCourseInfo.classGrade
             }
             if (this.dropdownPage >= res.total) {
               this.dropdownFinish = true

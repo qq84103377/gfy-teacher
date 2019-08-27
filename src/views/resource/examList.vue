@@ -1,44 +1,54 @@
 <template>
   <section class="exam-list">
     <div class="exam-list__body">
-      <list-item @clickTo="$router.push(`/examDetail?type=${item.send?1:0}`)" class="mgt10" style="background: #fff;"
-                 v-for="(item,index) in list" :key="index"
-                 :can-slide="true">
-<!--        <div slot="badge" v-if="item.send"><i class="iconGFY icon-send"></i></div>-->
-        <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
-        <div slot="desc">
-          <div class="desc-top">
-            <i class="iconGFY icon-share"></i>
-            <i class="iconGFY icon-choice"></i>
-          </div>
-          <div class="desc-bottom">
-            <div><i class="iconGFY icon-difficult"></i>困难</div>
-            <div><i class="iconGFY icon-zhu"></i>10</div>
-            <div><i class="iconGFY icon-ke"></i>10</div>
-            <div><i class="iconGFY icon-download"></i>10</div>
-            <div><i class="iconGFY icon-points"></i>10</div>
-            <div><i class="iconGFY icon-star"></i>10</div>
-          </div>
-        </div>
-<!--        <div slot="btn" class="btn-group van-hairline&#45;&#45;top">-->
-<!--          <div @click="$set(item,'see',!item.see)">-->
-<!--            <van-icon :name="item.see?'eye':'closed-eye'" class="eye"></van-icon>-->
-<!--            <span>{{item.see?'':'不'}}可见</span>-->
-<!--          </div>-->
-<!--          <div @click="addExam.title = '编辑';addExam.show = true">-->
-<!--            <i class="iconGFY icon-edit-orange"></i>-->
-<!--            <span>编辑</span>-->
-<!--          </div>-->
-<!--          <div @click="addExam.title = '复制';addExam.show = true">-->
-<!--            <i class="iconGFY icon-copy-orange"></i>-->
-<!--            <span>复制</span>-->
-<!--          </div>-->
-<!--          <div @click="$router.push(`/addTask?type=material`)">-->
-<!--            <i class="iconGFY icon-plane"></i>-->
-<!--            <span>发任务</span>-->
-<!--          </div>-->
-<!--        </div>-->
-      </list-item>
+      <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
+        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+          <list-item @clickTo="$router.push(`/examDetail?type=${item.send?1:0}`)" class="mgt10"
+                     style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list"
+                     :key="index"
+                     :itemTitle="item.testPaperName"
+                     :can-slide="true">
+            <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
+            <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+            <div slot="desc">
+              <div class="desc-top">
+                <i class="iconGFY"
+                   :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
+                <i class="iconGFY"
+                   :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
+              </div>
+              <div class="desc-bottom">
+                <div><i class="iconGFY icon-difficult"></i>{{item.testPaperDegree==='D01'?'容易':item.testPaperDegree==='D02'?'中等':'困难'}}
+                </div>
+                <div><i class="iconGFY icon-zhu"></i>{{item.subjectiveItemNum || 0}}</div>
+                <div><i class="iconGFY icon-ke"></i>{{item.objectiveItemNum || 0}}</div>
+                <div><i class="iconGFY icon-download"></i>{{item.downCount || 0}}</div>
+                <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+              </div>
+            </div>
+            <div slot="btn" class="btn-group van-hairline--top">
+              <div @click="modifyTeachCourseRes(item,index,1)">
+                <van-icon :name="item.statusCd=='S02'?'closed-eye':'eye'" class="eye"></van-icon>
+                <span>{{item.statusCd=='S02'?'不':''}}可见</span>
+              </div>
+              <div @click="addExam.title = '编辑';addExam.show = true;addExam.name=item.testPaperName;addExam.testPaperId=item.testPaperId;addExam.index=index;">
+                <i class="iconGFY icon-edit-orange"></i>
+                <span>编辑</span>
+              </div>
+              <div @click="addExam.title = '复制';addExam.show = true">
+                <i class="iconGFY icon-copy-orange"></i>
+                <span>复制</span>
+              </div>
+              <div @click="$router.push(`/addTask?type=material`)">
+                <i class="iconGFY icon-plane"></i>
+                <span>发任务</span>
+              </div>
+            </div>
+          </list-item>
+
+        </van-list>
+      </van-pull-refresh>
 
     </div>
     <div class="exam-list__footer">
@@ -53,7 +63,8 @@
         <van-cell class="exam-pop__cell">
           <div slot="title" class=" aic">
             <div><span class="red">*</span>名称:</div>
-            <input class="pdlt10" style="flex: 1" v-model="addExam.name" type="text" maxlength="64" placeholder="请输入名称,字数在64字内">
+            <input class="pdlt10" style="flex: 1" v-model="addExam.name" type="text" maxlength="64"
+                   placeholder="请输入名称,字数在64字内">
             <span class="red">{{64 - addExam.name.length}}</span>
             <van-icon v-show="addExam.name.length" @click="addExam.name = ''" class="clear" name="clear"/>
           </div>
@@ -62,16 +73,16 @@
           <div slot="title" class="aic">
             <span class="mgr10"><span class="red">*</span>试卷难度:</span>
             <van-radio-group style="display: flex;" v-model="addExam.difficult">
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="D01" class="mgr10"><i slot="icon" slot-scope="props"
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 易
               </van-radio>
-              <van-radio name="3" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="D02" class="mgr10"><i slot="icon" slot-scope="props"
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 中
               </van-radio>
-              <van-radio name="4" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="D03" class="mgr10"><i slot="icon" slot-scope="props"
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 难
               </van-radio>
             </van-radio-group>
@@ -81,23 +92,23 @@
           <div slot="title" class="aic">
             <span class="mgr10"><span class="red">*</span>共享级别:</span>
             <van-radio-group style="display: flex;" v-model="addExam.share">
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="S01" class="mgr10"><i slot="icon" slot-scope="props"
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 仅自己
               </van-radio>
-              <van-radio name="3" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="S02" class="mgr10"><i slot="icon" slot-scope="props"
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 校内
               </van-radio>
-              <van-radio name="4"><i slot="icon" slot-scope="props"
-                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio name="S03"><i slot="icon" slot-scope="props"
+                                       :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 公开
               </van-radio>
             </van-radio-group>
           </div>
         </van-cell>
         <div class="exam-pop__footer">
-          <van-button type="info" class="btn" @click="handleSubmit">提交</van-button>
+          <van-button :loading="addExam.btnLoading" loading-text="提交" type="info" class="btn" @click="handleSubmit">提交</van-button>
         </div>
       </div>
     </van-popup>
@@ -107,6 +118,8 @@
 
 <script>
   import listItem from '../../components/list-item'
+  import {teachApi} from "../../api/parent-GFY";
+  import {modifyTeachCourseRes, addTestPaper, addTeachCourseRes, modifyTestPaper} from '@/api/index'
 
   export default {
     name: "examList",
@@ -114,21 +127,226 @@
     data() {
       return {
         addExam: {
-          show:false,
+          show: false,
           title: '',
-          name:'',
-          difficult: '2',
-          share: '2'
+          name: '',
+          difficult: 'D01',
+          share: 'S02',
+          testPaperId: '',
+          btnLoading: false,
+          index: 0
         },
-        list: [{name: 1,send:true}, {name: 1,send:false}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true}, {name: 1,send:true},]
+        list: [],
+        listLoading: false,
+        refLoading: false,
+        finished: false,
+        currentPage: 0,
+        total: 0,
+      }
+    },
+    computed: {
+      show() {
+        return this.addExam.show
+      }
+    },
+    watch: {
+      show(v) {
+        if(!v) {
+          this.addExam.name = ''
+          this.addExam.difficult = 'D01'
+          this.addExam.share = 'S02'
+        }
       }
     },
     methods: {
-      handleSubmit() {
-        if(this.addExam.title == '新建试卷') {
-          this.$router.push(`/questionList`)
+      modifyTestPaper() {
+        let obj = {
+          "interUser":"runLfb",
+          "interPwd":"25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId":this.$store.getters.schoolId,
+          "testPaperInfo":{
+            "testPaperId":this.addExam.testPaperId,
+            "testPaperName":this.addExam.name,
+            "shareType":this.addExam.share,
+            "testPaperDegree":this.addExam.difficult
+          }
         }
-      }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        modifyTestPaper(params).then(res => {
+          if(res.flag) {
+            this.list[this.addExam.index].testPaperName = this.addExam.name
+            this.list[this.addExam.index].shareType = this.addExam.share
+            this.list[this.addExam.index].testPaperDegree = this.addExam.difficult
+            this.addExam.show = false
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addTeachCourseRes(resourceId) {
+        this.addExam.btnLoading = true
+        let obj = {
+          "interUser":"runLfb",
+          "interPwd":"25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId":this.$store.getters.schoolId,
+          "operateRoleType":"A02",
+          "tchCourseId":this.$route.query.tchCourseId,
+          "sysCourseId":this.$route.query.sysCourseId,
+          "relationSeqId":this.$route.query.relationCourseId,
+          "resourceType":"R02",
+          resourceId,
+          "statusCd":"S04"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTeachCourseRes(params).then(res => {
+          this.addExam.btnLoading = false
+          if(res.flag) {
+            this.addExam.show = false
+            this.$toast('添加成功')
+            this.onRefresh()
+            this.$router.push(`/questionList`)
+
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addTestPaper() {
+        if (!this.addExam.name) {
+          return this.$toast('请输入试卷名称')
+        }
+        this.addExam.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "testPaperInfo": {
+            "testPaperId": "",
+            "classGrade": this.$route.query.classGrade,//归属年级
+            "subjectType": "S01",//学科
+            "shareType": this.addExam.share,//共享级别
+            "belongSchoolId": this.$store.getters.schoolId,//归属学校
+            "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
+            "testPaperName": this.addExam.name,//试卷名称
+            "testPaperType": "T02",//试卷类型
+            "provinceCode": "",//省份编号
+            "areaCode": this.$store.getters.getUserInfo.areaCode,//地区编号
+            "belongYear": new Date().getFullYear(),//归属年份
+            "testPaperMode": "M01",//试卷模式
+            "testPaperDegree": this.addExam.difficult,//试卷难度
+            "score": 0,//试卷分数，默认0分
+            "subjectiveItemNum": 0,//主观题数量
+            "objectiveItemNum": 0,//客观题数量
+            "duration": 10,//试卷时长
+            "statusCd": "S01"//状态
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTestPaper(params).then(res => {
+          this.addExam.btnLoading = false
+          if (res.flag) {
+            this.addTeachCourseRes(res.testPaperInfo.testPaperId)
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      modifyTeachCourseRes(item, index, type) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": 'A02',
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": 'R02',
+          "resourceId": item.testPaperId,
+          "statusCd": type ? (item.statusCd == 'S02' ? 'S01' : 'S02') : 'S03'
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        modifyTeachCourseRes(params).then(res => {
+          if (res.flag) {
+            if (type) {
+              item.statusCd = item.statusCd == 'S02' ? 'S01' : 'S02'
+            } else {
+              this.list.splice(index, 1)
+              this.$toast('删除成功')
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handleSubmit() {
+        if (this.addExam.title == '新建试卷') {
+          this.addTestPaper()
+        }else {
+          this.modifyTestPaper()
+        }
+      },
+      async onLoad() {
+        this.currentPage++
+        if (this.currentPage > this.total && this.currentPage > 1) {
+          return
+        }
+        this.getList()
+      },
+      async onRefresh() {
+
+        // this.listLoading = false
+        this.finished = false
+        this.currentPage = 0
+        this.onLoad()
+      },
+      getList() {
+        const page = this.currentPage
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": 'R02',
+          "shareType": '',
+          "sourceName": "",
+          "pageSize": "10",
+          "currentPage": page
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        teachApi.getTeachCourseResDetail(params).then(res => {
+          this.listLoading = false
+          this.refLoading = false
+          this.total = res.total
+          if (res.flag && res.data && res.data[0] && res.data[0].testPaperInfo && res.data[0].testPaperInfo.length) {
+            this.list = page === 1 ? res.data[0].testPaperInfo : this.list.concat(res.data[0].testPaperInfo)
+            if (page >= res.total) {
+              this.finished = true
+            }
+          } else {
+            this.list = page === 1 ? [] : this.list.concat([])
+            this.finished = true
+          }
+        })
+      },
     }
   }
 </script>
@@ -138,24 +356,29 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     .exam-pop {
-      &__title{
+      &__title {
         font-size: 18px;
         font-weight: bold;
         text-align: center;
         line-height: 47px;
       }
+
       .clear {
         color: @blue;
         margin-left: 10px;
       }
-      .radio-normal  {
+
+      .radio-normal {
         border: 1px solid #999;
         border-radius: 50%;
         background: none;
       }
+
       &__footer {
         padding: 5px 10px;
+
         .btn {
           width: 100%;
           border-radius: 22px;
@@ -163,10 +386,12 @@
         }
       }
     }
+
     &__body {
       flex: 1;
       overflow-y: auto;
-      .cover{
+
+      .cover {
         background: @blue;
         display: flex;
         align-items: center;
@@ -175,26 +400,32 @@
         height: 100%;
         border-radius: 5px;
       }
+
       .desc-top {
         display: flex;
         margin: 3px 0;
+
         .iconGFY {
           margin-right: 5px;
         }
       }
+
       .desc-bottom {
         display: flex;
         font-size: 12px;
         color: #666;
+
         .iconGFY {
           margin-right: 3px;
         }
-        >div {
+
+        > div {
           margin-right: 7px;
           display: flex;
           align-items: center;
         }
       }
+
       .eye {
         color: #F89451;
       }

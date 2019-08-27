@@ -82,7 +82,7 @@ export const createCourseSummitInfoList =(params)=>{
 export const createCourseSummitInfo =(params)=>{
   return axios.post('teach/createCourseSummitInfo', qs.stringify(params))
 }
-//素材添加课件
+//添加课件资源
 export const addTeachCourseRes =(params)=>{
   return axios.post('teach/addTeachCourseRes', qs.stringify(params))
 }
@@ -101,4 +101,12 @@ export const modifyTeachCourseRes =(params)=>{
 //添加课中资源(微课、素材、试卷、试题、口语、讨论)
 export const addCourseWare =(params)=>{
   return axios.post('resource/addCourseWare', qs.stringify(params))
+}
+//创建试卷
+export const addTestPaper =(params)=>{
+  return axios.post('resource/addTestPaper', qs.stringify(params))
+}
+//编辑试卷
+export const modifyTestPaper =(params)=>{
+  return axios.post('resource/modifyTestPaper', qs.stringify(params))
 }

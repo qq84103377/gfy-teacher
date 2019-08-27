@@ -83,7 +83,7 @@
       </div>
     </div>
     <div class="upload-lesson__footer">
-      <van-button type="info" class="submit" @click="submit">提交</van-button>
+      <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="submit" @click="submit">提交</van-button>
     </div>
 
     <van-action-sheet
@@ -110,6 +110,7 @@
           relate: '2',
           name: '',
           desc: '',
+          btnLoading: false
         },
         actions: [{name: "从相册选取"}, {name: "拍照"}],
         showActionSheet: false,
@@ -130,6 +131,7 @@
     },
     methods: {
       createCourseSummitInfo(resourceId) {
+        this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -151,6 +153,7 @@
           requestJson: JSON.stringify(obj)
         }
         createCourseSummitInfo(params).then(res => {
+          this.form.btnLoading = false
           if(res.flag) {
             this.$toast('添加成功')
             this.$store.commit('setIsAddWare',true)
@@ -209,6 +212,7 @@
           this.$toast('请添加音视频')
           return
         }
+        this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
@@ -242,6 +246,7 @@
           requestJson: JSON.stringify(obj)
         }
         addCourseWare(params).then(res => {
+          this.form.btnLoading = false
           if (res.flag) {
             if(this.form.relate === '3') {
               // 关联课中

@@ -37,8 +37,7 @@
             <div slot="cover" class="cover"><img :src="item.ClassTeachingData.dataUrl" alt=""></div>
             <div slot="desc">
               <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.ClassTeachingData.shareType === 'S01','icon-school':item.ClassTeachingData.shareType === 'S02','icon-share':item.ClassTeachingData.shareType === 'S03'}"></i>
+                <i class="iconGFY icon-personal"></i>
                 <i class="iconGFY"
                    :class="{'icon-choice':item.ClassTeachingData.qualityType === 'Q01','icon-boutique':item.ClassTeachingData.qualityType === 'Q02'}"></i>
               </div>

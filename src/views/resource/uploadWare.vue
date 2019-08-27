@@ -61,7 +61,7 @@
         </van-cell>
       </div>
       <div class="upload-ware__footer">
-        <van-button type="info" class="btn" @click="submit">提交</van-button>
+        <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
       </div>
     </section>
 </template>
@@ -78,7 +78,8 @@
               name: '',
               desc: '',
               share: 'S02',
-              relate: '2'
+              relate: '2',
+              btnLoading: false
             },
             wareUrl: '',
             wareSize: '',
@@ -127,6 +128,7 @@
             this.$toast('请添加课件')
             return
           }
+          this.form.btnLoading = true
           let obj = {
             "interUser": "runLfb",
             "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
@@ -159,6 +161,7 @@
             requestJson: JSON.stringify(obj)
           }
           addCourseWare(params).then(res => {
+            this.form.btnLoading = false
             if (res.flag) {
               if(this.form.relate === '3') {
                 // 关联课中
@@ -177,6 +180,7 @@
           })
         },
         addTeachCourseRes(resourceId) {
+          this.form.btnLoading = true
           let obj = {
             "interUser":"runLfb",
             "interPwd":"25d55ad283aa400af464c76d713c07ad",
@@ -194,6 +198,7 @@
             requestJson: JSON.stringify(obj)
           }
           addTeachCourseRes(params).then(res => {
+            this.form.btnLoading = false
             if(res.flag) {
               this.$toast('添加成功')
               this.$store.commit('setIsAddWare',true)
