@@ -20,7 +20,7 @@
 
 
       <list-item class="mgt10" :itemTitle="info.name">
-        <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i></div>
+        <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i><img v-if="handleIcon() === 'img'" :src="info.dataUrl" alt=""></div>
         <div slot="desc">
           <div class="desc-top">
             发布者:{{info.belongAccountName}}
@@ -73,7 +73,7 @@
         } else if (t == 'pdf') {
           t = 'icon-pdf'
         } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
-          t = 'icon-img'
+          t = 'img'
         } else if (t == 'mp4' || t == 'mp3') {
           t = 'icon-video'
         } else {
@@ -172,6 +172,10 @@
         width: 100%;
         height: 100%;
         border-radius: 5px;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
 
       .desc-top {

@@ -57,26 +57,28 @@
     },
     methods: {
       selectCourse(tchClassTeachingDataList) {
-        this.$store.commit('setVanLoading', true)
-        let obj = {
-          interUser: 'runLfb',
-          interPwd: '25d55ad283aa400af464c76d713c07ad',
-          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-          tchClassTeachingDataList
-        }
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        createCourseSummitInfoList(params).then(res => {
-          this.$store.commit('setVanLoading', false)
-          if(res.flag) {
-            this.$refs['body'].scrollTo(0,0)
-            this.$toast('添加成功!')
-            this.onRefresh()
-          }else {
-            this.$toast(res.msg)
+        if(tchClassTeachingDataList.length) {
+          this.$store.commit('setVanLoading', true)
+          let obj = {
+            interUser: 'runLfb',
+            interPwd: '25d55ad283aa400af464c76d713c07ad',
+            operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+            tchClassTeachingDataList
           }
-        })
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          createCourseSummitInfoList(params).then(res => {
+            this.$store.commit('setVanLoading', false)
+            if(res.flag) {
+              this.$refs['body'].scrollTo(0,0)
+              this.$toast('添加成功!')
+              this.onRefresh()
+            }else {
+              this.$toast(res.msg)
+            }
+          })
+        }
       },
       goto(item) {
         if (item.resourceType === 'R01') {

@@ -58,4 +58,15 @@ let formatTime = (t = new Date()) => {
   let result = `${year}-${fillZero(month)}-${fillZero(date)} ${fillZero(hours)}:${fillZero(minutes)}:${fillZero(seconds)}`;
   return result;
 }
-export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime}
+
+let randomString = (len) => {
+  len = len || 32
+  var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+  var maxPos = $chars.length
+  var pwd = ''
+  for ( let i = 0; i < len; i++) {
+    pwd += $chars.charAt(Math.floor(Math.random() * maxPos))
+  }
+  return pwd
+}
+export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString}

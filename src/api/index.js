@@ -78,6 +78,18 @@ export const setDataTaskOrder =(params)=>{
 export const createCourseSummitInfoList =(params)=>{
   return axios.post('teach/createCourseSummitInfoList', qs.stringify(params))
 }
+//微课添加课件
+export const createCourseSummitInfo =(params)=>{
+  return axios.post('teach/createCourseSummitInfo', qs.stringify(params))
+}
+//素材添加课件
+export const addTeachCourseRes =(params)=>{
+  return axios.post('teach/addTeachCourseRes', qs.stringify(params))
+}
+//素材上传图片添加到教学课程关系表
+export const addTeachCourseResList =(params)=>{
+  return axios.post('teach/addTeachCourseResList', qs.stringify(params))
+}
 //删除堂测统计
 export const deleteCourseTask =(params)=>{
   return axios.post('teachNew/deleteCourseTask', qs.stringify(params))

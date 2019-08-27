@@ -7,7 +7,7 @@
                      :itemTitle="item.coursewareName"
                      :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
-            <div slot="cover" class="cover"><i class="iconGFY icon-video"></i></div>
+            <div slot="cover" class="cover" :style="{'background':item.imageUrl?'none':'#67E0A3'}"><img v-if="item.imageUrl" :src="item.imageUrl" alt=""><i v-else class="iconGFY icon-video"></i></div>
             <div slot="desc">
               <div class="desc-top">
                 <i class="iconGFY" :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
@@ -35,7 +35,7 @@
       </van-pull-refresh>
     </div>
     <div class="lesson-list__footer">
-      <van-button type="info" class="upload-btn" @click="$router.push(`/uploadLesson`)">上传微课</van-button>
+      <van-button type="info" class="upload-btn" @click="$router.push({path:'uploadLesson',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传微课</van-button>
     </div>
   </section>
 </template>
@@ -44,6 +44,7 @@
   import listItem from '../../components/list-item'
   import {teachApi} from '@/api/parent-GFY'
   import {modifyTeachCourseRes} from '@/api/index'
+  import store from '../../store/store'
 
   export default {
     name: "lessonList",
@@ -56,6 +57,21 @@
         finished: false,
         currentPage: 0,
         total: 0,
+      }
+    },
+    beforeRouteEnter(to, from, next) {
+      if(from.path === '/uploadLesson' && store.getters.getIsAddWare) {
+        next(vm => {
+          vm.listLoading = false
+          vm.refLoading= false
+          vm.finished= false
+          vm.currentPage= 0
+          vm.total= 0
+          vm.$store.commit('setIsAddWare',false)
+          vm.onLoad()
+        })
+      }else {
+        next()
       }
     },
     methods: {
@@ -84,6 +100,8 @@
               this.list.splice(index, 1)
               this.$toast('删除成功')
             }
+          }else {
+            this.$toast(res.msg)
           }
         })
       },
@@ -159,6 +177,10 @@
         width: 100%;
         height: 100%;
         border-radius: 5px;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
       .desc-top {
         display: flex;

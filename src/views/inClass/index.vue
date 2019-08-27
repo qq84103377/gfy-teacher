@@ -40,6 +40,7 @@
       }
     },
     created() {
+      this.$store.commit('setVanLoading',true)
       this.dropdownOnLoad()
 
     },
@@ -124,6 +125,7 @@
           requestJson: JSON.stringify(obj)
         }
         await getClassTeachCourseInfo(params).then(res => {
+          this.$store.commit('setVanLoading',false)
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
           this.total = res.total

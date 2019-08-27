@@ -16,7 +16,7 @@
     </dropdown-header>
     <div class="resource-wrap__body">
       <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
-      <van-cell class="fs16" title="素材" is-link to="materialList" />
+      <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
       <van-cell class="fs16" title="试卷" is-link to="examList" />
       <van-cell class="fs16" title="试题" is-link to="questionList" />
       <van-cell class="fs16" title="讨论" is-link to="discussList" />
@@ -96,6 +96,7 @@
           requestJson: JSON.stringify(obj)
         }
         await getClassTeachCourseInfo(params).then(res => {
+          this.$store.commit('setVanLoading',false)
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
           this.total = res.total
@@ -121,6 +122,7 @@
       },
     },
     created() {
+      this.$store.commit('setVanLoading',true)
       this.dropdownOnLoad()
     },
   }

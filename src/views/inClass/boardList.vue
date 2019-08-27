@@ -12,7 +12,7 @@
                      @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in teacher.list" :key="index"
                      :itemTitle="item.ClassTeachingData.name"
                      :can-slide="true">
-            <div slot="cover" class="cover"><i class="iconGFY icon-img"></i></div>
+            <div slot="cover" class="cover"><img :src="item.ClassTeachingData.dataUrl" alt=""></div>
             <div slot="desc">
               <div class="desc-top">
                 <i class="iconGFY"
@@ -34,7 +34,7 @@
                      @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in stu.list" :key="index"
                      :itemTitle="item.ClassTeachingData.name"
                      :can-slide="true">
-            <div slot="cover" class="cover"><i class="iconGFY icon-img"></i></div>
+            <div slot="cover" class="cover"><img :src="item.ClassTeachingData.dataUrl" alt=""></div>
             <div slot="desc">
               <div class="desc-top">
                 <i class="iconGFY"
@@ -254,13 +254,16 @@
       overflow-y: auto;
 
       .cover {
-        background: #F3D233;
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
         height: 100%;
         border-radius: 5px;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
 
       .desc-top {

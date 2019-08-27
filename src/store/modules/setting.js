@@ -1,6 +1,7 @@
 const state = {
   vanLoading: false,
-  teamList: []
+  teamList: [],
+  isAddWare: false
 }
 
 const mutations = {
@@ -9,7 +10,10 @@ const mutations = {
   },
   setTeamList (state,data) {
     state.teamList = data
-  }
+  },
+  setIsAddWare (state,data) {
+    state.isAddWare = data
+  },
 }
 
 const actions = {
@@ -22,6 +26,9 @@ const getters = {
   },
   getTeamList(state) {
     return state.teamList
+  },
+  getIsAddWare(state) {
+    return state.isAddWare
   }
 }
 
