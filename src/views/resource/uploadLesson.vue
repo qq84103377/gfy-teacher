@@ -147,7 +147,7 @@
           "majorLevel": "M01",
           "tchCourseId": this.$route.query.tchCourseId,
           "classId": this.$route.query.classId,
-          "subjectType": "S01"
+          "subjectType": this.$route.query.subjectType
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -218,7 +218,7 @@
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          "subjectType": 'S01',
+          "subjectType": this.$route.query.subjectType,
           courseWareList: [{
             knowledgePointId: this.$route.query.sysCourseId,
             coursewareName: this.form.name,

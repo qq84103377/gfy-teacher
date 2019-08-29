@@ -397,7 +397,7 @@
           .btn-reset-pwd {
             float: right;
             // margin-top: 3px;
-            margin-top: 0.44vh;
+            /*margin-top: 0.44vh;*/
           }
         }
 

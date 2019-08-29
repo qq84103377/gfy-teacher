@@ -2,7 +2,7 @@
   <van-swipe-cell class="list-item-wrap">
     <div class="pd10">
       <div class="badge"><slot name="badge"></slot></div>
-      <div class="aic" @click="$emit('clickTo')">
+      <div class="aic" style="align-items: flex-start" @click="$emit('clickTo')">
         <div class="icon-wrap" v-if="$slots.cover"><slot name="cover"></slot></div>
         <div style="flex: 1">
           <div class="title" @click="choose"><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-comment':taskType=='T01','icon-exam':taskType=='T02',
@@ -10,7 +10,7 @@
           'icon-learn-res-exp':taskType =='T04' && testPaperId==0,'icon-discuss':taskType =='T06','icon-spoken':taskType =='T13'}"></i>
             {{itemTitle}}
           </div>
-          <div v-if="$slots.desc"><slot name="desc"></slot></div>
+          <div v-if="$slots.desc" class="mgt5"><slot name="desc"></slot></div>
           <div v-else class="mgt15">
             <div class="time" v-for="(item,index) in classInfoList" :key="index" v-if="(index<2&&!fold) || fold">{{item.className}}:{{item.startDate}} -- {{item.endDate}}</div>
           </div>

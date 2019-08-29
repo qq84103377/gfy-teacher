@@ -1,8 +1,8 @@
 <template>
   <section class="exam-bar">
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
-      class="badge">99</span></div>
-    <div style="flex: 1">已选入<span class="fs10 red">150</span>道试题</div>
+      class="badge">{{total}}</span></div>
+    <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
     <div class="select-btn">选择其他</div>
     <div class="add-btn" @click="handleSubmit">{{type=='task'?'发任务':'生成试卷'}}</div>
     <van-overlay
@@ -14,13 +14,13 @@
       <van-cell>
         <div slot="title" class="jcsb">
           <div>已选题目</div>
-          <div>清空练习</div>
+          <div @click="clearQuestion">清空练习</div>
         </div>
       </van-cell>
-      <van-cell v-for="a in 9" :key="a">
+      <van-cell v-for="(item,index) in selectList" :key="index">
         <div slot="title" class="jcsb">
-          <div>选择题</div>
-          <div>1道</div>
+          <div>{{item.sectionName}}</div>
+          <div>{{item.child.length}}道</div>
         </div>
       </van-cell>
     </div>
@@ -46,15 +46,15 @@
           <div slot="title" class="aic">
             <div class="fs15 mgr10"><span class="red">*</span>试卷难度:</div>
             <van-radio-group style="display: flex;" v-model="form.difficult">
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="D01" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 易
               </van-radio>
-              <van-radio name="3" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="D02" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 中
               </van-radio>
-              <van-radio name="4" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="D03" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 难
               </van-radio>
@@ -65,15 +65,15 @@
           <div slot="title" class="aic">
             <div class="fs15 mgr10"><span class="red">*</span>共享级别:</div>
             <van-radio-group style="display: flex;" v-model="form.share">
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="S01" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 仅自己
               </van-radio>
-              <van-radio name="3" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="S02" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 校内
               </van-radio>
-              <van-radio name="4" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio name="S03" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 公开
               </van-radio>
@@ -83,14 +83,14 @@
         <van-cell class="add-exam-wrap__cell">
           <div slot="title">
             <div class="aic">
-              <div class="fs15" style="flex: 1"><span class="red">*</span>添加到课程: {{selectCourse}}</div>
-              <van-icon @click="showFilter" name="add" class="add"></van-icon>
+              <div class="fs15" style="flex: 1"><span class="red">*</span>添加到课程: {{$route.query.courseName}}</div>
+              <van-icon v-if="!$route.query.courseName" @click="showFilter" name="add" class="add"></van-icon>
             </div>
             <div class="red fs12 mgt10">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
           </div>
         </van-cell>
         <div class="add-exam-wrap__footer">
-          <van-button type="info" class="btn" @click="$router.push(`/examDetail`)">提交</van-button>
+          <van-button type="info" class="btn" @click="addTestPaper">提交</van-button>
         </div>
       </div>
     </van-popup>
@@ -101,11 +101,25 @@
 
 <script>
   import filterPanel from './filterPanel'
+  import {Dialog} from 'vant';
+  import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo} from '@/api/index'
 
   export default {
-    props: ['type'],
+    props: ['type', 'selectList'],
     name: "examBar",
     components: {filterPanel},
+    model: {
+      prop: 'selectList',
+      event: 'change'
+    },
+    computed: {
+      total() {
+        return this.selectList.reduce((t, v) => {
+          t += v.child.length
+          return t
+        }, 0)
+      }
+    },
     data() {
       return {
         selectPop: false,
@@ -113,31 +127,158 @@
         filterShow: false,
         form: {
           name: '',
-          difficult: '2',
-          share: '3',
+          difficult: 'D01',
+          share: 'S02',
+          btnLoading: false
         },
-        list: [
-          {name: '初一数学', child: [{name: '奥术大师多'}, {name: '是大V是大V'}, {name: '让各位'}]},
-          {name: '阿斯顿撒多', child: [{name: '上厕所'}, {name: '额外若翁'}, {name: '黄金金库'}]},
-          {name: '其他', child: [{name: '无'},]},
-        ],
         tempList: [],
         selectCourse: ''
       }
     },
     methods: {
+      addTestPaper() {
+        if (!this.form.name) {
+          return this.$toast('请输入试卷名称')
+        }
+        this.form.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "testPaperInfo": {
+            "testPaperId": "",
+            "classGrade": this.$route.query.classGrade,//归属年级
+            "subjectType": this.$route.query.subjectType,//学科
+            "shareType": this.form.share,//共享级别
+            "belongSchoolId": this.$store.getters.schoolId,//归属学校
+            "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
+            "testPaperName": this.form.name,//试卷名称
+            "testPaperType": "T02",//试卷类型
+            "provinceCode": "",//省份编号
+            "areaCode": this.$store.getters.getUserInfo.areaCode,//地区编号
+            "belongYear": new Date().getFullYear(),//归属年份
+            "testPaperMode": "M01",//试卷模式
+            "testPaperDegree": this.form.difficult,//试卷难度
+            "score": 0,//试卷分数，默认0分
+            "subjectiveItemNum": 0,//主观题数量
+            "objectiveItemNum": 0,//客观题数量
+            "duration": 10,//试卷时长
+            "statusCd": "S01"//状态
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTestPaper(params).then(res => {
+          this.form.btnLoading = false
+          if (res.flag) {
+            this.addTeachCourseRes(res.testPaperInfo.testPaperId)
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addTeachCourseRes(resourceId) {
+        this.form.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": "R02",
+          resourceId,
+          "statusCd": "S04"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTeachCourseRes(params).then(res => {
+          this.form.btnLoading = false
+          if (res.flag) {
+            this.addTestPaperExamInfo(resourceId)
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addTestPaperExamInfo(testPaperId) {
+        this.form.btnLoading = true
+        let testPaperExamInfoList = []
+        let examIndex = -1
+        this.selectList.forEach(v => {
+          v.child.forEach(c => {
+            examIndex++
+            testPaperExamInfoList.push({
+              "examId":c.examId,
+              "sectionType":v.sectionType,
+              "subjectType":c.subjectType,
+              "sectionName":v.sectionName,
+              "sectionIndex":v.sectionIndex,
+              examIndex,
+              "examScore":5,
+              "groupId":c.groupId,
+              "groupExamReList":c.groupExamList.map((g,gi) => {
+                return {
+                  "examGroupId":g.examGroupId,
+                  "groupId":g.groupId,
+                  "autoScoring":g.autoScoring,
+                  "groupIndex":gi + 1,
+                  "examScore":5
+                }
+              })
+            })
+          })
+
+        })
+        let obj = {
+          "interUser":"runLfb",
+          "interPwd":"25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          testPaperId,
+          "count":1,
+          testPaperExamInfoList
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTestPaperExamInfo(params).then(res => {
+          this.form.btnLoading = false
+          if(res.flag) {
+            this.$router.push(`/examDetail?testPaperId=${testPaperId}`)
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      clearQuestion() {
+        Dialog.confirm({
+          title: '确定清空已选试题吗?',
+          // message: '弹窗内容'
+        }).then(() => {
+          this.$emit('change', [])
+          this.$emit('clear')
+        }).catch(() => {
+          // on cancel
+        });
+      },
       handleFilter(item) {
         this.selectCourse = item.name
         this.list.forEach(v => {
           v.child.forEach(_v => {
-            this.$set(_v,'check',_v.name === item.name)
+            this.$set(_v, 'check', _v.name === item.name)
           })
         })
       },
       showFilter() {
         this.filterShow = true
-        this.$set(this.list[0],'active',true)
-        this.tempList = JSON.parse(JSON.stringify(this.list))
+        // this.$set(this.list[0], 'active', true)
+        // this.tempList = JSON.parse(JSON.stringify(this.list))
       },
       handleSubmit() {
         if (this.type === 'task') {

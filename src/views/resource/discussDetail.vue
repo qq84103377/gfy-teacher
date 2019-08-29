@@ -1,7 +1,7 @@
 <template>
     <section class="discuss-detail">
-      <div>asdasdsad</div>
-      <img src="../../assets/img/banner.png" alt="">
+      <div class="fs15 mgb20" style="font-weight: bold;">{{$route.query.data.discussName}}</div>
+      <div v-html="$route.query.data.discussContent"></div>
     </section>
 </template>
 

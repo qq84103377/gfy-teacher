@@ -18,8 +18,8 @@
       <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
       <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
       <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
-      <van-cell class="fs16" title="试题" is-link to="questionList" />
-      <van-cell class="fs16" title="讨论" is-link to="discussList" />
+      <van-cell class="fs16" title="试题" is-link @click="goto('/questionList')"/>
+      <van-cell class="fs16" title="讨论" is-link @click="goto('/discussList')"/>
       <van-cell class="fs16" title="口语" is-link to="spokenList" />
     </div>
   </section>
@@ -51,8 +51,8 @@
     },
     methods: {
       goto(path) {
-        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade} = this
-        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade}})
+        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,courseName} = this
+        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,courseName}})
       },
       selectCourse(tchCourseInfo, index) {
         this.index = index

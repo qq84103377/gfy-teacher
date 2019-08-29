@@ -110,3 +110,43 @@ export const addTestPaper =(params)=>{
 export const modifyTestPaper =(params)=>{
   return axios.post('resource/modifyTestPaper', qs.stringify(params))
 }
+//复制试卷
+export const copyTestPaper =(params)=>{
+  return axios.post('resource/copyTestPaper', qs.stringify(params))
+}
+//试题列表题型下拉列表
+export const getExamSectionTypeRelation =(params)=>{
+  return axios.post('resource/getExamSectionTypeRelation', qs.stringify(params))
+}
+//试题添加收藏
+export const createCollectInfo =(params)=>{
+  return axios.post('resource/createCollectInfo', qs.stringify(params))
+}
+//试题取消收藏
+export const delCollectInfo =(params)=>{
+  return axios.post('resource/delCollectInfo', qs.stringify(params))
+}
+//添加试题
+export const addTestPaperExamInfo =(params)=>{
+  return axios.post('resource/addTestPaperExamInfo', qs.stringify(params))
+}
+//获取试卷详情
+export const getTestPaperExamInfo =(params)=>{
+  return axios.post('resource/getTestPaperExamInfo', qs.stringify(params))
+}
+//新建论题
+export const addDiscussInfo =(params)=>{
+  return axios.post('resource/addDiscussInfo', qs.stringify(params))
+}
+//编辑论题
+export const modifyDiscussInfo =(params)=>{
+  return axios.post('resource/modifyDiscussInfo', qs.stringify(params))
+}
+//字典值查询
+export const getSysDictList =(params)=>{
+  return axios.post('sysDict/getSysDictList', qs.stringify(params))
+}
+//试题纠错
+export const addErrorCorrectInfo =(params)=>{
+  return axios.post('oprExamCorrect/addErrorCorrectInfo', qs.stringify(params))
+}

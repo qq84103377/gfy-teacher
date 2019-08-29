@@ -238,7 +238,8 @@
 
       .desc-top {
         display: flex;
-        margin: 3px 0;
+        margin-bottom: 6px;
+
 
         .iconGFY {
           margin-right: 5px;

@@ -1,6 +1,6 @@
 <template>
   <section class="exam-list">
-    <div class="exam-list__body">
+    <div class="exam-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
           <list-item @clickTo="$router.push(`/examDetail?type=${item.send?1:0}`)" class="mgt10"
@@ -32,11 +32,11 @@
                 <van-icon :name="item.statusCd=='S02'?'closed-eye':'eye'" class="eye"></van-icon>
                 <span>{{item.statusCd=='S02'?'不':''}}可见</span>
               </div>
-              <div @click="addExam.title = '编辑';addExam.show = true;addExam.name=item.testPaperName;addExam.testPaperId=item.testPaperId;addExam.index=index;">
+              <div @click="edit(item,index)">
                 <i class="iconGFY icon-edit-orange"></i>
                 <span>编辑</span>
               </div>
-              <div @click="addExam.title = '复制';addExam.show = true">
+              <div @click="copy(item)">
                 <i class="iconGFY icon-copy-orange"></i>
                 <span>复制</span>
               </div>
@@ -108,7 +108,8 @@
           </div>
         </van-cell>
         <div class="exam-pop__footer">
-          <van-button :loading="addExam.btnLoading" loading-text="提交" type="info" class="btn" @click="handleSubmit">提交</van-button>
+          <van-button :loading="addExam.btnLoading" loading-text="提交" type="info" class="btn" @click="handleSubmit">提交
+          </van-button>
         </div>
       </div>
     </van-popup>
@@ -119,7 +120,7 @@
 <script>
   import listItem from '../../components/list-item'
   import {teachApi} from "../../api/parent-GFY";
-  import {modifyTeachCourseRes, addTestPaper, addTeachCourseRes, modifyTestPaper} from '@/api/index'
+  import {modifyTeachCourseRes, addTestPaper, addTeachCourseRes, modifyTestPaper, copyTestPaper} from '@/api/index'
 
   export default {
     name: "examList",
@@ -151,7 +152,7 @@
     },
     watch: {
       show(v) {
-        if(!v) {
+        if (!v) {
           this.addExam.name = ''
           this.addExam.difficult = 'D01'
           this.addExam.share = 'S02'
@@ -159,29 +160,74 @@
       }
     },
     methods: {
-      modifyTestPaper() {
+      copy(item) {
+        this.addExam.title = '复制';
+        this.addExam.show = true
+        this.addExam.testPaperId = item.testPaperId
+        this.addExam.name = item.testPaperName + '-副本'
+      },
+      copyTestPaper(copyTestPaperId) {
+        this.addExam.btnLoading = true
         let obj = {
-          "interUser":"runLfb",
-          "interPwd":"25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId":this.$store.getters.schoolId,
-          "testPaperInfo":{
-            "testPaperId":this.addExam.testPaperId,
-            "testPaperName":this.addExam.name,
-            "shareType":this.addExam.share,
-            "testPaperDegree":this.addExam.difficult
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          copyTestPaperId,
+          "oldTestPaperId": this.addExam.testPaperId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        return copyTestPaper(params)
+        //   .then(res => {
+        //   this.addExam.btnLoading = false
+        //   if (res.flag) {
+        //
+        //   } else {
+        //     this.$toast(res.msg)
+        //   }
+        //
+        // })
+      },
+      edit(item, index) {
+        this.addExam.title = '编辑';
+        this.addExam.show = true;
+        this.addExam.name = item.testPaperName;
+        this.addExam.difficult = item.testPaperDegree;
+        this.addExam.share = item.shareType;
+        this.addExam.testPaperId = item.testPaperId;
+        this.addExam.index = index;
+      },
+      modifyTestPaper() {
+        if (!this.addExam.name) {
+          return this.$toast('请输入试卷名称')
+        }
+        this.addExam.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "testPaperInfo": {
+            "testPaperId": this.addExam.testPaperId,
+            "testPaperName": this.addExam.name,
+            "shareType": this.addExam.share,
+            "testPaperDegree": this.addExam.difficult
           }
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
         modifyTestPaper(params).then(res => {
-          if(res.flag) {
+          this.addExam.btnLoading = false
+          if (res.flag) {
             this.list[this.addExam.index].testPaperName = this.addExam.name
             this.list[this.addExam.index].shareType = this.addExam.share
             this.list[this.addExam.index].testPaperDegree = this.addExam.difficult
             this.addExam.show = false
-          }else {
+            this.$toast('编辑成功')
+          } else {
             this.$toast(res.msg)
           }
         })
@@ -189,33 +235,37 @@
       addTeachCourseRes(resourceId) {
         this.addExam.btnLoading = true
         let obj = {
-          "interUser":"runLfb",
-          "interPwd":"25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId":this.$store.getters.schoolId,
-          "operateRoleType":"A02",
-          "tchCourseId":this.$route.query.tchCourseId,
-          "sysCourseId":this.$route.query.sysCourseId,
-          "relationSeqId":this.$route.query.relationCourseId,
-          "resourceType":"R02",
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": "R02",
           resourceId,
-          "statusCd":"S04"
+          "statusCd": "S04"
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        addTeachCourseRes(params).then(res => {
-          this.addExam.btnLoading = false
-          if(res.flag) {
-            this.addExam.show = false
-            this.$toast('添加成功')
-            this.onRefresh()
-            this.$router.push(`/questionList`)
-
-          }else {
-            this.$toast(res.msg)
-          }
-        })
+        return addTeachCourseRes(params)
+        //  .then(res => {
+        //   this.addExam.btnLoading = false
+        //   if (res.flag) {
+        //     if (this.addExam.title === '新建试卷') {
+        //       this.addExam.show = false
+        //       this.$toast('添加成功')
+        //       this.$refs['body'].scrollTo(0, 0)
+        //       this.onRefresh()
+        //       this.$router.push(`/questionList`)
+        //     }
+        //
+        //   } else {
+        //     this.$toast(res.msg)
+        //   }
+        // })
       },
       addTestPaper() {
         if (!this.addExam.name) {
@@ -230,7 +280,7 @@
           "testPaperInfo": {
             "testPaperId": "",
             "classGrade": this.$route.query.classGrade,//归属年级
-            "subjectType": "S01",//学科
+            "subjectType": this.$route.query.subjectType,//学科
             "shareType": this.addExam.share,//共享级别
             "belongSchoolId": this.$store.getters.schoolId,//归属学校
             "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
@@ -254,7 +304,32 @@
         addTestPaper(params).then(res => {
           this.addExam.btnLoading = false
           if (res.flag) {
-            this.addTeachCourseRes(res.testPaperInfo.testPaperId)
+            if (this.addExam.title === '复制') {
+              Promise.all([this.copyTestPaper(res.testPaperInfo.testPaperId), this.addTeachCourseRes(res.testPaperInfo.testPaperId)]).then(ret => {
+                this.addExam.btnLoading = false
+                if (ret.every(v => v.flag)) {
+                  this.addExam.show = false
+                  this.$refs['body'].scrollTo(0, 0)
+                  this.onRefresh()
+                  this.$toast('复制成功')
+                }else {
+                  this.$toast(ret[0].msg)
+                }
+              })
+            } else {
+              Promise.all([this.addTeachCourseRes(res.testPaperInfo.testPaperId)]).then(ret => {
+                this.addExam.btnLoading = false
+                if (ret[0].flag) {
+                  this.addExam.show = false
+                  this.$toast('添加成功')
+                  this.$refs['body'].scrollTo(0, 0)
+                  this.onRefresh()
+                  this.$router.push(`/questionList`)
+                } else {
+                  this.$toast(ret[0].msg)
+                }
+              })
+            }
           } else {
             this.$toast(res.msg)
           }
@@ -291,10 +366,10 @@
         })
       },
       handleSubmit() {
-        if (this.addExam.title == '新建试卷') {
-          this.addTestPaper()
-        }else {
+        if (this.addExam.title == '编辑') {
           this.modifyTestPaper()
+        } else {
+          this.addTestPaper()
         }
       },
       async onLoad() {

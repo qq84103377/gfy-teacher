@@ -1,34 +1,62 @@
 <template>
   <section class="question-item-wrap">
-    <i class="iconGFY icon-auto"></i>
+    <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <div class="question-item-wrap__ctn">
-      <div>asdjkashdkajsd</div>
+      <div v-html="item.title"></div>
+      <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
+        ({{childIndex+1}})
+        <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
+        <div v-html="child.title"></div>
+        <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
+          <div class="btn-item" :class="{active:child.analyseShow}"
+               @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
+          </div>
+        </div>
+        <div v-if="child.analyseShow" class="question-item-wrap__analyse"
+             style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
+          <div>正确答案及相关解析</div>
+          <div>正确答案:</div>
+          <div v-html="child.answer"></div>
+          <div>解析:</div>
+          <div v-html="child.examExplain"></div>
+        </div>
+      </div>
       <div class="icon-group">
-        <span><i class="iconGFY icon-points"></i>0</span>
-        <span><i class="iconGFY icon-star"></i>0</span>
-        <span><i class="iconGFY icon-difficult"></i>困难</span>
+        <span><i class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
+        <span><i class="iconGFY icon-points"></i>{{item.useCount||0}}</span>
+        <span><i class="iconGFY icon-star"></i>{{item.collectCount||0}}</span>
+        <span><i class="iconGFY icon-difficult"></i>{{item.titleDegree==='D01'?'容易':item.titleDegree==='D02'?'中等':'困难'}}</span>
       </div>
     </div>
     <div class="question-item-wrap__btn-group van-hairline--top" :id="'question-item'+index">
-      <van-icon @click="tooltip=true" name="ellipsis" class="fs18" v-if="!isSend"></van-icon>
+      <van-icon @click="tooltip=true" name="ellipsis" class="fs18"></van-icon>
       <div class="aic" style="flex: 1;justify-content: flex-end">
         <div v-if="isSend" class="btn-item" @click="$emit('correct')">纠错</div>
-        <div class="btn-item" :class="{active:analyseShow}" @click="analyseShow=!analyseShow">查看解析</div>
-        <div v-if="isQuestion" class="btn-item" :class="{active:collect}" @click="collect=!collect">{{collect?'取消':'添加'}}收藏</div>
+        <div class="btn-item" v-if="!item.groupExamList.length" :class="{active:analyseShow}"
+             @click="analyseShow=!analyseShow">查看解析
+        </div>
+        <div v-if="isQuestion" class="btn-item" :class="{active:item.collectId}" @click="handleCollect(item.collectId)">
+          {{item.collectId?'取消':'添加'}}收藏
+        </div>
         <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint')">设置分数</div>
-        <div v-if="!isSend" class="btn-item" :class="{active:!isRemove}" @click="isRemove=!isRemove">{{isRemove?'添加':'移除'}}试题</div>
+        <div v-if="!isSend" class="btn-item" :class="{active:item.isRemove}"
+             @click="$emit('add',item.isRemove);$set(item,'isRemove',!item.isRemove)">
+          {{!item.isRemove?'添加':'移除'}}试题
+        </div>
       </div>
     </div>
     <div v-if="analyseShow" class="question-item-wrap__analyse">
       <div>正确答案及相关解析</div>
       <div>正确答案:</div>
-      <div>A</div>
+      <div v-html="item.answer"></div>
+      <div>解析:</div>
+      <div v-html="item.examExplain"></div>
     </div>
 
 
     <van-popup v-model="tooltip" :get-container="'#question-item'+index" class="tooltip-pop">
       <div class="tooltip-pop-wrap">
-        <div class="tooltip-pop-wrap__item" @click="$emit('correct')">纠错</div>
+        <div class="tooltip-pop-wrap__item" @click="tooltip=false;$emit('correct')">纠错</div>
         <div v-if="canMove" class="tooltip-pop-wrap__item">上移</div>
         <div v-if="canMove" class="tooltip-pop-wrap__item">下移</div>
       </div>
@@ -37,15 +65,76 @@
 </template>
 
 <script>
+  import {createCollectInfo, delCollectInfo} from '@/api/index'
+
   export default {
     name: "questionItem",
-    props: ['isSend','index','isQuestion','canMove'],//isQuestion 是否试题页面适用
+    props: ['isSend', 'index', 'isQuestion', 'canMove', 'item'],//isQuestion 是否试题页面适用
     data() {
       return {
         analyseShow: false,
-        isRemove: true,
         tooltip: false,
         collect: false
+      }
+    },
+    methods: {
+      handleCollect(v) {
+        if(!v) {
+          //添加收藏
+          let obj = {
+            "interUser": "value",
+            "interPwd": "value",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "resCollectInfo": {
+              "objectTypeCd": "C01",
+              "objectId": this.item.examId,
+              "collectType": "C01",
+              "accountNo": this.$store.getters.getUserInfo.accountNo,
+              "statusCd": this.item.statusCd,
+              "subjectType": this.$route.query.subjectType
+            },
+            "sysTypeCd": "S04"   //web传S02 app传S04
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          createCollectInfo(params).then(res => {
+            if(res.flag) {
+              this.item.collectId = res.resCollectInfo.collectId
+              this.$toast('收藏成功')
+            }else {
+              this.$toast(res.msg)
+            }
+          })
+        }else {
+          //取消收藏
+          let obj = {
+            "interUser": "value",
+            "interPwd": "value",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "resCollectInfo": {
+              "collectId":this.item.collectId,
+              "objectTypeCd":"C04",
+              "objectId":this.item.examId,
+              "collectType":"C01",
+              "accountNo": this.$store.getters.getUserInfo.accountNo,
+              "statusCd":this.item.statusCd
+            },
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          delCollectInfo(params).then(res => {
+            if(res.flag) {
+              this.item.collectId = 0
+              this.$toast('取消收藏')
+            }else {
+              this.$toast(res.msg)
+            }
+          })
+        }
       }
     }
   }
@@ -56,11 +145,19 @@
     position: relative;
     background: #fff;
     margin-bottom: 10px;
+
     .icon-auto {
       position: absolute;
       right: 0;
       top: 0;
     }
+
+    .init-wrap {
+      margin: 0 -12px;
+      padding: 0 12px;
+      position: relative;
+    }
+
     .tooltip-pop {
       border-radius: 5px;
       bottom: 90%;
@@ -77,7 +174,7 @@
         &__item {
           text-align: center;
           width: 85px;
-          line-height: 30px;
+          line-height: 24px;
           border-radius: 5px;
           margin-bottom: 5px;
           font-size: 15px;
@@ -104,20 +201,24 @@
 
     &__ctn {
       padding: 15px 12px;
+
       .icon-group {
         display: flex;
         align-items: center;
         margin-top: 22px;
         font-size: 12px;
         color: #666;
+
         span {
           margin-right: 15px;
+
           i {
             margin-right: 3px;
           }
         }
       }
     }
+
     &__btn-group {
       position: relative;
       padding: 8px 12px;
@@ -125,22 +226,27 @@
       align-items: center;
       justify-content: space-between;
       font-size: 12px;
-      .btn-item {
-        flex: 0 0 63px;
-        line-height: 22px;
-        text-align: center;
-        border-radius: 10px;
-        border: 1px solid #999;
-        margin-right: 11px;
-        &.active {
-          color: @blue;
-          border: 1px solid @blue;
-        }
-        &:last-child{
-          margin-right: 0;
-        }
+    }
+
+    .btn-item {
+      flex: 0 0 63px;
+      width: 63px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 10px;
+      border: 1px solid #999;
+      margin-right: 11px;
+
+      &.active {
+        color: @blue;
+        border: 1px solid @blue;
+      }
+
+      &:last-child {
+        margin-right: 0;
       }
     }
+
     &__analyse {
       padding: 8px 12px;
     }

@@ -1,28 +1,29 @@
 <template>
-    <section class="exam-detail">
-      <van-nav-bar
-        title="暗示健康的哈萨克积极思考阿萨德是啊十大"
-        @click-left="$router.back()"
-        left-arrow>
-      </van-nav-bar>
-      <div class="exam-detail__body">
-        <div class="exam-detail__body__score">
-          <span v-if="!isSend" style="font-weight: bold;flex: 1">已选入150道试题</span>
-          <span class="red">总分: 100</span>
-        </div>
-        <div class="exam-detail__body__question-num">
-          <div style="font-weight: bold;">1.选择题</div>
-          <div v-if="!isSend" class="set-point" @click="setPointShow=true">设置分数</div>
-        </div>
-        <question-item :can-move="a>1&&a<20" :is-send="isSend" v-for="a in 20" :key="a" @setPoint="setPointShow=true" @correct="correctShow=true" :index="a"></question-item>
+  <section class="exam-detail">
+    <van-nav-bar
+      title="暗示健康的哈萨克积极思考阿萨德是啊十大"
+      @click-left="$router.back()"
+      left-arrow>
+    </van-nav-bar>
+    <div class="exam-detail__body">
+      <div class="exam-detail__body__score">
+        <span v-if="!isSend" style="font-weight: bold;flex: 1">已选入150道试题</span>
+        <span class="red">总分: 100</span>
       </div>
-      <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-      <exam-bar type="task" v-if="!isSend"></exam-bar>
-      <!--  纠错弹窗-->
-      <correct-pop :show.sync="correctShow"></correct-pop>
-<!--      设置分数-->
-      <set-point-dialog :show.sync="setPointShow"></set-point-dialog>
-    </section>
+      <div class="exam-detail__body__question-num">
+        <div style="font-weight: bold;">1.选择题</div>
+        <div v-if="!isSend" class="set-point" @click="setPointShow=true">设置分数</div>
+      </div>
+      <question-item :can-move="a>1&&a<20" :is-send="isSend" v-for="a in 20" :key="a" @setPoint="setPointShow=true"
+                     @correct="correctShow=true" :index="a"></question-item>
+    </div>
+    <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
+    <exam-bar type="task" v-if="!isSend"></exam-bar>
+    <!--  纠错弹窗-->
+    <correct-pop :show.sync="correctShow"></correct-pop>
+    <!--      设置分数-->
+    <set-point-dialog :show.sync="setPointShow"></set-point-dialog>
+  </section>
 </template>
 
 <script>
@@ -30,21 +31,43 @@
   import examBar from '../../components/examBar'
   import correctPop from '../../components/correctPop'
   import setPointDialog from '../../components/setPointDialog'
-    export default {
-        name: "examDetail",
-      components: {questionItem,examBar,correctPop,setPointDialog},
-      computed: {
-          isSend() {
-            return this.$route.query.type == 1   // 0 未发 1 已发
-          }
-      },
-      data() {
-          return {
-            correctShow: false,
-            setPointShow: false,
-          }
+  import {getTestPaperExamInfo} from '@/api/index'
+
+  export default {
+    name: "examDetail",
+    components: {questionItem, examBar, correctPop, setPointDialog},
+    computed: {
+      isSend() {
+        return this.$route.query.type == 1   // 0 未发 1 已发
       }
+    },
+    data() {
+      return {
+        correctShow: false,
+        setPointShow: false,
+      }
+    },
+    methods: {
+      getDetail() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "testPaperId": this.$route.query.testPaperId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getTestPaperExamInfo(params).then(res => {
+
+        })
+      }
+    },
+    created() {
+      this.getDetail()
     }
+  }
 </script>
 
 <style lang="less" scoped>
@@ -52,9 +75,11 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     &__body {
       flex: 1;
       overflow-y: auto;
+
       &__score, &__question-num {
         display: flex;
         align-items: center;
@@ -62,9 +87,11 @@
         padding: 10px;
         background: #fff;
       }
+
       &__question-num {
         background: #f5f5f5;
         justify-content: space-between;
+
         .set-point {
           border-radius: 10px;
           border: 1px solid #999;
