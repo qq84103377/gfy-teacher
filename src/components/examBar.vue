@@ -241,7 +241,6 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           testPaperId,
-          "count":1,
           testPaperExamInfoList
         }
         let params = {
@@ -250,6 +249,7 @@
         addTestPaperExamInfo(params).then(res => {
           this.form.btnLoading = false
           if(res.flag) {
+            this.addExam = false
             this.$router.push(`/examDetail?testPaperId=${testPaperId}`)
           }else {
             this.$toast(res.msg)

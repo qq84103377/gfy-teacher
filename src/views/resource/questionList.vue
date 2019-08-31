@@ -49,7 +49,7 @@
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
 <!--          <div class="question-num">1.选择题</div>-->
           <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index"
-                        :item="item" :index="index"></question-item>
+                     :item="item" :index="index"></question-item>
         </van-list>
       </van-pull-refresh>
 

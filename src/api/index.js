@@ -134,6 +134,22 @@ export const addTestPaperExamInfo =(params)=>{
 export const getTestPaperExamInfo =(params)=>{
   return axios.post('resource/getTestPaperExamInfo', qs.stringify(params))
 }
+//试题有小题设置分数
+export const updateTestPaperSubExamScore =(params)=>{
+  return axios.post('resource/updateTestPaperSubExamScore', qs.stringify(params))
+}
+//试题无小题设置分数
+export const updateTestPaperExamScore =(params)=>{
+  return axios.post('resource/updateTestPaperExamScore', qs.stringify(params))
+}
+//移除试卷内的试题
+export const delTestPaperExamInfo =(params)=>{
+  return axios.post('resource/delTestPaperExamInfo', qs.stringify(params))
+}
+//试卷详情上下移动章节
+export const updateTestPaperSectonIndex =(params)=>{
+  return axios.post('resource/updateTestPaperSectonIndex', qs.stringify(params))
+}
 //新建论题
 export const addDiscussInfo =(params)=>{
   return axios.post('resource/addDiscussInfo', qs.stringify(params))

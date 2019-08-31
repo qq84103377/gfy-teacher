@@ -57,6 +57,17 @@
         }
       }
     },
+    watch: {
+      show(v) {
+        if(!v) {
+          this.remark = ''
+          this.selectItem = {}
+          this.typeList.forEach(v => {
+            this.$set(v,'active',false)
+          })
+        }
+      }
+    },
     created() {
       this.getSysDictList()
     },

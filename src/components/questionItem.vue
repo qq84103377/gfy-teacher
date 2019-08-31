@@ -2,17 +2,19 @@
   <section class="question-item-wrap">
     <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <div class="question-item-wrap__ctn">
+      <slot name="num"></slot>
       <div v-html="item.title"></div>
       <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
-        ({{childIndex+1}})
+        ({{childIndex+1}})本小题{{child.examScore}}分
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
         <div v-html="child.title"></div>
         <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
           <div class="btn-item" :class="{active:child.analyseShow}"
                @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
           </div>
+          <div class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
         </div>
-        <div v-if="child.analyseShow" class="question-item-wrap__analyse"
+        <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10"
              style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
           <div>正确答案及相关解析</div>
           <div>正确答案:</div>
@@ -22,7 +24,7 @@
         </div>
       </div>
       <div class="icon-group">
-        <span><i class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
+        <span><i v-if="isQuestion" class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
         <span><i class="iconGFY icon-points"></i>{{item.useCount||0}}</span>
         <span><i class="iconGFY icon-star"></i>{{item.collectCount||0}}</span>
         <span><i class="iconGFY icon-difficult"></i>{{item.titleDegree==='D01'?'容易':item.titleDegree==='D02'?'中等':'困难'}}</span>
@@ -32,7 +34,7 @@
       <van-icon @click="tooltip=true" name="ellipsis" class="fs18"></van-icon>
       <div class="aic" style="flex: 1;justify-content: flex-end">
         <div v-if="isSend" class="btn-item" @click="$emit('correct')">纠错</div>
-        <div class="btn-item" v-if="!item.groupExamList.length" :class="{active:analyseShow}"
+        <div class="btn-item" :class="{active:analyseShow}"
              @click="analyseShow=!analyseShow">查看解析
         </div>
         <div v-if="isQuestion" class="btn-item" :class="{active:item.collectId}" @click="handleCollect(item.collectId)">
@@ -40,25 +42,29 @@
         </div>
         <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint')">设置分数</div>
         <div v-if="!isSend" class="btn-item" :class="{active:item.isRemove}"
-             @click="$emit('add',item.isRemove);$set(item,'isRemove',!item.isRemove)">
+             @click="handleAdd">
           {{!item.isRemove?'添加':'移除'}}试题
         </div>
       </div>
     </div>
     <div v-if="analyseShow" class="question-item-wrap__analyse">
-      <div>正确答案及相关解析</div>
-      <div>正确答案:</div>
-      <div v-html="item.answer"></div>
-      <div>解析:</div>
-      <div v-html="item.examExplain"></div>
+      <div>试题编号:{{item.examId}}</div>
+      <div>知识点:{{item.knowledgePointName}}</div>
+      <div v-if="!item.groupExamList.length">
+        <div>正确答案及相关解析</div>
+        <div>正确答案:</div>
+        <div v-html="item.answer"></div>
+        <div>解析:</div>
+        <div v-html="item.examExplain"></div>
+      </div>
     </div>
 
 
     <van-popup v-model="tooltip" :get-container="'#question-item'+index" class="tooltip-pop">
       <div class="tooltip-pop-wrap">
         <div class="tooltip-pop-wrap__item" @click="tooltip=false;$emit('correct')">纠错</div>
-        <div v-if="canMove" class="tooltip-pop-wrap__item">上移</div>
-        <div v-if="canMove" class="tooltip-pop-wrap__item">下移</div>
+        <div v-if="up" @click="tooltip=false;$emit('move',0)" class="tooltip-pop-wrap__item">上移</div>
+        <div v-if="down" @click="tooltip=false;$emit('move',1)" class="tooltip-pop-wrap__item">下移</div>
       </div>
     </van-popup>
   </section>
@@ -66,10 +72,10 @@
 
 <script>
   import {createCollectInfo, delCollectInfo} from '@/api/index'
-
+  import { Dialog } from 'vant';
   export default {
     name: "questionItem",
-    props: ['isSend', 'index', 'isQuestion', 'canMove', 'item'],//isQuestion 是否试题页面适用
+    props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item'],//isQuestion 是否试题页面适用
     data() {
       return {
         analyseShow: false,
@@ -78,8 +84,23 @@
       }
     },
     methods: {
+      handleAdd() {
+        if(this.item.isRemove) {
+          Dialog.confirm({
+            title: '确定移除当前试题?'
+          }).then(() => {
+            this.$emit('add', this.item.isRemove);
+            // this.$set(this.item, 'isRemove', !this.item.isRemove)
+          }).catch(() => {
+            // on cancel
+          });
+        }else {
+          this.$emit('add', this.item.isRemove);
+          // this.$set(this.item, 'isRemove', !this.item.isRemove)
+        }
+      },
       handleCollect(v) {
-        if(!v) {
+        if (!v) {
           //添加收藏
           let obj = {
             "interUser": "value",
@@ -100,14 +121,14 @@
             requestJson: JSON.stringify(obj)
           }
           createCollectInfo(params).then(res => {
-            if(res.flag) {
+            if (res.flag) {
               this.item.collectId = res.resCollectInfo.collectId
               this.$toast('收藏成功')
-            }else {
+            } else {
               this.$toast(res.msg)
             }
           })
-        }else {
+        } else {
           //取消收藏
           let obj = {
             "interUser": "value",
@@ -115,22 +136,22 @@
             "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
-              "collectId":this.item.collectId,
-              "objectTypeCd":"C04",
-              "objectId":this.item.examId,
-              "collectType":"C01",
+              "collectId": this.item.collectId,
+              "objectTypeCd": "C04",
+              "objectId": this.item.examId,
+              "collectType": "C01",
               "accountNo": this.$store.getters.getUserInfo.accountNo,
-              "statusCd":this.item.statusCd
+              "statusCd": this.item.statusCd
             },
           }
           let params = {
             requestJson: JSON.stringify(obj)
           }
           delCollectInfo(params).then(res => {
-            if(res.flag) {
+            if (res.flag) {
               this.item.collectId = 0
               this.$toast('取消收藏')
-            }else {
+            } else {
               this.$toast(res.msg)
             }
           })
