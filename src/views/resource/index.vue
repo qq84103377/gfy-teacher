@@ -47,14 +47,18 @@
         classId: '',
         tchClassCourseInfo: [],
         classGrade: '',
+        tchCourseInfo:{}
       }
     },
     methods: {
       goto(path) {
+        this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
         const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,courseName} = this
         this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,courseName}})
+
       },
       selectCourse(tchCourseInfo, index) {
+        this.tchCourseInfo = tchCourseInfo
         this.index = index
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
@@ -105,6 +109,7 @@
           if (res.flag) {
             this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
             if (!this.courseName) {
+              this.tchCourseInfo = this.courseList[0].tchCourseInfo
               //首次取第一条课程的信息
               this.courseName = this.courseList[0].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId

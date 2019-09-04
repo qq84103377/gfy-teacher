@@ -6,6 +6,8 @@
           class="parent-checkbox"
           style="margin-left: 0;"
           v-model="item.check"
+          :title="item.className"
+          :disabled="!item.tchSubGroup || item.tchSubGroup.length==0 "
           @click=""
         >
           <i
@@ -13,47 +15,49 @@
             slot-scope="props"
             :class="['iconGFY','icon-check',{'normal':!props.checked}]"
           ></i>
-          {{item.name}}
+          {{item.className}}
         </van-checkbox>
-        <div class="team-select-wrap__body__group" v-for="(g,gi) in item.group" :key="gi">
+        <div class="team-select-wrap__body__group" v-for="(g,gi) in item.tchSubGroup" :key="gi">
           <van-checkbox
             class="gfy-checkbox"
             style="margin-left: 0;"
             v-model="g.check"
             @click="handleSelectParent(g)"
+            :disabled:="!g.tchClassSubGroupStudent.tchSubGroupStudent ||g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
           >
             <i
               slot="icon"
               slot-scope="props"
               :class="['iconGFY','icon-check',{'normal':!props.checked}]"
             ></i>
-            {{item.name}}
+            {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
           </van-checkbox>
           <div class="team-select-wrap__body__group-wrap">
-            <div @click="handleSelectChild(s,g)" v-for="(s,si) in g.stu" :key="si"
-                 :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.name}}
+            <div @click="handleSelectChild(s,g)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si"
+                 :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo| getStudentName(item.classId)}}
             </div>
           </div>
         </div>
       </div>
 
-      <div class="team-select-wrap__body__group" v-else v-for="(c,ci) in list" :key="ci">
+      <div class="team-select-wrap__body__group" v-if="$route.query.type === 'class'" v-for="(c,ci) in list" :key="ci">
         <van-checkbox
           class="gfy-checkbox"
           style="margin-left: 0;"
           v-model="c.check"
           @click="handleSelectParent(c)"
+          :disabled="!c.classStudent || c.classStudent.length == 0"
         >
           <i
             slot="icon"
             slot-scope="props"
             :class="['iconGFY','icon-check',{'normal':!props.checked}]"
           ></i>
-          {{item.name}}
+          {{c.className}}
         </van-checkbox>
         <div class="team-select-wrap__body__group-wrap">
-          <div @click="handleSelectChild(s,g)" v-for="(s,si) in g.stu" :key="si"
-               :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.name}}
+          <div @click="handleSelectChild(s,g)" v-for="(s,si) in c.classStudent" :key="si"
+               :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo|getStudentName(c.classId)}}
           </div>
         </div>
       </div>
@@ -79,8 +83,11 @@
       //
       //   })
       // }
-
-      this.list = JSON.parse(JSON.stringify(this.$store.getters.getTeamList))
+      let classInfo = this.$store.getters.getTaskClassInfo
+      if (classInfo) {
+        this.list = JSON.parse(classInfo);
+      }
+      //this.list = JSON.parse(JSON.stringify(this.$store.getters.getTeamList))
     },
     methods: {
       handleConfirm() {

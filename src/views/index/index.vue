@@ -8,14 +8,14 @@
       <div class="index-content-wrap__header">
         <div id="gfy_dropdown">
           <div @click="subjectShow = true">
-            <span>{{currentSubjectType}}</span>
+            <span >{{currentSubjectType}} </span>
             <van-icon class="fs16 black" name="arrow-down" />
           </div>
 
           <van-popup :overlay="false" v-model="subjectShow" get-container="#gfy_dropdown" class="score-pop">
             <div style="position: relative;">
               <div class="score-pop-wrap">
-                <div class="score-pop-wrap__item" v-for="(value, key) in subjectTypeList" :key="key" @click="handleClosePop(key)">{{value}}</div>
+                <div class="score-pop-wrap__item" :class="{active: currentSubjectType== value}" v-for="(value, key) in subjectTypeList" :key="key" @click="handleClosePop(key)">{{value}} <van-icon v-show="currentSubjectType== value " class="check blue" name="success"/></div>
               </div>
               <div class="parent">
                 <div class="child"></div>
@@ -27,7 +27,11 @@
         <i class="iconGFY icon-bell"></i>
       </div>
       <div class="index-content-wrap__body">
-        <img src="../../assets/img/banner.png" alt="">
+        <van-swipe :autoplay="3000">
+          <van-swipe-item v-for="(image, index) in publishList" :key="index">
+            <img :src="image.photoUrl" style="width:calc(100%)" />
+          </van-swipe-item>
+        </van-swipe>
         <div class="index-content-wrap__body__main-icon">
           <div @click="$router.push(`/preview`)" class="index-content-wrap__body__main-icon-item">
             <div class="icon-wrap blue"><i class="iconGFY icon-book"></i></div>
@@ -50,7 +54,9 @@
           <span class="fs16 black">未结束任务</span>
           <span class="blue fs12">查看更多></span>
         </div>
-        <div v-for="item in taskList" :key="item.taskId"  class="index-content-wrap__body__unfinish-wrap">
+        <van-skeleton :row="3"
+                      :loading="loading">
+          <div v-for="item in taskList" :key="item.taskId"  class="index-content-wrap__body__unfinish-wrap">
           <list-item :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
@@ -68,7 +74,7 @@
             </div>
           </list-item>
         </div>
-
+        </van-skeleton>
         <div class="divider-title">教学工具</div>
         <div class="icon-group">
           <div>
@@ -94,7 +100,8 @@
 
 <script>
   import listItem from '../../components/list-item'
-  import { getUnFinishCourseTask,getMySchoolInfo } from '@/api/index'
+  import { getUnFinishCourseTask,getMySchoolInfo,getClassStudent,getSubGroupStudent,getGradeTermInfo,getPublishByRole,
+    getClassTeacherCourseDeploy} from '@/api/index'
 
   export default {
         name: "index",
@@ -105,17 +112,22 @@
             subjectShow:false,
             taskList:[],
             subjectTypeList:{},
-            currentSubjectType:''
+            currentSubjectType:'',
+            loading:true,
+            publishList:[]
           }
       },
     mounted() {
       this.getMySchoolInfo()
-
+      this.getGradeTermInfo()
+      this.getPublishByRole()
+      this.getClassTeacherCourseDeploy()
     },
     methods: {
         handleClosePop(key) {
           this.subjectShow = false
           this.currentSubjectType = this.subjectTypeList[key]
+          localStorage.setItem("currentSubjectTypeName", this.currentSubjectType);
           localStorage.setItem("currentSubjectType", key);
         },
         getUnFinishCourseTask(){
@@ -145,6 +157,7 @@
                   }
                 })
               }
+              this.loading = false
             } else{
               this.$toast(res.msg)
             }
@@ -189,11 +202,15 @@
                     classMap[obj.classId] = obj
                     if (obj.teacherInfoList) {
                       obj.teacherInfoList.forEach(obj2=>{
-                        that.subjectTypeList[obj2.subjectType] = obj2.subjectName
+                        this.getSubGroupStudent(item.schoolId, obj.classId, obj2.subjectType)
+                        if (obj2.subjectType!='S20'){
+                          that.subjectTypeList[obj2.subjectType] = obj2.subjectName
+                        }
                       })
-
                     }
+                    this.getClassStudent(item.schoolId, obj.classId)
                   })
+
                 }
                 if (item.myHisClassInfo) {
                   item.myHisClassInfo.forEach(obj=>{
@@ -208,6 +225,7 @@
               for(let key in that.subjectTypeList){
                 console.log("属性：" + key + ",值：" + that.subjectTypeList[key]);
                 that.currentSubjectType = that.subjectTypeList[key];
+                localStorage.setItem("currentSubjectTypeName", this.currentSubjectType);
                 localStorage.setItem("currentSubjectType", key);
                 break
               }
@@ -217,10 +235,182 @@
               localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
               localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
               this.getUnFinishCourseTask()
+
+              //获取班级学生信息
+
+              //获取班级分组信息
+
             } else {
               this.$toast.error(res.msg)
             }
           })
+        },
+        async getSubGroupStudent(schoolId,classId,subjectType){
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": schoolId,
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "classId": classId,
+            "subjectType": subjectType
+          };
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+
+          getSubGroupStudent(params).then(res=>{
+            if (res.flag){
+              console.log(classId, ",班级学生分组", res.data)
+              if (res.data && res.data.length > 0) {
+                let subMap = []
+                res.data.forEach(item=>{
+                  let id = item.tchClassSubGroupStudent.tchClassSubGroup.subgroupId
+                  if (id != 0) {
+                    subMap.push(item)
+                  }
+                })
+                let key = "subGroup_" + subjectType + "_" + classId
+                localStorage.setItem(key, JSON.stringify(subMap))
+              }
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        },
+        async getClassStudent(schoolId,classId){
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": schoolId,
+            "classId": classId
+          }
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+
+          getClassStudent(params).then(res=>{
+            if (res.flag){
+              console.log(classId, ",班级学生：", res.data)
+              if (res.data && res.data.length > 0 && res.data[0].classStudent) {
+                let classStudent = res.data[0].classStudent
+                let classStudentMap = {}
+                classStudent.forEach(item=>{
+                  classStudentMap[item.accountNo] = item
+                })
+
+                let key = "classStudent_" + classId
+                localStorage.setItem(key, JSON.stringify(classStudentMap))
+              }
+
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+
+        },
+        async getGradeTermInfo(){
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+          }
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+          getGradeTermInfo(params).then(res => {
+            console.log(res)
+            if (res.flag){
+              this.$store.commit('setGradeTermList', res.resGradeTermList)
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        },
+        async getPublishByRole(){
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "belongSchoolId": this.$store.getters.schoolId,
+            "roleType": "A02",
+            "type": "T06",
+            "pageSize": "10",
+            "currPage": "1"
+          };
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+          getPublishByRole(params).then(res=>{
+            console.log(res)
+            if (res.flag){
+              this.publishList = res.data
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        },
+        async getClassTeacherCourseDeploy(){
+          let obj = {
+            'operateAccountNo':this.$store.getters.getUserInfo.accountNo
+          }
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+          getClassTeacherCourseDeploy(params).then(res => {
+            if (res.flag){
+              if (!res.data || res.data.length == 0) {
+                this.$toast("未配置建课信息，请联系管理人员")
+                return
+              }
+              let deployMap = {}
+              let key = ""
+              res.data.forEach(item => {
+                key = item.gradeTermInfo.grade + "_" + item.gradeTermInfo.term + "_" + item.subjectType +"_"+item.gradeTermId
+                if (deployMap[key]) {
+                  let tmp = deployMap[key]
+                  let flag = false
+                  for (let t of tmp) {
+                    if (t.textBookId == item.textBookId && t.gradeTermId == item.gradeTermId){
+                      flag = true
+                      break
+                    }
+                  }
+                  if (!flag){
+                    deployMap[key].push({
+                      textBookId:item.textBookId,
+                      textBookName:item.textBookName,
+                      gradeTermId:item.gradeTermId
+                    })
+                  }
+                } else {
+                  deployMap[key]=[{
+                    textBookId:item.textBookId,
+                    textBookName:item.textBookName,
+                    gradeTermId:item.gradeTermId
+                  }]
+                }
+              })
+              console.log("课程配置信息：", deployMap)
+              let list = []
+              for (let m in deployMap){
+                let k = m.split("_")
+                list.push({
+                  classGrade: k[0],
+                  term:k[1],
+                  subjectType:k[2],
+                  gradeTermId:k[3],
+                  textBookList : deployMap[m]
+                })
+              }
+              console.log("list", list);
+              localStorage.setItem("deployMap", JSON.stringify(list))
+            } else {
+              this.$toast("获取老师课程配置：" + res.msg)
+            }
+
+          });
         }
       }
     }
@@ -258,6 +448,10 @@
               line-height: 44px;
               font-size: 14px;
               border-top: 1px solid #eee;
+
+              &.active {
+                color: @blue;
+              }
             }
           }
           .parent {

@@ -25,7 +25,7 @@
         <div slot="title">
           <div class="add-task__body__cell-ctn mgl5">
             <div><span class="red">*</span>{{handleLabel()}}:</div>
-            <span class="pdlt10">说和做闻一多</span>
+            <span class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
           </div>
           <van-checkbox
             class="allow-fast"
@@ -44,9 +44,9 @@
         <div slot="title">
           <div class="add-task__body__cell-ctn" :class="{ccc:form.comment}">
             <div>试卷:</div>
-            <div class="pdlt10" style="flex:1">{{form.exam || '未选择试卷'}}</div>
-            <van-icon v-if="form.exam&&$route.query.type != 'exam'" @click="form.exam = ''" class="close" :class="{ccc:form.comment}" name="clear"/>
-            <van-icon v-if="$route.query.type != 'exam'" @click="filterShow=true" class="add" :class="{ccc:form.comment}" name="add"/>
+            <div class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}</div>
+            <van-icon v-if="testPaperName&&$route.query.type != 'exam'" @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}" name="clear"/>
+            <van-icon v-if="$route.query.type != 'exam'" @click="selectTestPaper" class="add" :class="{ccc:form.comment}" name="add" />
           </div>
           <van-checkbox
             class="allow-fast"
@@ -98,47 +98,49 @@
             </van-radio-group>
           </div>
           <div class="mgt15">
-            <div class="select-wrap" v-for="(item,index) in teamList" :key="index">
+            <div class="select-wrap" v-for="(item,index) in classList" :key="index">
               <div>
                 <van-checkbox
                   class="comment-check"
                   style="margin-left: 0;"
                   v-model="item.check"
                   @click="handleCheckParent(item)"
+                  :disabled="item.classStudent.length == 0"
                 >
                   <i
                     slot="icon"
                     slot-scope="props"
                     :class="['iconGFY','icon-check',{'normal':!props.checked}]"
                   ></i>
-                  {{item.name}}
+                  {{item.className}}
                 </van-checkbox>
                 <div class="select-wrap-desc">
-                  <div v-if="form.object == 1">发布范围: 全部学生</div>
+                  <div v-if="form.object == 1 ">发布范围: 全部学生</div>
 
                   <!--                  <van-checkbox-group v-else class="gfy-checkbox-group" @change="handleCheckChild($event,item)"-->
                   <!--                                      v-model="item.groupSelect">-->
                   <div v-else class="gfy-checkbox-group">
                     <van-checkbox
                       class="gfy-checkbox-group-item"
-                      v-for="(g, gi) in item.group"
+                      v-for="(g, gi) in item.tchSubGroup"
                       :key="gi"
                       :name="gi"
                       v-model="g.check"
                       @click="handleCheckChild(g,item)"
+                      :disabled="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
                     >
                       <i
                         slot="icon"
                         slot-scope="props"
                         :class="['iconGFY','icon-check',{'normal':!props.checked}]"
                       ></i>
-                      {{g.name}}
+                      {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
                     </van-checkbox>
                     <!--                  </van-checkbox-group>-->
                   </div>
                 </div>
               </div>
-              <van-icon @click="$router.push(`/teamSelect?type=${form.object == 1?'class':'team'}`)" class="fs16 grey9"
+              <van-icon @click="toSelectStudent" class="fs16 grey9"
                         name="arrow"></van-icon>
             </div>
           </div>
@@ -159,10 +161,18 @@
               </van-radio>
             </van-radio-group>
           </div>
-          <div class="time-wrap">
+          <div class="time-wrap" v-if="form.time == 1">
             <div @click="showTime=true" class="time-view">{{form.time1}}</div>
             <span class="divider">~</span>
             <div class="time-view">{{form.time2}}</div>
+          </div>
+          <div class="time-wrap" v-if="form.time==2" v-for="(item,index) in classList" :key="index">
+            <span class=" fs14 mgr10 class-name" :style="{width:item.className.length>6?'100%':'auto'}">{{item.className}}</span>
+            <div style="display: flex;align-items: center;flex: 1">
+              <div @click="showTime=true" class="time-view">{{form.time1}}</div>
+              <span class="divider">~</span>
+              <div class="time-view">{{form.time2}}</div>
+            </div>
           </div>
         </div>
       </van-cell>
@@ -187,13 +197,13 @@
       :style="{ height: '35%' }">
       <van-datetime-picker
         v-model="currentDate"
-        type="date"
+        type="datetime"
         @confirm="handleSelectTime"
         @cancel="showTime=false"
       />
     </van-popup>
 
-    <exam-filter :visible.sync="filterShow"></exam-filter>
+    <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName"  ref="examFilter"></exam-filter>
 
   </section>
 </template>
@@ -209,13 +219,15 @@
       return {
         filterShow: false,
         currentDate: new Date(),
+        tchCourseInfo:'',
+        resourceInfo:'',
         form: {
           name: '',
-          duration: '',
+          duration: '10',
           allowFast: false,
           allowEdit: false,
           comment: false,
-          exam: 'sdasdsa',
+          exam: '',
           object: '1',
           time: '1',
           time1: formatTime(new Date()),
@@ -247,9 +259,49 @@
           ]
         },
         showTime: false,
+        classList:{},
+        testPaperId: '',
+        testPaperName: ''
+      }
+    },
+    mounted(){
+      this.resourceInfo = this.$store.getters.getResourceInfo
+      console.log('课件', this.resourceInfo)
+      if (this.resourceInfo){
+        this.form.name = this.resourceInfo.coursewareName
+      }
+
+      //课程信息
+      this.tchCourseInfo = this.$store.getters.getTchCourseInfo
+      console.log("课程", this.tchCourseInfo)
+
+      if (this.tchCourseInfo) {
+        this.classList = this.tchCourseInfo.tchClassCourseInfo
+        let subjectType = this.tchCourseInfo.subjectType
+        let key = "subGroup_" + subjectType + "_"
+        let classKey = "classStudent_"
+
+        //获取分组信息
+        this.classList.forEach(item => {
+          key += item.classId
+          if (localStorage.getItem(key)) {
+            item.tchSubGroup = JSON.parse(localStorage.getItem(key))
+          } else{
+            item.tchSubGroup = []
+          }
+
+          //
+          classKey += item.classId
+          if (localStorage.getItem(classKey)) {
+            item.classStudent = JSON.parse(localStorage.getItem(classKey))
+          } else{
+            item.classStudent = []
+          }
+        })
       }
     },
     methods: {
+
       handleLabel() {
         if (this.$route.query.type === 'lesson') {
           return '微课'
@@ -272,13 +324,13 @@
       },
       handleCheckChild(group, classItem) {
 
-        group.stu.forEach(v => {
+        group.tchSubGroup.forEach(v => {
           this.$set(v, 'active', !group.check)
         })
         if (group.check) {
           // 取消勾选
 
-          let count = classItem.group.reduce((t, v) => {
+          let count = classItem.tchSubGroup.reduce((t, v) => {
             if (v.check) {
               t++
             }
@@ -297,7 +349,7 @@
         // if (item.check) {
         // 取消勾选
         // item.groupSelect = []
-        item.group.forEach(v => {
+        item.tchSubGroup.forEach(v => {
           this.$set(v, 'check', !item.check)
           v.stu.forEach(_v => {
             this.$set(_v, 'active', !item.check)
@@ -316,6 +368,16 @@
       handleSelectTime(v) {
         this.form.time1 = formatTime(v)
         this.showTime = false
+      },
+      toSelectStudent(){
+        //设置学生
+        this.$store.commit("setTaskClassInfo", JSON.stringify(this.classList))
+        let type = this.form.object == 1?'class':'team'
+        this.$router.push(`/teamSelect?type=` + type)
+      },
+      selectTestPaper(){
+        this.filterShow = true;
+        this.$refs.examFilter.getTeachCourseResDetail()
       }
     },
     computed: {
@@ -395,14 +457,17 @@
         }
 
         .time-wrap {
-          background: #f5f6fa;
-          padding: 10px 6px;
-          border-radius: 5px;
-          display: flex;
           align-items: center;
+          background: #f5f6fa;
+          border-radius: 10px;
+          display: flex;
+          padding: 10px;
           justify-content: space-between;
-          margin-top: 15px;
+          flex-wrap: wrap;
+          margin-bottom: 5px;
+          .class-name {
 
+          }
           .divider {
             margin: 0 5px;
           }

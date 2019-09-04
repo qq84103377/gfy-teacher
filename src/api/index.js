@@ -62,6 +62,45 @@ export const getClassTeachCourseInfo = (params)=>{
   return axios.post('teach/getClassTeachCourseInfo', qs.stringify(params))
 }
 
+//查询系统课程
+export const getTextBookCourseByParam =(params) =>{
+  return axios.post('resource/getTextBookCourseByParam', qs.stringify(params));
+}
+
+//获取共享系统课程
+export const getShareCourseDetailV2 =(params) =>{
+  return axios.post("resource/getShareCourseDetailV2", qs.stringify(params))
+}
+//获取教材课程
+export const getTextBookCourseInfo =(params)=>{
+  return axios.post("resource/getTextBookCourseInfo", qs.stringify(params))
+}
+//获取班级学生信息
+export const getClassStudent = (params)=>{
+  return axios.post("school/getClassStudent", qs.stringify(params))
+}
+
+//获取分组信息
+export const getSubGroupStudent = (params)=>{
+  return axios.post("teach/getSubGroupStudent", qs.stringify(params))
+}
+//创建课程
+export const createTeachCourse =(params)=>{
+  return axios.post("teach/createTeachCourse", qs.stringify(params))
+}
+//获取年级学期信息
+export const getGradeTermInfo=(params)=>{
+  return axios.post("resource/getGradeTermInfo", qs.stringify(params))
+}
+//获取轮播图
+export const getPublishByRole=(params)=>{
+  return axios.post("oprInformationPublish/getPublishByRole", qs.stringify(params))
+}
+//
+//查询老师建课配置
+export const getClassTeacherCourseDeploy=(params)=>{
+  return axios.post("school/getClassTeacherCourseDeploy", qs.stringify(params))
+}
 //获取任务列表
 export const getCourseTaskList =(params)=>{
   return axios.post('teach/getCourseTaskList', qs.stringify(params))

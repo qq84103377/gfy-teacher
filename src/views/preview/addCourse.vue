@@ -10,7 +10,7 @@
           label="名称:"
           @click-right-icon="filterShow=true">
           <div slot="input" class="input-wrap">
-            <input maxlength="64" v-model="form.name" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
+            <input maxlength="64" v-model="form.name" v-on:input="getSysCourseList" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
             <span class="num-tip">{{64 - form.name.length}}</span>
             <van-icon @click="form.name = ''" class="close" name="clear"/>
           </div>
@@ -18,15 +18,15 @@
             筛选
           </div>
         </van-field>
-        <div class="search-wrap" v-show="form.name">
-          <van-cell v-for="a in 10" :key="a">
+        <div class="search-wrap" v-show="showMask">
+          <van-cell v-for="(item, index) in sysCourseList" :key="index" @click="selectCourse(index)">
             <div slot="title" class="aic jcsb search-wrap__item">
               <div class="search-wrap__item-title">
-                jksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsdjksdakjsd
+                {{item.nodeName}}
               </div>
               <div class="jcsb aic fs10" style="flex: 0 0 25%">
-                <span class="tag">人教版</span>
-                <span class="tag">初一</span>
+                <span class="tag">{{item.textBookName}}</span>
+                <span class="tag">{{item.classGradeName}}</span>
               </div>
             </div>
           </van-cell>
@@ -40,15 +40,13 @@
         <div slot="title">
           <div class="gfy-label class-label jcsb aic">
             <div><span style="color: red">*</span>课程:</div>
-            <div class="blue">其他共享课程</div>
+            <div class="blue" @click="getShareCourseDetailV2">其他共享课程</div>
           </div>
-          <van-radio-group class="gfy-radio-group" v-model="form.course">
-            <van-radio name="1" class="mgr10 mgb10"><i slot="icon" slot-scope="props"
+          <van-radio-group class="gfy-radio-group" v-model="form.course" @change="changShareCourse">
+            <van-radio :name="index" class="mgr10 mgb10" v-for="(item ,index) in shareCourseList" :key="index"><i slot="icon" slot-scope="props"
                                                        :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-              会议鲁迅先生 <span class="grey9 fs10">(创建人:管理员5,使用次数:7)</span></van-radio>
-            <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
-                                                 :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-              会议鲁迅先生 <span class="grey9 fs10">(创建人:管理员5,使用次数:7)</span></van-radio>
+              {{item.courseName}} <span class="grey9 fs10">(创建人:{{item.belongAccountName}},使用次数:{{item.useAccount}})</span></van-radio>
+
           </van-radio-group>
         </div>
       </van-cell>
@@ -58,16 +56,16 @@
           <van-checkbox-group class="gfy-checkbox-group" v-model="result">
             <van-checkbox
               class="gfy-checkbox-group-item"
-              v-for="(item, index) in list"
-              :key="item"
-              :name="item"
+              v-for="(item, index) in classMap"
+              :key="index"
+              :name="item.classId"
             >
               <i
                 slot="icon"
                 slot-scope="props"
                 :class="['iconGFY','icon-check',{'normal':!props.checked}]"
               ></i>
-              龙江智慧一般 {{ item }}
+              {{item.className}}
             </van-checkbox>
           </van-checkbox-group>
         </div>
@@ -86,12 +84,19 @@
               </van-radio>
             </van-radio-group>
           </div>
-          <div class="time-group">
-            <span class=" fs14 mgr10 class-name" :style="{width:className.length>6?'100%':'auto'}">{{className}}</span>
+          <div class="time-group" v-if="form.radio ==2">
             <div style="display: flex;align-items: center;flex: 1">
-              <div @click="showTime=true" class="time-view">{{form.time1}}</div>
+              <div  class="time-view" @click="selectTime('begin')">{{form.time1}}</div>
               <span class="divider">~</span>
-              <div class="time-view">{{form.time2}}</div>
+              <div  class="time-view" @click="selectTime('end')">{{form.time2}}</div>
+            </div>
+          </div>
+          <div class="time-group" v-for="(item,index) in classMap" :key="index" v-if="form.radio ==1">
+            <span class=" fs14 mgr10 class-name" :style="{width:item.className.length>6?'100%':'auto'}">{{item.className}}</span>
+            <div style="display: flex;align-items: center;flex: 1">
+              <div class="time-view" @click="selectTime('begin',item.classId)">{{item.beginDate}}</div>
+              <span class="divider">~</span>
+              <div class="time-view" @click="selectTime('end',item.classId)">{{item.endDate}}</div>
             </div>
           </div>
         </div>
@@ -100,15 +105,15 @@
         <div slot="title" class="gfy-label aic">
           <span class="mgr10">共享:</span>
           <van-radio-group style="display: flex;" v-model="form.share">
-            <van-radio :disabled="!isEdit" name="2" class="mgr10"><i slot="icon" slot-scope="props"
+            <van-radio :disabled="!isEdit" name="S01" class="mgr10"><i slot="icon" slot-scope="props"
                                                                      :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked&&isEdit},{'icon-radio-disable':!isEdit}]"></i>
               个人
             </van-radio>
-            <van-radio v-if="isEdit" name="3" class="mgr10"><i slot="icon" slot-scope="props"
+            <van-radio v-if="isEdit" name="S02" class="mgr10"><i slot="icon" slot-scope="props"
                                                                :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
               校内
             </van-radio>
-            <van-radio v-if="isEdit" name="4"><i slot="icon" slot-scope="props"
+            <van-radio v-if="isEdit" name="S03"><i slot="icon" slot-scope="props"
                                                  :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
               共享
             </van-radio>
@@ -131,6 +136,7 @@
         :style="{ height: '35%' }">
         <van-datetime-picker
           v-model="currentDate"
+          :min-date="minDate"
           type="date"
           @confirm="handleSelectTime"
           @cancel="showTime=false"
@@ -143,9 +149,9 @@
       <van-button class="edit-btn" type="info">提交</van-button>
     </div>
     <div class="add-course-wrap__footer" v-else>
-      <van-button class="submit-btn" type="info">提交</van-button>
+      <van-button class="submit-btn" type="info" @click="createCourse">提交</van-button>
     </div>
-    <div class="mask" @click="form.name = ''" v-show="form.name"></div>
+    <div class="mask"  v-show="showMask"></div>
 
     <course-filter :visible.sync="filterShow"></course-filter>
   </section>
@@ -154,6 +160,7 @@
 <script>
   import {generateTimeReqestNumber} from '@/utils/filter'
   import courseFilter from '../../components/courseFilter'
+  import {getTextBookCourseByParam,getShareCourseDetailV2,createTeachCourse} from '@/api/index'
 
   export default {
     name: "addCourse",
@@ -162,39 +169,263 @@
       return {
         filterShow: false,
         showTime: false,
+        showMask:false,
         form: {
-          share: '',
+          share: 'S01',
           desc: '',
           name: '',
           course: '',
           radio: '2',
-          time1: generateTimeReqestNumber(new Date()),
-          time2: generateTimeReqestNumber(new Date()),
+          time1: '',
+          time2: '',
         },
+        sysCourseList:[],
+        shareCourseList:[],
+        currentShareCourse:'',
         list: ['a', 'b', 'c'],
         result: [],
         currentDate: new Date(),
+        minDate:new Date(),
         className: '电话的的的123',
+        classMap:{},
+        beginDate:[],
+        endDate:[],
+        timeType:{},
+        currentClassId:''
       }
     },
     computed: {
-      showMask: {
-        get() {
-          return this.form.name ? true : false
-        },
-        set(v) {
-          if (!v) {
-            this.form.name = ''
-          }
-        }
-      }
+      // showMask: {
+      //   get() {
+      //     return this.form.name ? true : false
+      //   },
+      //   set(v) {
+      //     if (!v) {
+      //       this.form.name = ''
+      //     }
+      //   }
+      // }
     },
     components: {courseFilter},
+    mounted(){
+      //班级信息
+      let cl=localStorage.getItem("classMap")
+
+      if (cl) {
+        this.classMap = JSON.parse(cl);
+        for (let m in this.classMap) {
+          this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+          let now = new Date()
+          now.setDate(now.getDate()+3)
+          this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+        }
+      }
+      let date = new Date()
+      this.form.time1 =  generateTimeReqestNumber(date);
+      date.setDate(date.getDate()+3)
+      this.form.time2 = generateTimeReqestNumber(date)
+    },
     methods: {
       handleSelectTime(v) {
-        this.form.time1 = generateTimeReqestNumber(v)
+        if (this.form.radio == '2'){
+          if (this.timeType =='begin'){
+            this.form.time1 = generateTimeReqestNumber(v)
+            //判断结束时间时候小于结束时间
+            let time1 = new Date(this.form.time1)
+            let time2 = new Date(this.form.time2)
+            if (time1.getTime() >= time2.getTime()) {
+              time1.setDate(time1.getDate()+3)
+              this.form.time2 = generateTimeReqestNumber(time1)
+            }
+          } else if (this.timeType=='end'){
+            this.form.time2 = generateTimeReqestNumber(v)
+          }
+        } else {
+          if (this.timeType =='begin'){
+            this.classMap[this.currentClassId]['beginDate'] =generateTimeReqestNumber(v)
+            let begin = new Date(this.classMap[this.currentClassId]['beginDate'])
+            let end = new Date(this.classMap[this.currentClassId]['endDate'])
+            if (begin.getTime() >= end.getTime()) {
+              begin.setDate(begin.getDate()+3)
+              this.classMap[this.currentClassId]['endDate'] = generateTimeReqestNumber(begin)
+            }
+          } else if(this.timeType=='end' ){
+            this.classMap[this.currentClassId]['endDate'] =generateTimeReqestNumber(v)
+          }
+        }
         this.showTime = false
+      },
+      getSysCourseList (){
+        this.showMask = true
+        if (this.form.name == "") {
+          return
+        }
+        let obj ={
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectList": [localStorage.getItem("currentSubjectType")],
+          "keyWord":this.form.name
+        };
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        getTextBookCourseByParam(params).then(res=>{
+          if (res.flag){
+
+            this.sysCourseList = res.data
+
+            if (!this.sysCourseList || this.sysCourseList.length ==0){
+              this.showMask = false
+            }
+          } else {
+            this.$toast(res.msg)
+            return
+          }
+        })
+      },
+      selectCourse(index){
+        console.log(index);
+        this.currentShareCourse=this.sysCourseList[index]
+        this.form.name = this.sysCourseList[index].nodeName
+        this.getShareCourseDetailV2()
+        this.showMask = false
+        console.log(this.currentShareCourse)
+      },
+      getShareCourseDetailV2(){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": 24,
+          "schoolTypeCd": "S01",
+          "sysCourseId": this.currentShareCourse.courseId,
+          "classGrade": this.currentShareCourse.classGrade,
+          "subjectType": "S01",
+          "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "pageSize": "100",
+          "termType": "T01",
+          "currentPage": "1"
+        };
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        getShareCourseDetailV2(params).then(res=>{
+          if (res.flag){
+            this.shareCourseList = res.shareCourseDetailList
+            this.form.course = 0;
+            this.result = []
+            if (this.shareCourseList) {
+              let classGrade = this.shareCourseList[0].classGrade
+              if (classGrade){
+                for (let m in this.classMap) {
+                  console.log(this.classMap[m])
+                  if (classGrade == this.classMap[m].classGrade){
+                    this.result.push(this.classMap[m].classId)
+                  }
+                }
+              }
+
+            }
+          } else{
+            this.$toast(res.msg);
+          }
+        })
+      },
+      selectTime(type,classId){
+        this.timeType = type
+        this.showTime = true
+        this.currentClassId = classId;
+        if (this.form.radio =='2'){
+          //统一设置
+          if (type =="begin"){
+            this.minDate = new Date()
+            this.currentDate = new Date(this.form.time1)
+          } else if (type =='end') {
+             let date = new Date(this.form.time1)
+             date.setDate(date.getDate() + 1)
+             this.minDate = date
+             this.currentDate = new Date(this.form.time2)
+          }
+        } else {
+          //分班设置
+          if (type =='begin'){//开始时间
+            this.minDate = new Date()
+            this.currentDate = new Date(this.classMap[classId].beginDate)
+          } else if (type =='end') {//结束时间
+            let date = new Date(this.classMap[classId].beginDate)
+            date.setDate(date.getDate() + 1)
+            this.minDate = date
+            this.currentDate = new Date(this.classMap[classId].endDate)
+          }
+        }
+      },
+      createCourse(){
+        let that = this
+        console.log(this.classMap)
+        if (!this.form.name){
+          this.$toast("请输入课程名称")
+          return
+        }
+        if (!this.result || this.result.length == 0) {
+          this.$toast("请选择班级")
+          return
+        }
+        if (this.form.course===''){
+          this.$toast("请选择课程")
+          return
+        }
+
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": 24,
+          "relationSeqId": this.shareCourseList[this.form.course].sysCourseId,
+          "sysCourseId": this.shareCourseList[this.form.course].sysCourseId,
+          "shareTchCourseId": this.shareCourseList[this.form.course].tchCourseId,
+          "courseName": this.form.name,
+          "subjectType": "S01",
+          "courseType": "C01",
+          "termType": "T01",
+          "shareType": "S01",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "classCount": this.result.length,
+          "desc": this.form.desc,
+        };
+        if (this.form.radio =='2'){
+          //统一设置
+          this.result.forEach((item,index) => {
+            obj["classInfo" + (index+1)] = item + "|" + this.form.time1 + "|" + this.form.time2
+          })
+        } else {
+          //分班设计
+
+          this.result.forEach((item,index) => {
+            obj["classInfo" + (index+1)] = item + "|" + that.classMap[item].beginDate + "|" + that.classMap[item.classId].endDate
+          })
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        console.log("新建课参数：" , params)
+
+        createTeachCourse(params).then(res => {
+          if (res.flag){
+            this.$toast("创建成功")
+            setTimeout(function () {
+              that.$router.push(`/preview`)
+            },200)
+          } else {
+            this.$toast(res.msg)
+          }
+
+        })
+      },
+      changShareCourse(){
+
       }
+
     }
   }
 </script>

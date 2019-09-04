@@ -24,7 +24,7 @@
                         <van-icon :name="item.statusCd=='S02'?'closed-eye':'eye'" class="eye"></van-icon>
                         <span>{{item.statusCd=='S02'?'不':''}}可见</span>
                       </div>
-                      <div @click="$router.push(`/addTask?type=lesson`)">
+                      <div @click="sendTask(item)">
                         <i class="iconGFY icon-plane"></i>
                         <span>发任务</span>
                       </div>
@@ -156,7 +156,11 @@
           }
         })
       },
-
+      sendTask(obj){
+        console.log("发任务：", obj.coursewareName)
+        this.$store.commit('setResourceInfo', obj)
+        this.$router.push(`/addTask?type=lesson`)
+      }
     }
   }
 </script>

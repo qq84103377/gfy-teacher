@@ -11,64 +11,70 @@
 
       <div class="course-filter-wrap__header van-hairline--bottom">
         <div class="course-filter-wrap__header-tab">
-          <span :class="{'active':item.active}" v-for="(item,index) in subjectList" :key="index"
-                @click="handleSubject(item)">{{item.name}}</span>
+          <span class="active">{{subjectName}}</span>
         </div>
         <van-icon class="icon-close" @click="show=false" name="close"/>
       </div>
       <div class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>
-          <div @click="gradeDropdown=!gradeDropdown">年级
+          <div @click="gradeDropdown=!gradeDropdown">{{classGradeMap[gradeIndex].classGrade|getGradeName}}
             <van-icon :name="gradeDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="gradeDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item">上学期</div>
-            <div class="dropdown-menu-item">下学期</div>
+            <div class="dropdown-menu-item" :class="{active: gradeIndex== index}" v-for="(item,index) in classGradeMap" :key="index" @click="changeGrade(index)">{{item.classGrade|getGradeName}}
+              <van-icon v-show="gradeIndex == index " class="check blue" name="success"/>
+            </div>
+
           </div>
         </div>
         <div >
-          <div @click="termDropdown=!termDropdown">学期
+          <div @click="termDropdown=!termDropdown">{{termTypeList[termIndex].name}}
             <van-icon :name="termDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="termDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item">上学期</div>
-            <div class="dropdown-menu-item">下学期</div>
+            <div class="dropdown-menu-item" @click="changeTermType(index)" :class="{active: termIndex== index}" v-for="(item,index) in termTypeList" :key="index">{{item.name}}
+              <van-icon v-show="termIndex== index " class="check blue" name="success"/>
+            </div>
           </div>
         </div>
         <div>
-          <div @click="versionDropdown=!versionDropdown">版本
+          <div @click="versionDropdown=!versionDropdown">{{textBookList[bookIndex].textBookName}}
             <van-icon :name="versionDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="versionDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item">上学期</div>
-            <div class="dropdown-menu-item">下学期</div>
+            <div class="dropdown-menu-item" :class="{active: bookIndex== index}"v-for="(item ,index) in textBookList" :key="index">{{item.textBookName}}
+              <van-icon v-show="bookIndex== index " class="check blue" name="success"/>
+            </div>
+
           </div>
         </div>
       </div>
       <div class="course-filter-wrap__body">
         <div class="course-filter-wrap__body-left">
-          <div :class="{'active':item.active}" v-for="(item,index) in unit" :key="index" @click="handleUnit(item)">
-            {{item.name}}
+          <div :class="{'active':unitIndex ==index }" v-for="(item,index) in unitList" :key="index" @click="handleUnit(index)">
+            {{item.nodeName}}
           </div>
         </div>
         <div class="course-filter-wrap__body-right">
           <div class="" v-for="(item,index) in courseList" :key="index">
-            <div class="course-first van-hairline--bottom"><span>说和做——记闻一多先生言行片段asdasdasdsads</span>
-              <van-icon @click="$set(item,'fold',!item.fold)" class="down-arrow"
+            <div class="course-first van-hairline--bottom" @click="$set(item,'fold',!item.fold)"><span>{{item.nodeName}}</span>
+              <van-icon  class="down-arrow" v-show="item.childNodeList && item.childNodeList.length>0"
                         :name="item.fold?'arrow-up':'arrow-down'"/>
             </div>
-            <div @click="handleSelect(c)" :class="['course-sec',{active:c.check}]" v-show="item.fold"
-                 v-for="(c,ci) in item.child" :key="ci">说和做——记闻一多先生言行片段
-              <van-icon v-show="c.check" class="check blue" name="success"/>
+            <div  :class="['course-sec',{active:sysCourseId == c.courseId}]" v-show="item.fold" @click="selectSysCourse(c.courseId)"
+                 v-for="(c,ci) in item.childNodeList" :key="ci">{{c.nodeName}}
+              <van-icon v-show="sysCourseId == c.courseId" class="check blue" name="success"/>
             </div>
           </div>
         </div>
       </div>
       <div class="course-filter-wrap__footer">
-        <van-button type="info" class="confirm-btn" @click="show=false">确定</van-button>
+        <van-button type="info" class="confirm-btn" @click="handleSubmit">确定</van-button>
       </div>
     </div>
   </van-popup>
 </template>
 
 <script>
+  import {getTextBookCourseInfo,getGradeTermInfo} from '@/api/index'
+
   export default {
     name: "courseFilter",
     props: ['visible'],
@@ -81,8 +87,22 @@
           name: '语文',
           active: false
         },],
-        subjectList: [{name: '语文', active: false}, {name: '数学', active: false}, {name: '音乐', active: false},],
-        courseList: [{child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]},]
+        unitList:[],
+        unitIndex:0,
+        subjectList: [{name: '语文', active: false}],
+        courseList:[],
+        sysCourseId:'',
+        termTypeList:[
+          {code:'T01', name: '上学期'},
+          {code:'T02', name: '下学期'}
+        ],
+        termIndex:0,
+        gradeTermList: this.$store.getters.getGradeTermInfo,
+        subjectName: localStorage.getItem("currentSubjectTypeName"),
+        classGradeMap:[],
+        gradeIndex:0,
+        textBookList:[],
+        bookIndex:0
       }
     },
     computed: {
@@ -93,6 +113,31 @@
         set() {
           this.$emit('update:visible', false)
         }
+      }
+    },
+    mounted(){
+
+      //获取上下学期
+      let now = new Date();
+      let month = now .getMonth();
+      if (7 >= month && month >= 2){
+        this.termIndex = 1
+      } else{
+        this.termIndex = 0
+      }
+
+
+
+      this.getTextBookCourseInfo()
+
+    },
+    created(){
+      //学科信息获取
+      if (localStorage.getItem("deployMap")){
+        this.classGradeMap = JSON.parse(localStorage.getItem("deployMap"))
+        this.textBookList = this.classGradeMap[0].textBookList
+      } else {
+        this.$toast("未配置年级学科信息")
       }
     },
     methods: {
@@ -111,13 +156,109 @@
         })
         item.active = true
       },
-      handleUnit(item) {
-        if (item.active) return
-        this.unit.forEach(v => {
-          v.active = false
-        })
-        item.active = true
+      handleUnit(index) {
+        this.unitIndex = index;
+        this.courseList = this.unitList[this.unitIndex].courseList
       },
+
+      async getTextBookCourseInfo(){
+        this.unitList = []
+        this.courseList = []
+        if (!this.classGradeMap[this.gradeIndex].gradeTermId){
+          this.$toast("年级配置错误")
+          return
+        }
+
+        if (!this.textBookList || !this.textBookList[this.bookIndex].textBookId){
+          this.$toast("版本配置错误")
+          return
+        }
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "textBookId": this.textBookList[this.bookIndex].textBookId,
+          "gradeTermId": this.classGradeMap[this.gradeIndex].gradeTermId,
+          "subjectType": localStorage.getItem("currentSubjectType")
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+
+        getTextBookCourseInfo(params).then(res=>{
+          console.log("课程：" ,res)
+          if (res.flag){
+            //重构数据
+            let textBookList = res.resTextbookCourseInfoList
+            if (textBookList){
+              //1.找出第一个节点
+              let nodeId = "-1";
+              for (let book of textBookList){
+                if (book.parentId == -1) {
+                  nodeId = book.nodeId
+                  break
+                }
+              }
+
+              //2.获取左侧列表
+              this.unitList =[]
+              let textBookMap ={}
+              let list = []
+              textBookList.forEach(item=>{
+                //按照parentId分组
+                if (!textBookMap[item.parentId+'']){
+                  textBookMap[item.parentId+'']= [item]
+                } else {
+                  textBookMap[item.parentId+''].push(item)
+                }
+                if (item.parentId == nodeId) {
+                  this.unitList.push(item)
+                }
+              })
+              //3.组件每单元下的数据
+              this.unitList.forEach(item=>{
+                let tmp = textBookMap[item.nodeId+'']
+                if (tmp){
+                  tmp.forEach(obj=>{
+                    obj.childNodeList = textBookMap[obj.nodeId+'']
+                  })
+                  item.courseList = tmp
+                }
+              })
+              this.courseList = this.unitList[this.unitIndex].courseList
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+
+        })
+      },
+      selectSysCourse(id){
+        this.sysCourseId = id
+
+      },
+      changeTermType(index){
+        this.termIndex = index
+        this.termDropdown = !this.termDropdown
+        this.getTextBookCourseInfo()
+      },
+      changeGrade(index){
+        this.gradeIndex = index
+        this.textBookList = this.classGradeMap[index].textBookList
+        this.bookIndex = 0
+        this.gradeDropdown = !this.gradeDropdown
+        this.getTextBookCourseInfo()
+      },
+      changeBook(index){
+        this.bookIndex = index
+        this.versionDropdown = !this.versionDropdown
+        this.getTextBookCourseInfo()
+      },
+      handleSubmit(){
+        this.show = false
+        this.$emit('update:visible', false)
+      }
     }
   }
 </script>

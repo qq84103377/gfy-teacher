@@ -16,8 +16,8 @@
         </div>
       </div>
       <div class="exam-filter-wrap__dropdown van-hairline--bottom">
-        <div>
-          <div @click="all=!all;personal=false;school=false;share=false" :class="{blue:all}">全部
+        <div v-for="(item , index) in shareList" :key="index" @click="getTeachCourseResDetail(item.code,1)">
+          <div  :class="{blue:item.code == shareType}">{{item.name}}
 <!--            <van-icon :name="all?'arrow-up':'arrow-down'"/>-->
           </div>
 <!--          <div v-show="all" class="dropdown-menu">-->
@@ -25,66 +25,84 @@
 <!--            <div class="dropdown-menu-item">下学期</div>-->
 <!--          </div>-->
         </div>
-        <div >
-          <div @click="personal=!personal;all=false;school=false;share=false" :class="{blue:personal}">个人
-<!--            <van-icon :name="personal?'arrow-up':'arrow-down'"/>-->
-          </div>
-<!--          <div v-show="personal" class="dropdown-menu">-->
-<!--            <div class="dropdown-menu-item">上学期</div>-->
-<!--            <div class="dropdown-menu-item">下学期</div>-->
-<!--          </div>-->
-        </div>
-        <div>
-          <div @click="school=!school;personal=false;all=false;share=false" :class="{blue:school}">校内
-<!--            <van-icon :name="school?'arrow-up':'arrow-down'"/>-->
-          </div>
-<!--          <div v-show="school" class="dropdown-menu">-->
-<!--            <div class="dropdown-menu-item">上学期</div>-->
-<!--            <div class="dropdown-menu-item">下学期</div>-->
-<!--          </div>-->
-        </div>
-        <div>
-          <div @click="share=!share;personal=false;school=false;all=false" :class="{blue:share}">共享
-<!--            <van-icon :name="share?'arrow-up':'arrow-down'"/>-->
-          </div>
-<!--          <div v-show="share" class="dropdown-menu">-->
-<!--            <div class="dropdown-menu-item">上学期</div>-->
-<!--            <div class="dropdown-menu-item">下学期</div>-->
-<!--          </div>-->
-        </div>
+        <!--<div >-->
+          <!--<div @click="personal=!personal;all=false;school=false;share=false" :class="{blue:personal}">个人-->
+<!--&lt;!&ndash;            <van-icon :name="personal?'arrow-up':'arrow-down'"/>&ndash;&gt;-->
+          <!--</div>-->
+<!--&lt;!&ndash;          <div v-show="personal" class="dropdown-menu">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">上学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">下学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;          </div>&ndash;&gt;-->
+        <!--</div>-->
+        <!--<div>-->
+          <!--<div @click="school=!school;personal=false;all=false;share=false" :class="{blue:school}">校内-->
+<!--&lt;!&ndash;            <van-icon :name="school?'arrow-up':'arrow-down'"/>&ndash;&gt;-->
+          <!--</div>-->
+<!--&lt;!&ndash;          <div v-show="school" class="dropdown-menu">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">上学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">下学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;          </div>&ndash;&gt;-->
+        <!--</div>-->
+        <!--<div>-->
+          <!--<div @click="share=!share;personal=false;school=false;all=false" :class="{blue:share}">共享-->
+<!--&lt;!&ndash;            <van-icon :name="share?'arrow-up':'arrow-down'"/>&ndash;&gt;-->
+          <!--</div>-->
+<!--&lt;!&ndash;          <div v-show="share" class="dropdown-menu">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">上学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="dropdown-menu-item">下学期</div>&ndash;&gt;-->
+<!--&lt;!&ndash;          </div>&ndash;&gt;-->
+        <!--</div>-->
       </div>
       <div class="exam-filter-wrap__body">
         <div class="exam-filter-wrap__body-right">
-          <div class="" v-for="(item,index) in courseList" :key="index">
+          <div class="" v-for="(item,index) in testPaperList" :key="index" @click="selectTest(item)">
 <!--            <div class="course-first van-hairline&#45;&#45;bottom"><span>说和做——记闻一多先生言行片段asdasdasdsads</span>-->
 <!--              <van-icon @click="$set(item,'fold',!item.fold)" class="down-arrow"-->
 <!--                        :name="item.fold?'arrow-up':'arrow-down'"/>-->
 <!--            </div>-->
-            <div @click="handleSelect(c)" :class="['course-sec',{active:c.check}]"
-                 v-for="(c,ci) in item.child" :key="ci">说和做——记闻一多先生言行片段
-              <van-icon v-show="c.check" class="check blue" name="success"/>
+            <div  :class="['course-sec',{active:item.testPaperId == currentTestPaperId}]">{{item.testPaperName}}
+              <van-icon v-show="item.testPaperId == currentTestPaperId" class="check blue" name="success"/>
             </div>
           </div>
         </div>
       </div>
       <div class="exam-filter-wrap__footer">
-        <van-button type="info" class="confirm-btn" @click="show=false">确定</van-button>
+        <van-button type="info" class="confirm-btn" @click="show=false;chooseTestPaper()">确定</van-button>
       </div>
     </div>
   </van-popup>
 </template>
 
 <script>
+  import {teachApi} from '@/api/parent-GFY'
+
   export default {
     name: "examFilter",
-    props: ['visible'],
+    props: ['visible','testPaperId','testPaperName'],
     data() {
       return {
         all: false,
         personal: false,
         school: false,
         share: false,
-        courseList: [{child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]},]
+        shareType:'',
+        shareList:[
+          {"name":"全部", "code": ""},
+          {"name":"个人", "code": "S01"},
+          {"name":"校内", "code": "S02"},
+          {"name":"共享", "code": "S03"}
+        ],
+        testPaperList:[],
+        courseList: [{child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]},],
+        refLoading: false,
+        listLoading: false,
+        finished: false,
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+        paperInfo:{},
+        currentTestPaperId:'',
+        currentTestPaperName:''
       }
     },
     computed: {
@@ -95,7 +113,15 @@
         set() {
           this.$emit('update:visible', false)
         }
+      },
+      testPaperId:function (newValue) {
+        this.currentTestPaperId = newValue
+      },
+      testPaperName:function (newValue) {
+        this.currentTestPaperName = newValue
       }
+    },
+    mounted(){
     },
     methods: {
       handleSelect(item) {
@@ -113,6 +139,64 @@
         })
         item.active = true
       },
+      async onLoad() {
+        this.currentPage++
+        if(this.currentPage > this.total && this.currentPage > 1) {
+          return
+        }
+        this.getTeachCourseResDetail(this.shareType,this.currentPage)
+      },
+      async onRefresh() {
+        this.finished = false
+        this.currentPage = 1
+        await this.getTeachCourseResDetail(this.shareType,this.currentPage)
+        this.$toast('刷新成功')
+      },
+      getTeachCourseResDetail(code,pageNo){
+        this.shareType = code
+        const page = pageNo
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": 24,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "tchCourseId": 2641,
+          "sysCourseId": 4562,
+          "relationSeqId": 4562,
+          "resourceType": "R02",
+          "sourceName": "",
+          "shareType": code,
+          "pageSize": this.pageSize,
+          "currentPage": pageNo
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        teachApi.getTeachCourseResDetail(params).then(res => {
+          this.listLoading = false
+          this.refLoading = false
+          this.total = res.total
+          if (res.flag && res.data && res.data[0] && res.data[0].testPaperInfo) {
+            this.testPaperList = res.data[0].testPaperInfo
+          } else {
+            this.testPaperList = page === 1 ? [] : this.testPaperList.concat([])
+            this.finished = true
+          }
+        })
+      },
+      selectTest(obj){
+        this.paperInfo = obj
+        this.currentTestPaperName = this.paperInfo.testPaperName
+        this.currentTestPaperId = this.paperInfo.testPaperId
+      },
+      chooseTestPaper(){
+        console.log("选择试卷", this.paperInfo);
+
+        this.$emit('update:testPaperId', this.paperInfo.testPaperId)
+        this.$emit('update:testPaperName', this.paperInfo.testPaperName)
+      }
     }
   }
 </script>
