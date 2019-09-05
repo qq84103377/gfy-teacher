@@ -21,7 +21,7 @@
           </div>
         </div>
         <question-item :up="ei>0" :down="ei<section.sectionExamList.length-1" :is-send="isSend"
-                       @add="delTestPaperExamInfo(exam)" v-for="(exam,ei) in section.sectionExamList" :key="ei"
+                       @add="handleAdd(exam)" v-for="(exam,ei) in section.sectionExamList" :key="ei"
                        @setPoint="setPoint($event,exam)"
                        @move="handleMove($event,section.sectionExamList,ei)" :item="exam.examQuestion"
                        @correct="correctInfo=exam.examQuestion;correctShow=true"
@@ -31,7 +31,7 @@
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-    <!--    <exam-bar type="task" v-if="!isSend"></exam-bar>-->
+        <exam-bar v-model="selectList" @clear="clear" type="task" v-if="!isSend"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
     <!--      设置分数-->
@@ -75,6 +75,7 @@
     },
     data() {
       return {
+        selectList: [],
         correctShow: false,
         setPointShow: false,
         list: [],
@@ -147,7 +148,22 @@
           }
         })
       },
-      delTestPaperExamInfo(exam) {
+      handleAdd(exam) {
+        let testPaperExamInfoList = []
+        testPaperExamInfoList.push({
+          "examId": exam.examQuestion.examId,
+          "examIndex": exam.sectionExamInfo.examIndex,
+          "sectionType": exam.sectionExamInfo.sectionType,
+          "subjectType": exam.examQuestion.subjectType,
+          "sectionName": exam.sectionName,
+          "sectionIndex": exam.sectionIndex,
+          examScore: exam.sectionExamInfo.examScore,
+          "groupId": exam.examQuestion.groupId,
+          groupExamReList: []
+        })
+        this.delTestPaperExamInfo(testPaperExamInfoList)
+      },
+      delTestPaperExamInfo(testPaperExamInfoList) {
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -155,19 +171,7 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "testPaperId": this.$route.query.testPaperId,
-          testPaperExamInfoList: [
-            {
-              "examId": exam.examQuestion.examId,
-              "examIndex": exam.sectionExamInfo.examIndex,
-              "sectionType": exam.sectionExamInfo.sectionType,
-              "subjectType": exam.examQuestion.subjectType,
-              "sectionName": exam.sectionName,
-              "sectionIndex": exam.sectionIndex,
-              examScore: exam.sectionExamInfo.examScore,
-              "groupId": exam.examQuestion.groupId,
-              groupExamReList: []
-            }
-          ]
+          testPaperExamInfoList
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -362,8 +366,13 @@
         getTestPaperExamInfo(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
+            this.selectList = []
             // 整理返回的试题列表 跟试题列表返回格式一致
             res.testPaperSectionList.forEach(sec => {
+             this.selectList.push({
+               sectionName: sec.testPaperSectionInfo.sectionName,
+               child: {length:sec.sectionExamList.length}
+             })
               sec.sectionExamList.forEach(exam => {
                 exam.sectionName = sec.testPaperSectionInfo.sectionName
                 exam.sectionIndex = sec.testPaperSectionInfo.sectionIndex
@@ -382,7 +391,30 @@
             this.$toast(res.msg)
           }
         })
-      }
+      },
+      clear() {
+        //清空所有试题时需要移除试题的添加状态样式
+        // this.list.forEach(v => {
+        //   this.$set(v,'isRemove',false)
+        // })
+        let arr = []
+        this.list.forEach(v => {
+          v.sectionExamList.forEach(s => {
+            arr.push({
+              "examId": s.examQuestion.examId,
+              "examIndex": s.sectionExamInfo.examIndex,
+              "sectionType": s.sectionExamInfo.sectionType,
+              "subjectType": s.examQuestion.subjectType,
+              "sectionName": s.sectionName,
+              "sectionIndex": s.sectionIndex,
+              examScore: s.sectionExamInfo.examScore,
+              "groupId": s.examQuestion.groupId,
+              groupExamReList: []
+            })
+          })
+        })
+        this.delTestPaperExamInfo(arr)
+      },
     },
     created() {
       this.getDetail()

@@ -160,6 +160,7 @@
         this.tab.type = false;
         this.tab.sort = false;
         if (item.active) return
+        this.$store.commit('setVanLoading',true)
         this.tab[key].forEach(v => {
           this.$set(v, 'active', false)
         })
@@ -251,6 +252,7 @@
           requestJson: JSON.stringify(obj)
         }
         teachApi.getTeachCourseResDetail(params).then(res => {
+          this.$store.commit('setVanLoading',false)
           this.listLoading = false
           this.refLoading = false
           this.total = res.total

@@ -31,7 +31,7 @@
                 <i class="iconGFY icon-edit"></i>
                 <span>编辑</span>
               </div>
-              <div @click="$router.push(`/statistic`)">
+              <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
                 <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
               </div>
@@ -82,6 +82,10 @@
       // this.getClassTeachCourseInfo()
     },
     methods: {
+      viewStat(item) {
+        this.$router.push({path:'/statistic',query:{info:item}})
+        localStorage.setItem('stat',JSON.stringify(item))
+      },
       selectCourse(tchCourseInfo) {
         this.currentPage = 1
         this.courseName = tchCourseInfo.courseName
@@ -184,7 +188,11 @@
               let classMap = JSON.parse(localStorage.getItem("classMap"))
               this.courseTaskList.forEach(item => {
                 if (item.tchClassTastInfo) {
-                  item.tchClassTastInfo.forEach(obj => {
+                  item.tchClassTastInfo.forEach((obj,i) => {
+                    if(i==0) {
+                      //跳转到任务统计页面时自动将第一个班级设置为选中状态
+                      obj.active = true
+                    }
                     if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                       obj['className'] = "--"
                     } else {

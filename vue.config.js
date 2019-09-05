@@ -5,7 +5,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-  outputDir: '../cordova-teacher/www',
+  outputDir: '../cordova-parent/www',
   pluginOptions: {
     'style-resources-loader': {
       preProcessor: 'less',

@@ -174,7 +174,7 @@
           </div>
         </van-collapse-item>
       </van-collapse>
-<!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
+      <!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
       <van-collapse class="res-centre-wrap__body__collapse" v-show="tabIndex" v-model="activeNames1">
         <van-collapse-item title="微课" name="1">
           <div>
@@ -307,7 +307,7 @@
           </div>
         </van-collapse-item>
       </van-collapse>
-      <van-cell is-link to="/questionList" >
+      <van-cell is-link to="/questionList">
         <div slot="title" class="fs16">试题</div>
       </van-cell>
     </div>
@@ -317,14 +317,19 @@
       class="add-pop"
       position="bottom">
       <div class="add-pop-wrap">
-        <div class="add-pop-wrap__title"><span>雅鲁藏布大峡谷》课文朗读添加至课程</span><van-icon name="close"></van-icon></div>
+        <div class="add-pop-wrap__title"><span>雅鲁藏布大峡谷》课文朗读添加至课程</span>
+          <van-icon name="close"></van-icon>
+        </div>
         <div class="add-pop-wrap__body">
-          <div class="add-pop-wrap__body__radio-group van-hairline--bottom" v-for="(item,index) in addCourseList" :key="index">
+          <div class="add-pop-wrap__body__radio-group van-hairline--bottom" v-for="(item,index) in addCourseList"
+               :key="index">
             <div class="fs15">{{item.name}}</div>
             <van-radio-group class="radio-group" v-model="item.radio">
-              <van-radio @click="handleClickRadio(item,ci)" v-for="(c,ci) in item.child" :key="ci" :name="ci" class="mgr10 mgb15"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-                <div class="aic">{{c.name}} <span v-if="c.name=='无'" class="red mglt10" style="word-break: break-all;">asdjasjkdkjasdkjakdjas</span></div>
+              <van-radio @click="handleClickRadio(item,ci)" v-for="(c,ci) in item.child" :key="ci" :name="ci"
+                         class="mgr10 mgb15"><i slot="icon" slot-scope="props"
+                                                :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                <div class="aic">{{c.name}} <span v-if="c.name=='无'" class="red mglt10" style="word-break: break-all;">asdjasjkdkjasdkjakdjas</span>
+                </div>
               </van-radio>
             </van-radio-group>
           </div>
@@ -335,27 +340,29 @@
       </div>
     </van-popup>
 
-    <filter-panel :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter"></filter-panel>
+    <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter"></filter-panel>
   </section>
 </template>
 
 <script>
   import listItem from '../../components/list-item'
   import filterPanel from '../../components/filterPanel'
+  import {getTextBookVersionInfo, getSubjectType} from '@/api/index'
+
   export default {
     name: "index",
     components: {listItem, filterPanel},
     data() {
       return {
-        arr: [{},{}],
+        arr: [{}, {}],
         addCourseList: [
-          {name:'asdx',child:[{name:'csasac'},{name:'是大V是'},]},
-          {name:'床单asas啊',child:[{name:'官方发布'},{name:'胜多负少的'},{name:'无'},]},
-          {name:'床单asas啊',child:[{name:'官方发布'},{name:'胜多负少的'},{name:'无'},]},
-          {name:'床单asas啊',child:[{name:'官方发布'},{name:'胜多负少的'},{name:'无'},]},
-          {name:'床单asas啊',child:[{name:'官方发布'},{name:'胜多负少的'},{name:'无'},]},
+          {name: 'asdx', child: [{name: 'csasac'}, {name: '是大V是'},]},
+          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
+          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
+          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
+          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
         ],
-        addPop:false,
+        addPop: false,
         tabIndex: 0,
         activeNames: [],
         activeNames1: [],
@@ -368,57 +375,112 @@
           course: ''
         },
         area: [
-          {name:'广东',child:[{name:'广州市'},{name:'清远市'},{name:'韶关市'}]},
-          {name:'广西',child:[{name:'玉林市'},{name:'贵港市'},{name:'南陵市'}]},
+          {name: '广东', child: [{name: '广州市'}, {name: '清远市'}, {name: '韶关市'}]},
+          {name: '广西', child: [{name: '玉林市'}, {name: '贵港市'}, {name: '南陵市'}]},
         ],
         res: [
-          {name:'粤教沪科版(沪粤版)',child: [{name:'亲年级上册'},{name:'八年级下册'},{name:'老头教学'}]},
-          {name:'外研版',child: [{name:'asdasd'},{name:'八年级fdfgd下册'},{name:'老头sdfs教学'}]},
+          {name: '粤教沪科版(沪粤版)', child: [{name: '亲年级上册'}, {name: '八年级下册'}, {name: '老头教学'}]},
+          {name: '外研版', child: [{name: 'asdasd'}, {name: '八年级fdfgd下册'}, {name: '老头sdfs教学'}]},
         ],
         subject: [
-          {name:'小学',child: [{name:'语文'},{name:'数学'},{name:'英语'}]},
-          {name:'初中',child: [{name:'生物'},{name:'化学'},{name:'物理'}]},
+          {name: '小学',value:'Y01',active:true,child:[]},
+          {name: '初中',value:'Y02',active:false,child:[]},
+          {name: '高中',value:'Y03',active:false,child:[]},
         ],
         course: [
-          {name:'一单元',child:[{name:'说和做砂进口的'},{name:'的境况是假的'},{name:'健康的时刻纯净水'}]},
-          {name:'五座',child:[{name:'四渡赤水都吃'},{name:'as'},{name:'的深V是'}]},
+          {name: '一单元', child: [{name: '说和做砂进口的'}, {name: '的境况是假的'}, {name: '健康的时刻纯净水'}]},
+          {name: '五座', child: [{name: '四渡赤水都吃'}, {name: 'as'}, {name: '的深V是'}]},
         ],
-        list: []
+        list: [
+          {name: '小学',value:'Y01',active:true,child:[]},
+          {name: '初中',value:'Y02',active:false,child:[]},
+          {name: '高中',value:'Y03',active:false,child:[]},
+        ],
+        label: 'subjectName'
       }
     },
+    created() {
+      this.getTextBookVersionInfo()
+      this.getSubjectType()
+    },
     methods: {
-      handleClickRadio(item,index) {
+      selectParent(index) {
+        if(this.title === '科目') {
+          this.getSubjectType(index)
+        }
+      },
+      getSubjectType(index = 0) {
+        if(this.subject[index].done) return
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          yearSection: this.subject[index].value,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getSubjectType(params).then(res => {
+          this.$set(this.subject[index],'done',true) // 是否已加载了数据
+          if(res.flag) {
+            this.subject[index].child = res.resSubjectTypeInfoList
+            this.list[index].child = res.resSubjectTypeInfoList
+          }
+        })
+      },
+      getTextBookVersionInfo() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "yearSection": "Y02",
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getTextBookVersionInfo(params).then(res => {
+          if(res.flag) {
+            res.textbookVersionList
+          }
+        })
+      },
+      handleClickRadio(item, index) {
         this.addCourseList.forEach(v => {
           // v.radio = ''
-          this.$set(v,'radio','')
+          this.$set(v, 'radio', '')
         })
-        this.$set(item,'radio',index)
+        this.$set(item, 'radio', index)
         // item.radio = index
       },
-      changeList(arr,title) {
+      changeList(arr, title) {
+        if(title === '科目') {
+          this.label = 'subjectName'
+        }
         this.title = title
-        this.$set(arr[0],'active',true)
+        this.$set(arr[0], 'active', true)
         this.list = JSON.parse(JSON.stringify(arr))
       },
       handleFilter(item) {
-        if(this.title === '地区') {
+        if (this.title === '地区') {
           this.filter.area = item.name
-          this.checkItem(this.area,item)
+          this.checkItem(this.area, item)
         } else if (this.title === '教材') {
           this.filter.res = item.name
-          this.checkItem(this.res,item)
+          this.checkItem(this.res, item)
         } else if (this.title === '科目') {
           this.filter.subject = item.name
-          this.checkItem(this.subject,item)
+          this.checkItem(this.subject, item)
         } else if (this.title === '课程') {
           this.filter.course = item.name
-          this.checkItem(this.course,item)
+          this.checkItem(this.course, item)
         }
       },
-      checkItem(arr,item) {
+      checkItem(arr, item) {
         arr.forEach(v => {
           v.child.forEach(_v => {
-              this.$set(_v,'check',_v.name === item.name)
+            this.$set(_v, 'check', _v.name === item.name)
           })
         })
       }
@@ -432,32 +494,38 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     .add-pop {
       /*max-height: 93%;*/
       height: 93%;
       overflow-y: hidden;
     }
+
     .add-pop-wrap {
       display: flex;
       flex-direction: column;
       height: 100%;
       overflow-y: hidden;
+
       .radio-normal {
         border: 1px solid #999;
         border-radius: 50%;
         background: none;
       }
-      &__title{
+
+      &__title {
         flex: 0 0 50px;
         display: flex;
         align-items: center;
         font-size: 18px;
         padding: 0 10px;
         justify-content: space-between;
+
         span {
           flex: 1;
           text-align: center;
         }
+
         i {
           flex: 0 0 22px;
           font-size: 22px;
@@ -465,30 +533,37 @@
           margin-left: 15px;
         }
       }
+
       &__body {
         flex: 1;
         overflow-y: auto;
+
         &__radio-group {
           padding: 10px;
+
           .radio-group {
             padding-left: 53px;
             margin-top: 15px;
+
             i {
               vertical-align: middle;
             }
           }
         }
       }
+
       &__footer {
         flex: 0 0 50px;
         padding: 5px 10px;
-        .btn{
+
+        .btn {
           width: 100%;
           border-radius: 22px;
           font-size: 18px;
         }
       }
     }
+
     &__tab {
       display: flex;
       background: #fff;

@@ -90,13 +90,13 @@
             title: '确定移除当前试题?'
           }).then(() => {
             this.$emit('add', this.item.isRemove);
-            // this.$set(this.item, 'isRemove', !this.item.isRemove)
+            this.$set(this.item, 'isRemove', !this.item.isRemove)
           }).catch(() => {
             // on cancel
           });
         }else {
           this.$emit('add', this.item.isRemove);
-          // this.$set(this.item, 'isRemove', !this.item.isRemove)
+          this.$set(this.item, 'isRemove', !this.item.isRemove)
         }
       },
       handleCollect(v) {

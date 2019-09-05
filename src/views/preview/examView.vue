@@ -10,8 +10,8 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table :isSpoken="isSpoken" id="ha" :classView="true" v-show="classView"></score-table>
-      <score-table :isSpoken="isSpoken" v-for="a in 3" :key="a" :id="'ha' + a" :classView="false" v-show="!classView"></score-table>
+      <score-table :isSpoken="isSpoken" :classView="true" v-show="classView"></score-table>
+      <score-table :isSpoken="isSpoken" v-for="a in 3" :key="a" :classView="false" v-show="!classView"></score-table>
     </div>
   </section>
 </template>
@@ -25,6 +25,8 @@
         classView: true, //按班级查看
         isSpoken: true
       }
+    },
+    created() {
     },
     components: {scoreTable},
     methods: {

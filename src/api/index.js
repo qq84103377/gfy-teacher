@@ -205,3 +205,15 @@ export const getSysDictList =(params)=>{
 export const addErrorCorrectInfo =(params)=>{
   return axios.post('oprExamCorrect/addErrorCorrectInfo', qs.stringify(params))
 }
+//任务统计详情
+export const statTaskStat =(params)=>{
+  return axios.post('teachNew/statTaskStat', qs.stringify(params))
+}
+//获取版本信息
+export const getTextBookVersionInfo =(params)=>{
+  return axios.post('resource/getTextBookVersionInfo', qs.stringify(params))
+}
+//获取科目信息
+export const getSubjectType =(params)=>{
+  return axios.post('resource/getSubjectType', qs.stringify(params))
+}

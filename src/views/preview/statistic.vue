@@ -1,14 +1,14 @@
 <template>
   <section class="statistic-wrap">
     <van-nav-bar
-      title="安顺达会计师大家开始打卡机sad啊是的的"
+      :title="info.taskName"
       @click-left="$router.back()"
       left-arrow>
       <div slot="right" class="fs12 blue" @click="$router.push(`/examAnalyse`)">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll" v-if="$route.query.type != 'inClass'">
-      <div v-for="(item,index) in classList" :key="index" @click="handleSelectTab(item)"
-           class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.name}}
+      <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)"
+           class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
       </div>
     </div>
     <div style="flex: 1;overflow-y: auto">
@@ -35,28 +35,29 @@
           </div>
         </div>
       </div>
-      <div class="statistic-wrap__histogram" v-if="!isWk&&!isSpoken">
+      <div class="statistic-wrap__histogram">
         <div class="statistic-wrap__histogram-label">
           <span class="divider">试卷统计:</span>
           <span class="tag">人数</span>
         </div>
         <div id="myChart2" ref="myChart2" class="histogram-chart"></div>
       </div>
-      <div class="statistic-wrap__view" v-if="!isWk">
+      <div class="statistic-wrap__view" v-if="isWk">
         <div class="statistic-wrap__view-tab">
           <div class="active">按题目查看</div>
-          <div @click="$router.push(`/examView`)">按学生查看</div>
+          <div @click="$router.push({path:`/examView`,query:{list:taskFinishInfo.studentStatList}})">按学生查看</div>
         </div>
         <div v-if="!isSpoken">
           <div class="fs12 black statistic-wrap__view-label">主观题</div>
           <div class="statistic-wrap__view-subject">
-            <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="a in 8" :key="a">
+            <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="(item,index) in taskFinishInfo.examstat"
+                 :key="index" v-if="item.auto_scoring === '0'">
               <div class="pd5">
-                <div>主观题(1题)</div>
-                <div>平均分: 0.00</div>
-                <div>总分:5</div>
+                <div>第{{item.exam_index}}题</div>
+                <div>平均分: {{item.avg_score}}</div>
+                <div>总分:{{item.total_score}}</div>
               </div>
-              <div class="status">已批改</div>
+              <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)? '已批改':'批改'}}</div>
             </div>
           </div>
           <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
@@ -72,13 +73,17 @@
           <div :class="{active:tabIndex}" @click="tabIndex=1">学生心得详情</div>
         </div>
         <div v-if="!tabIndex">
-          <video style="width: 100%;" controls src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718090841_X3NZH_测试.MP4"></video>
+          <video style="width: 100%;" controls
+                 src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718090841_X3NZH_测试.MP4"></video>
           <div class="statistic-wrap__view-desc">
             <div class="statistic-wrap__view-desc-cover"></div>
             <div class="statistic-wrap__view-desc-content">
               <div class="statistic-wrap__view-desc-content-title fs14">我只是个标题我只是个标题我只是个标题我只是我只是个标题我只是个标题我</div>
               <div class="grey6 fs12">发布者:高分云教育1</div>
-              <div class="grey6 fs12 aic desc"><van-icon name="clock-o" />2019-06-03 14:51:45<i class="iconGFY icon-points mglt10"></i>0</div>
+              <div class="grey6 fs12 aic desc">
+                <van-icon name="clock-o"/>
+                2019-06-03 14:51:45<i class="iconGFY icon-points mglt10"></i>0
+              </div>
             </div>
           </div>
         </div>
@@ -101,9 +106,9 @@
         <div class="stat-dialog-wrap__body">
           <div v-for="(item,index) in stuStatInfo.stu" :key="index">{{item}}</div>
         </div>
-<!--        <div class="stat-dialog-wrap__footer">-->
-<!--          <van-button class="dialog-btn" type="info" @click="stuStatInfo.statDialog=false">确定</van-button>-->
-<!--        </div>-->
+        <!--        <div class="stat-dialog-wrap__footer">-->
+        <!--          <van-button class="dialog-btn" type="info" @click="stuStatInfo.statDialog=false">确定</van-button>-->
+        <!--        </div>-->
       </div>
     </van-dialog>
   </section>
@@ -113,12 +118,14 @@
   import spokenTable from '../../components/spokenTable'
   import echarts from "echarts";
   import stuExp from '../../components/stuExp'
+  import {statTaskStat} from '@/api/index'
+
   export default {
     name: "statistic",
-    components: {stuExp,spokenTable},
+    components: {stuExp, spokenTable},
     data() {
       return {
-        isSpoken: true,
+        isSpoken: false,
         tabIndex: 0,
         isWk: true,
         stuStatInfo: {
@@ -126,16 +133,42 @@
           stu: ['撒大声地阿达', '撒大声', '撒大', '撒大声地阿', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达',],
           statDialog: false
         },
-        classList: [{name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'}, {name: '龙江智慧一般'},],
+        // info: JSON.parse(JSON.stringify(this.$route.query.info)),
+        info: JSON.parse(localStorage.getItem('stat')),
+        taskFinishInfo: {examstat:[]}
       }
     },
+    computed: {
+
+    },
     methods: {
+      async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
+         let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.info.taskId,
+          classId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+      await statTaskStat(params).then(res => {
+          if(res.flag) {
+            this.taskFinishInfo = res.data[0]
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       handleSelectTab(item) {
         if (item.active) return
-        this.classList.forEach(v => {
+        this.info.tchClassTastInfo.forEach(v => {
           this.$set(v, 'active', false)
         })
         item.active = true
+        this.statTaskStat(item.taskId)
       },
       drawPie() {
         this.$nextTick(() => {
@@ -185,8 +218,11 @@
                   }
                 },
                 data: [
-                  {value: 2, name: '未完成'},
-                  {value: 4, name: '已完成'}
+                  {value: this.taskFinishInfo.studentUnfinishList.reduce((t,v) => {
+                      t += v.accountNoList.length
+                      return t
+                    },0), name: '未完成'},
+                  {value: this.taskFinishInfo.finshCount, name: '已完成'}
                 ]
               }
             ],
@@ -240,7 +276,7 @@
             {
               name: '人数',
               type: 'bar',
-              data: ['800', '200', '300', '199', '499', '299'],
+              // data: Object.keys(this.taskFinishInfo.testPaperStat).map(v => this.taskFinishInfo.testPaperStat[v]),
               itemStyle: {
                 normal: {
                   color: '#FEB524'
@@ -253,43 +289,43 @@
       },
       drawObjectivePie() {
         var myChart = echarts.init(document.getElementById('myChart3'));
-        myChart.getDom().style.height = Math.ceil(4 / 6) * 60 + 'px'
+        const objectiveList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
+        myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
         myChart.resize()
         // 指定图表的配置项和数据
         let arr = []
-        for (let i = 0; i < 4; i++) {
-          console.log(((i % 6 == 0 || i / 6 > 1) ? Math.floor(i / 6) * 50 : 0));
-          arr.push({
-            name: `第${i + 1}题`,
-            type: 'pie',
-            radius: [22, 26],
-            center: [28 + i % 6 * 60, 28 + (((i + 1) / 6 > 1) ? Math.floor(i / 6) * 60 : 0)],
-            label: {
-              show: false,
-              position: 'center',
-              formatter: ''
-            },
-            hoverAnimation: false,
-            data: [
-              {
-                value: i, name: '正确率', label: {
-                  show: true,
-                  position: 'center',
-                  formatter: '{a}\n{d}%',
-                  textStyle: {
-                    baseline: 'bottom',
-                    fontSize: 12,
-                    color: '#000'
-                  }
-                },
+        for (let i = 0; i < objectiveList.length; i++) {
+            const correct = Number((objectiveList[i].exam_present.split("%")[0])/100)
+            arr.push({
+              name: `第${objectiveList[i].exam_index}题`,
+              type: 'pie',
+              radius: [22, 26],
+              center: [28 + i % 6 * 60, 28 + (((i + 1) / 6 > 1) ? Math.floor(i / 6) * 60 : 0)],
+              label: {
+                show: false,
+                position: 'center',
+                formatter: ''
               },
-              {value: i * 3, name: '错误率'}
-            ]
-          })
-
+              hoverAnimation: false,
+              data: [
+                {
+                  value: correct, name: '正确率', label: {
+                    show: true,
+                    position: 'center',
+                    formatter: '{a}\n{d}%',
+                    textStyle: {
+                      baseline: 'bottom',
+                      fontSize: 12,
+                      color: '#000'
+                    }
+                  },
+                },
+                {value: 1 - correct, name: '错误率'}
+              ]
+            })
         }
         var questionOption = {
-          color: ['#FF6666', '#5EF0A6'],
+          color: ['#5EF0A6','#FF6666' ],
           series: arr
         };
 
@@ -301,12 +337,15 @@
         })
       }
     },
-    mounted() {
+   async mounted() {
+     await this.statTaskStat()
       this.drawPie()
-      if(!this.isWk&&!this.isSpoken) {
-        this.drawHistogram()
-        this.drawObjectivePie()
+     // this.drawHistogram()
+     this.drawObjectivePie()
+     if (!this.isWk && !this.isSpoken) {
       }
+    },
+    created() {
     }
   }
 </script>
@@ -367,7 +406,7 @@
         /*}*/
 
         &.active {
-          background: linear-gradient(0deg, rgba(57, 240, 221, 1),rgba(140, 247, 238, 1));
+          background: linear-gradient(0deg, rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
           color: #fff;
         }
       }
@@ -461,7 +500,8 @@
       padding: 15px 10px;
       margin-top: 5px;
       background: #fff;
-      >video {
+
+      > video {
         width: 100%;
         height: 200px;
       }
@@ -503,7 +543,6 @@
       &-subject {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
 
         &-item {
           border: 1px solid #fbdd31;
@@ -511,7 +550,10 @@
           font-size: 10px;
           margin-bottom: 5px;
           flex: 0 0 80px;
-
+          margin-right: 8px;
+          &:nth-child(4n) {
+            margin-right: 0;
+          }
           .status {
             color: #fff;
             background: @graOrange;
@@ -528,6 +570,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+
         &-cover {
           flex: 0 0 69px;
           height: 74px;
@@ -535,6 +578,7 @@
           background: #b9fff8;
           margin-right: 4px;
         }
+
         &-content {
           .desc {
             i {
@@ -598,6 +642,7 @@
         padding: 10px 20px;
         display: flex;
         flex-wrap: wrap;
+
         div {
           flex: 0 0 66px;
           padding: 4px;

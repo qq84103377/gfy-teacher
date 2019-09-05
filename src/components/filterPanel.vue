@@ -19,7 +19,7 @@
         <div class="ware-filter-wrap__body-right">
           <div class="" v-for="(item,index) in childList" :key="index">
             <div @click="handleSelect(item)" class="van-hairline--bottom">
-              <div :class="['cell__item',{active:item.check}]">{{item.name}}
+              <div :class="['cell__item',{active:item.check}]">{{item[label]}}
                 <van-icon v-show="item.check" class="check blue" name="success"/></div>
               <div v-if="item.name==='无'" class="fs12 red tip">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
             </div>
@@ -37,7 +37,7 @@
   import { Dialog } from 'vant';
   export default {
     name: "filterPanel",
-    props: ['visible', 'list','title'],
+    props: ['visible', 'list','title','label'],
     data() {
       return {
         index: 0,
@@ -118,6 +118,7 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
+          this.$emit('selectParent',index)
       },
     }
   }

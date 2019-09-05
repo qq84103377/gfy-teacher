@@ -27,7 +27,7 @@
 <script>
   export default {
     name: "scoreTable",
-    props: ['id', 'classView', 'list','isSpoken'],
+    props: ['classView', 'list','isSpoken'],
     data() {
       return {
         tableData: [

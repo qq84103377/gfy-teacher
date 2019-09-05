@@ -32,7 +32,7 @@
       <div class="add-exam-wrap">
         <div class="add-exam-wrap__title">
           <div>生成试卷</div>
-          <van-icon name="close"></van-icon>
+          <van-icon name="close" @click="addExam=false"></van-icon>
         </div>
         <van-cell class="add-exam-wrap__cell">
           <div slot="title" class="aic">
@@ -47,15 +47,15 @@
             <div class="fs15 mgr10"><span class="red">*</span>试卷难度:</div>
             <van-radio-group style="display: flex;" v-model="form.difficult">
               <van-radio name="D01" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 易
               </van-radio>
               <van-radio name="D02" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 中
               </van-radio>
               <van-radio name="D03" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 难
               </van-radio>
             </van-radio-group>
@@ -66,15 +66,15 @@
             <div class="fs15 mgr10"><span class="red">*</span>共享级别:</div>
             <van-radio-group style="display: flex;" v-model="form.share">
               <van-radio name="S01" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 仅自己
               </van-radio>
               <van-radio name="S02" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 校内
               </van-radio>
               <van-radio name="S03" class="mgr10"><i slot="icon" slot-scope="props"
-                                                   :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                                                     :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 公开
               </van-radio>
             </van-radio-group>
@@ -90,7 +90,7 @@
           </div>
         </van-cell>
         <div class="add-exam-wrap__footer">
-          <van-button type="info" class="btn" @click="addTestPaper">提交</van-button>
+          <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="addTestPaper">提交</van-button>
         </div>
       </div>
     </van-popup>
@@ -135,6 +135,18 @@
         selectCourse: ''
       }
     },
+    watch: {
+      addExam(v) {
+        if (!v) {
+          this.form = {
+            name: '',
+            difficult: 'D01',
+            share: 'S02',
+            btnLoading: false
+          }
+        }
+      }
+    },
     methods: {
       addTestPaper() {
         if (!this.form.name) {
@@ -173,13 +185,13 @@
         addTestPaper(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            this.addTeachCourseRes(res.testPaperInfo.testPaperId)
+            this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
           } else {
             this.$toast(res.msg)
           }
         })
       },
-      addTeachCourseRes(resourceId) {
+      addTeachCourseRes(resourceId, name) {
         this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",
@@ -200,13 +212,13 @@
         addTeachCourseRes(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            this.addTestPaperExamInfo(resourceId)
+            this.addTestPaperExamInfo(resourceId, name)
           } else {
             this.$toast(res.msg)
           }
         })
       },
-      addTestPaperExamInfo(testPaperId) {
+      addTestPaperExamInfo(testPaperId, name) {
         this.form.btnLoading = true
         let testPaperExamInfoList = []
         let examIndex = -1
@@ -214,21 +226,21 @@
           v.child.forEach(c => {
             examIndex++
             testPaperExamInfoList.push({
-              "examId":c.examId,
-              "sectionType":v.sectionType,
-              "subjectType":c.subjectType,
-              "sectionName":v.sectionName,
-              "sectionIndex":v.sectionIndex,
+              "examId": c.examId,
+              "sectionType": v.sectionType,
+              "subjectType": c.subjectType,
+              "sectionName": v.sectionName,
+              "sectionIndex": v.sectionIndex,
               examIndex,
-              "examScore":5,
-              "groupId":c.groupId,
-              "groupExamReList":c.groupExamList.map((g,gi) => {
+              "examScore": 5,
+              "groupId": c.groupId,
+              "groupExamReList": c.groupExamList.map((g, gi) => {
                 return {
-                  "examGroupId":g.examGroupId,
-                  "groupId":g.groupId,
-                  "autoScoring":g.autoScoring,
-                  "groupIndex":gi + 1,
-                  "examScore":5
+                  "examGroupId": g.examGroupId,
+                  "groupId": g.groupId,
+                  "autoScoring": g.autoScoring,
+                  "groupIndex": gi + 1,
+                  "examScore": 5
                 }
               })
             })
@@ -236,8 +248,8 @@
 
         })
         let obj = {
-          "interUser":"runLfb",
-          "interPwd":"25d55ad283aa400af464c76d713c07ad",
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           testPaperId,
@@ -248,24 +260,26 @@
         }
         addTestPaperExamInfo(params).then(res => {
           this.form.btnLoading = false
-          if(res.flag) {
+          if (res.flag) {
             this.addExam = false
-            this.$router.push(`/examDetail?testPaperId=${testPaperId}`)
-          }else {
+            this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}`)
+          } else {
             this.$toast(res.msg)
           }
         })
       },
       clearQuestion() {
-        Dialog.confirm({
-          title: '确定清空已选试题吗?',
-          // message: '弹窗内容'
-        }).then(() => {
-          this.$emit('change', [])
-          this.$emit('clear')
-        }).catch(() => {
-          // on cancel
-        });
+        if(this.selectList.length) {
+          Dialog.confirm({
+            title: '确定清空已选试题吗?',
+            // message: '弹窗内容'
+          }).then(() => {
+            this.$emit('change', [])
+            this.$emit('clear')
+          }).catch(() => {
+            // on cancel
+          });
+        }
       },
       handleFilter(item) {
         this.selectCourse = item.name
