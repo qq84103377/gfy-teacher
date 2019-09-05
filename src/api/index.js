@@ -217,3 +217,15 @@ export const getTextBookVersionInfo =(params)=>{
 export const getSubjectType =(params)=>{
   return axios.post('resource/getSubjectType', qs.stringify(params))
 }
+//获取答题详情
+export const getExamItemDetail =(params)=>{
+  return axios.post('teach/getExamItemDetail', qs.stringify(params))
+}
+//试卷分析
+export const getTestPaperAnalysis =(params)=>{
+  return axios.post('teach/getTestPaperAnalysis', qs.stringify(params))
+}
+//得分分析
+export const getTestPaperScoreAnalysis =(params)=>{
+  return axios.post('teach/getTestPaperScoreAnalysis', qs.stringify(params))
+}

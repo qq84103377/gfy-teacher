@@ -8,17 +8,32 @@
       <span class="header-item">用时</span>
       <span class="header-item score">测试得分</span>
     </div>
-    <div class="row">
-      <div class="row-item team-col" v-if="!classView">桂容桂容桂</div>
-      <div class="row-item average" v-if="!classView">89</div>
-      <div class="row-item">
-        <div v-for="a in 3" :key="a">欧阳锋</div>
+    <div v-if="classView">
+      <div class="row" v-for="(item,index) in list" :key="index">
+        <div class="row-item">
+          <div :class="{stuName:item.redoTimes>0}">{{item.name}}</div>
+        </div>
+        <div class="row-item">
+          <div>{{item.duration}}</div>
+        </div>
+        <div class="row-item  score blue">
+          <div @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">{{item.score}} ></div>
+        </div>
       </div>
-      <div class="row-item">
-        <div v-for="a in 3" :key="a">20分30秒</div>
-      </div>
-      <div class="row-item  score blue">
-        <div v-for="a in 3" :key="a" @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">89 ></div>
+    </div>
+    <div v-else>
+      <div class="row" v-for="(item,index) in list" :key="index">
+        <div class="row-item team-col">{{item.groupName}}</div>
+        <div class="row-item average">{{item.average}}</div>
+        <div class="row-item">
+          <div :class="{stuName:item.redoTimes>0}" v-for="(s,index1) in item.stu" :key="index1">{{s.name}}</div>
+        </div>
+        <div class="row-item">
+          <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>
+        </div>
+        <div class="row-item  score blue">
+          <div v-for="(s,index3) in item.stu" :key="index3" @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">{{s.score}} ></div>
+        </div>
       </div>
     </div>
   </div>
@@ -30,15 +45,7 @@
     props: ['classView', 'list','isSpoken'],
     data() {
       return {
-        tableData: [
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-          {teamName:'容桂初一智慧一班第一组容桂初一智慧一班第一组',average: 90,name:'欧阳修裘千仞',time: '20分30秒',score:90},
-        ]
+
       }
     },
     mounted() {
@@ -149,6 +156,7 @@
         &.team-col {
           flex: 0 0 10%;
           padding: 0 10px;
+          word-break: break-all;
         }
 
         &.average {
@@ -170,6 +178,24 @@
           border-bottom: 1px solid #F5F6FA;
           &:last-child {
             border-bottom: none;
+          }
+        }
+        .stuName {
+          position: relative;
+          overflow: hidden;
+          &::after {
+            position: absolute;
+            left: -29px;
+            top: -11px;
+            width: 80px;
+            height: 30px;
+            line-height: 45px;
+            font-size: 10px;
+            color: #fff;
+            background: #f8d25c;
+            content: '重做';
+            transform: rotateZ(-30deg);
+            text-align: center;
           }
         }
       }

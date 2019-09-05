@@ -50,7 +50,7 @@
 
 <script>
   import echarts from "echarts";
-
+  import {getTestPaperAnalysis, getTestPaperScoreAnalysis} from '@/api/index'
   export default {
     name: "examAnalyse",
     data() {

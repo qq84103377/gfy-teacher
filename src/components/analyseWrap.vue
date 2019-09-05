@@ -7,8 +7,8 @@
         <slot></slot>
       </div>
       <div class="analyse-wrap__footer">
-        <van-button class="btn mgr10" type="info">上一题</van-button>
-        <van-button class="btn" type="info">下一题</van-button>
+        <van-button @click="$emit('toggle',false)" class="btn mgr10" type="info">上一题</van-button>
+        <van-button @click="$emit('toggle',true)" class="btn" type="info">下一题</van-button>
       </div>
     </section>
 </template>

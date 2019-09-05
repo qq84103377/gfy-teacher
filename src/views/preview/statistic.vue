@@ -23,19 +23,19 @@
         <div class="statistic-wrap__achievement-score">
           <div>
             <span>班级平均分</span>
-            <span class="red">98分</span>
+            <span class="red">{{taskFinishInfo.finshCount>0?(taskFinishInfo.totalScore / taskFinishInfo.finshCount).toFixed(2):0}}分</span>
           </div>
           <div>
             <span>班级最高分</span>
-            <span class="red">100分</span>
+            <span class="red">{{taskFinishInfo.maxScore}}分</span>
           </div>
           <div>
             <span>班级最低分</span>
-            <span class="red">1分</span>
+            <span class="red">{{taskFinishInfo.minScore}}分</span>
           </div>
         </div>
       </div>
-      <div class="statistic-wrap__histogram">
+      <div class="statistic-wrap__histogram" v-if="info.resourceType !== 'R03'">
         <div class="statistic-wrap__histogram-label">
           <span class="divider">试卷统计:</span>
           <span class="tag">人数</span>
@@ -45,23 +45,27 @@
       <div class="statistic-wrap__view" v-if="isWk">
         <div class="statistic-wrap__view-tab">
           <div class="active">按题目查看</div>
-          <div @click="$router.push({path:`/examView`,query:{list:taskFinishInfo.studentStatList}})">按学生查看</div>
+          <div @click="$router.push({name:`examView`,params:{info:taskFinishInfo,title:info.taskName}})">按学生查看</div>
         </div>
         <div v-if="!isSpoken">
-          <div class="fs12 black statistic-wrap__view-label">主观题</div>
-          <div class="statistic-wrap__view-subject">
-            <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="(item,index) in taskFinishInfo.examstat"
-                 :key="index" v-if="item.auto_scoring === '0'">
-              <div class="pd5">
-                <div>第{{item.exam_index}}题</div>
-                <div>平均分: {{item.avg_score}}</div>
-                <div>总分:{{item.total_score}}</div>
+          <div v-if="taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
+            <div class="fs12 black statistic-wrap__view-label">主观题</div>
+            <div class="statistic-wrap__view-subject">
+              <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="(item,index) in taskFinishInfo.examstat"
+                   :key="index" v-if="item.auto_scoring === '0'">
+                <div class="pd5">
+                  <div>第{{item.exam_index}}题</div>
+                  <div>平均分: {{item.avg_score}}</div>
+                  <div>总分:{{item.total_score}}</div>
+                </div>
+                <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)? '已批改':'批改'}}</div>
               </div>
-              <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)? '已批改':'批改'}}</div>
             </div>
           </div>
-          <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
-          <div id="myChart3" ref="myChart3" class="subject-pie"></div>
+          <div v-if="taskFinishInfo.examstat.some(v => v.auto_scoring === '1')">
+            <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
+            <div id="myChart3" ref="myChart3" class="subject-pie"></div>
+          </div>
         </div>
         <div v-else>
           <spoken-table type="statistic"></spoken-table>
@@ -119,7 +123,7 @@
   import echarts from "echarts";
   import stuExp from '../../components/stuExp'
   import {statTaskStat} from '@/api/index'
-
+  import {getStudentName} from '@/utils/filter'
   export default {
     name: "statistic",
     components: {stuExp, spokenTable},
@@ -130,7 +134,7 @@
         isWk: true,
         stuStatInfo: {
           title: '',
-          stu: ['撒大声地阿达', '撒大声', '撒大', '撒大声地阿', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达', '撒大声地阿达',],
+          stu: [],
           statDialog: false
         },
         // info: JSON.parse(JSON.stringify(this.$route.query.info)),
@@ -162,13 +166,21 @@
           }
         })
       },
-      handleSelectTab(item) {
+     async handleSelectTab(item) {
         if (item.active) return
-        this.info.tchClassTastInfo.forEach(v => {
+       this.$store.commit('setVanLoading',true)
+       this.info.tchClassTastInfo.forEach(v => {
           this.$set(v, 'active', false)
         })
         item.active = true
-        this.statTaskStat(item.taskId)
+
+       await this.statTaskStat(item.classId)
+       this.$store.commit('setVanLoading',false)
+       this.drawPie()
+       if(this.info.resourceType !== 'R03') {
+         this.drawHistogram()
+       }
+        this.drawObjectivePie()
       },
       drawPie() {
         this.$nextTick(() => {
@@ -240,11 +252,26 @@
             // 	}
             // }
           };
-          myChart.setOption(_option)
+          myChart.setOption(_option,true)
           myChart.on('click', params => {
-            console.log(params, '=3=3=');
-            this.stuStatInfo.statDialog = true
+            this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name
+            if(params.name === '未完成') {
+              this.taskFinishInfo.studentUnfinishList.forEach(v => {
+                v.accountNoList.forEach(s => {
+                  const name = getStudentName(s,this.info.tchClassTastInfo.find(t => t.active).classId)
+                  this.stuStatInfo.stu.push(name)
+                })
+              })
+            }else {
+              this.taskFinishInfo.finishStudent.reduce((t,v) => {
+                const name = getStudentName(v,this.info.tchClassTastInfo.find(t => t.active).classId)
+                t.push(name)
+                return t
+              },this.stuStatInfo.stu)
+            }
+
+            this.stuStatInfo.statDialog = true
           })
         });
       },
@@ -276,7 +303,7 @@
             {
               name: '人数',
               type: 'bar',
-              // data: Object.keys(this.taskFinishInfo.testPaperStat).map(v => this.taskFinishInfo.testPaperStat[v]),
+              data: Object.keys(this.taskFinishInfo.testPaperStat).map(v => this.taskFinishInfo.testPaperStat[v]),
               itemStyle: {
                 normal: {
                   color: '#FEB524'
@@ -285,16 +312,18 @@
             }
           ],
         };
-        myChart.setOption(paperOption);
+        myChart.setOption(paperOption,true);
       },
       drawObjectivePie() {
-        var myChart = echarts.init(document.getElementById('myChart3'));
-        const objectiveList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
-        myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
-        myChart.resize()
-        // 指定图表的配置项和数据
-        let arr = []
-        for (let i = 0; i < objectiveList.length; i++) {
+        //有客观题才渲染
+        if(this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
+          var myChart = echarts.init(document.getElementById('myChart3'));
+          const objectiveList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
+          myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
+          myChart.resize()
+          // 指定图表的配置项和数据
+          let arr = []
+          for (let i = 0; i < objectiveList.length; i++) {
             const correct = Number((objectiveList[i].exam_present.split("%")[0])/100)
             arr.push({
               name: `第${objectiveList[i].exam_index}题`,
@@ -323,24 +352,39 @@
                 {value: 1 - correct, name: '错误率'}
               ]
             })
+          }
+          var questionOption = {
+            color: ['#5EF0A6','#FF6666' ],
+            series: arr
+          };
+
+          myChart.setOption(questionOption,true);
+
+          myChart.on('click', params => {
+            console.log(params, '=3=3=');
+            const questionList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
+           const item = questionList[params.seriesIndex]
+           const classId = this.info.tchClassTastInfo.find(t => t.active).classId
+            // this.$router.push(`/subjectAnalyse?taskId=${this.info.taskId}&examId=${item.exam_id}&classId=${classId}&groupId=${item.group_id}`)
+            this.$router.push({path:'/subjectAnalyse',query:{
+                taskId:this.info.taskId,
+                examId:item.exam_id,
+                groupId:item.group_id,
+                classId,
+                questionList
+              }})
+          })
         }
-        var questionOption = {
-          color: ['#5EF0A6','#FF6666' ],
-          series: arr
-        };
-
-        myChart.setOption(questionOption);
-
-        myChart.on('click', params => {
-          console.log(params, '=3=3=');
-          this.$router.push(`/subjectAnalyse`)
-        })
       }
     },
    async mounted() {
+      this.$store.commit('setVanLoading',true)
      await this.statTaskStat()
-      this.drawPie()
-     // this.drawHistogram()
+     this.$store.commit('setVanLoading',false)
+     this.drawPie()
+     if(this.info.resourceType !== 'R03') {
+       this.drawHistogram()
+     }
      this.drawObjectivePie()
      if (!this.isWk && !this.isSpoken) {
       }
