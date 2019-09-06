@@ -19,8 +19,8 @@
               </div>
               <div class="desc-bottom">
                 <div>难度: {{item.spokenDegree==='D01'?'容易':item.spokenDegree==='D02'?'中等':'困难'}}</div>
-                <div>单词: 10</div>
-                <div>句子: 10</div>
+                <div>单词: {{item.wordCount}}</div>
+                <div>句子: {{item.sentenceCount}}</div>
               </div>
             </div>
             <div slot="btn" class="btn-group van-hairline--top">

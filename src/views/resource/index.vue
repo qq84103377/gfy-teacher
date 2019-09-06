@@ -20,7 +20,7 @@
       <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
       <van-cell class="fs16" title="试题" is-link @click="goto('/questionList')"/>
       <van-cell class="fs16" title="讨论" is-link @click="goto('/discussList')"/>
-      <van-cell class="fs16" title="口语" is-link to="spokenList" />
+      <van-cell class="fs16" title="口语" is-link @click="goto('/spokenList')"/>
     </div>
   </section>
 </template>

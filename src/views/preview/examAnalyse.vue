@@ -14,27 +14,34 @@
         <div id="myChart2" ref="myChart2" class="chart-histogram"></div>
       </div>
       <div id="myChart3" ref="myChart3" class="chart-histogram"></div>
-      <div class="desc">本张试卷包括题型为1道单选题，1道文言文阅读，难度为简单：0%，中等：0%，困难：100%， 知识点涵盖字词积累、修改病句。</div>
+      <div class="desc">本张试卷包括题型为<span><span v-for="(item,index) in examInfo.titleTypeCount" :key="index">{{item.value}}道{{item.name}},</span></span>难度为<span><span
+        v-for="(item,index) in examInfo.degreeCount"
+        :key="index">{{item.name}}:{{item.value}}%,</span></span>知识点涵盖<span><span
+        v-for="(item,index) in examInfo.knowledgePointInfos" :key="index">{{item.knowledgePointName}}{{index < examInfo.knowledgePointInfos.length-1?'、':'。'}}</span></span>
+      </div>
     </div>
     <div ref="scrollCtn" style="flex: 1;overflow-y: auto" class="pd10" v-show="!isExam">
       <div class="score-table">
         <div class="col">
           <div>#</div>
-          <div v-for="(item,index) in list" :key="index" @click="handleCharts(index,item,0)" :class="{blue:item.active}">{{item.name}}</div>
+          <div v-for="(item,index) in scoreInfo" :key="index" @click="handleCharts(index,item,0)"
+               :class="{blue:item.active}">{{item.name}}
+          </div>
           <div>平均分</div>
           <div>得分率</div>
         </div>
-        <div class="scroll-content">
-          <div v-for="(item,index) in list[0].exam.arr" :key="index" class="col" :class="{'one-item':list[0].exam.arr.length==1}">
+        <div v-if="scoreInfo.length" class="scroll-content">
+          <div v-for="(item,index) in scoreInfo[0].exam.arr" :key="index" class="col"
+               :class="{'one-item':scoreInfo[0].exam.arr.length==1}">
             <div @click="handleCharts(index,item,1)" :class="{blue:item.active}">第{{index+1}}题</div>
-            <div v-for="(a,i) in list" :key="i">{{a.exam.arr[index].point}}</div>
-            <div>33%</div>
-            <div>10%</div>
+            <div v-for="(a,i) in scoreInfo" :key="i">{{a.exam.arr[index].score}}</div>
+            <div>{{averagePoint(index)}}</div>
+            <div>{{scoreRate(index)}}</div>
           </div>
         </div>
         <div class="col">
           <div>总分</div>
-          <div v-for="(item,index) in list" :key="index">{{item.total}}</div>
+          <div v-for="(item,index) in scoreInfo" :key="index">{{item.total}}</div>
           <div>-</div>
           <div>-</div>
         </div>
@@ -51,6 +58,8 @@
 <script>
   import echarts from "echarts";
   import {getTestPaperAnalysis, getTestPaperScoreAnalysis} from '@/api/index'
+  import {getStudentName} from '@/utils/filter'
+
   export default {
     name: "examAnalyse",
     data() {
@@ -59,43 +68,160 @@
         scoreChartShow: false,
         stuIndex: 0,
         examIndex: 0,
-        list: [
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-          {name:'陈超怀',exam:{arr:[{point:13},{point:13},{point:13},{point:13},]},total:20},
-        ]
+        // list: [
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
+        // ],
+        examInfo: {
+          knowledgePointInfos: [],
+          knowMap: {},
+          titleTypeCount: [],
+          titleTypeName: [],
+          degreeCount: [],
+          useCount: [],
+          accuracy: [],
+        },
+        scoreInfo: []
       }
     },
+    created() {
+      this.getTestPaperScoreAnalysis()
+    },
     methods: {
+      scoreRate(index) {
+        const hasPoint = this.scoreInfo.reduce((t, v) => {
+         if(v.exam.arr[index].score>0) {
+           t++
+         }
+         return t
+        }, 0)
+        if (this.scoreInfo.length) {
+         return (hasPoint / this.scoreInfo.length).toFixed(4) * 100 + '%'
+        }else {
+          return 0 + '%'
+        }
+      },
+      averagePoint(index) {
+        const totalScore = this.scoreInfo.reduce((t, v) => {
+          t += v.exam.arr[index].score
+          return t
+        }, 0)
+        if (this.scoreInfo.length) {
+         return (totalScore / this.scoreInfo.length).toFixed(2)
+        }else {
+          return 0
+        }
+      },
+      getTestPaperScoreAnalysis() {
+        this.$store.commit('setVanLoading',true)
+        const {classId, taskId} = this.$route.query
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          testPaperId: this.$route.query.testPaperId,
+          classId,
+          taskId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getTestPaperScoreAnalysis(params).then(res => {
+          this.$store.commit('setVanLoading',false)
+          if (res.flag) {
+            this.scoreInfo = Object.keys(res.data[0].student).map(v => {
+              return {
+                name: getStudentName(v, this.$route.query.classId),
+                total: res.data[0].student[v].reduce((t, value,i) => {
+                  // value.average = this.averagePoint(i)
+                  t += value.score
+                  return t
+                }, 0),
+                exam: {
+                  arr: res.data[0].student[v]
+                }
+              }
+            })
+            console.log(this.scoreInfo);
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      async getTestPaperAnalysis() {
+        this.$store.commit('setVanLoading',true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          testPaperId: this.$route.query.testPaperId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getTestPaperAnalysis(params).then(res => {
+          this.$store.commit('setVanLoading',false)
+          if (res.flag) {
+            this.examInfo = res.data[0]
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       backTop() {
         this.$refs['scrollCtn'].scrollTo(0, 0)
       },
-      handleCharts(index,item,flag) {
+      handleCharts(index, item, flag) {
+        if(item.active) return
         this.scoreChartShow = true
-        if(flag) {
-          //点击题目
-          this.$set(this.list[this.examIndex],'active',false)
+        if (flag) {
+          //点击题目 this.scoreInfo[0].exam.arr[this.examIndex]
+          this.$set(this.scoreInfo[0].exam.arr[this.examIndex], 'active', false)
+          this.$set(this.scoreInfo[this.stuIndex], 'active', false)
           this.examIndex = index
-        }else {
+        } else {
           //点击学生
-          this.$set(this.list[this.stuIndex],'active',false)
+          this.$set(this.scoreInfo[this.stuIndex], 'active', false)
+          this.$set(this.scoreInfo[0].exam.arr[this.examIndex], 'active', false)
           this.stuIndex = index
         }
-        this.$set(item,'active',true)
+        this.$set(item, 'active', true)
         this.$nextTick(() => {
-          this.drawHistogramScore(index)
+          if(flag) {
+            let xArr = []
+            let scoreArr = []
+            let averageArr = []
+            this.scoreInfo.forEach(v => {
+              xArr.push(getStudentName(v.exam.arr[index].accountNo, this.$route.query.classId))
+              scoreArr.push(v.exam.arr[index].score)
+              averageArr.push(this.averagePoint(index))
+            })
+            this.drawHistogramScore(xArr,scoreArr,averageArr)
+          }else {
+            let scoreArr = []
+            let averageArr = []
+            const xArr = item.exam.arr.map((v,i) => {
+              scoreArr.push(v.score)
+              averageArr.push(this.averagePoint(i))
+              return `第${i + 1}题`
+            })
+            this.drawHistogramScore(xArr,scoreArr,averageArr)
+          }
           this.$refs['scrollCtn'].scrollTo(0, this.$refs['scrollCtn'].scrollHeight)
         })
       },
       drawPie() {
         var myChart = echarts.init(document.getElementById('myChart1'));
-        var color2 = ['#01B9FF', '#ffb91f', '#52c9ce', '#f15c6d', '#f15c6d', '#355e82', '#ce6382', '#8331f1'];
+        var color2 = ['#64D5FF', '#FE7624', '#FEE224', '#8A77FF', '#24FE80', '#FBC74D', '#FE4D24', '#8BFE24', '#FE24D8', '#24FEC8', '#64FDFF', '#249AFE', '#8A77FF'];
         var examOption = {
-          // color:color2,
+          color: color2,
           // title: {
           //   text: '题型分布',
           //   left:'center'
@@ -104,11 +230,11 @@
           //   trigger: 'item',
           //   formatter: "{a} <br/>{b}: {c} ({d}%)"
           // },
-          // legend: {
-          //   orient: 'vertical',
-          //   x: 'left',
-          //   data:['单选题','文言文阅读']
-          // },
+          legend: {
+            // orient: 'vertical',
+            // x: 'left',
+            data: this.examInfo.titleTypeName
+          },
           series: [
             {
               name: '题型分布',
@@ -131,15 +257,15 @@
                   show: false
                 }
               },
-              data: [{name: '单选题', value: 1}, {name: '文言文阅读', value: 2},]
+              data: this.examInfo.titleTypeCount
             },
             {
               name: '试卷题型难度',
               type: 'pie',
-              tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b}:{d}%"
-              },
+              // tooltip: {
+              //   trigger: 'item',
+              //   formatter: "{a} <br/>{b}:{d}%"
+              // },
               radius: ['40%', '55%'],
               label: {
                 normal: {
@@ -151,17 +277,18 @@
                   // borderRadius: 4
                 }
               },
-              data: [{name: '简单', value: 1, itemStyle: {color: '#F2F056'}}, {
-                name: '中等',
-                value: 2,
-                itemStyle: {color: '#56F2E3'}
-              }, {name: '困难', value: 3, itemStyle: {color: '#FF9777'}},]
+              // data: [{name: '简单', value: 1, itemStyle: {color: '#F2F056'}}, {
+              //   name: '中等',
+              //   value: 2,
+              //   itemStyle: {color: '#56F2E3'}
+              // }, {name: '困难', value: 3, itemStyle: {color: '#FF9777'}},]
+              data: this.examInfo.degreeCount
             }
           ]
         };
 
 
-        myChart.setOption(examOption);
+        myChart.setOption(examOption, true);
       },
       drawHistogramY() {
         var myChart = echarts.init(document.getElementById('myChart2'));
@@ -179,7 +306,7 @@
           },
           yAxis: {
             type: 'category',
-            data: ['单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '单选题', '多选题', '作文']
+            data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName)
           },
           itemStyle: {
             color: '#56F2E3'
@@ -188,7 +315,7 @@
             {
               name: '知识点分布',
               type: 'bar',
-              data: ['2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '2', '5', '9']
+              data: Object.keys(this.examInfo.knowMap).map(v => this.examInfo.knowMap[v])
             }
           ],
           dataZoom: [
@@ -201,7 +328,7 @@
           ],
         };
 
-        myChart.setOption(contentOption);
+        myChart.setOption(contentOption, true);
       },
       drawHistogramX() {
         var myChart = echarts.init(document.getElementById('myChart3'));
@@ -230,7 +357,7 @@
           xAxis: [
             {
               type: 'category',
-              data: ['第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题',],
+              data: this.examInfo.useCount.map((v, i) => `第${i + 1}题`),
               axisPointer: {
                 type: 'shadow'
               },
@@ -273,13 +400,13 @@
             {
               name: '使用次数',
               type: 'bar',
-              data: ['23', '2', '4', '55', '23', '2', '4', '23', '2', '4', '55', '23', '2', '4',],
+              data: this.examInfo.useCount.map(v => v.value),
             },
             {
               name: '正确率',
               type: 'line',
               yAxisIndex: 1,
-              data: ['2', '1', '4', '2', '1', '2', '33', '2', '1', '4', '2', '1', '2', '33'],
+              data: this.examInfo.accuracy,
               itemStyle: {
                 color: '#F2C760'
               },
@@ -288,9 +415,9 @@
         };
 
 
-        myChart.setOption(goalOption);
+        myChart.setOption(goalOption, true);
       },
-      drawHistogramScore(index) {
+      drawHistogramScore(xArr,scoreArr,averageArr) {
         var myChart = echarts.init(document.getElementById('myChart4'));
         // myChart.getDom().style.width = '100%'
         // myChart.resize()
@@ -307,19 +434,19 @@
             color: '#56F2E3'
           },
           grid: {
-            top: '15%',
+            top: '25%',
             left: '3%',
-            right: '15%',
+            right: '0',
             bottom: '1%',
             containLabel: true
           },
           legend: {
-            data: ['得分', '平均分']
+            data: ['得分', '平均分'],
           },
           xAxis: [
             {
               type: 'category',
-              data: ['第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题', '第一题',],
+              data: xArr,
               axisPointer: {
                 type: 'shadow'
               },
@@ -347,11 +474,11 @@
               // max: max,
               // interval:max/10,
               axisLabel: {
-                show: false,
+                // show: false,
                 formatter: '{value} 分'
               },
               nameTextStyle: {
-                color: '#fff'
+                // color: '#fff'
               },
               axisTick: {
                 show: false
@@ -367,14 +494,14 @@
               name: '得分',
               type: 'bar',
               // data:socre
-              data: ['23', '2', '4', '55', '23', '2', '4', '23', '2', '4', '55', '23', '2', '4',],
+              data: scoreArr,
             },
             {
               name: '平均分',
               type: 'line',
               yAxisIndex: 1,
               // data:theAverageScore
-              data: [index, '1', '4', '2', '1', '2', '33', '2', '1', '4', '2', '1', '2', '33'],
+              data: averageArr,
               itemStyle: {
                 color: '#F2C760'
               },
@@ -382,10 +509,11 @@
           ]
         };
 
-        myChart.setOption(goalOption);
+        myChart.setOption(goalOption, true);
       },
     },
-    mounted() {
+    async mounted() {
+      await this.getTestPaperAnalysis()
       this.drawPie()
       this.drawHistogramY()
       this.drawHistogramX()
@@ -427,7 +555,7 @@
         padding: 0 15px;
 
         &.active {
-          background: linear-gradient(0deg,  rgba(57, 240, 221, 1),rgba(140, 247, 238, 1));
+          background: linear-gradient(0deg, rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
           color: #fff;
         }
 
@@ -460,7 +588,11 @@
     .chart-histogram {
       width: 100%;
       height: 250px;
+      &#myChart4 {
+        padding-right: 50px;
+      }
     }
+
 
     .desc {
       padding: 10px;
@@ -500,6 +632,7 @@
       /*  left: 0;*/
       /*  background: #e0fffc;*/
       /*}*/
+
       .col {
         flex: 0 0 89px;
 
@@ -512,6 +645,7 @@
             background: #e0fffc;
           }
         }
+
         &.one-item {
           flex: 1;
         }
@@ -537,6 +671,7 @@
 
       }
     }
+
     .backtop {
       position: fixed;
       right: 10px;

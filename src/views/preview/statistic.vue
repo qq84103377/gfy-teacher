@@ -4,7 +4,7 @@
       :title="info.taskName"
       @click-left="$router.back()"
       left-arrow>
-      <div slot="right" class="fs12 blue" @click="$router.push(`/examAnalyse`)">试卷分析</div>
+      <div slot="right" class="fs12 blue" @click="viewAnalyse">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll" v-if="$route.query.type != 'inClass'">
       <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)"
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="statistic-wrap__histogram" v-if="info.resourceType !== 'R03'">
+      <div class="statistic-wrap__histogram" v-if="isTestPaper">
         <div class="statistic-wrap__histogram-label">
           <span class="divider">试卷统计:</span>
           <span class="tag">人数</span>
@@ -143,9 +143,15 @@
       }
     },
     computed: {
-
+      isTestPaper() {
+        return this.$route.query.testPaperId > 0
+      }
     },
     methods: {
+      viewAnalyse() {
+        if(!this.isTestPaper) return this.$toast('不含试卷,无法查看分析')
+        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}`)
+      },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
          let obj = {
           "interUser": "runLfb",
@@ -177,7 +183,7 @@
        await this.statTaskStat(item.classId)
        this.$store.commit('setVanLoading',false)
        this.drawPie()
-       if(this.info.resourceType !== 'R03') {
+       if(this.isTestPaper) {
          this.drawHistogram()
        }
         this.drawObjectivePie()
@@ -280,13 +286,13 @@
         // 指定图表的配置项和数据
         var paperOption = {
           calculable: true,
-          // tooltip: {
-          //   trigger: 'item',
-          //   formatter: "{b} : {c}人"
-          // },
-          // legend: {
-          //   data: ['人数']
-          // },
+          grid: {
+            top: '15%',
+            left: '0%',
+            right: '4%',
+            bottom: '1%',
+            containLabel: true
+          },
           xAxis: {
             data: ['0-50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-100%'],
             axisLabel: {
@@ -382,7 +388,7 @@
      await this.statTaskStat()
      this.$store.commit('setVanLoading',false)
      this.drawPie()
-     if(this.info.resourceType !== 'R03') {
+     if(this.isTestPaper) {
        this.drawHistogram()
      }
      this.drawObjectivePie()
