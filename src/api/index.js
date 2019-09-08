@@ -229,3 +229,7 @@ export const getTestPaperAnalysis =(params)=>{
 export const getTestPaperScoreAnalysis =(params)=>{
   return axios.post('teach/getTestPaperScoreAnalysis', qs.stringify(params))
 }
+//加分/减分
+export const saveRewardScore =(params)=>{
+  return axios.post('teach/saveRewardScore', qs.stringify(params))
+}

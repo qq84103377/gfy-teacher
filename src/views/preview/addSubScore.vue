@@ -1,7 +1,7 @@
 <template>
   <section class="add-sub-score">
     <div class="add-sub-score__body">
-      <van-cell class="mgt10" v-for="(item,index) in list" :key="index">
+      <van-cell class="mgt10" v-for="(item,index) in scoreSpan" :key="index">
         <div slot="title">
           <div class="cell-header">
             <van-checkbox
@@ -35,17 +35,16 @@
 
     <van-popup v-model="scoreShow" get-container=".add-sub-score__footer" class="score-pop" :style="{left: leftValue}">
       <div class="score-pop-wrap">
-        <div class="score-pop-wrap__item" @click="handleClosePop">1分</div>
-        <div class="score-pop-wrap__item" @click="handleClosePop">2分</div>
-        <div class="score-pop-wrap__item" @click="handleClosePop">3分</div>
-        <div class="score-pop-wrap__item" @click="handleClosePop">4分</div>
-        <div class="score-pop-wrap__item" @click="handleClosePop">5分</div>
+        <div class="score-pop-wrap__item" v-for="item in 5" :key="item" @click="handleClosePop(item)">{{item}}分</div>
       </div>
     </van-popup>
   </section>
 </template>
 
 <script>
+  import {getStudentName} from '@/utils/filter'
+  import {saveRewardScore} from '@/api/index'
+
   export default {
     name: "addSubScore",
     data() {
@@ -53,28 +52,85 @@
         leftValue: '30%',
         scoreShow: false,
         checkbox: 0,
-        list: [{
-          name: '满分100',
-          stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]
-        }, {name: '90-99分', stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'},]}, {
-          name: '80-89分',
-          stu: []
-        }, {
-          name: '70-79分',
-          stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]
-        }, {
-          name: '60-69分',
-          stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]
-        }, {
-          name: '60以下',
-          stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]
-        }, {name: '未提交', stu: [{name: '李华'}, {name: '李华ds'}, {name: '李华sadasd'}, {name: '李华ds'}, {name: '李华ds'},]},]
+        scoreSpan: [
+          {name: '满分100', min: 100, max: 101, stu: []},
+          {name: '90-99分', min: 90, max: 100, stu: []},
+          {name: '80-89分', min: 80, max: 90, stu: []},
+          {name: '70-79分', min: 70, max: 80, stu: []},
+          {name: '60-69分', min: 60, max: 70, stu: []},
+          {name: '60分以下', min: 0, max: 60, stu: []},
+          {name: '未提交', stu: []},
+        ],
       }
     },
+    computed: {},
+    created() {
+      this.handleList()
+    },
     methods: {
-      handleClosePop() {
+      saveRewardScore(score) {
+        let accountArr = this.scoreSpan.reduce((t, v, i) => {
+          const arr = v.stu.filter(s => s.active).reduce((total, value) => {
+            total.push(value.accountNo)
+            return total
+          }, [])
+          t.push(...arr)
+          return t
+        }, [])
+        const str = accountArr.join('|')
+        if(str === '') return this.$toast('请选择学生')
+        this.$store.commit('setVanLoading',true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.params.info.taskId,
+          "type": this.leftValue === '30%' ? "T01" : 'T02',
+          score,
+          "subjectType": localStorage.currentSubjectType,
+          "teacherName": localStorage.userInfo.userName,
+          "taskName": JSON.parse(localStorage.getItem('stat')).taskName,
+          "termType": this.$route.params.termType,
+          "classId": this.$route.params.info.classId,
+          "groupIdList": "",
+          "accountNoList": str
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        saveRewardScore(params).then(res => {
+          this.$store.commit('setVanLoading',false)
+          if (res.flag) {
+            this.$toast(this.leftValue == '30%' ? '加分成功' : '减分成功')
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handleList() {
+        this.$route.params.info.studentStatList.forEach(v => {
+          let percent = 0
+          if (this.$route.params.info.testPaperScore > 0) {
+            percent = Number((v.score / this.$route.params.info.testPaperScore * 100).toFixed(2))
+          }
+          if (v.endDate) {
+            const index = this.scoreSpan.findIndex(s => percent >= s.min && percent < s.max)
+            this.scoreSpan[index].stu.push({
+              name: getStudentName(v.accountNo, this.$route.params.info.classId),
+              accountNo: v.accountNo
+            })
+          } else {
+            this.scoreSpan[6].stu.push({
+              name: getStudentName(v.accountNo, this.$route.params.info.classId),
+              accountNo: v.accountNo
+            })
+          }
+        })
+      },
+      handleClosePop(score) {
+        this.saveRewardScore(score)
         this.scoreShow = false
-        this.$toast(this.leftValue=='30%'?'加分成功':'减分成功')
       },
       handleFold(item) {
         if (item.stu.length) {

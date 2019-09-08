@@ -18,7 +18,7 @@
 <script>
   export default {
     name: 'shareBar',
-    props: ['show', 'title', 'pic', 'link', 'type'], // type: 'art'资讯分享 'psy'心理测试分享
+    props: ['show', 'title', 'pic', 'link', 'type'],
     computed: {
       visible: {
         get () {
@@ -81,7 +81,7 @@
           Wechat.share({
             message: {
               title: _this.title,
-              description: _this.handleDesc(),
+              description: '',
               thumb: _this.pic || 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/feedback/information/201907/icon-48-mdpi.png',
               // mediaTagName: "TEST-TAG-001",
               // messageExt: "这是第三方带的测试字段",
@@ -103,7 +103,7 @@
           args.scene = item.type === 'qq' ? QQSDK.Scene.QQ : QQSDK.Scene.QQZone//QQSDK.Scene.QQZone,QQSDK.Scene.Favorite
           args.url = this.link
           args.title = this.title
-          args.description = this.handleDesc()
+          args.description = ''
           args.image = this.pic || 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/feedback/information/201907/icon-48-mdpi.png'
           QQSDK.shareNews(() => {
             this.$toast.success('分享成功')

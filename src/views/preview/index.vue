@@ -66,6 +66,7 @@
         courseTaskList: [],
         courseName: '',
         tchCourseId: '',
+        termType: '',
         refLoading: false,
         listLoading: false,
         finished: false,
@@ -83,13 +84,14 @@
     },
     methods: {
       viewStat(item) {
-        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId}})
+        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType}})
         localStorage.setItem('stat',JSON.stringify(item))
       },
       selectCourse(tchCourseInfo) {
         this.currentPage = 1
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
+        this.termType = tchCourseInfo.termType
         this.getCourseTaskList(this.courseName, this.tchCourseId)
       },
       dropdownOnLoad() {
@@ -115,6 +117,7 @@
           await this.getClassTeachCourseInfo()
           this.courseName = this.courseList[0].tchCourseInfo.courseName
           this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
+          this.termType = this.courseList[0].tchCourseInfo.termType
         }
         this.getCourseTaskList(this.courseName, this.tchCourseId)
       },

@@ -26,7 +26,7 @@
         <div class="row-item team-col">{{item.groupName}}</div>
         <div class="row-item average">{{item.average}}</div>
         <div class="row-item">
-          <div :class="{stuName:item.redoTimes>0}" v-for="(s,index1) in item.stu" :key="index1">{{s.name}}</div>
+          <div :class="{stuName:s.redoTimes>0}" v-for="(s,index1) in item.stu" :key="index1">{{s.name}}</div>
         </div>
         <div class="row-item">
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>

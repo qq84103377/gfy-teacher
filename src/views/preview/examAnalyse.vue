@@ -68,15 +68,6 @@
         scoreChartShow: false,
         stuIndex: 0,
         examIndex: 0,
-        // list: [
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        //   {name: '陈超怀', exam: {arr: [{point: 13}, {point: 13}, {point: 13}, {point: 13},]}, total: 20},
-        // ],
         examInfo: {
           knowledgePointInfos: [],
           knowMap: {},

@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="statistic-wrap__histogram" v-if="isTestPaper">
+      <div class="statistic-wrap__histogram" v-show="isTestPaper">
         <div class="statistic-wrap__histogram-label">
           <span class="divider">试卷统计:</span>
           <span class="tag">人数</span>
@@ -96,8 +96,8 @@
     </div>
 
     <div class="statistic-wrap__footer">
-      <van-button class="btn" type="info" @click="$router.push(`/addSubScore`)">加分/减分</van-button>
-      <van-button class="btn" type="info" @click="$router.push(`/briefing`)">分享报告</van-button>
+      <van-button class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">加分/减分</van-button>
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">分享报告</van-button>
     </div>
 
 
