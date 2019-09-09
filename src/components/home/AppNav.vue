@@ -41,13 +41,13 @@ export default {
           title: "资源中心",
           normal: require("../../assets/img/icon-res1.png"),
           active: require("../../assets/img/icon-res1-active.png"),
-          path: "/resCentre"
+          // path: "/resCentre"
         },
         {
           title: "教学统计",
           normal: require("../../assets/img/icon-linear.png"),
           active: require("../../assets/img/icon-linear-aactive.png"),
-          path: "/mine"
+          // path: "/mine"
         },
         {
           title: "我的",
@@ -60,7 +60,9 @@ export default {
   },
   methods: {
     handleChange(item) {
-      this.$router.replace(item.path);
+      if (item.path) {
+        this.$router.replace(item.path);
+      }
     }
   }
 };

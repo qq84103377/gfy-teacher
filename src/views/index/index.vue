@@ -141,21 +141,21 @@
           }
           getUnFinishCourseTask(params).then(res=>{
             console.log(res)
-            if (res.flag){
+            if (res.flag ){
               this.taskList = res.data;
-              if (localStorage.getItem("classMap")){
-                let classMap = JSON.parse(localStorage.getItem("classMap"))
-                this.taskList.forEach(item=>{
-                  if (item.tchCourseClassInfo){
-                    item.tchCourseClassInfo.forEach(obj=>{
+              if (localStorage.getItem("classMap") && this.taskList && this.taskList.length > 0) {
+                let classMap = JSON.parse(localStorage.getItem("classMap"));
+                this.taskList.forEach(item => {
+                  if (item.tchCourseClassInfo) {
+                    item.tchCourseClassInfo.forEach(obj => {
                       if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                         obj['className'] = "--"
-                      } else{
-                        obj['className']= classMap[obj.classId].className
+                      } else {
+                        obj['className'] = classMap[obj.classId].className
                       }
                     })
                   }
-                })
+                });
               }
               this.loading = false
             } else{
@@ -183,9 +183,9 @@
                 return
               }
               let mySchool = res.data[0].mySchoolInfo
-              if (!mySchool){
-                this.$toast("该老师未配置学校信息")
-                return
+              if (!mySchool || mySchool.length == 0) {
+                this.$toast("该老师未配置学校信息");
+                return;
               }
               let schoolMap = {}
               let classMap = {}
@@ -202,13 +202,19 @@
                     classMap[obj.classId] = obj
                     if (obj.teacherInfoList) {
                       obj.teacherInfoList.forEach(obj2=>{
-                        this.getSubGroupStudent(item.schoolId, obj.classId, obj2.subjectType)
+                        if (!localStorage.getItem("subGroup_" + obj2.subjectType + "_" + obj.classId)) {
+                          this.getSubGroupStudent(item.schoolId, obj.classId, obj2.subjectType);
+                        }
+
+
                         if (obj2.subjectType!='S20'){
                           that.subjectTypeList[obj2.subjectType] = obj2.subjectName
                         }
                       })
                     }
-                    this.getClassStudent(item.schoolId, obj.classId)
+                    if (!localStorage.getItem("classStudent_"+obj.classId)){
+                      this.getClassStudent(item.schoolId, obj.classId)
+                    }
                   })
 
                 }
@@ -333,7 +339,7 @@
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "belongSchoolId": this.$store.getters.schoolId,
+            "belongSchoolId": '',
             "roleType": "A02",
             "type": "T06",
             "pageSize": "10",
@@ -366,46 +372,48 @@
               }
               let deployMap = {}
               let key = ""
-              res.data.forEach(item => {
-                key = item.gradeTermInfo.grade + "_" + item.gradeTermInfo.term + "_" + item.subjectType +"_"+item.gradeTermId
-                if (deployMap[key]) {
-                  let tmp = deployMap[key]
-                  let flag = false
-                  for (let t of tmp) {
-                    if (t.textBookId == item.textBookId && t.gradeTermId == item.gradeTermId){
-                      flag = true
-                      break
+              let gradeMap = {}
+              let dataList = res.data
+              dataList.forEach(item => {
+                gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
+              })
+              let deployList = []
+              let gradeTermMap = {}
+              for (let k in gradeMap) {
+
+                //配置的学期列表、版本列表
+                let termMap = {}
+                let bookMap = {}
+                let bookList = [];
+                let termList = [];
+
+                dataList.forEach(item=>{
+                  gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
+                  if (k===item.gradeTermInfo.grade) {
+                    if (!bookMap[item.textBookId]) {
+                      bookMap[item.textBookId] = item.textBookName
+                      bookList.push({
+                        textBookId:item.textBookId,
+                        textBookName:item.textBookName
+                      })
+                    }
+                    if (!termMap[item.gradeTermInfo.term]) {
+                      termMap[item.gradeTermInfo.term] = item.gradeTermInfo.term
+                      termList.push(termMap[item.gradeTermInfo.term])
                     }
                   }
-                  if (!flag){
-                    deployMap[key].push({
-                      textBookId:item.textBookId,
-                      textBookName:item.textBookName,
-                      gradeTermId:item.gradeTermId
-                    })
-                  }
-                } else {
-                  deployMap[key]=[{
-                    textBookId:item.textBookId,
-                    textBookName:item.textBookName,
-                    gradeTermId:item.gradeTermId
-                  }]
-                }
-              })
-              console.log("课程配置信息：", deployMap)
-              let list = []
-              for (let m in deployMap){
-                let k = m.split("_")
-                list.push({
-                  classGrade: k[0],
-                  term:k[1],
-                  subjectType:k[2],
-                  gradeTermId:k[3],
-                  textBookList : deployMap[m]
                 })
+                let obj ={
+                  classGrade: k,
+                  bookInfo:bookList,
+                  termInfo:termList
+                }
+                deployList.push(obj)
               }
-              console.log("list", list);
-              localStorage.setItem("deployMap", JSON.stringify(list))
+
+              console.log("配置列表", deployList)
+              localStorage.setItem("deployList", JSON.stringify(deployList))
+              localStorage.setItem("gradeTermMap", JSON.stringify(gradeTermMap))
             } else {
               this.$toast("获取老师课程配置：" + res.msg)
             }

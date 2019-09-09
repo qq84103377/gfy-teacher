@@ -119,7 +119,15 @@ let getGradeName = (grade)=>{
   }
   return gradeName
 }
-
+let getTermName = (type) => {
+  if (type == "T01") {
+    return "上学期"
+  } else if (type=="T02"){
+    return "下学期"
+  } else {
+    return ""
+  }
+};
 let randomString = (len) => {
   len = len || 32
   var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
@@ -130,4 +138,4 @@ let randomString = (len) => {
   }
   return pwd
 }
-export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getStudentName,getGradeName}
+export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getStudentName,getGradeName,getTermName}

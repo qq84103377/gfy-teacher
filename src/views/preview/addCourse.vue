@@ -8,13 +8,13 @@
           required
           clearable
           label="名称:"
-          @click-right-icon="filterShow=true">
+          >
           <div slot="input" class="input-wrap">
             <input maxlength="64" v-model="form.name" v-on:input="getSysCourseList" style="width: 100%" placeholder="请输入名称,字数在64字内"/>
             <span class="num-tip">{{64 - form.name.length}}</span>
             <van-icon @click="form.name = ''" class="close" name="clear"/>
           </div>
-          <div v-if="!isEdit" slot="right-icon" class="fs14 blue">
+          <div v-if="!isEdit" slot="right-icon" class="fs14 blue" @click="openSysCourse">
             筛选
           </div>
         </van-field>
@@ -52,7 +52,7 @@
       </van-cell>
       <van-cell class="class-group">
         <div slot="title">
-          <div class="gfy-label class-label"><span style="color: red">*</span>选择班级:</div>
+          <div class="gfy-label class-label"><span style="color: red">*</span>选择班级:{{sysCourseId}}</div>
           <van-checkbox-group class="gfy-checkbox-group" v-model="result">
             <van-checkbox
               class="gfy-checkbox-group-item"
@@ -151,16 +151,16 @@
     <div class="add-course-wrap__footer" v-else>
       <van-button class="submit-btn" type="info" @click="createCourse">提交</van-button>
     </div>
-    <div class="mask"  v-show="showMask"></div>
+    <!--<div class="mask"  v-show="showMask"></div>-->
 
-    <course-filter :visible.sync="filterShow"></course-filter>
+    <course-filter :visible.sync="filterShow" :sysCourseId.sync = "sysCourseId"></course-filter>
   </section>
 </template>
 
 <script>
   import {generateTimeReqestNumber} from '@/utils/filter'
   import courseFilter from '../../components/courseFilter'
-  import {getTextBookCourseByParam,getShareCourseDetailV2,createTeachCourse} from '@/api/index'
+  import {getTextBookCourseByParam,getShareCourseDetailV2,createTeachCourse,getClassTeacherCourseDeploy} from '@/api/index'
 
   export default {
     name: "addCourse",
@@ -179,9 +179,10 @@
           time1: '',
           time2: '',
         },
+        sysCourseId:'',
         sysCourseList:[],
         shareCourseList:[],
-        currentShareCourse:'',
+        currentShareCourse:{},
         list: ['a', 'b', 'c'],
         result: [],
         currentDate: new Date(),
@@ -191,7 +192,8 @@
         beginDate:[],
         endDate:[],
         timeType:{},
-        currentClassId:''
+        currentClassId:'',
+
       }
     },
     computed: {
@@ -224,6 +226,7 @@
       this.form.time1 =  generateTimeReqestNumber(date);
       date.setDate(date.getDate()+3)
       this.form.time2 = generateTimeReqestNumber(date)
+      //this.getClassTeacherCourseDeploy()
     },
     methods: {
       handleSelectTime(v) {
@@ -270,14 +273,12 @@
         let params ={
           requestJson: JSON.stringify(obj)
         }
+        let that = this
         getTextBookCourseByParam(params).then(res=>{
           if (res.flag){
 
-            this.sysCourseList = res.data
+            that.sysCourseList = res.data
 
-            if (!this.sysCourseList || this.sysCourseList.length ==0){
-              this.showMask = false
-            }
           } else {
             this.$toast(res.msg)
             return
@@ -287,6 +288,7 @@
       selectCourse(index){
         console.log(index);
         this.currentShareCourse=this.sysCourseList[index]
+
         this.form.name = this.sysCourseList[index].nodeName
         this.getShareCourseDetailV2()
         this.showMask = false
@@ -301,10 +303,10 @@
           "schoolTypeCd": "S01",
           "sysCourseId": this.currentShareCourse.courseId,
           "classGrade": this.currentShareCourse.classGrade,
-          "subjectType": "S01",
+          "subjectType": localStorage.getItem("currentSubjectType"),
           "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
           "pageSize": "100",
-          "termType": "T01",
+          //"termType": "T01",
           "currentPage": "1"
         };
         let params ={
@@ -316,6 +318,7 @@
             this.form.course = 0;
             this.result = []
             if (this.shareCourseList) {
+              this.sysCourseId = this.shareCourseList[0].sysCourseId
               let classGrade = this.shareCourseList[0].classGrade
               if (classGrade){
                 for (let m in this.classMap) {
@@ -424,8 +427,125 @@
       },
       changShareCourse(){
 
-      }
+      },
+      async getClassTeacherCourseDeploy(){
+        let obj = {
+          'operateAccountNo':this.$store.getters.getUserInfo.accountNo
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeacherCourseDeploy(params).then(res => {
+          if (res.flag){
+            if (!res.data || res.data.length == 0) {
+              this.$toast("未配置建课信息，无法筛选系统课程，请联系管理人员")
+              return
+            }
+            let deployMap = {}
+            let key = ""
+            let gradeMap = {}
+            let dataList = res.data
+            dataList.forEach(item => {
+              gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
+            })
+            let deployList = []
+            for (let k in gradeMap) {
 
+              //配置的学期列表、版本列表
+              let termMap = {}
+              let bookMap = {}
+              let bookList = [];
+              let termList = [];
+              let gradeTermMap = {}
+              dataList.forEach(item=>{
+                gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
+                if (k===item.gradeTermInfo.grade) {
+                  if (!bookMap[item.textBookId]) {
+                    bookMap[item.textBookId] = item.textBookName
+                    bookList.push({
+                      textBookId:item.textBookId,
+                      textBookName:item.textBookName
+                    })
+                  }
+                  if (!termMap[item.gradeTermInfo.term]) {
+                    termMap[item.gradeTermInfo.term] = item.gradeTermInfo.term
+                    termList.push(termMap[item.gradeTermInfo.term])
+                  }
+                }
+              })
+              let obj ={
+                classGrade: k,
+                bookInfo:bookList,
+                termInfo:termList
+              }
+              deployList.push(obj)
+            }
+
+            console.log("配置列表", deployList)
+            localStorage.setItem("deployList", JSON.stringify(deployList))
+            localStorage.setItem("gradeTermMap", JSON.stringify(gradeTermMap))
+            res.data.forEach(item => {
+              key = item.gradeTermInfo.grade + "_" + item.gradeTermInfo.term + "_" + item.subjectType +"_"+item.gradeTermId
+              if (deployMap[key]) {
+                let tmp = deployMap[key]
+                let flag = false
+                for (let t of tmp) {
+                  if (t.textBookId == item.textBookId && t.gradeTermId == item.gradeTermId){
+                    flag = true
+                    break
+                  }
+                }
+                if (!flag){
+                  deployMap[key].push({
+                    textBookId:item.textBookId,
+                    textBookName:item.textBookName,
+                    gradeTermId:item.gradeTermId
+                  })
+                }
+              } else {
+                deployMap[key]=[{
+                  textBookId:item.textBookId,
+                  textBookName:item.textBookName,
+                  gradeTermId:item.gradeTermId
+                }]
+              }
+            })
+            console.log("课程配置信息：", deployMap)
+            let list = []
+            for (let m in deployMap){
+              let k = m.split("_")
+              list.push({
+                classGrade: k[0],
+                term:k[1],
+                subjectType:k[2],
+                gradeTermId:k[3],
+                textBookList : deployMap[m]
+              })
+            }
+            console.log("list", list);
+            localStorage.setItem("deployMap", JSON.stringify(list))
+
+          } else {
+            this.$toast("获取老师课程配置：" + res.msg)
+          }
+        });
+      },
+      handleSysCourse(name,id,grade){
+        console.log(name,id,grade)
+        this.form.name = name
+        this.currentShareCourse['courseId'] = id
+        this.currentShareCourse['classGrade'] = grade
+        this.getShareCourseDetailV2()
+      },
+      openSysCourse(){
+
+        if (!localStorage.getItem("deployList")) {
+          this.filterShow = false
+          this.$toast('未配置创建课程信息')
+          return
+        }
+        this.filterShow = true
+      }
     }
   }
 </script>

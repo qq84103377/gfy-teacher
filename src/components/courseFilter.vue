@@ -17,29 +17,29 @@
       </div>
       <div class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>
-          <div @click="gradeDropdown=!gradeDropdown">{{classGradeMap[gradeIndex].classGrade|getGradeName}}
+          <div @click="gradeDropdown=!gradeDropdown" v-if="classGradeList.length>0">{{classGradeList[gradeIndex].classGrade|getGradeName}}
             <van-icon :name="gradeDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="gradeDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item" :class="{active: gradeIndex== index}" v-for="(item,index) in classGradeMap" :key="index" @click="changeGrade(index)">{{item.classGrade|getGradeName}}
+            <div class="dropdown-menu-item" :class="{active: gradeIndex== index}" v-for="(item,index) in classGradeList" :key="index" @click="changeGrade(index)">{{item.classGrade|getGradeName}}
               <van-icon v-show="gradeIndex == index " class="check blue" name="success"/>
             </div>
 
           </div>
         </div>
         <div >
-          <div @click="termDropdown=!termDropdown">{{termTypeList[termIndex].name}}
+          <div @click="termDropdown=!termDropdown">{{termTypeList[termIndex]|getTermName}}
             <van-icon :name="termDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="termDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item" @click="changeTermType(index)" :class="{active: termIndex== index}" v-for="(item,index) in termTypeList" :key="index">{{item.name}}
+            <div class="dropdown-menu-item" @click="changeTermType(index)" :class="{active: termIndex== index}" v-for="(item,index) in termTypeList" :key="index">{{item|getTermName}}
               <van-icon v-show="termIndex== index " class="check blue" name="success"/>
             </div>
           </div>
         </div>
         <div>
-          <div @click="versionDropdown=!versionDropdown">{{textBookList[bookIndex].textBookName}}
+          <div @click="versionDropdown=!versionDropdown" v-if="bookInfoList.length>0">{{bookInfoList[bookIndex].textBookName}}
             <van-icon :name="versionDropdown?'arrow-up':'arrow-down'"/></div>
           <div v-show="versionDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item" :class="{active: bookIndex== index}"v-for="(item ,index) in textBookList" :key="index">{{item.textBookName}}
+            <div class="dropdown-menu-item" :class="{active: bookIndex== index}"v-for="(item ,index) in bookInfoList" :key="index">{{item.textBookName}}
               <van-icon v-show="bookIndex== index " class="check blue" name="success"/>
             </div>
 
@@ -54,13 +54,20 @@
         </div>
         <div class="course-filter-wrap__body-right">
           <div class="" v-for="(item,index) in courseList" :key="index">
-            <div class="course-first van-hairline--bottom" @click="$set(item,'fold',!item.fold)"><span>{{item.nodeName}}</span>
-              <van-icon  class="down-arrow" v-show="item.childNodeList && item.childNodeList.length>0"
-                        :name="item.fold?'arrow-up':'arrow-down'"/>
+            <div v-if="item.childNodeList && item.childNodeList.length>0">
+              <div class="course-first van-hairline--bottom" @click="$set(item,'fold',!item.fold)"><span>{{item.nodeName}}</span>
+                <van-icon  class="down-arrow" v-show="item.childNodeList && item.childNodeList.length>0"
+                           :name="item.fold?'arrow-up':'arrow-down'"/>
+              </div>
+              <div  :class="['course-sec',{active:currentSysCourseId == c.courseId}]" v-show="item.fold" @click="selectSysCourse(c.courseId,c.nodeName)"
+                    v-for="(c,ci) in item.childNodeList" :key="ci">{{c.nodeName}}
+                <van-icon v-show="currentSysCourseId == c.courseId" class="check blue" name="success"/>
             </div>
-            <div  :class="['course-sec',{active:sysCourseId == c.courseId}]" v-show="item.fold" @click="selectSysCourse(c.courseId)"
-                 v-for="(c,ci) in item.childNodeList" :key="ci">{{c.nodeName}}
-              <van-icon v-show="sysCourseId == c.courseId" class="check blue" name="success"/>
+            </div>
+            <div v-else>
+              <div :class="['course-sec',{active:currentSysCourseId == item.courseId}]" @click="selectSysCourse(item.courseId,item.nodeName)"><span>{{item.nodeName}}</span>
+                <van-icon v-show="currentSysCourseId == item.courseId" class="check blue" name="success"/>
+              </div>
             </div>
           </div>
         </div>
@@ -77,7 +84,7 @@
 
   export default {
     name: "courseFilter",
-    props: ['visible'],
+    props: ['visible','sysCourseId'],
     data() {
       return {
         gradeDropdown: false,
@@ -91,18 +98,22 @@
         unitIndex:0,
         subjectList: [{name: '语文', active: false}],
         courseList:[],
-        sysCourseId:'',
-        termTypeList:[
-          {code:'T01', name: '上学期'},
-          {code:'T02', name: '下学期'}
-        ],
+        //sysCourseId:'',
+        termTypeList:[],
         termIndex:0,
         gradeTermList: this.$store.getters.getGradeTermInfo,
         subjectName: localStorage.getItem("currentSubjectTypeName"),
         classGradeMap:[],
         gradeIndex:0,
         textBookList:[],
-        bookIndex:0
+        bookIndex:0,
+        currentSysCourseId:this.sysCourseId,
+        currentSysCourseName:'',
+        isDeploy:false,
+        classGradeList:[],
+        bookInfoList:[],
+        isNowTerm:0,
+        gradeTermMap:''
       }
     },
     computed: {
@@ -121,24 +132,49 @@
       let now = new Date();
       let month = now .getMonth();
       if (7 >= month && month >= 2){
-        this.termIndex = 1
+        this.isNowTerm = 1
       } else{
-        this.termIndex = 0
+        this.isNowTerm = 0
       }
-
-
-
-      this.getTextBookCourseInfo()
-
-    },
-    created(){
       //学科信息获取
-      if (localStorage.getItem("deployMap")){
-        this.classGradeMap = JSON.parse(localStorage.getItem("deployMap"))
-        this.textBookList = this.classGradeMap[0].textBookList
+      if (localStorage.getItem("deployList")){
+        this.classGradeList = JSON.parse(localStorage.getItem("deployList"))
+        this.bookInfoList = this.classGradeList[this.gradeIndex].bookInfo
+        this.termTypeList = this.classGradeList[this.gradeIndex].termInfo
+        if (this.termTypeList && this.termTypeList.length > 1) {
+          if (this.isNowTerm === 1){
+            this.termTypeList.forEach((item,index)=>{
+              if (item == "T02") {
+                this.termIndex = index
+              }
+            })
+          } else {
+            this.termTypeList.forEach((item,index)=>{
+              if (item == "T01") {
+                this.termIndex = index
+              }
+            })
+          }
+        } else {
+          this.termIndex = 0
+        }
+        this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
       }
+
+      if (localStorage.getItem('gradeTermMap')){
+        this.gradeTermMap = JSON.parse(localStorage.getItem("gradeTermMap"))
+      } else{
+        this.$toast("年级信息错误")
+      }
+      if(this.isDeploy){
+        this.getTextBookCourseInfo()
+      }
+    },
+    created(){
+
+
     },
     methods: {
       handleSelect(item) {
@@ -162,14 +198,15 @@
       },
 
       async getTextBookCourseInfo(){
+        this.unitIndex = 0
+        this.bookIndex = 0
         this.unitList = []
         this.courseList = []
-        if (!this.classGradeMap[this.gradeIndex].gradeTermId){
-          this.$toast("年级配置错误")
-          return
-        }
+        //年级计算
+        let key = this.classGradeList[this.gradeIndex].classGrade + "_" + this.termTypeList[this.termIndex];
+        let gradeId = this.gradeTermMap[key]
 
-        if (!this.textBookList || !this.textBookList[this.bookIndex].textBookId){
+        if (!this.bookInfoList || !this.bookInfoList[this.bookIndex].textBookId){
           this.$toast("版本配置错误")
           return
         }
@@ -178,8 +215,8 @@
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          "textBookId": this.textBookList[this.bookIndex].textBookId,
-          "gradeTermId": this.classGradeMap[this.gradeIndex].gradeTermId,
+          "textBookId": this.bookInfoList[this.bookIndex].textBookId,
+          "gradeTermId": gradeId,
           "subjectType": localStorage.getItem("currentSubjectType")
         }
         let params ={
@@ -234,9 +271,9 @@
 
         })
       },
-      selectSysCourse(id){
-        this.sysCourseId = id
-
+      selectSysCourse(id,name){
+        this.currentSysCourseId = id
+        this.currentSysCourseName =name
       },
       changeTermType(index){
         this.termIndex = index
@@ -245,7 +282,26 @@
       },
       changeGrade(index){
         this.gradeIndex = index
-        this.textBookList = this.classGradeMap[index].textBookList
+        this.bookInfoList = this.classGradeList[index].bookInfo
+        this.termTypeList =this.classGradeList[index].termInfo
+        if (this.termTypeList && this.termTypeList.length > 1) {
+          if (this.isNowTerm === 1){
+            this.termTypeList.forEach((item,index)=>{
+              if (item == "T02") {
+                this.termIndex = index
+              }
+            })
+          } else {
+            this.termTypeList.forEach((item,index)=>{
+              if (item == "T01") {
+                this.termIndex = index
+              }
+            })
+          }
+        } else {
+          this.termIndex = 0
+        }
+
         this.bookIndex = 0
         this.gradeDropdown = !this.gradeDropdown
         this.getTextBookCourseInfo()
@@ -258,7 +314,11 @@
       handleSubmit(){
         this.show = false
         this.$emit('update:visible', false)
-      }
+        this.$emit('update:sysCourseId', this.currentSysCourseId)
+        this.$parent.handleSysCourse(this.currentSysCourseName,this.currentSysCourseId,this.classGradeMap[this.gradeIndex].classGrade)
+      },
+
+
     }
   }
 </script>

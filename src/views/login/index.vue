@@ -228,6 +228,7 @@
              this.$store.commit('SET_LOGININFO',res.data[0].loginInfoVo.usrInfo);
 
             if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A02') {
+              localStorage.setItem("isLogin", true);
               this.$router.replace('/index')
             } else {
               this.$router.push({ name: 'settings', params: { accountNo: res.data[0].loginInfoVo.usrInfo.accountNo } })
@@ -278,7 +279,7 @@
               return;
             }
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
-
+            localStorage.setItem("isLogin", true);
             this.$router.replace('/index')
 
           } else {

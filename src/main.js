@@ -6,7 +6,7 @@ import store from './store/store'
 // import fundebugVue from 'fundebug-vue'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
-// import VConsole from 'vconsole/dist/vconsole.min.js'
+import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
@@ -66,7 +66,7 @@ viewportUnitsBuggyfill.init({
 Vue.use(Navigation, {
   router
 })
-// let vConsole = new VConsole()
+let vConsole = new VConsole()
 Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)
@@ -83,11 +83,11 @@ Object.keys(myFilter).forEach(key => {
 Vue.config.productionTip = false
 //
 router.beforeEach((to, from, next) => {
-  // if (to.path == '/login') {
-  //   if (store.getters.getThirdInfo) {
-  //     next('/index')
-  //   }
-  // }
+  if (to.path == '/login') {
+    if (localStorage.getItem('isLogin')) {
+      next('/index')
+    }
+  }
   next()
 })
 new Vue({
