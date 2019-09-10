@@ -60,6 +60,9 @@ let formatTime = (t = new Date()) => {
 }
 
 let getStudentName = (accountNo,classId) => {
+  if(accountNo === JSON.parse(localStorage.userInfo).accountNo) {
+    return JSON.parse(localStorage.userInfo).userName
+  }
   if (!classId || !accountNo){
     return "--"
   }

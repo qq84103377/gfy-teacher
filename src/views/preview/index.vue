@@ -84,7 +84,7 @@
     },
     methods: {
       viewStat(item) {
-        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType}})
+        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType,tchCourseId:item.tchCourseId,taskId:item.taskId,taskType:item.taskType}})
         localStorage.setItem('stat',JSON.stringify(item))
       },
       selectCourse(tchCourseInfo) {

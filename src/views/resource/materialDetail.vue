@@ -19,7 +19,7 @@
       <iframe v-else-if=" (type === 'office'||type === 'pdf') && info.srcUrl && !vanLoading" :src="info.srcUrl"></iframe>
 
 
-      <list-item class="mgt10" :itemTitle="info.name">
+      <list-item class="mgt10" :itemTitle="info.coursewareName">
         <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i><img v-if="handleIcon() === 'img'" :src="info.srcUrl" alt=""></div>
         <div slot="desc">
           <div class="desc-top">

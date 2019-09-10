@@ -14,7 +14,7 @@
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button type="info" class="notice-btn" v-if="!isWk&&$route.query.type != 'inClass'">一键提醒</van-button>
+          <van-button type="info" class="notice-btn" v-if="$route.query.type != 'inClass'">一键提醒</van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
@@ -44,30 +44,81 @@
       </div>
       <div class="statistic-wrap__view" v-if="isWk">
         <div class="statistic-wrap__view-tab">
-          <div class="active">按题目查看</div>
-          <div @click="$router.push({name:`examView`,params:{info:taskFinishInfo,title:info.taskName}})">按学生查看</div>
+          <div :class="{active:wareActive}" @click="wareActive = true" v-if="$route.query.taskType === 'T04'">学资源详情
+          </div>
+          <div :class="{active:!wareActive}" @click="wareActive = false" v-if="$route.query.taskType === 'T04'&&!isTestPaper">学生心得详情
+          </div>
+          <div :class="{active:!wareActive}" @click="wareActive = false" v-if="isTestPaper">按题目查看</div>
+          <div @click="$router.push({name:`examView`,params:{info:taskFinishInfo,title:info.taskName}})" v-if="isTestPaper">按学生查看</div>
         </div>
-        <div v-if="!isSpoken">
-          <div v-if="taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
+
+<!--        学生心得-->
+        <stu-exp @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="$route.query.taskType === 'T04'&&!isTestPaper&&!wareActive" :list="appraiseList">
+        </stu-exp>
+
+
+        <!--        学资源详情-->
+        <div class="ware-detail" v-show="!isSpoken&&wareActive">
+          <video v-if="type === 'mp4'" controls="controls"
+                 controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video>
+          <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl"
+                 controls="controls"
+                 controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio>
+          <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl"
+               :src="wareDetail.courseware.srcUrl"/>
+          <!--      <PDF v-else-if=" type === 'pdf' && info.srcUrl" :url="info.srcUrl"-->
+          <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
+          <!--      <iframe v-else-if=" type === 'pdf' && info.srcUrl && !vanLoading" :src="info.srcUrl"></iframe>-->
+          <iframe v-else-if=" (type === 'office'||type === 'pdf') && wareDetail.courseware.srcUrl && !vanLoading"
+                  :src="wareDetail.courseware.srcUrl"></iframe>
+
+          <list-item class="mgt10" :itemTitle="wareDetail.courseware.coursewareName">
+            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i><img
+              v-if="handleIcon() === 'img'" :src="wareDetail.courseware.srcUrl" alt=""></div>
+            <div slot="desc">
+              <div class="desc-top">
+                发布者:{{wareDetail.courseware.belongAccountName}}
+              </div>
+              <div class="desc-bottom">
+                <div>
+                  <van-icon name="clock-o"></van-icon>
+                  {{wareDetail.courseware.createDate}}
+                </div>
+                <div><i class="iconGFY icon-points"></i>{{wareDetail.courseware.useCount || 0}}</div>
+                <div><i class="iconGFY icon-download"></i>{{wareDetail.courseware.downLoadCount || 0}}</div>
+              </div>
+            </div>
+          </list-item>
+
+        </div>
+
+<!--        主观题 客观题列表-->
+        <div v-show="!isSpoken&&!wareActive">
+          <div v-if="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
             <div class="fs12 black statistic-wrap__view-label">主观题</div>
             <div class="statistic-wrap__view-subject">
-              <div class="statistic-wrap__view-subject-item" @click="$router.push(`/subjectList`)" v-for="(item,index) in taskFinishInfo.examstat"
+              <div class="statistic-wrap__view-subject-item" @click="viewSubjectList(item)"
+                   v-for="(item,index) in taskFinishInfo.examstat"
                    :key="index" v-if="item.auto_scoring === '0'">
                 <div class="pd5">
                   <div>第{{item.exam_index}}题</div>
                   <div>平均分: {{item.avg_score}}</div>
                   <div>总分:{{item.total_score}}</div>
                 </div>
-                <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)? '已批改':'批改'}}</div>
+                <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)?
+                  '已批改':'批改'}}
+                </div>
               </div>
             </div>
           </div>
-          <div v-if="taskFinishInfo.examstat.some(v => v.auto_scoring === '1')">
+          <div v-if="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')">
             <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
             <div id="myChart3" ref="myChart3" class="subject-pie"></div>
           </div>
         </div>
-        <div v-else>
+
+
+        <div v-show="isSpoken">
           <spoken-table type="statistic"></spoken-table>
         </div>
       </div>
@@ -96,8 +147,14 @@
     </div>
 
     <div class="statistic-wrap__footer">
-      <van-button class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">加分/减分</van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">分享报告</van-button>
+      <van-button class="btn" type="info"
+                  @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
+        加分/减分
+      </van-button>
+      <van-button class="btn" type="info"
+                  @click="$router.push({path:`/briefing`,query:{info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+        分享报告
+      </van-button>
     </div>
 
 
@@ -119,16 +176,24 @@
 </template>
 
 <script>
+  import {mapMutations, mapGetters, mapState} from 'vuex'
+  import {pubApi} from '@/api/parent-GFY'
+  import listItem from '../../components/list-item'
   import spokenTable from '../../components/spokenTable'
   import echarts from "echarts";
   import stuExp from '../../components/stuExp'
-  import {statTaskStat} from '@/api/index'
+  import {statTaskStat, getCourseTaskDetail, getAppraiseV2,saveRewardScore,addReply,essAppraise,unessAppraise, getReply, delPraise, addPraise, topAppraise, untopAppraise} from '@/api/index'
   import {getStudentName} from '@/utils/filter'
+
   export default {
     name: "statistic",
-    components: {stuExp, spokenTable},
+    components: {stuExp, spokenTable, listItem},
     data() {
       return {
+        appraiseList: [],
+        type: '', //学资源类型
+        wareDetail: {courseware: {srcUrl: ''}}, // 学资源详情
+        wareActive: false, //学资源详情tab选中状态
         isSpoken: false,
         tabIndex: 0,
         isWk: true,
@@ -139,21 +204,351 @@
         },
         // info: JSON.parse(JSON.stringify(this.$route.query.info)),
         info: JSON.parse(localStorage.getItem('stat')),
-        taskFinishInfo: {examstat:[]}
+        taskFinishInfo: {examstat: []}
       }
     },
     computed: {
       isTestPaper() {
         return this.$route.query.testPaperId > 0
-      }
+      },
+      ...mapState({
+        vanLoading: state => state.setting.vanLoading
+      })
     },
     methods: {
+      handleComment(replyContent,item) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          appraiseId: item.appraiseId,
+          replyContent,
+          parentReplyId: 0,
+        }
+        addReply(obj).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.$toast('评论成功')
+            item.comment = ''
+            item.replyList.unshift(res.data[0].pubReplyInfo)
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handleScore(item,type) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.query.taskId,
+          type,
+          score: 1,
+          "subjectType": localStorage.currentSubjectType,
+          "teacherName": localStorage.userInfo.userName,
+          "taskName": JSON.parse(localStorage.getItem('stat')).taskName,
+          "termType": this.$route.query.termType,
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          "groupIdList": "",
+          "accountNoList": item.appraiseAccountNo
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        saveRewardScore(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            const score = item.score * 1 + (type === 'T01' ? 1 : -1)
+            item.score = score > 0 ? '+' + score : score
+            this.$toast(`${type === 'T01'?'加':'减'}分成功`)
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handleTop(item) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          appraiseId: item.appraiseId,
+        }
+          ,api
+        if(item.topFlag === '1') {
+          api = untopAppraise
+        }else {
+          api = topAppraise
+        }
+        api(obj).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.$toast(item.topFlag === '1'?'取消置顶':'置顶成功')
+            this.getAppraise()
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handleEss(item) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          appraiseId: item.appraiseId,
+        }
+          ,api
+        if(item.essFlag === '1') {
+          api = unessAppraise
+        }else {
+          api = essAppraise
+        }
+        api(obj).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.$toast(item.essFlag === '1'?'取消精华':'加精华成功')
+            this.getAppraise()
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      handlePraise(item) {
+        this.$store.commit('setVanLoading', true)
+        let obj,api
+        if(item.good) {
+          api = delPraise
+          obj = {
+            praiseId: item.praiseList.find(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo).praiseId
+          }
+        }else {
+          api = addPraise
+          obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+            objectId: item.appraiseId,
+            objectTypeCd: 'P01',
+          }
+        }
+        api(obj).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.$toast(item.good?'取消点赞':'点赞成功')
+            this.getAppraise()
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+     getAppraise() {
+       this.$store.commit('setVanLoading', true)
+       let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          currPage: 1,
+          isAppendMode: true,
+          objectId: this.$route.query.taskId,
+          objectTypeCd: 'A01',
+          pageSize: 9999,
+          praiseType: 1,
+          replyType: 1,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+       getAppraiseV2(params).then(res => {
+         this.$store.commit('setVanLoading', false)
+         if(res.flag) {
+            res.data[0].appraiseListInfo.forEach(async v => {
+              // 本账号是否有点过赞
+              v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
+              v.score = this.rewardScore(v.appraiseAccountNo)
+              // if(v.replyCount > 0) {
+              //  let response = await this.getReply(v.appraiseId)
+              //   if(response.flag) {
+              //    v.replyList = response.data[0].replyListInfo
+              //   }
+              // }
+              let dom = document.createElement('div')
+              v.imgArr = []
+              v.audioArr = []
+              v.videoArr = []
+              dom.innerHTML = v.appraiseContent
+              if(v.appraiseContent) {
+                const imgArr = dom.querySelectorAll('img')
+                const audioArr = dom.querySelectorAll('audio')
+                const videoArr = dom.querySelectorAll('video')
+                for (let i = 0; i < imgArr.length; i++) {
+                  v.imgArr.push(imgArr[i].src)
+                  let parent = imgArr[i].parentElement
+                  parent.removeChild(imgArr[i])
+                }
+                for (let i = 0; i < audioArr.length; i++) {
+                  v.audioArr.push(audioArr[i].src)
+                  let parent = audioArr[i].parentElement
+                  parent.removeChild(audioArr[i])
+                }
+                for (let i = 0; i < videoArr.length; i++) {
+                  v.videoArr.push(videoArr[i].src)
+                  let parent = videoArr[i].parentElement
+                  parent.removeChild(videoArr[i])
+                }
+              }
+              v.text = dom.outerHTML
+            })
+            this.appraiseList = res.data[0].appraiseListInfo
+            console.log(this.appraiseList,'=s=s=s=s=s');
+          }
+        })
+      },
+      rewardScore(accountNo) {
+        const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
+        return  score > 0 ? '+' + score : score
+      },
+      getReply(appraiseId) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          classId: this.info.tchClassTastInfo.find(t => t.active).classId,
+          currPage: 1,
+          pageSize: 9999,
+          appraiseId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+       return getReply(params)
+      },
+      checkUrlPermission() {
+        // 课件鉴权
+        let permissionParams = {
+          'interUser': 'runLfb',
+          'interPwd': '25d55ad283aa400af464c76d713c07ad',
+          'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+          'belongSchoolId': this.$store.getters.schoolId,
+          'url': this.wareDetail.courseware.srcUrl,
+          'sysTypeCd': 'S03'
+        }
+        this.$store.commit('setVanLoading', true)
+        pubApi.checkUrlPermission({requestJson: JSON.stringify(permissionParams)}).then((respone) => {
+          this.$store.commit('setVanLoading', false)
+          if (respone.flag) {
+            if (this.type == 'office' || this.type == 'pdf') {
+              if (this.wareDetail.courseware.srcUrl.indexOf('pubquanlang') > -1) {
+                this.wareDetail.courseware.srcUrl = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
+
+              } else {
+                this.wareDetail.courseware.srcUrl = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
+              }
+            } else {
+              this.wareDetail.courseware.srcUrl = respone.data[0].accessUrl
+            }
+          } else {
+            this.wareDetail.courseware.srcUrl = ''
+          }
+        })
+      },
+      getUrlSuffix(url) {
+        var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
+        console.log(t)
+        if (t == 'ppt' || t == 'pptx') {
+          t = 'office'
+        } else if (t == 'doc' || t == 'docx') {
+          t = 'office'
+        } else if (t == 'xls' || t == 'xlsx') {
+          t = 'office'
+        } else if (t == 'zip' || t == 'rar' || t == '7z') {
+          t = 'rar'
+        } else if (t == 'pdf') {
+          t = 'pdf'
+        } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
+          t = 'img'
+        } else if (t == 'mp4') {
+          t = 'mp4'
+        } else if (t == 'mp3') {
+          t = 'mp3'
+        } else {
+          t = 'unkown'
+        }
+        return t
+      },
+      handleIcon() {
+        var t = this.wareDetail.courseware.srcUrl.substring(this.wareDetail.courseware.srcUrl.lastIndexOf('.') + 1).toLowerCase()
+        if (t == 'ppt' || t == 'pptx') {
+          t = 'icon-ppt'
+        } else if (t == 'doc' || t == 'docx') {
+          t = 'icon-doc'
+        } else if (t == 'xls' || t == 'xlsx') {
+          t = 'icon-xls'
+        } else if (t == 'zip' || t == 'rar' || t == '7z') {
+          // t = 'icon'
+        } else if (t == 'pdf') {
+          t = 'icon-pdf'
+        } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
+          t = 'img'
+        } else if (t == 'mp4' || t == 'mp3') {
+          t = 'icon-video'
+        } else {
+          // t = 'unkown'
+        }
+        return t
+      },
+      async getCourseTaskDetail() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          operateRoleType: 'A02',
+          tchCourseId: this.$route.query.tchCourseId,
+          "taskId": this.$route.query.taskId,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getCourseTaskDetail(params).then(res => {
+          if (res.flag) {
+            this.wareDetail = res.data[0]
+          }
+        })
+      },
+      viewSubjectList(item) {
+        const questionList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0')
+        const classId = this.info.tchClassTastInfo.find(t => t.active).classId
+        this.$router.push({
+          path: '/subjectList', query: {
+            taskId: this.info.taskId,
+            examId: item.exam_id,
+            groupId: item.group_id,
+            classId,
+            questionList,
+            info: this.taskFinishInfo
+          }
+        })
+      },
       viewAnalyse() {
-        if(!this.isTestPaper) return this.$toast('不含试卷,无法查看分析')
+        if (!this.isTestPaper) return this.$toast('不含试卷,无法查看分析')
         this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
-         let obj = {
+        let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
@@ -164,29 +559,31 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-      await statTaskStat(params).then(res => {
-          if(res.flag) {
+        await statTaskStat(params).then(res => {
+          if (res.flag) {
             this.taskFinishInfo = res.data[0]
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
       },
-     async handleSelectTab(item) {
+      async handleSelectTab(item) {
         if (item.active) return
-       this.$store.commit('setVanLoading',true)
-       this.info.tchClassTastInfo.forEach(v => {
+        this.$store.commit('setVanLoading', true)
+        this.info.tchClassTastInfo.forEach(v => {
           this.$set(v, 'active', false)
         })
         item.active = true
 
-       await this.statTaskStat(item.classId)
-       this.$store.commit('setVanLoading',false)
-       this.drawPie()
-       if(this.isTestPaper) {
-         this.drawHistogram()
-       }
-        this.drawObjectivePie()
+        await this.statTaskStat(item.classId)
+        this.$store.commit('setVanLoading', false)
+        this.drawPie()
+        if (this.isTestPaper) {
+          this.drawHistogram()
+        }
+        if (this.taskFinishInfo.examstat) {
+          this.drawObjectivePie()
+        }
       },
       drawPie() {
         this.$nextTick(() => {
@@ -236,10 +633,12 @@
                   }
                 },
                 data: [
-                  {value: this.taskFinishInfo.studentUnfinishList.reduce((t,v) => {
+                  {
+                    value: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
                       t += v.accountNoList.length
                       return t
-                    },0), name: '未完成'},
+                    }, 0), name: '未完成'
+                  },
                   {value: this.taskFinishInfo.finshCount, name: '已完成'}
                 ]
               }
@@ -258,23 +657,23 @@
             // 	}
             // }
           };
-          myChart.setOption(_option,true)
+          myChart.setOption(_option, true)
           myChart.on('click', params => {
             this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name
-            if(params.name === '未完成') {
+            if (params.name === '未完成') {
               this.taskFinishInfo.studentUnfinishList.forEach(v => {
                 v.accountNoList.forEach(s => {
-                  const name = getStudentName(s,this.info.tchClassTastInfo.find(t => t.active).classId)
+                  const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                   this.stuStatInfo.stu.push(name)
                 })
               })
-            }else {
-              this.taskFinishInfo.finishStudent.reduce((t,v) => {
-                const name = getStudentName(v,this.info.tchClassTastInfo.find(t => t.active).classId)
+            } else {
+              this.taskFinishInfo.finishStudent.reduce((t, v) => {
+                const name = getStudentName(v, this.info.tchClassTastInfo.find(t => t.active).classId)
                 t.push(name)
                 return t
-              },this.stuStatInfo.stu)
+              }, this.stuStatInfo.stu)
             }
 
             this.stuStatInfo.statDialog = true
@@ -318,11 +717,11 @@
             }
           ],
         };
-        myChart.setOption(paperOption,true);
+        myChart.setOption(paperOption, true);
       },
       drawObjectivePie() {
         //有客观题才渲染
-        if(this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
+        if (this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
           var myChart = echarts.init(document.getElementById('myChart3'));
           const objectiveList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
           myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
@@ -330,7 +729,7 @@
           // 指定图表的配置项和数据
           let arr = []
           for (let i = 0; i < objectiveList.length; i++) {
-            const correct = Number((objectiveList[i].exam_present.split("%")[0])/100)
+            const correct = Number((objectiveList[i].exam_present.split("%")[0]) / 100)
             arr.push({
               name: `第${objectiveList[i].exam_index}题`,
               type: 'pie',
@@ -360,42 +759,56 @@
             })
           }
           var questionOption = {
-            color: ['#5EF0A6','#FF6666' ],
+            color: ['#5EF0A6', '#FF6666'],
             series: arr
           };
 
-          myChart.setOption(questionOption,true);
+          myChart.setOption(questionOption, true);
 
           myChart.on('click', params => {
             console.log(params, '=3=3=');
             const questionList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
-           const item = questionList[params.seriesIndex]
-           const classId = this.info.tchClassTastInfo.find(t => t.active).classId
+            const item = questionList[params.seriesIndex]
+            const classId = this.info.tchClassTastInfo.find(t => t.active).classId
             // this.$router.push(`/subjectAnalyse?taskId=${this.info.taskId}&examId=${item.exam_id}&classId=${classId}&groupId=${item.group_id}`)
-            this.$router.push({path:'/subjectAnalyse',query:{
-                taskId:this.info.taskId,
-                examId:item.exam_id,
-                groupId:item.group_id,
+            this.$router.push({
+              path: '/subjectAnalyse', query: {
+                taskId: this.info.taskId,
+                examId: item.exam_id,
+                groupId: item.group_id,
                 classId,
                 questionList
-              }})
+              }
+            })
           })
         }
       }
     },
-   async mounted() {
-      this.$store.commit('setVanLoading',true)
-     await this.statTaskStat()
-     this.$store.commit('setVanLoading',false)
-     this.drawPie()
-     if(this.isTestPaper) {
-       this.drawHistogram()
-     }
-     this.drawObjectivePie()
-     if (!this.isWk && !this.isSpoken) {
+    async mounted() {
+      await this.statTaskStat()
+      this.$store.commit('setVanLoading', false)
+      this.drawPie()
+      if (this.isTestPaper) {
+        this.drawHistogram()
+      }
+      if (this.taskFinishInfo.examstat) {
+        this.drawObjectivePie()
+      }
+      if (!this.isWk && !this.isSpoken) {
       }
     },
-    created() {
+    async created() {
+      this.$store.commit('setVanLoading', true)
+      if (this.$route.query.taskType === 'T04') {
+        //如果是学资源则把tab设置为激活
+        // this.wareActive = true
+        if(!this.isTestPaper) {
+          this.getAppraise()
+        }
+        await this.getCourseTaskDetail()
+        this.checkUrlPermission()
+        this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
+      }
     }
   }
 </script>
@@ -551,6 +964,55 @@
       margin-top: 5px;
       background: #fff;
 
+      .ware-detail {
+        > img, > video, > iframe {
+          width: 100%;
+          height: 200px;
+        }
+
+        > audio {
+          height: 95px;
+          width: 100%;
+        }
+
+        .cover {
+          background: #F3D233;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          border-radius: 5px;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        .desc-top {
+          font-size: 10px;
+          color: #666;
+        }
+
+        .desc-bottom {
+          display: flex;
+          font-size: 12px;
+          color: #666;
+          justify-content: flex-start;
+
+          .iconGFY {
+            margin-right: 3px;
+          }
+
+          > div {
+            margin-right: 6px;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+
       > video {
         width: 100%;
         height: 200px;
@@ -601,9 +1063,11 @@
           margin-bottom: 5px;
           flex: 0 0 80px;
           margin-right: 8px;
+
           &:nth-child(4n) {
             margin-right: 0;
           }
+
           .status {
             color: #fff;
             background: @graOrange;

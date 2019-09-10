@@ -233,3 +233,35 @@ export const getTestPaperScoreAnalysis =(params)=>{
 export const saveRewardScore =(params)=>{
   return axios.post('teach/saveRewardScore', qs.stringify(params))
 }
+//获取资源详情
+export const getCourseTaskDetail =(params)=>{
+  return axios.post('teachNew/getCourseTaskDetail', qs.stringify(params))
+}
+//获取评价
+export const getAppraiseV2 =(params)=>{
+  return axios.post('public/getAppraiseV2', qs.stringify(params))
+}
+//获取评价里面的回复
+export const getReply =(params)=>{
+  return axios.post('public/getReply', qs.stringify(params))
+}
+//置顶评价
+export const topAppraise =(params)=>{
+  return axios.post('public/topAppraise', qs.stringify(params))
+}
+//取消置顶评价
+export const untopAppraise =(params)=>{
+  return axios.post('public/untopAppraise', qs.stringify(params))
+}
+//评价加精华
+export const essAppraise =(params)=>{
+  return axios.post('public/essAppraise', qs.stringify(params))
+}
+//取消评价加精华
+export const unessAppraise =(params)=>{
+  return axios.post('public/unessAppraise', qs.stringify(params))
+}
+//评价添加回复
+export const addReply =(params)=>{
+  return axios.post('public/addReply', qs.stringify(params))
+}
