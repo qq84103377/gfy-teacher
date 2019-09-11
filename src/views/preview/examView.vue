@@ -1,7 +1,7 @@
 <template>
   <section class="exam-view-wrap">
     <van-nav-bar
-      :title="$route.params.title"
+      :title="title"
       @click-left="$router.back()"
       left-arrow>
     </van-nav-bar>
@@ -10,7 +10,7 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table :list="classList" :isSpoken="isSpoken" :classView="true" v-show="classView"></score-table>
+      <score-table @jump="jump" :list="classList" :isSpoken="isSpoken" :classView="true" v-show="classView"></score-table>
       <score-table :list="groupList" :isSpoken="isSpoken" :classView="false" v-show="!classView"></score-table>
     </div>
   </section>
@@ -24,23 +24,25 @@
     data() {
       return {
         classView: true, //按班级查看
-        isSpoken: true
+        isSpoken: false,
+        info: JSON.parse(JSON.stringify(this.$route.params.info)),
+        title: this.$route.params.title
       }
     },
     computed: {
       classList() {
-       return  this.$route.params.info.studentStatList.reduce((t,v) => {
+       return  this.info.studentStatList.reduce((t,v) => {
           if(v.endDate) {
-            t.push({...v,name:getStudentName(v.accountNo,this.$route.params.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`})
+            t.push({...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`})
           }
           return t
         },[])
       },
       groupList() {
-        return  this.$route.params.info.studentStatList.reduce((t,v) => {
+        return  this.info.studentStatList.reduce((t,v) => {
           if(v.endDate) {
             const index = t.findIndex(g => g.groupId === v.groupId)
-            const item = {...v,name:getStudentName(v.accountNo,this.$route.params.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`}
+            const item = {...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`}
             if(index > -1) {
               // 已存在相同组
               t[index].stu.push(item)
@@ -67,9 +69,13 @@
     },
     components: {scoreTable},
     methods: {
+      jump(item) {
+        // this.$router.push(this.isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse?accountNo=${item.accountNo}`)
+        this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId}})
+      },
       handleToggle(bol) {
         //班级未分组时,无法切换小组查看 弹出toast
-        if(JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.$route.params.info.classId}`]).length === 0) {
+        if(JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
          return this.$toast('该班级未分组,无法进行小组查看')
         }
         this.classView = bol

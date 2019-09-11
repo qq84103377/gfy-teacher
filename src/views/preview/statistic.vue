@@ -823,6 +823,7 @@
       width: 100%;
       height: 160px;
       margin: 0 auto;
+      margin-top: 20px;
     }
 
     .subject-pie {

@@ -17,7 +17,7 @@
           <div>{{item.duration}}</div>
         </div>
         <div class="row-item  score blue">
-          <div @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">{{item.score}} ></div>
+          <div @click="$emit('jump',item)">{{item.score}} ></div>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>
         </div>
         <div class="row-item  score blue">
-          <div v-for="(s,index3) in item.stu" :key="index3" @click="$router.push(isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse`)">{{s.score}} ></div>
+          <div v-for="(s,index3) in item.stu" :key="index3" @click="$emit('jump',s)">{{s.score}} ></div>
         </div>
       </div>
     </div>
