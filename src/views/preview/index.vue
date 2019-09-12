@@ -87,13 +87,15 @@
         this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType,tchCourseId:item.tchCourseId,taskId:item.taskId,taskType:item.taskType}})
         localStorage.setItem('stat',JSON.stringify(item))
       },
-      selectCourse(tchCourseInfo) {
-        this.currentPage = 1
+     async selectCourse(tchCourseInfo) {
+       this.$store.commit('setVanLoading',true)
+       this.currentPage = 1
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
         this.termType = tchCourseInfo.termType
-        this.getCourseTaskList(this.courseName, this.tchCourseId)
-      },
+       await this.getCourseTaskList(this.courseName, this.tchCourseId)
+       this.$store.commit('setVanLoading',false)
+     },
       dropdownOnLoad() {
         this.dropdownPage++
 

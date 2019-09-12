@@ -20,7 +20,7 @@
 
 
       <list-item class="mgt10" :itemTitle="info.name">
-        <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i><img v-if="handleIcon() === 'img'" :src="info.dataUrl" alt=""></div>
+        <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img v-if="iconType === 'img'" :src="info.dataUrl" alt=""></div>
         <div slot="desc">
           <div class="desc-top">
             发布者:{{info.belongAccountName}}
@@ -51,7 +51,8 @@
     data() {
       return {
         info: this.$route.query.data,
-        type: ''
+        type: '',
+        iconType: ''
       }
     },
     computed: {
@@ -60,8 +61,8 @@
       })
     },
     methods: {
-      handleIcon () {
-        var t = this.info.dataUrl.substring(this.info.dataUrl.lastIndexOf('.') + 1).toLowerCase()
+      handleIcon (url) {
+        var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {
           t = 'icon-ppt'
         } else if (t == 'doc' || t == 'docx') {
@@ -137,8 +138,9 @@
     },
     created() {
         if (this.info.resourceType === 'R01' || this.$route.query.type === 'board') {
-          this.checkUrlPermission()
           this.type = this.getUrlSuffix(this.info.dataUrl)
+          this.iconType = this.handleIcon(this.info.dataUrl)
+          this.checkUrlPermission()
         }
 
     }

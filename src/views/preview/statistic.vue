@@ -44,21 +44,23 @@
       </div>
       <div class="statistic-wrap__view" v-if="isWk">
         <div class="statistic-wrap__view-tab">
-          <div :class="{active:wareActive}" @click="wareActive = true" v-if="$route.query.taskType === 'T04'">学资源详情
+          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="$route.query.taskType === 'T04'">学资源详情
           </div>
-          <div :class="{active:!wareActive}" @click="wareActive = false" v-if="$route.query.taskType === 'T04'&&!isTestPaper">学生心得详情
+          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="$route.query.taskType === 'T01'">微课详情
           </div>
-          <div :class="{active:!wareActive}" @click="wareActive = false" v-if="isTestPaper">按题目查看</div>
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T01','T04'].includes($route.query.taskType)&&!isTestPaper">学生心得详情
+          </div>
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="isTestPaper">按题目查看</div>
           <div @click="$router.push({name:`examView`,params:{info:taskFinishInfo,title:info.taskName}})" v-if="isTestPaper">按学生查看</div>
         </div>
 
 <!--        学生心得-->
-        <stu-exp @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="$route.query.taskType === 'T04'&&!isTestPaper&&!wareActive" :list="appraiseList">
+        <stu-exp @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="$route.query.taskType === 'T04'&&!isTestPaper&&tabIndex === 1" :list="appraiseList">
         </stu-exp>
 
 
-        <!--        学资源详情-->
-        <div class="ware-detail" v-show="!isSpoken&&wareActive">
+        <!--        学资源/微课详情-->
+        <div class="ware-detail" v-show="!isSpoken&&tabIndex === 0">
           <video v-if="type === 'mp4'" controls="controls"
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video>
           <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl"
@@ -73,8 +75,8 @@
                   :src="wareDetail.courseware.srcUrl"></iframe>
 
           <list-item class="mgt10" :itemTitle="wareDetail.courseware.coursewareName">
-            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon()"></i><img
-              v-if="handleIcon() === 'img'" :src="wareDetail.courseware.srcUrl" alt=""></div>
+            <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img
+              v-if="iconType === 'img'" :src="wareDetail.courseware.srcUrl" alt=""></div>
             <div slot="desc">
               <div class="desc-top">
                 发布者:{{wareDetail.courseware.belongAccountName}}
@@ -93,7 +95,7 @@
         </div>
 
 <!--        主观题 客观题列表-->
-        <div v-show="!isSpoken&&!wareActive">
+        <div v-show="!isSpoken&&tabIndex === 1">
           <div v-if="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
             <div class="fs12 black statistic-wrap__view-label">主观题</div>
             <div class="statistic-wrap__view-subject">
@@ -123,26 +125,26 @@
         </div>
       </div>
       <div class="statistic-wrap__view" v-else>
-        <div class="statistic-wrap__view-tab">
-          <div :class="{active:!tabIndex}" @click="tabIndex=0">微课详情</div>
-          <div :class="{active:tabIndex}" @click="tabIndex=1">学生心得详情</div>
-        </div>
-        <div v-if="!tabIndex">
-          <video style="width: 100%;" controls
-                 src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718090841_X3NZH_测试.MP4"></video>
-          <div class="statistic-wrap__view-desc">
-            <div class="statistic-wrap__view-desc-cover"></div>
-            <div class="statistic-wrap__view-desc-content">
-              <div class="statistic-wrap__view-desc-content-title fs14">我只是个标题我只是个标题我只是个标题我只是我只是个标题我只是个标题我</div>
-              <div class="grey6 fs12">发布者:高分云教育1</div>
-              <div class="grey6 fs12 aic desc">
-                <van-icon name="clock-o"/>
-                2019-06-03 14:51:45<i class="iconGFY icon-points mglt10"></i>0
-              </div>
-            </div>
-          </div>
-        </div>
-        <stu-exp v-else></stu-exp>
+<!--        <div class="statistic-wrap__view-tab">-->
+<!--          <div :class="{active:!tabIndex}" @click="tabIndex=0">微课详情</div>-->
+<!--          <div :class="{active:tabIndex}" @click="tabIndex=1">学生心得详情</div>-->
+<!--        </div>-->
+<!--        <div v-if="!tabIndex">-->
+<!--          <video style="width: 100%;" controls-->
+<!--                 src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718090841_X3NZH_测试.MP4"></video>-->
+<!--          <div class="statistic-wrap__view-desc">-->
+<!--            <div class="statistic-wrap__view-desc-cover"></div>-->
+<!--            <div class="statistic-wrap__view-desc-content">-->
+<!--              <div class="statistic-wrap__view-desc-content-title fs14">我只是个标题我只是个标题我只是个标题我只是我只是个标题我只是个标题我</div>-->
+<!--              <div class="grey6 fs12">发布者:高分云教育1</div>-->
+<!--              <div class="grey6 fs12 aic desc">-->
+<!--                <van-icon name="clock-o"/>-->
+<!--                2019-06-03 14:51:45<i class="iconGFY icon-points mglt10"></i>0-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <stu-exp v-else></stu-exp>-->
       </div>
     </div>
 
@@ -193,9 +195,11 @@
         appraiseList: [],
         type: '', //学资源类型
         wareDetail: {courseware: {srcUrl: ''}}, // 学资源详情
-        wareActive: false, //学资源详情tab选中状态
+        iconType: '',
+        // wareActive: false, //学资源详情tab选中状态
+        // lessonActive: false, //微课详情tab选中状态
         isSpoken: false,
-        tabIndex: 0,
+        tabIndex: 1,
         isWk: true,
         stuStatInfo: {
           title: '',
@@ -204,7 +208,7 @@
         },
         // info: JSON.parse(JSON.stringify(this.$route.query.info)),
         info: JSON.parse(localStorage.getItem('stat')),
-        taskFinishInfo: {examstat: []}
+        taskFinishInfo: {examstat: [],studentStatList:[]}
       }
     },
     computed: {
@@ -355,7 +359,7 @@
           }
         })
       },
-     getAppraise() {
+     async getAppraise() {
        this.$store.commit('setVanLoading', true)
        let obj = {
           "interUser": "runLfb",
@@ -372,9 +376,9 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       getAppraiseV2(params).then(res => {
+       await getAppraiseV2(params).then(res => {
          this.$store.commit('setVanLoading', false)
-         if(res.flag) {
+         if(res.flag&&res.data[0]) {
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
               v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
@@ -414,7 +418,9 @@
             })
             this.appraiseList = res.data[0].appraiseListInfo
             console.log(this.appraiseList,'=s=s=s=s=s');
-          }
+          }else {
+           this.appraiseList = []
+         }
         })
       },
       rewardScore(accountNo) {
@@ -466,6 +472,7 @@
       },
       getUrlSuffix(url) {
         var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
+        debugger
         console.log(t)
         if (t == 'ppt' || t == 'pptx') {
           t = 'office'
@@ -488,8 +495,8 @@
         }
         return t
       },
-      handleIcon() {
-        var t = this.wareDetail.courseware.srcUrl.substring(this.wareDetail.courseware.srcUrl.lastIndexOf('.') + 1).toLowerCase()
+      handleIcon(url) {
+        var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {
           t = 'icon-ppt'
         } else if (t == 'doc' || t == 'docx') {
@@ -526,6 +533,7 @@
         await getCourseTaskDetail(params).then(res => {
           if (res.flag) {
             this.wareDetail = res.data[0]
+            this.iconType = this.handleIcon(res.data[0].courseware.srcUrl)
           }
         })
       },
@@ -576,7 +584,6 @@
         item.active = true
 
         await this.statTaskStat(item.classId)
-        this.$store.commit('setVanLoading', false)
         this.drawPie()
         if (this.isTestPaper) {
           this.drawHistogram()
@@ -584,6 +591,15 @@
         if (this.taskFinishInfo.examstat) {
           this.drawObjectivePie()
         }
+
+        if (this.$route.query.taskType === 'T04') {
+          //如果是学资源则把tab设置为激活
+          // this.wareActive = true
+          if(!this.isTestPaper) {
+           await this.getAppraise()
+          }
+        }
+        this.$store.commit('setVanLoading', false)
       },
       drawPie() {
         this.$nextTick(() => {
@@ -785,8 +801,8 @@
       }
     },
     async mounted() {
+      this.$store.commit('setVanLoading', true)
       await this.statTaskStat()
-      this.$store.commit('setVanLoading', false)
       this.drawPie()
       if (this.isTestPaper) {
         this.drawHistogram()
@@ -794,21 +810,23 @@
       if (this.taskFinishInfo.examstat) {
         this.drawObjectivePie()
       }
-      if (!this.isWk && !this.isSpoken) {
-      }
-    },
-    async created() {
-      this.$store.commit('setVanLoading', true)
-      if (this.$route.query.taskType === 'T04') {
+      if (['T01','T04'].includes(this.$route.query.taskType)) {
         //如果是学资源则把tab设置为激活
         // this.wareActive = true
         if(!this.isTestPaper) {
           this.getAppraise()
         }
         await this.getCourseTaskDetail()
-        this.checkUrlPermission()
         this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
+        this.checkUrlPermission()
       }
+
+      this.$store.commit('setVanLoading', false)
+      // if (!this.isWk && !this.isSpoken) {
+      // }
+    },
+    async created() {
+
     }
   }
 </script>

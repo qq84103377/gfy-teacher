@@ -6,8 +6,8 @@
         <div slot="title" class="upload-img__body__cell">
           <div class="aic">
             <div class="fs15"><span class="red">*</span>图片:</div>
-            <div class="pdlt10 fz10 grey9" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
-            <van-icon @click="" class="add" name="add"/>
+            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
+            <van-icon @click="showSheet" class="add" name="add"/>
 
             <!--            <input-->
             <!--              type="file"-->
@@ -121,6 +121,13 @@
       this.getOSSKey();
     },
     methods: {
+      showSheet() {
+        if (this.imgList.length) {
+          this.$toast('只能上传一张图片!')
+          return
+        }
+        this.showActionSheet = !this.showActionSheet
+      },
       changeName(item) {
         this.$set(item, 'edit', true)
       },

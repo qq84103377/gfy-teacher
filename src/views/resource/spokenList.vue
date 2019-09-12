@@ -7,7 +7,7 @@
                      v-for="(item,index) in list" :key="index"
                      @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.isSend==='S05'}"></i></div>
-            <div slot="cover" class="cover"><img src="../../assets/img/icon-en.png" alt=""></div>
+            <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
             <div slot="desc">
               <div class="desc-top">
                 <div class="desc-top">
@@ -417,11 +417,6 @@
         width: 100%;
         height: 100%;
         border-radius: 5px;
-
-        img {
-          width: 52px;
-          height: 50px;
-        }
       }
 
       .desc-top {

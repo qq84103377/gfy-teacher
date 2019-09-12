@@ -37,9 +37,6 @@
     components: {analyseWrap},
     data() {
       return {
-        list: [
-          1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
-        ],
         info: {examQuestionInfo:{},testPaperInfo:[],questionList:[]},
         curIndex: 0,
       }

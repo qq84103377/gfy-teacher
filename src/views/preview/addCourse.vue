@@ -24,8 +24,8 @@
               <div class="search-wrap__item-title">
                 {{item.nodeName}}
               </div>
-              <div class="jcsb aic fs10" style="flex: 0 0 25%">
-                <span class="tag">{{item.textBookName}}</span>
+              <div class="jcsb aic fs10">
+                <span class="tag mgr10">{{item.textBookName}}</span>
                 <span class="tag">{{item.classGradeName}}</span>
               </div>
             </div>
@@ -588,14 +588,14 @@
 
         &__item {
           &-title {
-            flex: 0 0 70%;
+            /*flex: 0 0 70%;*/
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
           }
 
           .tag {
-            color: @blue;
+            color: #16AAB7;
             font-size: 10px;
             background: #E0FFFC;
             line-height: 20px;

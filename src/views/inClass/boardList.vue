@@ -83,16 +83,22 @@
           list: [],
           scrollTop: 0
         },
+        firstFlag: false // 首次加载学生白板
       }
     },
     methods: {
       changeTab(index) {
         this.tabIndex = index
         if(this.tabIndex) {
-          this.teacher.scrollTop = this.$refs['body'].scrollTop
-          this.$nextTick(() => {
-            this.$refs['body'].scrollTo(0,this.stu.scrollTop)
-          })
+          if(this.firstFlag) {
+            this.teacher.scrollTop = this.$refs['body'].scrollTop
+            this.$nextTick(() => {
+              this.$refs['body'].scrollTo(0,this.stu.scrollTop)
+            })
+          }else {
+            this.firstFlag = true
+            this.onLoad()
+          }
         }else {
           this.stu.scrollTop = this.$refs['body'].scrollTop
           this.$nextTick(() => {
