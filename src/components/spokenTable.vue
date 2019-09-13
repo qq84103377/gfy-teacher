@@ -12,7 +12,7 @@
       <div class="row" v-for="(item,index) in list" :key="index">
         <div class="col">{{index+1}}</div>
         <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">{{item.word}}</div>
-        <div class="col blue" v-if="type == 'statistic'" @click="$router.push(`/spokenAnalyse?type=analyse`)">{{item.average}} ></div>
+        <div class="col blue" v-if="type == 'statistic'" @click="$router.push(`/spokenAnalyse?type=personal`)">{{item.average}} ></div>
         <div class="col ex-width" v-if="type == 'analyse'">{{item.name}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">

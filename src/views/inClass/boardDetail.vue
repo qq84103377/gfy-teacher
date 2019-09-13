@@ -20,7 +20,7 @@
 
 
       <list-item class="mgt10" :itemTitle="info.name">
-        <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img v-if="iconType === 'img'" :src="info.dataUrl" alt=""></div>
+<!--        <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img v-if="iconType === 'img'" :src="info.dataUrl" alt=""></div>-->
         <div slot="desc">
           <div class="desc-top">
             发布者:{{info.belongAccountName}}
@@ -139,7 +139,7 @@
     created() {
         if (this.info.resourceType === 'R01' || this.$route.query.type === 'board') {
           this.type = this.getUrlSuffix(this.info.dataUrl)
-          this.iconType = this.handleIcon(this.info.dataUrl)
+          // this.iconType = this.handleIcon(this.info.dataUrl)
           this.checkUrlPermission()
         }
 

@@ -20,7 +20,7 @@
 
 
       <list-item class="mgt10" :itemTitle="info.coursewareName">
-        <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img v-if="iconType === 'img'" :src="info.srcUrl" alt=""></div>
+<!--        <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img v-if="iconType === 'img'" :src="info.srcUrl" alt=""></div>-->
         <div slot="desc">
           <div class="desc-top">
             发布者:{{info.belongAccountName}}
@@ -138,7 +138,7 @@
     },
     created() {
       this.type = this.getUrlSuffix(this.info.srcUrl)
-      this.iconType = this.handleIcon(this.info.srcUrl)
+      // this.iconType = this.handleIcon(this.info.srcUrl)
       this.checkUrlPermission()
     }
   }

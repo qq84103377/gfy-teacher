@@ -265,3 +265,11 @@ export const unessAppraise =(params)=>{
 export const addReply =(params)=>{
   return axios.post('public/addReply', qs.stringify(params))
 }
+//任务统计一键提醒
+export const saveDailyReminder =(params)=>{
+  return axios.post('operate/saveDailyReminder', qs.stringify(params))
+}
+//任务统计获取每日提醒状态
+export const getDailyRemindStatus =(params)=>{
+  return axios.post('operate/getDailyRemindStatus', qs.stringify(params))
+}

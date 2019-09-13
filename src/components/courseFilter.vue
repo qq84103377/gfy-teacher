@@ -6,6 +6,7 @@
     :style="{ height: '93%' }">
     <div class="course-filter-wrap">
       <van-overlay
+        class-name="mask"
         :show="gradeDropdown||termDropdown||versionDropdown"
         @click="gradeDropdown = false;termDropdown=false;versionDropdown=false"/>
 
@@ -328,7 +329,9 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-
+    .mask {
+      background: transparent;
+    }
     &__header {
       flex: 0 0 50px;
       display: flex;

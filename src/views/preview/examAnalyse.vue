@@ -20,7 +20,7 @@
         v-for="(item,index) in examInfo.knowledgePointInfos" :key="index">{{item.knowledgePointName}}{{index < examInfo.knowledgePointInfos.length-1?'、':'。'}}</span></span>
       </div>
     </div>
-    <div ref="scrollCtn" style="flex: 1;overflow-y: auto" class="pd10" v-show="!isExam">
+    <div ref="scrollCtn" style="flex: 1;overflow-y: auto" class="pd10" v-show="!isExam" v-if="scoreInfo.length">
       <div class="score-table">
         <div class="col">
           <div>#</div>
@@ -30,7 +30,7 @@
           <div>平均分</div>
           <div>得分率</div>
         </div>
-        <div v-if="scoreInfo.length" class="scroll-content">
+        <div class="scroll-content">
           <div v-for="(item,index) in scoreInfo[0].exam.arr" :key="index" class="col"
                :class="{'one-item':scoreInfo[0].exam.arr.length==1}">
             <div @click="handleCharts(index,item,1)" :class="{blue:item.active}">第{{index+1}}题</div>
@@ -51,6 +51,9 @@
       </div>
       <div id="myChart4" ref="myChart4" v-show="scoreChartShow" class="chart-histogram mgt10"></div>
       <i @click="backTop" class="iconGFY icon-backtop backtop"></i>
+    </div>
+    <div v-else class="pd10" style="text-align: center;">
+      暂无学生完成情况!
     </div>
   </section>
 </template>

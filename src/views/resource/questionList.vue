@@ -1,6 +1,7 @@
 <template>
   <section class="question-list">
     <van-overlay
+      class-name="mask"
       :show="tab.questionType||tab.difficult||tab.type||tab.sort"
       @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;"/>
     <div class="question-list__tab">
@@ -287,7 +288,9 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
-
+    .mask {
+      background: transparent;
+    }
     &__tab {
       flex: 0 0 44px;
       display: flex;

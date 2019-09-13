@@ -4,6 +4,7 @@
         :show="subjectShow"
         @click="subjectShow = false"
         z-index="99"
+        class-name="mask"
       />
       <div class="index-content-wrap__header">
         <div id="gfy_dropdown">
@@ -428,6 +429,9 @@
   .index-content-wrap {
     display: flex;
     flex-direction: column;
+    .mask {
+      background: transparent;
+    }
     &__header {
       flex: 0 0 44px;
       padding: 0 15px;
@@ -446,7 +450,7 @@
           top: 140%;
           transform: none;
           overflow-y: inherit;
-          box-shadow:0px 5px 9px 0px rgba(83,167,163,1);
+          box-shadow:0px 2px 5px 0px #999;
           &-wrap {
 
             &__item {
@@ -502,10 +506,12 @@
       flex: 1;
       overflow-y: auto;
       padding: 10px 16px;
-      >img {
-        width: 100%;
+      .van-swipe{
         height: 150px;
         border-radius: 5px;
+        img {
+          height: 100%;
+        }
       }
       &__main-icon {
         display: flex;
