@@ -5,14 +5,14 @@
         @click-left="$router.back()"
         left-arrow>
       </van-nav-bar>
-      <div class="spoken-analyse__topic" v-if="$route.query.type == 'analyse'">app</div>
-     <div class="play-all-wrap" v-if="$route.query.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>
+      <div class="spoken-analyse__topic" v-if="$route.params.type == 'analyse'">{{info[index].splitSentence.sentenceContent}}</div>
+     <div class="play-all-wrap" v-if="$route.params.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>
       <div class="spoken-analyse__body">
-        <spoken-table @play="isPlay = false" ref="spoken" :type="$route.query.type"></spoken-table>
+        <spoken-table @play="isPlay = false" ref="spoken" :classId="$route.params.classId" :type="$route.params.type" :list="info[index].splitInfoStudentAnswers"></spoken-table>
       </div>
-      <div class="spoken-analyse__footer"  v-if="$route.query.type == 'analyse'">
-        <van-button class="btn mgr10" type="info">上一题</van-button>
-        <van-button class="btn" type="info">下一题</van-button>
+      <div class="spoken-analyse__footer"  v-if="$route.params.type == 'analyse'">
+        <van-button @click="toggle(0)" class="btn mgr10" type="info">上一题</van-button>
+        <van-button @click="toggle(1)" class="btn" type="info">下一题</van-button>
       </div>
     </section>
 </template>
@@ -24,10 +24,19 @@
       data() {
         return {
           isPlay: false,
+          index: this.$route.params.index
         }
       },
       components: {spokenTable},
+      computed: {
+        info() {
+          return this.$route.params.info
+        }
+      },
       methods: {
+        toggle(type) {
+
+        },
           playAll() {
             if(this.isPlay) {
               this.isPlay=false
@@ -47,12 +56,14 @@
     flex-direction: column;
     background: #f5f5f5;
     &__topic {
-      flex: 0 0 50px;
+      /*flex: 0 0 50px;*/
+      padding: 5px;
       background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 18px;
+      text-align: center;
     }
     .play-all-wrap {
       padding: 10px 10px 0;

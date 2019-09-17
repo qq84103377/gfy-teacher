@@ -21,16 +21,16 @@
         <div class="subject-list-wrap__body-bottom">
           <div class="row">
             <div class="name">名字</div>
-            <div class="answer" style="text-align: center;" @click="$router.push(`/subjectCorrect`)">答案</div>
+            <div class="answer" style="text-align: center;" @click="">答案</div>
             <div class="score">分数</div>
             <div class="error">错误率</div>
           </div>
           <div class="row" v-for="(item,index) in info.statStudentAnswer.stuAnswer" :key="index">
             <div class="name">{{getStudentName(item.students[0],$route.query.classId)}} <span class="red">{{rewardScore(item.students[0])}}</span></div>
             <div class="answer">
-              <div v-html="item.text"></div>
+              <div @click="subjectCorrect(item)" class="ellipsis" v-html="item.text"></div>
               <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]" v-if="item.imgArr.length">
-                <div v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
+                <div @click="subjectCorrect(item,i)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
               </div>
               <div style="width: 100%;" v-if="item.audioArr.length">
                 <video-player  class="video-player-box"
@@ -56,7 +56,7 @@
 <script>
   import analyseWrap from '../../components/analyseWrap'
   import 'video.js/dist/video-js.css'
-  import {getExamItemDetail} from '@/api/index'
+  import {getExamItemDetail, getExamFinishInfo} from '@/api/index'
   import {getStudentName} from '@/utils/filter'
 
   import { videoPlayer } from 'vue-video-player'
@@ -85,20 +85,9 @@
           // poster: "/static/images/author.jpg",
         },
         fold: true,
-        list: [
-          {name:'欧阳吉祥吉祥',answer:'题型讲解词语运用的题型为题运用的题型为题',score:'5分',error:'10%'},
-          {name:'欧阳吉祥吉祥',answer:'题型讲解词语运用的题型为题运用的题型为题',score:'5分',error:'10%',add:'+5'},
-          {name:'欧阳吉祥吉祥',answer:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3',score:'5分',error:'10%',add:'+5',type:'audio'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-          {name:'欧阳吉祥吉祥',answer:[require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png'),require('../../assets/img/banner.png')],score:'5分',error:'10%',add:'+5',type:'img'},
-        ],
         tabList: JSON.parse(JSON.stringify(this.$route.query.questionList)),
-        info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}}
+        info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}},
+        studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList))
       }
     },
     created() {
@@ -106,8 +95,17 @@
       const index = this.tabList.findIndex(v => v.exam_id === examId)
       this.$set(this.tabList[index], 'active', true)
       this.getExamItemDetail(examId, groupId)
+      this.getExamFinishInfo(examId)
     },
     methods: {
+      subjectCorrect(item,i) {
+        console.log(item);
+          // 点击图片
+          const index = this.tabList.findIndex(v => v.active)
+          const name = getStudentName(item.students[0],this.$route.query.classId)
+          this.$router.push(`/subjectCorrect?accountNo=${item.students[0]}&examId=${this.$route.query.examId}&index=${index}&name=${name}&imgIndex=${i||0}`)
+
+      },
       toggleQuestion(bol) {
         const index = this.tabList.findIndex(v => v.active)
         if (bol) {
@@ -127,7 +125,7 @@
         }
       },
       rewardScore(accountNo) {
-        const score = this.$route.query.info.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
+        const score = this.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
        return  score > 0 ? '+' + score : score
       },
       toggleTab(item) {
@@ -137,6 +135,29 @@
         })
         this.$set(item, 'active', true)
         this.getExamItemDetail(item.exam_id, item.group_id)
+      },
+      getExamFinishInfo(examId) {
+        const {taskId, classId} = this.$route.query
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          taskId,
+          classId,
+          examId,
+          tchCourseId:this.$route.query.tchCourseId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getExamFinishInfo(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+          }else {
+            this.$toast(res.msg)
+          }
+        })
       },
       getExamItemDetail(examId, groupId) {
         this.$store.commit('setVanLoading', true)
@@ -175,9 +196,8 @@
                   let parent = audioArr[i].parentElement
                   parent.removeChild(audioArr[i])
                 }
-                dom.firstChild.className = 'ellipsis'
               }
-              v.text = dom.outerHTML
+              v.text = dom.outerText
             })
             this.info = res.data[0]
           }else {

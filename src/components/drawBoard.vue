@@ -199,7 +199,9 @@
       // 坐标转换
       windowToCanvas(x, y) {
         let bbox = this.canvas.getBoundingClientRect();
+        console.log(y,bbox.top,'================');
         return {x: x - bbox.left, y: y - bbox.top};
+        // return {x,y};
       },
       // 计算两点之间的距离函数
       calcDistance(lastCoordinate, curCoordinate) {
@@ -235,6 +237,9 @@
         context.beginPath();
         context.lineTo(x1, y1);
         context.lineTo(x2, y2);
+        console.log(y2,'yyyyyyyyyyyyyyy');
+        // context.lineTo(0,132);
+        // context.lineTo(100,500);
 
         context.lineWidth = lineWidth;
         context.lineCap = 'round'; // 线与线交合不会产生空隙
@@ -309,7 +314,6 @@
         // const origenY = this.canvas.height / 2
         // let xr = (x - origenX) * cos(-arc) - (y - origenY) * sin(-arc) + origenX     // X原点-屏幕高/2    90度
         // let xy = (x - origenX) * sin(-arc) + (y - origenY) * cos(-arc) + origenY    // Y原点-屏幕高/2   90度
-        console.log(this.canvas.width,this.canvas.height);
         return { x: xr, y: xy }
         // return {x,y}
       },
@@ -330,7 +334,6 @@
               _this.point = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
               _this.lastCoordinate = _this.windowToCanvas(_this.point.x, _this.point.y);
               _this.lastTimestamp = new Date().getTime();
-              console.log('touchStart')
             },
             touchMove: function (event) {
               // swordEle.style.translateX += evt.deltaX;
@@ -424,19 +427,19 @@
       // let footerHeight = $('.footer').height(); // 获取底部高度
       //
       this.offCanvas.width = window.document.body.offsetWidth
-      this.offCanvas.height = window.document.body.offsetHeight
+      this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
       this.canvas.width = window.document.body.offsetWidth
-      this.canvas.height = window.document.body.offsetHeight
+      this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
       this.figure()
 
 
 
       window.addEventListener('resize', () => {
         this.offCanvas.width = window.document.body.offsetWidth
-        this.offCanvas.height = window.document.body.offsetHeight
+        this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
         // offCanvas.height = $(window).height() - footerHeight;
         this.canvas.width = window.document.body.offsetWidth
-        this.canvas.height = window.document.body.offsetHeight
+        this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
         console.log(this.canvas.width);
         console.log(this.canvas.height);
         // canvas.height = $(window).height() - footerHeight;

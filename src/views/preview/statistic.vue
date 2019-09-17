@@ -110,7 +110,7 @@
         </div>
         <div class="ware-detail" v-if="!isSpoken&&tabIndex === 0&&['T06'].includes($route.query.taskType)">
           <div v-html="wareDetail.discussInfo.discussName"></div>
-          <div v-html="wareDetail.discussInfo.discussContent"></div>
+          <div class="dis-ctn" v-html="wareDetail.discussInfo.discussContent"></div>
         </div>
 
         <!--        主观题 客观题列表-->
@@ -140,7 +140,7 @@
 
 
         <div v-if="$route.query.taskType === 'T13'">
-          <spoken-table type="statistic"></spoken-table>
+          <spoken-table type="statistic" :list="taskFinishInfo.finishResultBySplit" :classId="info.tchClassTastInfo.find(t => t.active).classId"></spoken-table>
         </div>
       </div>
     </div>
@@ -241,6 +241,8 @@
         // }
       },
       saveDailyReminder() {
+        if(this.remind) return
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -255,8 +257,9 @@
           requestJson: JSON.stringify(obj)
         }
         saveDailyReminder(params).then(res => {
+          this.$store.commit('setVanLoading', false)
           if(res.flag) {
-
+            this.remind = true
           }else {
             this.$toast(res.msg)
           }
@@ -607,6 +610,7 @@
             taskId: this.info.taskId,
             examId: item.exam_id,
             groupId: item.group_id,
+            tchCourseId:this.$route.query.tchCourseId,
             classId,
             questionList,
             info: this.taskFinishInfo
@@ -630,6 +634,9 @@
         }
         await statTaskStat(params).then(res => {
           if (res.flag) {
+            if(this.$route.query.taskType === 'T13') {
+              res.data[0].studentStatList = res.data[0].examstat
+            }
             this.taskFinishInfo = res.data[0]
           } else {
             this.$toast(res.msg)
@@ -1055,6 +1062,12 @@
       background: #fff;
 
       .ware-detail {
+        overflow-x: hidden;
+        .dis-ctn {
+          img {
+            width: 100%;
+          }
+        }
         > img, > video, > iframe {
           width: 100%;
           height: 200px;

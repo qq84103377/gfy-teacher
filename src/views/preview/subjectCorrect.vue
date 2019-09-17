@@ -1,10 +1,10 @@
 <template>
   <div class="correct-wrap">
-    <div class="correct-wrap__header" v-show="!isPen">
-      <van-icon name="arrow-left"/>
-      <span>飞龙在天在天</span>
-      <span>题号:1 (1)</span>
-      <span>进度：10/46</span>
+    <div class="correct-wrap__header" v-show="!isFold">
+      <van-icon @click="$router.back()" name="arrow-left"/>
+      <span>{{$route.query.name}}</span>
+      <span v-if="info.questionList[questionIndex]">题号:{{info.questionList[questionIndex].num}}</span>
+      <span>进度：{{questionIndex + 1}}/{{info.questionList.length}}</span>
       <i @click="" class="iconGFY icon-enlarge"></i>
       <i class="iconGFY icon-reduce"></i>
       <i class="iconGFY icon-rotate-left"></i>
@@ -16,7 +16,7 @@
       <span @click="commentShow=true" class="action-btn" style="background: #FAE573;">点评</span>
     </div>
 
-    <div class="correct-wrap__side" v-show="!isPen">
+    <div class="correct-wrap__side" v-show="!isFold">
       <div class="correct-wrap__side-top">
         <div class="score-btn">满分</div>
         <div class="score-btn" style="background: #FA7373;">零分</div>
@@ -38,15 +38,23 @@
         <div class="submit fs10">提交</div>
       </div>
     </div>
-    <div class="correct-wrap__bottom">
+    <div class="correct-wrap__bottom" id="tools-bar">
       <i @click="isPen=!isPen;isRubber=false" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
       <i @click="isRubber=!isRubber;isPen=false" class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
       <i class="iconGFY icon-del"></i>
       <i @click="isGood=!isGood" class="iconGFY icon-good" :class="{'icon-good-active':isGood}"></i>
+      <i @click="isFold=!isFold" class="iconGFY icon-good" ></i>
     </div>
-<!--    <div class="canvas-mask" v-show="!isPen&&!isRubber"></div>-->
-    <draw-board :text="commentText" :isPen="isPen" :isRubber="isRubber" :imgUrl="require('../../assets/img/banner.png')" @exit="handleExit"></draw-board>
+    <div class="correct-wrap__body">
+      <div class="correct-wrap__body__text" ref="text" v-if="info.questionList[questionIndex]&&info.questionList[questionIndex].text" >
+        <div class="ellipsis" v-html="info.questionList[questionIndex].text"></div>
+        <div class="more-btn">查看更多</div>
+      </div>
+      <div class="correct-wrap__body__draw" v-if="info.questionList[questionIndex]&&info.questionList[questionIndex].imgArr.length">
+        <draw-board :text="commentText" :isPen="isPen" :isRubber="isRubber" :imgUrl="info.questionList[questionIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+      </div>
+    </div>
     <van-dialog
       v-model="viewSubject"
       :show-confirm-button="false" >
@@ -111,7 +119,10 @@
   import drawBoard from '../../components/drawBoard'
   // import 'swiper/dist/css/swiper.css'////这里注意具体看使用的版本是否需要引入样式，以及具体位置。
   // import {swiper, swiperSlide} from 'vue-awesome-swiper'
-
+  import {getCourseTaskDetail} from '@/api/index'
+  import AlloyFinger from 'alloyfinger'
+  import  'alloyfinger/transformjs/transform'
+  import AlloyPaper from 'alloyfinger/asset/alloy_paper.js'
   export default {
     name: "subjectCorrect",
     components: {
@@ -131,6 +142,7 @@
         isPen: true,
         isRubber: false,
         isGood: false,
+        isFold: false,
         value1: '10分',
         option: [
           {text: '全部商品', value: 0},
@@ -138,35 +150,151 @@
           {text: '活动商品', value: 2}
         ],
         thumbnail: false,
-        swiperOption: {
-          zoom: {
-            maxRatio: 5, //最大倍数
-            minRatio: 1, //最小倍数
-            toggle: false, //不允许双击缩放，只允许手机端触摸缩放。
-            // containerClass: 'my-zoom-container', //zoom container 类名
-          },
-
-        },
-        imgIndex: 0,
         imgUrl: '',
         imgList: [require('../../assets/img/banner.png')],
         show: true,
-        index: 0,
+        questionIndex: Number(this.$route.query.index),
+        imgIndex: Number(this.$route.query.imgIndex) || 0,
+        info: {examQuestionInfo:{},testPaperInfo:[],questionList:[]}
       }
     },
     created() {
 
       screen.orientation.lock('landscape')
+      this.getCourseTaskDetail()
     },
     mounted() {
-      // window.addEventListener('resize', () => {
-      //     alert(window.screen.height)
-      //     this.height = window.screen.height - 50
-      //     this.width = window.screen.width
-      // })
-
+      this.figure()
     },
     methods: {
+      figure() {
+        // let swordEle = document.getElementsByClassName('canvas')[0]
+        let swordEle = document.getElementById('tools-bar')
+        let _this = this
+        var Stage = AlloyPaper.Stage, Bitmap = AlloyPaper.Bitmap,Loader=AlloyPaper.Loader;
+
+        Transform(swordEle)
+        let bwidth, bheight, swidth, sheight;
+        var initScale = 1;
+        var af = new AlloyFinger(swordEle, {
+          touchStart: function (event) {
+            // if(!_this.isPen&&!_this.isRubber) return
+            // _this.point = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
+            // _this.lastCoordinate = _this.windowToCanvas(_this.point.x, _this.point.y);
+            // _this.lastTimestamp = new Date().getTime();
+            // console.log('touchStart')
+          },
+          touchMove: function (event) {
+          },
+          touchEnd: function () {
+            // let strArr = swordEle.style.transform.split(',')
+            // _this.rotateX = strArr[0].split('matrix3d(')[1]
+            // _this.rotateY = strArr[5]
+            // console.log(_this.rotateX,_this.rotateY)
+          },
+          touchCancel: function () {
+          },
+          multipointStart: function () {
+
+          },
+          multipointEnd: function () {
+          },
+          tap: function () {
+          },
+          doubleTap: function () {
+          },
+          longTap: function () {
+          },
+          singleTap: function () {
+          },
+          rotate: function (evt) {
+
+          },
+          pinch(evt) {
+          },
+          pressMove: function (evt) {
+            let widthDiff = bwidth - swidth;
+            let heightDiff = bheight - sheight;
+            // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
+            // } else {
+            swordEle.translateX += evt.deltaX;
+            swordEle.translateY += evt.deltaY;
+            // }
+          },
+          swipe: function (evt) {
+          }
+        });
+      },
+      getDom(item) {
+        this.$set(item,'imgArr',[])
+        this.$set(item,'audioArr',[])
+        let dom = document.createElement('div')
+        dom.innerHTML = item.studentAnswer
+        if(item.studentAnswer) {
+          const imgArr = dom.querySelectorAll('img')
+          const audioArr = dom.querySelectorAll('audio')
+          for (let i = 0; i < imgArr.length; i++) {
+            item.imgArr.push(imgArr[i].src)
+            let parent = imgArr[i].parentElement
+            parent.removeChild(imgArr[i])
+          }
+          for (let i = 0; i < audioArr.length; i++) {
+            item.audioArr.push(audioArr[i].src)
+            let parent = audioArr[i].parentElement
+            parent.removeChild(audioArr[i])
+          }
+          this.$set(item,'text',dom.outerText)
+        }else {
+          this.$set(item,'text','')
+        }
+      },
+      getCourseTaskDetail() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A03",
+          "tchCourseId": JSON.parse(localStorage.stat).tchCourseId,
+          "accountNo": this.$route.query.accountNo,
+          "taskId": JSON.parse(localStorage.stat).taskId,
+          "isNeedHisAnswer": "Y"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getCourseTaskDetail(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            let arr = [],bNum = 0
+            res.data[0].testPaperInfo.forEach((v,index) => {
+              v.sectionExam.forEach((s,i) => {
+                bNum++
+                if(s.testPaperExamGroup.length) {
+                  let sNum = 0
+                  s.testPaperExamGroup.forEach((t,ti) => {
+                    sNum++
+                    if(i===0&&index===0&&ti===0) this.$set(t.groupExamInfo,'active',true)
+                    t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
+                    t.groupExamInfo.num = `${bNum}(${sNum})`
+                    arr.push(t.groupExamInfo)
+                  })
+                }else {
+                  if(i===0&&index===0) this.$set(s.examQuestion,'active',true)
+                  s.examQuestion.num = bNum
+                  arr.push(s.examQuestion)
+                }
+              })
+            })
+            res.data[0].questionList = arr
+            this.info = res.data[0]
+            this.getDom(this.info.questionList[this.questionIndex])
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       ab(i, index) {
         this.$refs['menuItem' + i][0].toggle({show: false})
         this.value1 = `${index}分`
@@ -186,7 +314,7 @@
 <style lang="less" scoped>
   @deep: ~">>>";
   .correct-wrap {
-    overflow-y: hidden;
+    overflow: hidden;
     @{deep} .van-popup--right {
       transform: translate3d(0,0,0);
       top: 26px;
@@ -518,9 +646,41 @@
 
     }
 
+    &__body {
+      background: rgb(205,236,211);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      &__text {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        /*width: calc(100% - 100px);*/
+        margin: 31px 105px 10px 10px;
+        font-size: 10px;
+        .ellipsis {
+          overflow : hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;      /* 可以显示的行数，超出部分用...表示*/
+          -webkit-box-orient: vertical;
+          flex: 1;
+        }
+        .more-btn {
+          color: #16AAB7;
+          font-size: 10px;
+          margin-left: 5px;
+        }
+      }
+      &__draw {
+        flex: 1;
+      }
+    }
     &__bottom {
       position: absolute;
-      width: 100px;
+      width: 125px;
       height: 24px;
       z-index: 9;
       right: 5px;

@@ -273,3 +273,7 @@ export const saveDailyReminder =(params)=>{
 export const getDailyRemindStatus =(params)=>{
   return axios.post('operate/getDailyRemindStatus', qs.stringify(params))
 }
+//主观题批改列表
+export const getExamFinishInfo =(params)=>{
+  return axios.post('teach/getExamFinishInfo', qs.stringify(params))
+}

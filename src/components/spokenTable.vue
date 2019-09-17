@@ -11,9 +11,9 @@
     <div class="scroll-area">
       <div class="row" v-for="(item,index) in list" :key="index">
         <div class="col">{{index+1}}</div>
-        <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">{{item.word}}</div>
-        <div class="col blue" v-if="type == 'statistic'" @click="$router.push(`/spokenAnalyse?type=personal`)">{{item.average}} ></div>
-        <div class="col ex-width" v-if="type == 'analyse'">{{item.name}}</div>
+        <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">{{item.splitSentence.sentenceContent}}</div>
+        <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage}} ></div>
+        <div class="col ex-width" v-if="type == 'analyse'">{{getStudentName(item.accountNo,classId)}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">
           <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>
@@ -25,20 +25,26 @@
 </template>
 
 <script>
-    export default {
+  import {getStudentName} from '@/utils/filter'
+  export default {
         name: "spokenTable",
-      props: ['type'], //statistic 统计页面  analyse 题目分析  personal 个人分析
+      props: ['type','list','classId'], //statistic 统计页面  analyse 题目分析  personal 个人分析
       data() {
           return {
             playIndex: null,
-            list: [
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-              {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
-            ]
+            // list: [
+            //   {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+            //   {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+            //   {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+            //   {word: 'Words and expressions？Words and',score: 9,average: 100,name: '裘千仞欧阳修',src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201907/20190718082513_bE83G_允儿 - 简单爱 (Live).MP3'},
+            // ]
           }
       },
+    computed: {
+      getStudentName() {
+        return getStudentName
+      }
+    },
       methods: {
           play(index,item) {
             this.$emit('play')
@@ -85,6 +91,13 @@
           this.$set(this.list[this.playIndex],'play',false)
           document.getElementById('audio' + this.playIndex).removeEventListener('ended', this.playEndedHandler, false)
           document.getElementById('audio' + this.playIndex).pause()
+        },
+        jump(index) {
+            if(this.type === 'statistic') {
+              this.$router.push({name:'spokenAnalyse',params:{type:'analyse',info:this.list,classId:this.classId,index}})
+            }else {
+              this.$router.push({name:'spokenAnalyse',params:{type:'personal',info:this.list,classId:this.classId,index}})
+            }
         }
       }
     }
@@ -118,7 +131,8 @@
         flex: 1;
         text-align: center;
         /*line-height: 44px;*/
-        height: 44px;
+        min-height: 44px;
+        line-height: 22px;
         border-right: 1px solid #F5F6FA;
         border-bottom: 1px solid #F5F6FA;
         display: flex;
