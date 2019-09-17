@@ -300,6 +300,14 @@ export default new Router({
             isShowNav: true
           }
         },
+        {
+          path: '/mine',
+          name: 'mine',
+          component: () => import('./views/mine/index.vue'),
+          meta: {
+            isShowNav: true
+          }
+        },
       ]
     },
     {
@@ -316,13 +324,6 @@ export default new Router({
       path: '/resetPwd',
       name: 'resetPwd',
       component: () => import('./views/login/resetPwd.vue')
-    },{
-      path: '/mine',
-      name: 'mine',
-      component: () => import('./views/mine/index.vue'),
-      meta: {
-        isShowNav: true,
-      }
     },
   ]
 })
