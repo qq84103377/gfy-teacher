@@ -330,7 +330,6 @@
 
     .preview-wrap-header-right {
       flex: 0 0 40px;
-
       .edit-btn {
         font-size: 14px;
         display: flex;
@@ -350,7 +349,11 @@
           font-size: 10px;
           text-align: center;
           display: inline-block;
-
+          color: #16AAB7;
+          white-space: nowrap;
+          .van-ellipsis {
+            display: inline;
+          }
           &::after {
             right: 6px;
             top: 6px;

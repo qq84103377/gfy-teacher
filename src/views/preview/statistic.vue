@@ -237,7 +237,7 @@
         // if(this.$route.query.taskType === 'T13') {
         //   this.$router.push({name:`spokenAnalyse`,query:{type: 'analyse'}})
         // }else {
-        this.$router.push({name:`examView`,params:{info:this.taskFinishInfo,title:this.info.taskName}})
+        this.$router.push({name:`examView`,params:{info:this.taskFinishInfo,title:this.info.taskName,isSpoken:this.$route.query.taskType === 'T13'}})
         // }
       },
       saveDailyReminder() {

@@ -8,7 +8,7 @@
       <div class="spoken-analyse__topic" v-if="$route.params.type == 'analyse'">{{info[index].splitSentence.sentenceContent}}</div>
      <div class="play-all-wrap" v-if="$route.params.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>
       <div class="spoken-analyse__body">
-        <spoken-table @play="isPlay = false" ref="spoken" :classId="$route.params.classId" :type="$route.params.type" :list="info[index].splitInfoStudentAnswers"></spoken-table>
+        <spoken-table @play="isPlay = false" ref="spoken" :classId="$route.params.classId" :type="$route.params.type" :list="$route.params.type === 'personal'?info:info[index].splitInfoStudentAnswers"></spoken-table>
       </div>
       <div class="spoken-analyse__footer"  v-if="$route.params.type == 'analyse'">
         <van-button @click="toggle(0)" class="btn mgr10" type="info">上一题</van-button>
@@ -35,7 +35,21 @@
       },
       methods: {
         toggle(type) {
-
+          if(type) {
+            // 下一题
+            if(this.index < this.info.length -1) {
+              this.index++
+            }else {
+              this.$toast('没有下一题了!')
+            }
+          }else {
+            //上一题
+            if(this.index > 0) {
+              this.index--
+            }else {
+              this.$toast('没有上一题了!')
+            }
+          }
         },
           playAll() {
             if(this.isPlay) {

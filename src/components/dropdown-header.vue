@@ -15,7 +15,7 @@
           </van-pull-refresh>
 
         </div>
-        <div class="folder-btn" @click="$refs['dropdown'].toggle({show:false})"><i class="iconGFY icon-fold"></i></div>
+        <div class="folder-btn" @click="$refs['dropdown'].toggle(false)"><i class="iconGFY icon-fold"></i></div>
       </van-dropdown-item>
 
     </van-dropdown-menu>
@@ -58,7 +58,7 @@
       methods:{
         selectCourse(tchCourseInfo,index) {
           this.$emit('selectCourse',tchCourseInfo,index)
-          this.$refs['dropdown'].toggle({show:false})
+          this.$refs['dropdown'].toggle(false)
         },
         onLoad() {
           this.$emit('onLoad')
@@ -94,6 +94,7 @@
       width: 66px;
       height: 27px;
       border-radius: 13px;
+      margin-right: 10px;
     }
     .dropdown-btn {
       background: #e0fffc;
@@ -118,13 +119,14 @@
         overflow : hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: #16AAB7;
         &::after {
           right: 6px;
-          top: 6px;
+          top: 8px;
           content: '';
         }
         &--down::after{
-          top: 10px;
+          top: 11px;
           content: '';
         }
       }

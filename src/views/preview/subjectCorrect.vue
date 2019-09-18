@@ -296,7 +296,7 @@
         })
       },
       ab(i, index) {
-        this.$refs['menuItem' + i][0].toggle({show: false})
+        this.$refs['menuItem' + i][0].toggle(false)
         this.value1 = `${index}分`
       },
       handleExit(src) {

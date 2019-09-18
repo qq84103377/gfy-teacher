@@ -10,8 +10,8 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table @jump="jump" :list="classList" :isSpoken="isSpoken" :classView="true" v-show="classView"></score-table>
-      <score-table :list="groupList" :isSpoken="isSpoken" :classView="false" v-show="!classView"></score-table>
+      <score-table @jump="jump" :list="classList" :classView="true" v-show="classView"></score-table>
+      <score-table :list="groupList" :classView="false" v-show="!classView"></score-table>
     </div>
   </section>
 </template>
@@ -24,9 +24,9 @@
     data() {
       return {
         classView: true, //按班级查看
-        isSpoken: false,
         info: JSON.parse(JSON.stringify(this.$route.params.info)),
-        title: this.$route.params.title
+        title: this.$route.params.title,
+        isSpoken: this.$route.params.isSpoken
       }
     },
     computed: {
@@ -71,7 +71,17 @@
     methods: {
       jump(item) {
         // this.$router.push(this.isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse?accountNo=${item.accountNo}`)
-        this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId}})
+        debugger
+        if(this.isSpoken) {
+         let info = this.info.finishResultBySplit.reduce((t,v) => {
+            let answer = v.splitInfoStudentAnswers.find(value => value.accountNo === item.accountNo)
+           if(answer) t.push({...answer,sentenceContent:v.splitSentence.sentenceContent}) // 词汇存进数组
+            return t
+          },[])
+          this.$router.push({name:'spokenAnalyse',params:{type:'personal',info,classId:this.info.classId,index:0}})
+        }else {
+          this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId}})
+        }
       },
       handleToggle(bol) {
         //班级未分组时,无法切换小组查看 弹出toast

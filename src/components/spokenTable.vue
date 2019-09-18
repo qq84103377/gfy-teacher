@@ -11,13 +11,14 @@
     <div class="scroll-area">
       <div class="row" v-for="(item,index) in list" :key="index">
         <div class="col">{{index+1}}</div>
-        <div class="col ex-width" v-if="type == 'statistic' || type == 'personal'">{{item.splitSentence.sentenceContent}}</div>
+        <div class="col ex-width pd5" v-if="type == 'statistic'">{{item.splitSentence.sentenceContent}}</div>
+        <div class="col ex-width pd5" v-if="type == 'personal'">{{item.sentenceContent}}</div>
         <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage}} ></div>
         <div class="col ex-width" v-if="type == 'analyse'">{{getStudentName(item.accountNo,classId)}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">
           <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>
-          <audio :id="'audio'+ index" :src="item.src"></audio>
+          <audio :id="'audio'+ index" :src="item.studentAnswer"></audio>
         </div>
       </div>
     </div>

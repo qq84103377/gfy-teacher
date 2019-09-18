@@ -42,7 +42,7 @@
 <script>
   export default {
     name: "scoreTable",
-    props: ['classView', 'list','isSpoken'],
+    props: ['classView', 'list'],
     data() {
       return {
 
