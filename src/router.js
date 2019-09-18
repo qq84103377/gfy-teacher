@@ -308,6 +308,78 @@ export default new Router({
             isShowNav: true
           }
         },
+        {
+          path: '/userInfo',
+          name: 'userInfo',
+          component: () => import('./views/mine/userInfo.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '个人信息'
+          }
+        },
+        {
+          path: '/shop',
+          name: 'shop',
+          component: () => import('./views/mine/shop/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '积分商城'
+          }
+        },
+        {
+          path: '/help',
+          name: 'help',
+          component: () => import('./views/mine/help.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '使用帮助'
+          }
+        },
+        {
+          path: '/myLevel',
+          name: 'myLevel',
+          component: () => import('./views/mine/myLevel.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '我的等级'
+          }
+        },
+        // {
+        //   path: '/myNotice',
+        //   name: 'myNotice',
+        //   component: () => import('./views/mine/myNotice.vue'),
+        //   meta: {
+        //     isShowHeader: true,
+        //     title: '我的提醒'
+        //   }
+        // },
+        {
+          path: '/setting',
+          name: 'setting',
+          component: () => import('./views/mine/setting/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '个人设置'
+          }
+        },
+        {
+          path: '/service',
+          name: 'service',
+          component: () => import('./views/mine/service.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '为您服务'
+          }
+        },
+        {
+          path: '/feedback',
+          name: 'feedback',
+          component: () => import('./views/mine/feedback/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '意见反馈'
+          }
+        },
       ]
     },
     {
