@@ -2,9 +2,9 @@
   <div class="correct-wrap">
     <div class="correct-wrap__header" v-show="!isFold">
       <van-icon @click="$router.back()" name="arrow-left"/>
-      <span>{{$route.query.name}}</span>
-      <span v-if="info.questionList[questionIndex]">题号:{{info.questionList[questionIndex].num}}</span>
-      <span>进度：{{questionIndex + 1}}/{{info.questionList.length}}</span>
+      <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}</span>
+      <span>题号:{{$route.params.examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}}</span>
+      <span>进度：{{stuIndex + 1}}/{{stuArr.length}}</span>
       <i @click="" class="iconGFY icon-enlarge"></i>
       <i class="iconGFY icon-reduce"></i>
       <i class="iconGFY icon-rotate-left"></i>
@@ -15,7 +15,8 @@
       <span class="action-btn" style="background: #FABC73;">减分</span>
       <span @click="commentShow=true" class="action-btn" style="background: #FAE573;">点评</span>
     </div>
-
+    <i class="iconGFY icon-circle-arrow" @click="toggle(0)"></i>
+    <i class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
     <div class="correct-wrap__side" v-show="!isFold">
       <div class="correct-wrap__side-top">
         <div class="score-btn">满分</div>
@@ -47,12 +48,15 @@
       <i @click="isFold=!isFold" class="iconGFY icon-good" ></i>
     </div>
     <div class="correct-wrap__body">
-      <div class="correct-wrap__body__text" ref="text" v-if="info.questionList[questionIndex]&&info.questionList[questionIndex].text" >
-        <div class="ellipsis" v-html="info.questionList[questionIndex].text"></div>
-        <div class="more-btn">查看更多</div>
+      <div class="correct-wrap__body__text" ref="text" v-if="stuArr[stuIndex].answer[aswIndex].text" >
+        <div class="ellipsis" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
+        <div class="more-btn">展开答案</div>
       </div>
-      <div class="correct-wrap__body__draw" v-if="info.questionList[questionIndex]&&info.questionList[questionIndex].imgArr.length">
-        <draw-board :text="commentText" :isPen="isPen" :isRubber="isRubber" :imgUrl="info.questionList[questionIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
+        <draw-board :text="commentText" :isPen="isPen" :isRubber="isRubber" :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+      </div>
+      <div class="correct-wrap__body__undo" v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
+        学生未作答
       </div>
     </div>
     <van-dialog
@@ -116,6 +120,7 @@
 </template>
 
 <script>
+  import {getStudentName} from '@/utils/filter'
   import drawBoard from '../../components/drawBoard'
   // import 'swiper/dist/css/swiper.css'////这里注意具体看使用的版本是否需要引入样式，以及具体位置。
   // import {swiper, swiperSlide} from 'vue-awesome-swiper'
@@ -150,23 +155,72 @@
           {text: '活动商品', value: 2}
         ],
         thumbnail: false,
-        imgUrl: '',
-        imgList: [require('../../assets/img/banner.png')],
         show: true,
-        questionIndex: Number(this.$route.query.index),
-        imgIndex: Number(this.$route.query.imgIndex) || 0,
-        info: {examQuestionInfo:{},testPaperInfo:[],questionList:[]}
+        imgIndex: Number(this.$route.params.imgIndex) || 0,
+        aswIndex: Number(this.$route.params.aswIndex),
+        stuIndex: Number(this.$route.params.stuIndex),
+        stuArr: JSON.parse(JSON.stringify(this.$route.params.stuArr)),
+        classId: this.$route.params.classId,
+        info: JSON.parse(JSON.stringify(this.$route.params.info)),
+      }
+    },
+    computed: {
+      getStudentName(){
+        return getStudentName
       }
     },
     created() {
 
       screen.orientation.lock('landscape')
-      this.getCourseTaskDetail()
+      // this.getCourseTaskDetail()
     },
     mounted() {
       this.figure()
     },
     methods: {
+      toggle(type) {
+        if(type) {
+          // 下一个
+          if(this.imgIndex < this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1) {
+            //下一个图片
+            this.imgIndex++
+          }else {
+            if(this.aswIndex < this.stuArr[this.stuIndex].answer.length - 1) {
+              //下一个小题
+              this.aswIndex++
+              this.imgIndex = 0
+            }else {
+              //下一个学生
+              if(this.stuIndex < this.stuArr.length - 1) {
+                this.stuIndex++
+                this.aswIndex = 0
+                this.imgIndex = 0
+              }else {
+                this.$toast('最后啦')
+              }
+            }
+          }
+        }else {
+          //上一个
+          if(this.imgIndex > 0) {
+            //上一个图片
+            this.imgIndex--
+          }else {
+            if(this.aswIndex > 0) {
+              this.aswIndex--
+              this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length?this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length-1:0
+            }else {
+              if(this.stuIndex > 0) {
+                this.stuIndex--
+                this.aswIndex = this.stuArr[this.stuIndex].answer.length?this.stuArr[this.stuIndex].answer.length-1:0
+                this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length?this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length-1:0
+              }else {
+                this.$toast('最前啦')
+              }
+            }
+          }
+        }
+      },
       figure() {
         // let swordEle = document.getElementsByClassName('canvas')[0]
         let swordEle = document.getElementById('tools-bar')
@@ -374,6 +428,18 @@
     }
     @{deep} .van-dialog {
       width: auto;
+    }
+    .icon-circle-arrow {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: 5px;
+      transform: translateY(-50%);
+      &.rotate {
+        left: auto;
+        right: 5px;
+        transform: translateY(-50%) rotateZ(180deg);
+      }
     }
     .view-subject {
       width: 200px;
@@ -669,13 +735,25 @@
           flex: 1;
         }
         .more-btn {
-          color: #16AAB7;
+          color: red;
           font-size: 10px;
           margin-left: 5px;
         }
       }
       &__draw {
         flex: 1;
+      }
+      &__undo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background: rgb(218,249,238);
+        color: red;
+        border-radius: 3px;
+        text-align: center;
+        line-height: 30px;
+        padding: 0 10px;
       }
     }
     &__bottom {

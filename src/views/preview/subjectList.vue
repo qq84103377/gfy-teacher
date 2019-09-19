@@ -46,9 +46,9 @@
                 <div class="left">
                   <div class="mgb5">{{examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}} <i v-if="asw.qualityType" class="iconGFY icon-good-active"></i></div>
                   <div v-if="asw.result && asw.result !== '<p></p>'">
-                    <div @click="subjectCorrect(asw)" class="ellipsis" v-html="asw.text"></div>
+                    <div @click="subjectCorrect(asw,index,aswIndex)" class="ellipsis" v-html="asw.text"></div>
                     <div class="img-wrap" :class="[{img4: asw.imgArr.length==4},{img56:asw.imgArr.length>4}]" v-if="asw.imgArr.length">
-                      <div @click="subjectCorrect(asw,i)" v-for="(img,i) in asw.imgArr" :key="i"><img :src="img" alt=""></div>
+                      <div @click="subjectCorrect(asw,index,aswIndex,i)" v-for="(img,i) in asw.imgArr" :key="i"><img :src="img" alt=""></div>
                     </div>
                     <div style="width: 100%;" v-if="asw.audioArr.length">
                       <!--                    <video-player  class="video-player-box"-->
@@ -62,7 +62,7 @@
                       <i style="width: 100%;" class="iconGFY icon-player"></i>
                     </div>
                   </div>
-                  <div v-else class="undo">学生未作答</div>
+                  <div v-else @click="subjectCorrect(asw,index,aswIndex)" class="undo">学生未作答</div>
                 </div>
                 <div class="right">{{asw.error}}</div>
               </div>
@@ -123,12 +123,24 @@
       this.getExamFinishInfo(examId)
     },
     methods: {
-      subjectCorrect(item,i) {
+      subjectCorrect(item,stuIndex,aswIndex,imgIndex) {
         console.log(item);
           // 点击图片
-          const index = this.tabList.findIndex(v => v.active)
-          const name = getStudentName(item.students[0],this.$route.query.classId)
-          this.$router.push(`/subjectCorrect?accountNo=${item.students[0]}&examId=${this.$route.query.examId}&index=${index}&name=${name}&imgIndex=${i||0}`)
+          // const index = this.tabList.findIndex(v => v.active)
+          // const name = getStudentName(item.accountNo,this.$route.query.classId)
+          // this.$router.push(`/subjectCorrect?accountNo=${item.accountNo}&examId=${this.$route.query.examId}&index=${index}&name=${name}&imgIndex=${i||0}`)
+          this.$router.push({name:'subjectCorrect',params:{
+              accountNo:item.accountNo,
+              examId:this.$route.query.examId,
+              classId:this.$route.query.classId,
+              imgIndex:imgIndex||0,
+              aswIndex,
+              stuIndex,
+              examNum:this.examNum,
+              // index,
+              stuArr:this.stuArr,
+              info:this.info
+            }})
 
       },
       toggleQuestion(bol) {

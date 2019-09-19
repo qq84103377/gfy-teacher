@@ -122,7 +122,7 @@
         // $('.clearButton').trigger('click')
         this.clearScreen()
         this.drawImg(this.imgUrl); // 画图
-        animatePanel('.bg-panel', '-130px', '.control-button', '60px');
+        // animatePanel('.bg-panel', '-130px', '.control-button', '60px');
       },
       text(v) {
         this.ctx.font = '18px bold Adobe Heiti Std R'

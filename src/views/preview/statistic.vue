@@ -683,7 +683,7 @@
           this.$set(v, 'active', false)
         })
         item.active = true
-
+        this.getDailyRemindStatus()
         await this.statTaskStat(item.classId)
         this.drawPie()
         if (this.isTestPaper) {
