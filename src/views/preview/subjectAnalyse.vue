@@ -3,7 +3,7 @@
     <analyse-wrap @toggle="toggleQuestion">
       <div class="scroll-tab" slot="tab">
         <div class="scroll-tab__item" :class="{active:item.active}" @click="toggleTab(item)"
-             v-for="(item,index) in list" :key="index">{{item.str}}
+             v-for="(item,index) in list" :key="index">{{item.num}}
         </div>
       </div>
       <div class="subject-analyse__body">

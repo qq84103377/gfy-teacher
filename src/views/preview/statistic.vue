@@ -14,7 +14,9 @@
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button class="notice-btn" :class="{remind: remind}" v-if="$route.query.type != 'inClass'" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}</van-button>
+          <van-button class="notice-btn" :class="{remind: remind}" v-if="$route.query.type != 'inClass'"
+                      @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          </van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
@@ -115,18 +117,19 @@
 
         <!--        主观题 客观题列表-->
         <div v-show="tabIndex === 1" v-if="$route.query.taskType !== 'T13'">
-          <div v-if="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
+          <div
+            v-if="taskFinishInfo.paperDataList&&taskFinishInfo.paperDataList.some(v => v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length))">
             <div class="fs12 black statistic-wrap__view-label">主观题</div>
             <div class="statistic-wrap__view-subject">
               <div class="statistic-wrap__view-subject-item" @click="viewSubjectList(item)"
-                   v-for="(item,index) in taskFinishInfo.examstat"
-                   :key="index" v-if="item.auto_scoring === '0'">
+                   v-for="(item,index) in taskFinishInfo.paperDataList"
+                   :key="index" v-if="item.autoScoring === '0' && (item.groupExamList.some(g => g.autoScoring === '0') || !item.groupExamList.length)">
                 <div class="pd5">
-                  <div>第{{item.exam_index}}题</div>
-                  <div>平均分: {{item.avg_score}}</div>
-                  <div>总分:{{item.total_score}}</div>
+                  <div>第{{index + 1}}题</div>
+                  <div>平均分: {{calcScore(item,'avg_score')}}</div>
+                  <div>总分:{{calcScore(item,'total_score')}}</div>
                 </div>
-                <div class="status">{{(item.student_finish_count > 0 && item.finish_count == item.student_finish_count)?
+                <div class="status">{{isCorrect(item)?
                   '已批改':'批改'}}
                 </div>
               </div>
@@ -140,7 +143,8 @@
 
 
         <div v-if="$route.query.taskType === 'T13'">
-          <spoken-table type="statistic" :list="taskFinishInfo.finishResultBySplit" :classId="info.tchClassTastInfo.find(t => t.active).classId"></spoken-table>
+          <spoken-table type="statistic" :list="taskFinishInfo.finishResultBySplit"
+                        :classId="info.tchClassTastInfo.find(t => t.active).classId"></spoken-table>
         </div>
       </div>
     </div>
@@ -220,7 +224,7 @@
         },
         // info: JSON.parse(JSON.stringify(this.$route.query.info)),
         info: JSON.parse(localStorage.getItem('stat')),
-        taskFinishInfo: {examstat: [], studentStatList: []},
+        taskFinishInfo: {examstat: [], studentStatList: [], paperDataList: []},
         remind: false,
       }
     },
@@ -233,15 +237,39 @@
       })
     },
     methods: {
+      isCorrect(item) {
+        if (item.groupId === -1) {
+         let exam = this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)
+         return exam.student_finish_count > 0 && exam.finish_count == exam.student_finish_count
+        } else {
+         return item.groupExamList.some(v => {
+            let exam = this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)
+            return exam.student_finish_count > 0 && exam.finish_count == exam.student_finish_count
+          })
+        }
+      },
+      calcScore(item, key) {
+        if (item.groupId === -1) {
+          return this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)[key]
+        } else {
+          return item.groupExamList.reduce((t, v) => {
+            t += this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)[key]
+            return t
+          }, 0)
+        }
+      },
       viewStu() {
         // if(this.$route.query.taskType === 'T13') {
         //   this.$router.push({name:`spokenAnalyse`,query:{type: 'analyse'}})
         // }else {
-        this.$router.push({name:`examView`,params:{info:this.taskFinishInfo,title:this.info.taskName,isSpoken:this.$route.query.taskType === 'T13'}})
+        this.$router.push({
+          name: `examView`,
+          params: {info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13'}
+        })
         // }
       },
       saveDailyReminder() {
-        if(this.remind) return
+        if (this.remind) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -250,7 +278,7 @@
           "belongSchoolId": this.$store.getters.schoolId,
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           "objectId": this.$route.query.taskId,
-          "objectType":'T01',
+          "objectType": 'T01',
           accountNoList: this.taskFinishInfo.studentUnfinishList[0].accountNoList
         }
         let params = {
@@ -258,9 +286,9 @@
         }
         saveDailyReminder(params).then(res => {
           this.$store.commit('setVanLoading', false)
-          if(res.flag) {
+          if (res.flag) {
             this.remind = true
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
@@ -273,15 +301,15 @@
           "belongSchoolId": this.$store.getters.schoolId,
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           "objectId": this.$route.query.taskId,
-          "objectType":'T01',
+          "objectType": 'T01',
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
         getDailyRemindStatus(params).then(res => {
-          if(res.flag) {
+          if (res.flag) {
             this.remind = res.data.length > 0
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
@@ -603,14 +631,19 @@
         })
       },
       viewSubjectList(item) {
-        const questionList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0')
+        let questionList = []
+        this.taskFinishInfo.paperDataList.forEach((v,i) => {
+          if(v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length)) {
+            questionList.push({...v,num:i+1})
+          }
+        })
         const classId = this.info.tchClassTastInfo.find(t => t.active).classId
         this.$router.push({
           path: '/subjectList', query: {
             taskId: this.info.taskId,
-            examId: item.exam_id,
-            groupId: item.group_id,
-            tchCourseId:this.$route.query.tchCourseId,
+            examId: item.examId,
+            groupId: item.groupId,
+            tchCourseId: this.$route.query.tchCourseId,
             classId,
             questionList,
             info: this.taskFinishInfo
@@ -634,7 +667,7 @@
         }
         await statTaskStat(params).then(res => {
           if (res.flag) {
-            if(this.$route.query.taskType === 'T13') {
+            if (this.$route.query.taskType === 'T13') {
               res.data[0].studentStatList = res.data[0].examstat
             }
             this.taskFinishInfo = res.data[0]
@@ -807,7 +840,19 @@
         //有客观题才渲染
         if (this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
           var myChart = echarts.init(document.getElementById('myChart3'));
-          const objectiveList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
+          let objectiveList = []
+          this.taskFinishInfo.paperDataList.forEach((v,i) => {
+            if(v.autoScoring === '1') {
+              objectiveList.push({...v,num:i+1,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present})
+            }
+            let group = []
+            v.groupExamList.forEach((g,gi) => {
+              if(g.autoScoring === '1') {
+                group.push({...g,num:`${i+1}(${gi+1})`,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present})
+              }
+            })
+            objectiveList = objectiveList.concat(group)
+          })
           myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
           myChart.resize()
           // 指定图表的配置项和数据
@@ -815,7 +860,7 @@
           for (let i = 0; i < objectiveList.length; i++) {
             const correct = Number((objectiveList[i].exam_present.split("%")[0]) / 100)
             arr.push({
-              name: `第${objectiveList[i].exam_index}题`,
+              name: `第${objectiveList[i].num}题`,
               type: 'pie',
               radius: [22, 26],
               center: [28 + i % 6 * 60, 28 + (((i + 1) / 6 > 1) ? Math.floor(i / 6) * 60 : 0)],
@@ -833,7 +878,7 @@
                     formatter: '{a}\n{d}%',
                     textStyle: {
                       baseline: 'bottom',
-                      fontSize: 12,
+                      fontSize: 10,
                       color: '#000'
                     }
                   },
@@ -851,17 +896,16 @@
 
           myChart.on('click', params => {
             console.log(params, '=3=3=');
-            const questionList = this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '1')
-            const item = questionList[params.seriesIndex]
+            const item = objectiveList[params.seriesIndex]
             const classId = this.info.tchClassTastInfo.find(t => t.active).classId
             // this.$router.push(`/subjectAnalyse?taskId=${this.info.taskId}&examId=${item.exam_id}&classId=${classId}&groupId=${item.group_id}`)
             this.$router.push({
               path: '/subjectAnalyse', query: {
                 taskId: this.info.taskId,
-                examId: item.exam_id,
-                groupId: item.group_id,
+                examId: item.examId||item.examGroupId,
+                groupId: item.groupId,
                 classId,
-                questionList
+                questionList:objectiveList
               }
             })
           })
@@ -983,6 +1027,7 @@
           line-height: 26px;
           color: #fff;
           background: @blue;
+
           &.remind {
             color: #999;
             background: #f5f6fa;
@@ -1063,11 +1108,13 @@
 
       .ware-detail {
         overflow-x: hidden;
+
         .dis-ctn {
           img {
             width: 100%;
           }
         }
+
         > img, > video, > iframe {
           width: 100%;
           height: 200px;
