@@ -3,7 +3,7 @@
     <analyse-wrap @toggle="toggleQuestion">
       <div class="scroll-tab" slot="tab">
         <div class="scroll-tab__item" :class="{active:item.active}" @click="toggleTab(item)"
-             v-for="(item,index) in list" :key="index">{{item.exam_index}}
+             v-for="(item,index) in list" :key="index">{{item.str}}
         </div>
       </div>
       <div class="subject-analyse__body">
@@ -47,7 +47,7 @@
     },
     created() {
       const {examId, groupId} = this.$route.query
-      const index = this.list.findIndex(v => v.exam_id === examId)
+      const index = this.list.findIndex(v => (v.examId || v.examGroupId) === examId)
       this.$set(this.list[index], 'active', true)
       this.getExamItemDetail(examId, groupId)
     },
@@ -76,7 +76,7 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
-        this.getExamItemDetail(item.exam_id, item.group_id)
+        this.getExamItemDetail(item.examId||item.examGroupId, item.groupId)
       },
       getExamItemDetail(examId, groupId) {
         this.$store.commit('setVanLoading', true)

@@ -274,7 +274,7 @@
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           "objectId": this.$route.query.taskId,
           "objectType":'T01',
-      }
+        }
         let params = {
           requestJson: JSON.stringify(obj)
         }
