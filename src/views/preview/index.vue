@@ -84,7 +84,8 @@
     },
     methods: {
       viewStat(item) {
-        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType,tchCourseId:item.tchCourseId,taskId:item.taskId,taskType:item.taskType}})
+        this.$store.commit('setVanLoading',true)
+        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType,tchCourseId:item.tchCourseId,taskId:item.taskId,taskType:item.taskType,resourceType:item.resourceType}})
         localStorage.setItem('stat',JSON.stringify(item))
       },
      async selectCourse(tchCourseInfo) {

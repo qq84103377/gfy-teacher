@@ -5,8 +5,8 @@
       <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}</span>
       <span>题号:{{$route.params.examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}}</span>
       <span>进度：{{stuIndex + 1}}/{{stuArr.length}}</span>
-      <i @click="" class="iconGFY icon-enlarge"></i>
-      <i class="iconGFY icon-reduce"></i>
+      <i @click="zoom(1)" class="iconGFY icon-enlarge"></i>
+      <i @click="zoom(0)" class="iconGFY icon-reduce"></i>
       <i class="iconGFY icon-rotate-left"></i>
       <i class="iconGFY icon-rotate-right"></i>
       <span @click="viewSubject=true">看原题</span>
@@ -15,8 +15,9 @@
       <span class="action-btn" style="background: #FABC73;">减分</span>
       <span @click="commentShow=true" class="action-btn" style="background: #FAE573;">点评</span>
     </div>
-    <i class="iconGFY icon-circle-arrow" @click="toggle(0)"></i>
-    <i class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
+    <i v-if="!(aswIndex==0&&stuIndex==0&&imgIndex==0)&&!isFold" class="iconGFY icon-circle-arrow"
+       @click="toggle(0)"></i>
+    <i v-if="!isFold" class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
     <div class="correct-wrap__side" v-show="!isFold">
       <div class="correct-wrap__side-top">
         <div class="score-btn">满分</div>
@@ -40,40 +41,51 @@
       </div>
     </div>
     <div class="correct-wrap__bottom" id="tools-bar">
-      <i @click="isPen=!isPen;isRubber=false" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
-      <i @click="isRubber=!isRubber;isPen=false" class="iconGFY icon-rubber"
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isPen=!isPen;isRubber=false" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isRubber=!isRubber;isPen=false" class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
-      <i class="iconGFY icon-del"></i>
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" class="iconGFY icon-del"></i>
       <i @click="isGood=!isGood" class="iconGFY icon-good" :class="{'icon-good-active':isGood}"></i>
-      <i @click="isFold=!isFold" class="iconGFY icon-good" ></i>
+      <i @click="isFold=!isFold" class="iconGFY icon-hide" :class="{'icon-hide-active':isFold}"></i>
     </div>
     <div class="correct-wrap__body">
-      <div class="correct-wrap__body__text" ref="text" v-if="stuArr[stuIndex].answer[aswIndex].text" >
-        <div class="ellipsis" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
-        <div class="more-btn">展开答案</div>
+      <!--      <div class="correct-wrap__body__text" :style="{flex: stuArr[stuIndex].answer[aswIndex].imgArr.length? '0 0 35%':'none'}" ref="text" v-if="stuArr[stuIndex].answer[aswIndex].text" >-->
+      <div class="correct-wrap__body__text" ref="text"
+           :class="{ellipsis:stuArr[stuIndex].answer[aswIndex].imgArr.length}"
+           v-if="stuArr[stuIndex].answer[aswIndex].text">
+        <div style="word-break: break-all" class="text-area" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
+        <div class="more-btn" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案</div>
       </div>
-      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
-        <draw-board :text="commentText" :isPen="isPen" :isRubber="isRubber" :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+      <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length">
+        <i class="iconGFY icon-circle-logo"></i>
+        <audio autoplay controls controlsList="nodownload" :src="stuArr[stuIndex].answer[aswIndex].audioArr[0]"></audio>
       </div>
-      <div class="correct-wrap__body__undo" v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
+      <div class="correct-wrap__body__draw" :style="{flex: stuArr[stuIndex].answer[aswIndex].text? '0 0 88%':'1'}"
+           v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
+        <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
+        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber"
+                    :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+      </div>
+      <div class="correct-wrap__body__undo"
+           v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
         学生未作答
       </div>
     </div>
     <van-dialog
       v-model="viewSubject"
-      :show-confirm-button="false" >
+      :show-confirm-button="false">
       <div class="view-subject">
-        <div class="view-subject__header">看原题<van-icon @click="viewSubject=false" name="cross" /></div>
+        <div class="view-subject__header">看原题
+          <van-icon @click="viewSubject=false" name="cross"/>
+        </div>
         <div class="view-subject__body">
           <div class="mgb5 pd5" style="background: #fff;">
             <div>看原题</div>
-            <div>(伞)逍遥游(19分)</div>
-            <div>(伞)逍遥游(19分)</div>
+            <div v-html="examTitle"></div>
           </div>
           <div class="pd5" style="background: #fff;">
             <div>看答案</div>
-            <div>答案:暗示健康大可接受的安会计师的哈会计师打开手机端跨境四大皆空加深的</div>
-            <!--            <div>im</div>-->
+            <div v-html="examAnswer"></div>
           </div>
         </div>
       </div>
@@ -86,7 +98,9 @@
       <div class="stu-info-wrap">
         <div class="stu-info-wrap__header">
           <div class="mgb5">阅卷情况 10/46</div>
-          <div class="search-input"><input v-model="stuName" placeholder="请输入查找的学生姓名" type="text"/><van-icon name="search"></van-icon></div>
+          <div class="search-input"><input v-model="stuName" placeholder="请输入查找的学生姓名" type="text"/>
+            <van-icon name="search"></van-icon>
+          </div>
         </div>
         <div class="stu-info-wrap__body">
           <div class="stu-item" v-for="a in 10" :key="a">
@@ -100,7 +114,7 @@
 
     <van-dialog
       v-model="commentShow"
-      :show-confirm-button="false" >
+      :show-confirm-button="false">
       <div class="comment-dialog">
         <div class="comment-dialog__header">评论</div>
         <div class="comment-dialog__body">
@@ -126,8 +140,9 @@
   // import {swiper, swiperSlide} from 'vue-awesome-swiper'
   import {getCourseTaskDetail} from '@/api/index'
   import AlloyFinger from 'alloyfinger'
-  import  'alloyfinger/transformjs/transform'
+  import 'alloyfinger/transformjs/transform'
   import AlloyPaper from 'alloyfinger/asset/alloy_paper.js'
+
   export default {
     name: "subjectCorrect",
     components: {
@@ -138,7 +153,7 @@
     data() {
       return {
         commentText: '',
-        commonWord: ['你做的很不错,继续加油!','理解的很好,可以毕业','做得很差,明天不用来上课'],
+        commonWord: ['你做的很不错,继续加油!', '理解的很好,可以毕业', '做得很差,明天不用来上课'],
         comment: '',
         stuName: '',
         stuInfo: false,
@@ -162,11 +177,26 @@
         stuArr: JSON.parse(JSON.stringify(this.$route.params.stuArr)),
         classId: this.$route.params.classId,
         info: JSON.parse(JSON.stringify(this.$route.params.info)),
+        scale: 1,
       }
     },
     computed: {
-      getStudentName(){
+      getStudentName() {
         return getStudentName
+      },
+      examTitle() {
+        if (this.info.groupExamList.length) {
+          return this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).title
+        } else {
+          return this.info.title
+        }
+      },
+      examAnswer() {
+        if (this.info.groupExamList.length) {
+          return this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).answer
+        } else {
+          return this.info.answer
+        }
       }
     },
     created() {
@@ -178,43 +208,60 @@
       this.figure()
     },
     methods: {
+      zoom(type) {
+        this.scale += type ? 0.1 : -0.1
+        this.$refs['drawBoard'].handleZoom(this.scale)
+      },
       toggle(type) {
-        if(type) {
+        if (type) {
           // 下一个
-          if(this.imgIndex < this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1) {
+          if (this.imgIndex < this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1) {
             //下一个图片
             this.imgIndex++
-          }else {
-            if(this.aswIndex < this.stuArr[this.stuIndex].answer.length - 1) {
+            this.scale = 1
+          } else {
+            if (this.aswIndex < this.stuArr[this.stuIndex].answer.length - 1) {
               //下一个小题
               this.aswIndex++
               this.imgIndex = 0
-            }else {
+              this.scale = 1
+            } else {
               //下一个学生
-              if(this.stuIndex < this.stuArr.length - 1) {
+              if (this.stuIndex < this.stuArr.length - 1) {
                 this.stuIndex++
                 this.aswIndex = 0
                 this.imgIndex = 0
-              }else {
-                this.$toast('最后啦')
+                this.scale = 1
+              } else {
+                this.$dialog.confirm({
+                  title: "",
+                  message: "已经全部批改完该大题,是否回到批改列表?",
+                  cancelButtonText: "取消",
+                  confirmButtonText: "确定"
+                }).then(() => {
+                  this.$router.back()
+                })
               }
             }
           }
-        }else {
+        } else {
           //上一个
-          if(this.imgIndex > 0) {
+          if (this.imgIndex > 0) {
             //上一个图片
             this.imgIndex--
-          }else {
-            if(this.aswIndex > 0) {
+            this.scale = 1
+          } else {
+            if (this.aswIndex > 0) {
               this.aswIndex--
-              this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length?this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length-1:0
-            }else {
-              if(this.stuIndex > 0) {
+              this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
+              this.scale = 1
+            } else {
+              if (this.stuIndex > 0) {
                 this.stuIndex--
-                this.aswIndex = this.stuArr[this.stuIndex].answer.length?this.stuArr[this.stuIndex].answer.length-1:0
-                this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length?this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length-1:0
-              }else {
+                this.aswIndex = this.stuArr[this.stuIndex].answer.length ? this.stuArr[this.stuIndex].answer.length - 1 : 0
+                this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
+                this.scale = 1
+              } else {
                 this.$toast('最前啦')
               }
             }
@@ -225,7 +272,7 @@
         // let swordEle = document.getElementsByClassName('canvas')[0]
         let swordEle = document.getElementById('tools-bar')
         let _this = this
-        var Stage = AlloyPaper.Stage, Bitmap = AlloyPaper.Bitmap,Loader=AlloyPaper.Loader;
+        var Stage = AlloyPaper.Stage, Bitmap = AlloyPaper.Bitmap, Loader = AlloyPaper.Loader;
 
         Transform(swordEle)
         let bwidth, bheight, swidth, sheight;
@@ -280,11 +327,11 @@
         });
       },
       getDom(item) {
-        this.$set(item,'imgArr',[])
-        this.$set(item,'audioArr',[])
+        this.$set(item, 'imgArr', [])
+        this.$set(item, 'audioArr', [])
         let dom = document.createElement('div')
         dom.innerHTML = item.studentAnswer
-        if(item.studentAnswer) {
+        if (item.studentAnswer) {
           const imgArr = dom.querySelectorAll('img')
           const audioArr = dom.querySelectorAll('audio')
           for (let i = 0; i < imgArr.length; i++) {
@@ -297,9 +344,9 @@
             let parent = audioArr[i].parentElement
             parent.removeChild(audioArr[i])
           }
-          this.$set(item,'text',dom.outerText)
-        }else {
-          this.$set(item,'text','')
+          this.$set(item, 'text', dom.outerText)
+        } else {
+          this.$set(item, 'text', '')
         }
       },
       getCourseTaskDetail() {
@@ -320,22 +367,22 @@
         }
         getCourseTaskDetail(params).then(res => {
           this.$store.commit('setVanLoading', false)
-          if(res.flag) {
-            let arr = [],bNum = 0
-            res.data[0].testPaperInfo.forEach((v,index) => {
-              v.sectionExam.forEach((s,i) => {
+          if (res.flag) {
+            let arr = [], bNum = 0
+            res.data[0].testPaperInfo.forEach((v, index) => {
+              v.sectionExam.forEach((s, i) => {
                 bNum++
-                if(s.testPaperExamGroup.length) {
+                if (s.testPaperExamGroup.length) {
                   let sNum = 0
-                  s.testPaperExamGroup.forEach((t,ti) => {
+                  s.testPaperExamGroup.forEach((t, ti) => {
                     sNum++
-                    if(i===0&&index===0&&ti===0) this.$set(t.groupExamInfo,'active',true)
+                    if (i === 0 && index === 0 && ti === 0) this.$set(t.groupExamInfo, 'active', true)
                     t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
                     t.groupExamInfo.num = `${bNum}(${sNum})`
                     arr.push(t.groupExamInfo)
                   })
-                }else {
-                  if(i===0&&index===0) this.$set(s.examQuestion,'active',true)
+                } else {
+                  if (i === 0 && index === 0) this.$set(s.examQuestion, 'active', true)
                   s.examQuestion.num = bNum
                   arr.push(s.examQuestion)
                 }
@@ -344,7 +391,7 @@
             res.data[0].questionList = arr
             this.info = res.data[0]
             this.getDom(this.info.questionList[this.questionIndex])
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
@@ -369,13 +416,16 @@
   @deep: ~">>>";
   .correct-wrap {
     overflow: hidden;
+
     @{deep} .van-popup--right {
-      transform: translate3d(0,0,0);
+      transform: translate3d(0, 0, 0);
       top: 26px;
       height: calc(100% - 26px);
-      &.van-popup-slide-right-enter,&.van-popup-slide-right-leave-active {
-        transform: translate3d(100%,0,0);
+
+      &.van-popup-slide-right-enter, &.van-popup-slide-right-leave-active {
+        transform: translate3d(100%, 0, 0);
       }
+
       .stu-info-wrap {
         background: #000;
         height: 100%;
@@ -383,10 +433,12 @@
         width: 120px;
         display: flex;
         flex-direction: column;
+
         &__header {
           flex: 0 0 20%;
           font-size: 8px;
           color: #fff;
+
           .search-input {
             font-size: 4px;
             height: 15px;
@@ -396,23 +448,28 @@
             background: #eee;
             padding: 0 3px;
             border-radius: 2px;
-            input{
+
+            input {
               color: #999;
             }
+
             .van-icon-search {
               color: #333;
             }
           }
         }
+
         &__body {
           flex: 1;
           overflow-y: auto;
+
           .stu-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 6px;
-            >div{
+
+            > div {
               text-align: center;
               min-width: 28px;
               background: #fff;
@@ -426,25 +483,31 @@
         }
       }
     }
+
     @{deep} .van-dialog {
       width: auto;
     }
+
     .icon-circle-arrow {
       position: absolute;
       z-index: 10;
       top: 50%;
       left: 5px;
       transform: translateY(-50%);
+
       &.rotate {
         left: auto;
         right: 5px;
         transform: translateY(-50%) rotateZ(180deg);
       }
     }
+
     .view-subject {
       width: 200px;
       display: flex;
       flex-direction: column;
+      max-height: 150px;
+
       &__header {
         position: relative;
         flex: 0 0 25px;
@@ -453,6 +516,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
         .van-icon-cross {
           position: absolute;
           right: 5px;
@@ -460,11 +524,13 @@
           transform: translateY(-50%);
         }
       }
+
       &__body {
         font-size: 7px;
         background: #f5f5f5;
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
       }
     }
 
@@ -472,6 +538,7 @@
       width: 260px;
       display: flex;
       flex-direction: column;
+
       &__header {
         flex: 0 0 25px;
         background: #eee;
@@ -480,12 +547,14 @@
         align-items: center;
         justify-content: center;
       }
+
       &__body {
         font-size: 7px;
         background: #fff;
         flex: 1;
         overflow-y: auto;
         padding: 6px;
+
         textarea {
           width: 100%;
           background: #f5f6fa;
@@ -493,10 +562,12 @@
           padding: 5px;
           margin-bottom: 5px;
         }
+
         .tag-wrap {
           display: flex;
           align-items: center;
           flex-wrap: wrap;
+
           span {
             background: #f5f6fa;
             border-radius: 3px;
@@ -508,13 +579,15 @@
           }
         }
       }
+
       &__footer {
         flex: 0 0 26px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 0 30px;
-        .cancel,.confirm {
+
+        .cancel, .confirm {
           font-size: 8px;
           flex: 1;
           border-radius: 8px;
@@ -522,15 +595,18 @@
           height: 100%;
           line-height: 16px;
         }
+
         .cancel {
           border: 1px solid #ccc;
         }
+
         .confirm {
           margin-right: 0;
           color: #fff;
         }
       }
     }
+
     .canvas-mask {
       position: absolute;
       top: 0;
@@ -655,11 +731,11 @@
               color: #333 !important;
 
               &::after {
-                top: .4vw;
-                right: -2.2vw;
+                top: 3vw;
+                right: -2.1vw;
                 border-color: transparent transparent currentcolor currentcolor;
                 border-style: solid;
-                border-width: .6vw;
+                border-width: .5vw;
                 -webkit-transform: rotate(-45deg);
                 transform: rotate(-45deg);
                 opacity: .8;
@@ -667,11 +743,11 @@
               }
 
               &.van-dropdown-menu__title--down::after {
-                top: 1vw;
-                right: -2.2vw;
+                top: 2.2vw;
+                right: -2.1vw;
                 border-color: transparent transparent currentcolor currentcolor;
                 border-style: solid;
-                border-width: .6vw;
+                border-width: .5vw;
                 -webkit-transform: rotate(-45deg);
                 transform: rotate(135deg);
                 opacity: .8;
@@ -713,42 +789,67 @@
     }
 
     &__body {
-      background: rgb(205,236,211);
+      background: rgb(205, 236, 211);
       position: relative;
       display: flex;
       flex-direction: column;
       width: 100%;
       height: 100%;
+
       &__text {
         display: flex;
         align-items: center;
         justify-content: space-between;
         /*width: calc(100% - 100px);*/
-        margin: 31px 105px 10px 10px;
+        padding: 33px 105px 10px 10px;
         font-size: 10px;
-        .ellipsis {
-          overflow : hidden;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;      /* 可以显示的行数，超出部分用...表示*/
-          -webkit-box-orient: vertical;
-          flex: 1;
+        min-height: 40px;
+
+        &.ellipsis {
+          flex: 0 0 12%;
+
+          .text-area {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /*display: -webkit-box;*/
+            /*-webkit-line-clamp: 2;      !* 可以显示的行数，超出部分用...表示*!*/
+            /*-webkit-box-orient: vertical;*/
+            flex: 1;
+            word-break: break-all;
+            white-space: nowrap;
+          }
         }
+
         .more-btn {
           color: red;
           font-size: 10px;
           margin-left: 5px;
         }
       }
+
+      &__audio {
+        background: #fff;
+        border-radius: 3px;
+        margin: 50px 120px 0 50px;
+        text-align: center;
+        padding: 10px;
+        audio {
+          display: block;
+          margin: 10px auto 0;
+          width: 100%;
+        }
+      }
       &__draw {
+        position: relative;
         flex: 1;
       }
+
       &__undo {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%,-50%);
-        background: rgb(218,249,238);
+        transform: translate(-50%, -50%);
+        background: rgb(218, 249, 238);
         color: red;
         border-radius: 3px;
         text-align: center;
@@ -756,9 +857,10 @@
         padding: 0 10px;
       }
     }
+
     &__bottom {
       position: absolute;
-      width: 125px;
+      /*width: 125px;*/
       height: 24px;
       z-index: 9;
       right: 5px;
@@ -769,6 +871,12 @@
       justify-content: space-between;
       align-items: center;
       padding: 0 10px;
+      i {
+        margin-right: 10px;
+        &:last-child{
+          margin-right: 0;
+        }
+      }
     }
   }
 </style>

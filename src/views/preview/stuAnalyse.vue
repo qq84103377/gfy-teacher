@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="stu-analyse__body" v-if="info.questionList[curIndex]">
-        <div class="stu-analyse__body-top">
+        <div class="stu-analyse__body-top html-img">
           <div style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].score}}分</div>
           <div v-html="info.questionList[curIndex].title"></div>
           <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].answer"></span></div>
@@ -96,20 +96,36 @@
           this.$store.commit('setVanLoading', false)
           if(res.flag) {
             let arr = []
-            res.data[0].testPaperInfo.forEach((v,index) => {
-              v.sectionExam.forEach((s,i) => {
-                if(s.testPaperExamGroup.length) {
-                  s.testPaperExamGroup.forEach((t,ti) => {
-                    if(i===0&&index===0&&ti===0) this.$set(t.groupExamInfo,'active',true)
-                    t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
-                    arr.push(t.groupExamInfo)
-                  })
-                }else {
-                  if(i===0&&index===0) this.$set(s.examQuestion,'active',true)
-                  arr.push(s.examQuestion)
-                }
+            if(res.data[0].resourceType === 'R03') {
+              if(res.data[0].examQuestionInfo.groupExamList.length) {
+                //单题有小题
+                res.data[0].examQuestionInfo.groupExamList.forEach((v,i) => {
+                  if(i === 0) v.active = true
+                  v.title = res.data[0].examQuestionInfo.title + v.title
+                  arr.push(v)
+                })
+              }else {
+                //单题无小题
+                res.data[0].examQuestionInfo.active = true
+                arr.push(res.data[0].examQuestionInfo)
+              }
+            }else {
+              res.data[0].testPaperInfo.forEach((v,index) => {
+                v.sectionExam.forEach((s,i) => {
+                  if(s.testPaperExamGroup.length) {
+                    s.testPaperExamGroup.forEach((t,ti) => {
+                      if(i===0&&index===0&&ti===0) this.$set(t.groupExamInfo,'active',true)
+                      t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
+                      arr.push(t.groupExamInfo)
+                    })
+                  }else {
+                    if(i===0&&index===0) this.$set(s.examQuestion,'active',true)
+                    arr.push(s.examQuestion)
+                  }
+                })
               })
-            })
+            }
+
             res.data[0].questionList = arr
             this.info = res.data[0]
           }else {

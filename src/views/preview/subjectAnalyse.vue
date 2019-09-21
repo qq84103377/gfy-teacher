@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="subject-analyse__body">
-        <div class="subject-analyse__body-top fs14">
+        <div class="subject-analyse__body-top fs14 html-img">
           <div v-html="info.examQuestionInfo.title"></div>
           <div>正确答案: <span class="blue inline" v-html="info.examQuestionInfo.answer"></span></div>
           <div>答案解析:</div>
@@ -46,8 +46,8 @@
       }
     },
     created() {
-      const {examId, groupId} = this.$route.query
-      const index = this.list.findIndex(v => (v.examId || v.examGroupId) === examId)
+      const {examId, groupId, resourceType} = this.$route.query
+      const index = this.list.findIndex(v => (resourceType === 'R03'? v.exam_id:(v.examId || v.examGroupId)) === examId)
       this.$set(this.list[index], 'active', true)
       this.getExamItemDetail(examId, groupId)
     },

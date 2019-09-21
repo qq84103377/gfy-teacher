@@ -7,7 +7,7 @@
       <div class="subject-list-wrap__body">
         <div class="subject-list-wrap__body-top">
           <div class="fs16">
-            <div class="detail" :class="{'fold':fold}" >
+            <div class="detail html-img" :class="{'fold':fold}" >
               <div v-html="info.title"></div>
               <div v-if="info.groupExamList.length">
                 <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
@@ -59,7 +59,7 @@
                       <!--                                   customEventName="customstatechangedeventname"-->
                       <!--                                   @play="onPlayerPlay($event)">-->
                       <!--                    </video-player>-->
-                      <i style="width: 100%;" class="iconGFY icon-player"></i>
+                      <i @click="subjectCorrect(asw,index,aswIndex)" style="width: 100%;" class="iconGFY icon-player"></i>
                     </div>
                   </div>
                   <div v-else @click="subjectCorrect(asw,index,aswIndex)" class="undo">学生未作答</div>
@@ -116,14 +116,14 @@
       }
     },
     created() {
-      const {examId, groupId} = this.$route.query
+      const {examId} = this.$route.query
       const index = this.tabList.findIndex(v => v.examId === examId)
       this.$set(this.tabList[index], 'active', true)
       // this.getExamItemDetail(examId, groupId)
       this.getExamFinishInfo(examId)
     },
     methods: {
-      subjectCorrect(item,stuIndex,aswIndex,imgIndex) {
+          subjectCorrect(item,stuIndex,aswIndex,imgIndex) {
         console.log(item);
           // 点击图片
           // const index = this.tabList.findIndex(v => v.active)
@@ -321,6 +321,7 @@
       display: -webkit-box;
       -webkit-line-clamp: 2;      /* 可以显示的行数，超出部分用...表示*/
       -webkit-box-orient: vertical;
+      word-break: break-all;
     }
   }
 </style>
