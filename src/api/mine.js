@@ -21,6 +21,11 @@ export const getUserCounterDetailGroupByDay = (params) => {
   return axios.post('counter/getUserCounterDetailGroupByDay', qs.stringify(params))
 }
 
+// 获取我的等级信息
+export const getMylevelInfo = (params) => {
+  return axios.post('counter/getMylevelInfo', qs.stringify(params))
+}
+
 // 修改个人信息（头像、性别）
 export const updateUserInfo = (params) => {
   return axios.post('user/updateUserInfo', qs.stringify(params))

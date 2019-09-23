@@ -339,10 +339,10 @@ export default new Router({
           path: '/myLevel',
           name: 'myLevel',
           component: () => import('./views/mine/myLevel.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '我的等级'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '我的等级'
+          // }
         },
         // {
         //   path: '/myNotice',
