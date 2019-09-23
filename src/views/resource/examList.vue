@@ -40,7 +40,7 @@
                 <i class="iconGFY icon-copy-orange"></i>
                 <span>复制</span>
               </div>
-              <div @click="$router.push(`/addTask?type=material`)">
+              <div @click="senTask(item)">
                 <i class="iconGFY icon-plane"></i>
                 <span>发任务</span>
               </div>
@@ -421,6 +421,16 @@
             this.finished = true
           }
         })
+      },
+      senTask(obj){
+        if (!obj.objectiveItemNum && !obj.subjectiveItemNum){
+          this.$toast('该试卷不含试题')
+          return
+        }
+        console.log("发任务：", obj.testPaperName)
+        this.$store.commit('setSendTaskClassStudent', {})
+        this.$store.commit('setResourceInfo', obj)
+        this.$router.push(`/addTask?type=exam&_t=new`)
       },
     }
   }

@@ -32,7 +32,7 @@
                 <i class="iconGFY icon-copy-orange"></i>
                 <span>复制任务</span>
               </div>
-              <div @click="$router.push(`/addTask?type=spoken`)">
+              <div @click="sendTask(item)">
                 <i class="iconGFY icon-plane"></i>
                 <span>发任务</span>
               </div>
@@ -365,6 +365,16 @@
           }
         })
       },
+      sendTask(obj){
+        if (!obj.wordCount || obj.sentenceCount) {
+          this.$toast("该口语不含单词或者句子")
+          return
+        }
+        console.log("发任务：", obj.spokenTitle)
+        this.$store.commit('setResourceInfo', obj)
+        this.$router.push(`/addTask?type=spoken_t=new`)
+      }
+
     }
   }
 </script>

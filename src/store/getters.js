@@ -5,6 +5,10 @@ const getters = {
     const schoolMap = JSON.parse(localStorage.getItem("schoolMap"))
     return Object.keys(schoolMap)[0]
   },
+  schoolIdList:()=>{
+    const schoolMap = JSON.parse(localStorage.getItem("schoolMap"))
+    return Object.keys
+  },
   vanLoading: state => state.setting.vanLoading,
   getUserInfo: state => state.user.userInfo || JSON.parse(localStorage.getItem('userInfo')),
   getThirdInfo: state => state.user.thirdInfo || JSON.parse(localStorage.getItem('thirdInfo')),

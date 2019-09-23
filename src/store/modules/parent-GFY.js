@@ -52,7 +52,7 @@ const state = {
   /****首页任务*****/
   childList: [],
 
-  courseType: {
+  taskTypeList: {
     'T01': '微课试卷',
     'T02': '微课心得',
     'T03': '测验',

@@ -137,6 +137,10 @@ export const deleteCourseTask =(params)=>{
 export const modifyTeachCourseRes =(params)=>{
   return axios.post('teach/modifyTeachCourseRes', qs.stringify(params))
 }
+//修改课程
+export const modifyTeachCourse = (params) => {
+  return axios.post('teach/modifyTeachCourse', qs.stringify(params))
+}
 //添加课中资源(微课、素材、试卷、试题、口语、讨论)
 export const addCourseWare =(params)=>{
   return axios.post('resource/addCourseWare', qs.stringify(params))
@@ -212,6 +216,10 @@ export const statTaskStat =(params)=>{
 //获取版本信息
 export const getTextBookVersionInfo =(params)=>{
   return axios.post('resource/getTextBookVersionInfo', qs.stringify(params))
+}
+//创建任务
+export const createCourseTask = (params) => {
+  return axios.post('teachNew/createCourseTask', qs.stringify(params))
 }
 //获取科目信息
 export const getSubjectType =(params)=>{

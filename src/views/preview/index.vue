@@ -10,7 +10,7 @@
       <div slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true"></edit-course>
+            <edit-course :is-edit="true" :editCourseInfo.sync = "currentTchCourseInfo" class="editClass"></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -33,7 +33,7 @@
               </div>
               <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
-                <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
+                <span>{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>
@@ -41,7 +41,7 @@
       </van-pull-refresh>
     </div>
     <div class="preview-wrap__footer van-hairline--top">
-      <van-button class="add-mission" type="info">新建任务</van-button>
+      <van-button class="add-mission" type="info" @click="$router.push(`/resource`)">新建任务</van-button>
     </div>
 
     <!--    <edit-course></edit-course>-->
@@ -76,7 +76,8 @@
         dropdownRefLoading: false,
         dropdownListLoading: false,
         dropdownFinish: false,
-        total: 0
+        total: 0,
+        currentTchCourseInfo:{}
       }
     },
     mounted() {
@@ -88,6 +89,7 @@
         localStorage.setItem('stat',JSON.stringify(item))
       },
      async selectCourse(tchCourseInfo) {
+       this.currentTchCourseInfo = tchCourseInfo
        this.$store.commit('setVanLoading',true)
        this.currentPage = 1
         this.courseName = tchCourseInfo.courseName
@@ -156,6 +158,7 @@
           this.dropdownRefLoading = false
           if (res.flag && res.data && res.data[0]) {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
             if (page >= res.total) {
               this.dropdownFinish = true
             }
@@ -192,12 +195,16 @@
             if (localStorage.getItem("classMap")) {
               let classMap = JSON.parse(localStorage.getItem("classMap"))
               this.courseTaskList.forEach(item => {
+                let finishCount = 0
+                let allCount = 0
                 if (item.tchClassTastInfo) {
                   item.tchClassTastInfo.forEach((obj,i) => {
                     if(i==0) {
                       //跳转到任务统计页面时自动将第一个班级设置为选中状态
                       obj.active = true
                     }
+                    finishCount += obj.finshCount
+                    allCount += obj.allCount
                     if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                       obj['className'] = "--"
                     } else {
@@ -205,6 +212,8 @@
                     }
                   })
                 }
+                item.finishCount = finishCount
+                item.allCount = allCount
               })
             }
             if (this.currentPage >= res.total) {
@@ -217,7 +226,7 @@
             this.finished = true
           }
         })
-      }
+      },
     }
 
   }
@@ -378,12 +387,17 @@
         }
 
         @{deep} .van-dropdown-item__content {
-          max-height: 95%;
+          height: 95%;
           display: flex;
           flex-direction: column;
           overflow-y: hidden;
         }
       }
     }
+  }
+  .editClass{
+    height: 100%;
+    width: 100%;
+    position: absolute;
   }
 </style>

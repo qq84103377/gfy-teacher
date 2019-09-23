@@ -91,7 +91,7 @@
               <div  class="time-view" @click="selectTime('end')">{{form.time2}}</div>
             </div>
           </div>
-          <div class="time-group" v-for="(item,index) in classMap" :key="index" v-if="form.radio ==1">
+          <div class="time-group" v-for="(item,index) in classMap" :key="index" v-if="form.radio ==1" v-show="result.indexOf(item.classId)>0">
             <span class=" fs14 mgr10 class-name" :style="{width:item.className.length>6?'100%':'auto'}">{{item.className}}</span>
             <div style="display: flex;align-items: center;flex: 1">
               <div class="time-view" @click="selectTime('begin',item.classId)">{{item.beginDate}}</div>
@@ -140,16 +140,17 @@
           type="date"
           @confirm="handleSelectTime"
           @cancel="showTime=false"
+          :formatter="formatter"
         />
       </van-popup>
     </div>
 
     <div class="add-course-wrap__footer" v-if="isEdit">
       <van-button class="edit-btn" type="info">取消</van-button>
-      <van-button class="edit-btn" type="info">提交</van-button>
+      <van-button class="edit-btn" type="info" :loading="loadingEdit" @click="submitEdit" loading-text="修改中...">提交</van-button>
     </div>
     <div class="add-course-wrap__footer" v-else>
-      <van-button class="submit-btn" type="info" @click="createCourse">提交</van-button>
+      <van-button class="submit-btn" type="info" @click="createCourse" :loading="loadingSubmit">提交</van-button>
     </div>
     <!--<div class="mask"  v-show="showMask"></div>-->
 
@@ -160,13 +161,15 @@
 <script>
   import {generateTimeReqestNumber} from '@/utils/filter'
   import courseFilter from '../../components/courseFilter'
-  import {getTextBookCourseByParam,getShareCourseDetailV2,createTeachCourse,getClassTeacherCourseDeploy} from '@/api/index'
+  import {getTextBookCourseByParam,getShareCourseDetailV2,createTeachCourse,getClassTeacherCourseDeploy,modifyTeachCourse} from '@/api/index'
 
   export default {
     name: "addCourse",
-    props: ['isEdit'],
+    props: ['isEdit','editCourseInfo'],
     data() {
       return {
+        loadingEdit:false,
+        loadingSubmit:false,
         filterShow: false,
         showTime: false,
         showMask:false,
@@ -212,23 +215,99 @@
     mounted(){
       //班级信息
       let cl=localStorage.getItem("classMap")
-
       if (cl) {
         this.classMap = JSON.parse(cl);
+      }
+      if (this.isEdit){
+        console.log("编辑课程信息", this.editCourseInfo);
+        this.form.name=this.editCourseInfo.courseName
+        this.form.desc = this.editCourseInfo.desc
+        this.form.share = this.editCourseInfo.shareType
+
+        let tchClassCourseInfo = this.editCourseInfo.tchClassCourseInfo
+        let classStart={}
+        let classEnd = {}
+
+        //判断是分班设置还是统一设置
+        let flag = false
+        let start = tchClassCourseInfo[0].startDate
+        let end = tchClassCourseInfo[0].endDate
+        tchClassCourseInfo.forEach(item => {
+          classStart[item.classId] = item.startDate
+          classEnd[item.classId] = item.endDate
+          this.result.push(item.classId)
+          if(start != item.startDate || end != item.endDate){
+            flag = true
+          }
+
+        });
+
+        if (flag) {
+          this.form.radio = "1"
+          //分班
+          for (let m in this.classMap) {
+            if (classStart[this.classMap[m].classId]){
+              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date(classStart[this.classMap[m].classId]))
+            } else {
+              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+            }
+            if (classEnd[this.classMap[m].classId]) {
+              this.classMap[m]['endDate'] = generateTimeReqestNumber(new Date(classEnd[this.classMap[m].classId]))
+            } else {
+              let now = new Date()
+              now.setDate(now.getDate()+3)
+              this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+            }
+          }
+
+          let date = new Date()
+          this.form.time1 =  generateTimeReqestNumber(date);
+          date.setDate(date.getDate()+3)
+          this.form.time2 = generateTimeReqestNumber(date)
+        } else {
+          //统一
+          this.form.radio = "2"
+          for (let m in this.classMap) {
+            this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+            let now = new Date()
+            now.setDate(now.getDate()+3)
+            this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+          }
+          this.form.time1 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].startDate))
+          this.form.time2 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].endDate))
+        }
+      } else{
+        this.form.radio = "2"
         for (let m in this.classMap) {
           this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
           let now = new Date()
           now.setDate(now.getDate()+3)
           this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
         }
+        let date = new Date()
+        this.form.time1 =  generateTimeReqestNumber(date);
+        date.setDate(date.getDate()+3)
+        this.form.time2 = generateTimeReqestNumber(date)
       }
-      let date = new Date()
-      this.form.time1 =  generateTimeReqestNumber(date);
-      date.setDate(date.getDate()+3)
-      this.form.time2 = generateTimeReqestNumber(date)
+
       //this.getClassTeacherCourseDeploy()
     },
     methods: {
+      formatter(type,value){
+        console.log(type)
+        if (type === 'year') {
+          return `${value}年`;
+        } else if (type === 'month') {
+          return `${value}月`
+        } else if (type === "day") {
+          return `${value}日`
+        } else if (type === "hour") {
+          return `${value}时`
+        } else if (type === "minute") {
+          return `${value}分`
+        }
+        return value;
+      },
       handleSelectTime(v) {
         if (this.form.radio == '2'){
           if (this.timeType =='begin'){
@@ -383,7 +462,7 @@
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": 24,
+          "belongSchoolId": this.$store.getters.schoolId,
           "relationSeqId": this.shareCourseList[this.form.course].sysCourseId,
           "sysCourseId": this.shareCourseList[this.form.course].sysCourseId,
           "shareTchCourseId": this.shareCourseList[this.form.course].tchCourseId,
@@ -405,21 +484,23 @@
           //分班设计
 
           this.result.forEach((item,index) => {
-            obj["classInfo" + (index+1)] = item + "|" + that.classMap[item].beginDate + "|" + that.classMap[item.classId].endDate
+            obj["classInfo" + (index+1)] = item + "|" + that.classMap[item].beginDate + "|" + that.classMap[item].endDate
           })
         }
         let params ={
           requestJson: JSON.stringify(obj)
         }
         console.log("新建课参数：" , params)
-
+        this.loadingSubmit = true
         createTeachCourse(params).then(res => {
           if (res.flag){
             this.$toast("创建成功")
             setTimeout(function () {
+              this.loadingSubmit = false
               that.$router.push(`/preview`)
             },200)
           } else {
+            this.loadingSubmit = false
             this.$toast(res.msg)
           }
 
@@ -545,7 +626,80 @@
           return
         }
         this.filterShow = true
+      },
+      submitEdit(){
+        console.log("编辑课程")
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "tchCourseId": this.editCourseInfo.tchCourseId,
+          "courseName": this.form.name,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "shareType": this.form.share,
+          "classCount": this.result.length,
+          "desc": this.form.desc,
+
+        }
+        let that = this
+        if (this.form.radio =='2'){
+          //统一设置
+          if (!this.form.time1){
+            this.$toast("开始时间不能为空")
+            return
+          }
+          if (!this.form.time2) {
+            this.$toast("结束时间不能为空")
+            return
+          }
+          if (new Date(this.form.time1)>new Date(this.form.time2)) {
+            this.$toast("开始时间不能大于结束时间")
+            return
+          }
+
+          this.result.forEach((item,index) => {
+            obj["classInfo" + (index+1)] = item + "|" + this.form.time1 + "|" + this.form.time2
+          })
+        } else {
+          //分班设计
+          this.result.forEach((item,index) => {
+            if (!that.classMap[item].beginDate){
+              this.$toast(that.classMap[item].className + "开始时间不能为空")
+              return
+            }
+            if (!that.classMap[item].endDate) {
+              this.$toast(that.classMap[item].className + "结束时间不能为空")
+              return
+            }
+            if (new Date(that.classMap[item].beginDate)>new Date(that.classMap[item].endDate)) {
+              this.$toast(that.classMap[item].className + "开始时间不能大于结束时间")
+              return
+            }
+            obj["classInfo" + (index+1)] = item + "|" + that.classMap[item].beginDate + "|" + that.classMap[item].endDate
+          })
+        }
+        let params ={
+          requestJson: JSON.stringify(obj)
+        }
+        console.log("修改课程", params)
+        this.loadingEdit = true
+        modifyTeachCourse(params).then(res=>{
+          this.loadingEdit = false
+          if(res){
+            if (res.flag){
+              this.$toast('修改成功')
+            } else {
+              this.$toast(res.flag)
+            }
+          } else {
+            this.$toast("修改失败")
+            return
+          }
+
+        })
       }
+
     }
   }
 </script>
@@ -604,9 +758,7 @@
           }
         }
 
-
       }
-
 
     }
 

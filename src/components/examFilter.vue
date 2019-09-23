@@ -78,7 +78,7 @@
 
   export default {
     name: "examFilter",
-    props: ['visible','testPaperId','testPaperName'],
+    props: ['visible','testPaperId','testPaperName','tchCourseInfo'],
     data() {
       return {
         all: false,
@@ -101,8 +101,9 @@
         pageSize: 10,
         total: 0,
         paperInfo:{},
-        currentTestPaperId:'',
-        currentTestPaperName:''
+        currentTestPaperId:this.testPaperId,
+        currentTestPaperName:'',
+
       }
     },
     computed: {
@@ -113,15 +114,10 @@
         set() {
           this.$emit('update:visible', false)
         }
-      },
-      testPaperId:function (newValue) {
-        this.currentTestPaperId = newValue
-      },
-      testPaperName:function (newValue) {
-        this.currentTestPaperName = newValue
       }
     },
     mounted(){
+
     },
     methods: {
       handleSelect(item) {
@@ -153,23 +149,30 @@
         this.$toast('刷新成功')
       },
       getTeachCourseResDetail(code,pageNo){
+        console.log("查询试卷",this.tchCourseInfo)
+        if (!this.tchCourseInfo){
+          this.$toast("课程信息错误")
+          this.testPaperList = []
+          return
+        }
         this.shareType = code
         const page = pageNo
         let obj = {
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": 24,
+          "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
-          "tchCourseId": 2641,
-          "sysCourseId": 4562,
-          "relationSeqId": 4562,
+          "tchCourseId": this.tchCourseInfo.tchCourseId,
+          "sysCourseId": this.tchCourseInfo.sysCourseId,
+          "relationSeqId": this.tchCourseInfo.relationCourseId,
           "resourceType": "R02",
           "sourceName": "",
           "shareType": code,
           "pageSize": this.pageSize,
-          "currentPage": pageNo
+          "currentPage": pageNo,
+          "schoolIdList":this.$store.getters.schoolIdList
         }
         let params ={
           requestJson: JSON.stringify(obj)

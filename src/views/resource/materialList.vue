@@ -29,7 +29,7 @@
                   <i class="iconGFY icon-download-orange"></i>
                   <span>下载</span>
                 </div>
-                <div @click="$router.push(`/addTask?type=material`)">
+                <div @click="sendTask(item)">
                   <i class="iconGFY icon-plane"></i>
                   <span>发任务</span>
                 </div>
@@ -184,6 +184,11 @@
             this.finished = true
           }
         })
+      },
+      sendTask(obj){
+        console.log("发任务：", obj.coursewareName)
+        this.$store.commit('setResourceInfo', obj)
+        this.$router.push(`/addTask?type=material_t=new`)
       },
     }
   }
