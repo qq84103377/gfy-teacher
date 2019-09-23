@@ -29,7 +29,7 @@
                 <i class="iconGFY icon-edit-orange"></i>
                 <span>编辑</span>
               </div>
-              <div @click="$router.push(`/addTask?type=discuss`)">
+              <div @click="sendTask(item)">
                 <i class="iconGFY icon-plane"></i>
                 <span>发任务</span>
               </div>
@@ -510,6 +510,11 @@
             this.finished = true
           }
         })
+      },
+      sendTask(obj){
+        console.log("发任务：", obj.discussName)
+        this.$store.commit('setResourceInfo', obj)
+        this.$router.push(`/addTask?type=discuss_t=new`)
       },
     }
   }

@@ -2,17 +2,27 @@
   <section class="subject-list-wrap">
     <analyse-wrap @toggle="toggleQuestion">
       <div class="scroll-tab" slot="tab">
-        <div @click="toggleTab(item)" class="scroll-tab__item" :class="{active:item.active}" v-for="(item,index) in tabList" :key="index">{{item.exam_index}}</div>
+        <div @click="toggleTab(item)" class="scroll-tab__item" :class="{active:item.active}" v-for="(item,index) in tabList" :key="index">{{item.num}}</div>
       </div>
       <div class="subject-list-wrap__body">
         <div class="subject-list-wrap__body-top">
           <div class="fs16">
             <div class="detail" :class="{'fold':fold}" >
-              <div v-html="info.examQuestionInfo.title"></div>
-              <div class="fs14">
-                <div class="mgt10">正确答案: <span class="blue" v-html="info.examQuestionInfo.answer"></span></div>
-                <div class="mgt10">答案解析:</div>
-                <div v-html="info.examQuestionInfo.examExplain"></div>
+              <div v-html="info.title"></div>
+              <div v-if="info.groupExamList.length">
+                <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
+                  <div class="mgt10" v-html="item.title"></div>
+                  <div class="mgt10">正确答案: <span class="blue" v-html="item.answer"></span></div>
+                  <div class="mgt10">答案解析:</div>
+                  <div v-html="item.examExplain"></div>
+                </div>
+              </div>
+              <div v-else>
+                <div class="fs14">
+                  <div class="mgt10">正确答案: <span class="blue" v-html="info.answer"></span></div>
+                  <div class="mgt10">答案解析:</div>
+                  <div v-html="info.examExplain"></div>
+                </div>
               </div>
               <div @click="fold = !fold" class="blue fold-btn" :class="{active:fold}">{{fold?'展开原题':'收起'}}</div>
             </div>
@@ -22,29 +32,41 @@
           <div class="row">
             <div class="name">名字</div>
             <div class="answer" style="text-align: center;" @click="">答案</div>
-            <div class="score">分数</div>
+<!--            <div class="score">分数</div>-->
             <div class="error">错误率</div>
           </div>
-          <div class="row" v-for="(item,index) in info.statStudentAnswer.stuAnswer" :key="index">
-            <div class="name">{{getStudentName(item.students[0],$route.query.classId)}} <span class="red">{{rewardScore(item.students[0])}}</span></div>
+          <div class="row" v-for="(item,index) in stuArr" :key="index">
+            <div class="name">
+              <span>{{getStudentName(item.accountNo,$route.query.classId)}}</span>
+              <span class="blue">({{rewardScore(item.accountNo)}})</span>
+              <span class="red">{{stuScore(item)}}分</span>
+            </div>
             <div class="answer">
-              <div @click="subjectCorrect(item)" class="ellipsis" v-html="item.text"></div>
-              <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]" v-if="item.imgArr.length">
-                <div @click="subjectCorrect(item,i)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
-              </div>
-              <div style="width: 100%;" v-if="item.audioArr.length">
-                <video-player  class="video-player-box"
-                               v-for="(audio,index) in item.audioArr" :key="index"
-                               ref="videoPlayer"
-                               :options="{ sources: [{type: 'audio/mp4',src: audio}],}"
-                               :playsinline="true"
-                               customEventName="customstatechangedeventname"
-                               @play="onPlayerPlay($event)">
-                </video-player>
+              <div class="answer-wrap" v-for="(asw,aswIndex) in item.answer" :key="aswIndex">
+                <div class="left">
+                  <div class="mgb5">{{examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}} <i v-if="asw.qualityType" class="iconGFY icon-good-active"></i></div>
+                  <div v-if="asw.result && asw.result !== '<p></p>'">
+                    <div @click="subjectCorrect(asw)" class="ellipsis" v-html="asw.text"></div>
+                    <div class="img-wrap" :class="[{img4: asw.imgArr.length==4},{img56:asw.imgArr.length>4}]" v-if="asw.imgArr.length">
+                      <div @click="subjectCorrect(asw,i)" v-for="(img,i) in asw.imgArr" :key="i"><img :src="img" alt=""></div>
+                    </div>
+                    <div style="width: 100%;" v-if="asw.audioArr.length">
+                      <!--                    <video-player  class="video-player-box"-->
+                      <!--                                   v-for="(audio,i) in asw.audioArr" :key="i"-->
+                      <!--                                   ref="videoPlayer"-->
+                      <!--                                   :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
+                      <!--                                   :playsinline="true"-->
+                      <!--                                   customEventName="customstatechangedeventname"-->
+                      <!--                                   @play="onPlayerPlay($event)">-->
+                      <!--                    </video-player>-->
+                      <i style="width: 100%;" class="iconGFY icon-player"></i>
+                    </div>
+                  </div>
+                  <div v-else class="undo">学生未作答</div>
+                </div>
+                <div class="right">{{asw.error}}</div>
               </div>
             </div>
-            <div class="score">{{item.studentsNew[0].score || 0}}</div>
-            <div class="error red">{{item.studentsNew[0].percent?(item.studentsNew[0].percent*100+'%'):'--'}}</div>
           </div>
         </div>
       </div>
@@ -86,15 +108,18 @@
         },
         fold: true,
         tabList: JSON.parse(JSON.stringify(this.$route.query.questionList)),
-        info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}},
-        studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList))
+        // info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}},
+        info: {groupFinishMap: {}, groupExamList: []},
+        studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList)),
+        stuArr: [],
+        examNum: '', // 大题题号
       }
     },
     created() {
       const {examId, groupId} = this.$route.query
-      const index = this.tabList.findIndex(v => v.exam_id === examId)
+      const index = this.tabList.findIndex(v => v.examId === examId)
       this.$set(this.tabList[index], 'active', true)
-      this.getExamItemDetail(examId, groupId)
+      // this.getExamItemDetail(examId, groupId)
       this.getExamFinishInfo(examId)
     },
     methods: {
@@ -124,8 +149,14 @@
           }
         }
       },
+      stuScore(item) {
+       return item.answer.reduce((t,v) => {
+           t += v.score
+         return t
+        },0)
+      },
       rewardScore(accountNo) {
-        const score = this.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
+        const score = this.studentStatList.find(v => v.accountNo == accountNo).studentRewardScore || 0
        return  score > 0 ? '+' + score : score
       },
       toggleTab(item) {
@@ -134,9 +165,11 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
-        this.getExamItemDetail(item.exam_id, item.group_id)
+        // this.getExamItemDetail(item.exam_id, item.groupId)
+        this.getExamFinishInfo(item.examId)
       },
       getExamFinishInfo(examId) {
+        this.$store.commit('setVanLoading', true)
         const {taskId, classId} = this.$route.query
         let obj = {
           "interUser": "runLfb",
@@ -154,6 +187,59 @@
         getExamFinishInfo(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if(res.flag) {
+            this.examNum = this.tabList.find(v => v.active).num
+            let stuArr = []
+            const key = res.data[0].groupExamList.length?'groupFinishMap':'finishMap'
+              Object.keys(res.data[0][key]).forEach(k => {
+                let examId = k.split('_')[0], accountNo = k.split('_')[1],errorArr = [],errorPercent='--'
+                let index = stuArr.findIndex(s => s.accountNo == accountNo)
+
+                if(res.data[0].groupExamList.length) {
+                  // 有小题时 查询错误率
+                  errorArr = res.data[0].groupExamList.find(v => v.examGroupId == examId).examGroupErrorPercentInfo
+                  if(errorArr.length) {
+                    let errorItem = errorArr.find(v => v.accountNo == accountNo)
+                    if(errorItem) errorPercent = errorItem.errorPercent * 100 + '%'
+                  }
+                }else {
+                  if(res.data[0].examErrorPercentInfo.length) {
+                    let errorItem = res.data[0].examErrorPercentInfo.find(v => v.accountNo == accountNo)
+                    if(errorItem) errorPercent = errorItem.errorPercent * 100 + '%'
+                  }
+                }
+
+                let dom = document.createElement('div')
+                res.data[0][key][k].imgArr = []
+                res.data[0][key][k].audioArr = []
+                dom.innerHTML = res.data[0][key][k].result
+                if(res.data[0][key][k].result) {
+                  const imgArr = dom.querySelectorAll('img')
+                  const audioArr = dom.querySelectorAll('audio')
+                  for (let i = 0; i < imgArr.length; i++) {
+                    res.data[0][key][k].imgArr.push(imgArr[i].src)
+                    let parent = imgArr[i].parentElement
+                    parent.removeChild(imgArr[i])
+                  }
+                  for (let i = 0; i < audioArr.length; i++) {
+                    res.data[0][key][k].audioArr.push(audioArr[i].src)
+                    let parent = audioArr[i].parentElement
+                    parent.removeChild(audioArr[i])
+                  }
+                }
+                res.data[0][key][k].text = dom.outerText
+                if(index > -1) {
+                  // 该学生已存在数组中
+                  stuArr[index].answer.push({...res.data[0][key][k],error:errorPercent})
+                }else {
+                  stuArr.push({
+                    accountNo,
+                    answer: [{...res.data[0][key][k],error:errorPercent}],
+                  })
+                }
+              })
+            this.info = res.data[0]
+            this.stuArr = stuArr
+            console.log(stuArr,'dllddldlld');
           }else {
             this.$toast(res.msg)
           }
@@ -219,8 +305,10 @@
     .ellipsis {
       flex: 1;
       overflow: hidden;
-      white-space: nowrap;
       text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;      /* 可以显示的行数，超出部分用...表示*/
+      -webkit-box-orient: vertical;
     }
   }
 </style>
@@ -228,12 +316,6 @@
   @deep: ~'>>>';
   .subject-list-wrap {
     background: #f5f5f5;
-    .ellipsis {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
     .scroll-tab {
       &__item {
         text-align: center;
@@ -258,6 +340,7 @@
       font-size: 12px;
 
       &-top {
+        overflow-x: hidden;
         margin-bottom: 10px;
         padding: 12px 15px;
         background: #fff;
@@ -311,6 +394,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
           }
           .answer {
             flex: 1;
@@ -319,6 +403,30 @@
             /*align-items: center;*/
             /*justify-content: center;*/
             text-align: left;
+            &-wrap {
+              margin-bottom: 5px;
+              padding-bottom: 5px;
+              border-bottom: 1px solid #f5f6fa;
+              display: flex;
+              width: 100%;
+              align-items: center;
+              &:last-child{
+                border-bottom: none;
+              }
+              .left{
+                flex: 1;
+              }
+              .right{
+                flex: 0 0 18%;
+                color: red;
+                text-align: center;
+              }
+            }
+            .icon-good-active {
+              width: 8.5px;
+              height: 11px;
+              margin-left: 10px;
+            }
             .img-wrap {
               width: 100%;
               display: flex;
@@ -356,6 +464,13 @@
                   }
                 }
               }
+            }
+            .undo {
+              border: 1px solid #ccc;
+              line-height: 60px;
+              text-align: center;
+              font-size: 15px;
+              color: red;
             }
           }
         }

@@ -10,7 +10,7 @@
       <div slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true"></edit-course>
+            <edit-course :is-edit="true" :editCourseInfo.sync = "currentTchCourseInfo" class="editClass"></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -20,8 +20,8 @@
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
-                     :key="index" :can-slide="true" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
-                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo">
+                     :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0"  :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
+                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
@@ -33,7 +33,7 @@
               </div>
               <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
-                <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
+                <span>{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>
@@ -41,7 +41,7 @@
       </van-pull-refresh>
     </div>
     <div class="preview-wrap__footer van-hairline--top">
-      <van-button class="add-mission" type="info">新建任务</van-button>
+      <van-button class="add-mission" type="info" @click="$router.push(`/resource`)">新建任务</van-button>
     </div>
 
     <!--    <edit-course></edit-course>-->
@@ -52,7 +52,7 @@
   import listItem from '../../components/list-item'
   import dropdownHeader from '../../components/dropdown-header'
   import editCourse from './addCourse'
-  import {getClassTeachCourseInfo, getCourseTaskList} from '@/api/index'
+  import {getClassTeachCourseInfo, getCourseTaskList,setCourseTaskOrder,topCourseTask,deleteCourseTask} from '@/api/index'
 
   export default {
     name: "index",
@@ -76,7 +76,8 @@
         dropdownRefLoading: false,
         dropdownListLoading: false,
         dropdownFinish: false,
-        total: 0
+        total: 0,
+        currentTchCourseInfo:{}
       }
     },
     mounted() {
@@ -88,6 +89,7 @@
         localStorage.setItem('stat',JSON.stringify(item))
       },
      async selectCourse(tchCourseInfo) {
+       this.currentTchCourseInfo = tchCourseInfo
        this.$store.commit('setVanLoading',true)
        this.currentPage = 1
         this.courseName = tchCourseInfo.courseName
@@ -156,6 +158,7 @@
           this.dropdownRefLoading = false
           if (res.flag && res.data && res.data[0]) {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
             if (page >= res.total) {
               this.dropdownFinish = true
             }
@@ -192,12 +195,16 @@
             if (localStorage.getItem("classMap")) {
               let classMap = JSON.parse(localStorage.getItem("classMap"))
               this.courseTaskList.forEach(item => {
+                let finishCount = 0
+                let allCount = 0
                 if (item.tchClassTastInfo) {
                   item.tchClassTastInfo.forEach((obj,i) => {
                     if(i==0) {
                       //跳转到任务统计页面时自动将第一个班级设置为选中状态
                       obj.active = true
                     }
+                    finishCount += obj.finshCount
+                    allCount += obj.allCount
                     if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                       obj['className'] = "--"
                     } else {
@@ -205,6 +212,8 @@
                     }
                   })
                 }
+                item.finishCount = finishCount
+                item.allCount = allCount
               })
             }
             if (this.currentPage >= res.total) {
@@ -217,7 +226,71 @@
             this.finished = true
           }
         })
+      },
+      moveTask(item,index,type){
+        const tarTaskId = this.courseTaskList[type?index+1:index-1].taskId
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "tarTaskId": tarTaskId,
+          "oldTaskId": item.taskId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        setCourseTaskOrder(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList[index] = this.courseTaskList.splice(type?index+1:index-1,1,this.courseTaskList[index])[0]
+            this.$toast(`${type?'下':'上'}移成功`)
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      topTask(item,index){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "tchCourseId": this.tchCourseId,
+          "taskId": item.taskId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        topCourseTask(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList[index] = this.courseTaskList.splice(0,1,this.courseTaskList[index])[0]
+            this.$toast('置顶成功')
+          }else {
+            this.$toast(res.msg)
+          }
+
+        })
+      },
+      delTask(item,index){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": item.taskId,
+          "tchCourseId": this.tchCourseId
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        deleteCourseTask(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList.splice(index, 1)
+            this.$toast('删除成功')
+          }else {
+            this.$toast(res.msg)
+          }
+        });
       }
+
     }
 
   }
@@ -378,12 +451,17 @@
         }
 
         @{deep} .van-dropdown-item__content {
-          max-height: 95%;
+          height: 95%;
           display: flex;
           flex-direction: column;
           overflow-y: hidden;
         }
       }
     }
+  }
+  .editClass{
+    height: 100%;
+    width: 100%;
+    position: absolute;
   }
 </style>

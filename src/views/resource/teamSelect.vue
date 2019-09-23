@@ -17,13 +17,16 @@
           ></i>
           {{item.className}}
         </van-checkbox>
-        <div class="team-select-wrap__body__group" v-for="(g,gi) in item.tchSubGroup" :key="gi">
+        <div class="team-select-wrap__body__group" v-if="!item.tchSubGroup || item.tchSubGroup.length==0">
+          此班级无分组
+        </div>
+        <div class="team-select-wrap__body__group" v-else v-for="(g,gi) in item.tchSubGroup" :key="gi">
           <van-checkbox
             class="gfy-checkbox"
             style="margin-left: 0;"
             v-model="g.check"
             @click="handleSelectParent(g)"
-            :disabled:="!g.tchClassSubGroupStudent.tchSubGroupStudent ||g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
+            :disabled:="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
           >
             <i
               slot="icon"
@@ -46,7 +49,7 @@
           style="margin-left: 0;"
           v-model="c.check"
           @click="handleSelectParent(c)"
-          :disabled="!c.classStudent || c.classStudent.length == 0"
+          :disabled="c.disabled"
         >
           <i
             slot="icon"
@@ -56,7 +59,7 @@
           {{c.className}}
         </van-checkbox>
         <div class="team-select-wrap__body__group-wrap">
-          <div @click="handleSelectChild(s,g)" v-for="(s,si) in c.classStudent" :key="si"
+          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si"
                :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo|getStudentName(c.classId)}}
           </div>
         </div>
@@ -74,7 +77,9 @@
     name: "teamSelect",
     data() {
       return {
-        list: []
+        list: [],
+        sendStudent:{},
+        sendGroup:{},
       }
     },
     created() {
@@ -87,6 +92,11 @@
       if (classInfo) {
         this.list = JSON.parse(classInfo);
       }
+
+      //获取选中班级学生
+      this.sendStudent = this.$store.getters.getSendTaskClassStudent
+      //获取选中班级分组
+      this.sendGroup = this.$store.getters.getSendTaskClassSubGroup
       //this.list = JSON.parse(JSON.stringify(this.$store.getters.getTeamList))
     },
     methods: {
@@ -98,15 +108,26 @@
         this.$set(s, 'active', !s.active)
         if (s.active) {
             this.$set(item,'check',true)
-        }else if(item.stu.every(v => !v.active)) {
-          this.$set(item,'check',false)
-
+        }else {
+          let classStudent = item.classStudent
+          let flag = false
+          for (let k in classStudent){
+            if (classStudent[k].active){
+              flag = true
+              break
+            }
+          }
+          if (!flag){
+            this.$set(item,'check',false)
+          }
         }
       },
       handleSelectParent(item) {
-          item.stu.forEach(v => {
-            this.$set(v,'active',!item.check)
-          })
+          let classStudent = item.classStudent
+          for (let k in classStudent){
+            classStudent[k].active = !item.check
+          }
+
       }
     }
 

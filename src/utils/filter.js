@@ -130,7 +130,19 @@ let getTermName = (type) => {
   } else {
     return ""
   }
-};
+}
+let dealType =(val1,val2)=>{
+  if (val1 == null || val1 == undefined) {
+    return ''
+  } else {
+    if (val2[val1]) {
+      return val2[val1]
+    } else {
+      return ''
+    }
+  }
+  console.log(val1, val2)
+}
 let randomString = (len) => {
   len = len || 32
   var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
@@ -141,4 +153,4 @@ let randomString = (len) => {
   }
   return pwd
 }
-export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getStudentName,getGradeName,getTermName}
+export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getStudentName,getGradeName,getTermName,dealType}

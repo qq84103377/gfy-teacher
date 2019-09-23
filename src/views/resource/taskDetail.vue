@@ -9,7 +9,7 @@
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>名称</div>
-              <div class="ellipsis">说和做闻一多和作文一朵说和做闻一多和作文一朵说和做闻一多和作文一朵</div>
+              <div class="ellipsis">{{taskDetail.taskName}}</div>
             </div>
           </van-cell>
           <van-cell>
@@ -27,7 +27,7 @@
           <van-cell>
             <div slot="title">
               <div>描述:</div>
-              <div class="desc">说和做闻一多说和做闻一多说和做...说和做闻一多说和做闻一多说和做...说和做闻一多说和做闻一多说和做...说和做闻一多说和做闻一多说和做闻一多说和做闻一多说和做闻一多说和做</div>
+              <div class="desc">{{taskDetail.desc}}</div>
             </div>
           </van-cell>
         </div>
@@ -35,19 +35,19 @@
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>类型</div>
-              <div>微课程+试卷/微课程+心得</div>
+              <div>{{taskDetail.taskType|dealType(taskTypeList)}}</div>
             </div>
           </van-cell>
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>题量</div>
-              <div>10道</div>
+              <div>{{taskDetail.examCount}}道</div>
             </div>
           </van-cell>
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>时长</div>
-              <div>10分钟</div>
+              <div>{{taskDetail.duration}}分钟</div>
             </div>
           </van-cell>
           <van-cell>
@@ -72,16 +72,24 @@
 
 <script>
   import shareBar from '../../components/shareBar'
+
   export default {
-        name: "taskDetail",
+    name: "taskDetail",
     components: {shareBar},
     data() {
-          return {
-            remark: '',
-            shareBarShow: false
-          }
+      return {
+        remark: '',
+        shareBarShow: false,
+        taskDetail: {},
+        taskTypeList : this.$store.getters.taskTypeList
+
       }
+    },
+    mounted() {
+      this.taskDetail = this.$store.getters.getSendTaskInfo
+      console.log(this.taskTypeList)
     }
+  }
 </script>
 
 <style lang="less" scoped>

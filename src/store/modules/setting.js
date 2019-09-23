@@ -5,7 +5,10 @@ const state = {
   tchCourseInfo:{},//课程信息
   taskClassInfo:{},//任务班级
   gradeTermList:[],//年级学期
-  isAddWare: false
+  isAddWare: false,
+  sendTaskClassStudent:{},//发任务班级学生信息
+  sendTaskClassSubGroup:{},//发任务班级分组信息
+  sendTaskInfo:{},//发布的任务信息
 }
 
 const mutations = {
@@ -31,6 +34,15 @@ const mutations = {
   setIsAddWare (state,data) {
     state.isAddWare = data
   },
+  setSendTaskClassStudent(state, data){
+    state.sendTaskClassStudent = data
+  },
+  setSendTaskClassSubGroup(state, data){
+    state.sendTaskClassSubGroup = data
+  },
+  setSendTaskInfo(state, data){
+    state.sendTaskInfo = data
+  }
 }
 
 const actions = {
@@ -38,7 +50,7 @@ const actions = {
 }
 
 const getters = {
-  getVanLoading (state) {
+  getVanLoading(state) {
     return state.vanLoading
   },
   getTeamList(state) {
@@ -47,11 +59,14 @@ const getters = {
   getResourceInfo: state => state.resourceInfo,
   getTchCourseInfo: state => state.tchCourseInfo,
   getTaskClassInfo: state => state.taskClassInfo,
-  getGradeTermInfo:state =>state.gradeTermList,
+  getGradeTermInfo: state => state.gradeTermList,
+  getSendTaskClassStudent: state => state.sendTaskClassStudent,
+  getSendTaskClassSubGroup: state => state.sendTaskClassSubGroup,
+  getSendTaskInfo: state => state.sendTaskInfo,
   getIsAddWare(state) {
     return state.isAddWare
   }
-}
+};
 
 export default {
   state,

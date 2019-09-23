@@ -137,6 +137,10 @@ export const deleteCourseTask =(params)=>{
 export const modifyTeachCourseRes =(params)=>{
   return axios.post('teach/modifyTeachCourseRes', qs.stringify(params))
 }
+//修改课程
+export const modifyTeachCourse = (params) => {
+  return axios.post('teach/modifyTeachCourse', qs.stringify(params))
+}
 //添加课中资源(微课、素材、试卷、试题、口语、讨论)
 export const addCourseWare =(params)=>{
   return axios.post('resource/addCourseWare', qs.stringify(params))
@@ -213,6 +217,10 @@ export const statTaskStat =(params)=>{
 export const getTextBookVersionInfo =(params)=>{
   return axios.post('resource/getTextBookVersionInfo', qs.stringify(params))
 }
+//创建任务
+export const createCourseTask = (params) => {
+  return axios.post('teachNew/createCourseTask', qs.stringify(params))
+}
 //获取科目信息
 export const getSubjectType =(params)=>{
   return axios.post('resource/getSubjectType', qs.stringify(params))
@@ -276,4 +284,12 @@ export const getDailyRemindStatus =(params)=>{
 //主观题批改列表
 export const getExamFinishInfo =(params)=>{
   return axios.post('teach/getExamFinishInfo', qs.stringify(params))
+}
+//上下移动任务
+export const setCourseTaskOrder =(params)=>{
+  return axios.post('teach/setCourseTaskOrder', qs.stringify(params))
+}
+//任务置顶
+export const topCourseTask = (params) => {
+  return axios.post('teach/topCourseTask', qs.stringify(params))
 }

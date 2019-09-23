@@ -316,7 +316,7 @@
         this.show = false
         this.$emit('update:visible', false)
         this.$emit('update:sysCourseId', this.currentSysCourseId)
-        this.$parent.handleSysCourse(this.currentSysCourseName,this.currentSysCourseId,this.classGradeMap[this.gradeIndex].classGrade)
+        this.$parent.handleSysCourse(this.currentSysCourseName,this.currentSysCourseId,this.classGradeList[this.gradeIndex].classGrade)
       },
 
 
