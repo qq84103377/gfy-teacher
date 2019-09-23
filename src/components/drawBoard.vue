@@ -137,17 +137,17 @@
         // animatePanel('.bg-panel', '-130px', '.control-button', '60px');
       },
       text(v) {
-        this.ctx.font = '18px bold Adobe Heiti Std R'
-        this.ctx.clearRect(this.rectX,this.rectY,this.rectW,this.rectH)
-        this.ctx.fillStyle = '#ccc'
-        this.rectX = this.canvas.width/2 - this.ctx.measureText(v).width/2 - 20
-        this.rectY = (this.canvas.height - 70)
-        this.rectW = this.ctx.measureText(v).width + 40
-        this.rectH = 50
-        this.ctx.fillRect(this.rectX,this.rectY,this.rectW,this.rectH)
-        this.ctx.fillStyle = 'red'
-        this.ctx.textAlign = "center"
-        this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
+        // this.ctx.font = '18px bold Adobe Heiti Std R'
+        // this.ctx.clearRect(this.rectX,this.rectY,this.rectW,this.rectH)
+        // this.ctx.fillStyle = '#ccc'
+        // this.rectX = this.canvas.width/2 - this.ctx.measureText(v).width/2 - 20
+        // this.rectY = (this.canvas.height - 70)
+        // this.rectW = this.ctx.measureText(v).width + 40
+        // this.rectH = 50
+        // this.ctx.fillRect(this.rectX,this.rectY,this.rectW,this.rectH)
+        // this.ctx.fillStyle = 'red'
+        // this.ctx.textAlign = "center"
+        // this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
       }
     },
     methods: {
@@ -264,6 +264,7 @@
         context.stroke();
       },
       save() {
+        debugger
         this.imgArray = []
         if (this.imgUrl) { // 存在背景图才执行
           this.imgArray.push(this.offCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
@@ -300,7 +301,8 @@
             compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
             if (i >= document.querySelectorAll('.offImgs img').length - 1) {
               let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-              _this.$emit('exit', compositeImg)
+              console.log(compositeImg,'过来啊');
+              // _this.$emit('exit', compositeImg)
             }
           };
         }

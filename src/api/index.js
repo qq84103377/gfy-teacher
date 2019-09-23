@@ -277,3 +277,7 @@ export const getDailyRemindStatus =(params)=>{
 export const getExamFinishInfo =(params)=>{
   return axios.post('teach/getExamFinishInfo', qs.stringify(params))
 }
+//主观题批改点评
+export const addAppraise =(params)=>{
+  return axios.post('public/addAppraise', qs.stringify(params))
+}

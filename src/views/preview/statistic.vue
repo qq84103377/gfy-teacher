@@ -668,7 +668,8 @@
             tchCourseId: this.$route.query.tchCourseId,
             classId,
             questionList,
-            info: this.taskFinishInfo
+            info: this.taskFinishInfo,
+            termType:this.$route.query.termType
           }
         })
       },
