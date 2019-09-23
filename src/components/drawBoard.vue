@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%;height: 100%;">
+  <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0;">
     <div class="wrapper" id="test">
       <canvas class="offCanvas"></canvas>
       <canvas ref="canvas" class="canvas"
@@ -114,6 +114,7 @@
         rectY: 0,
         rectW: 0,
         rectH: 0,
+        swordEle: null,
       }
     },
     props: ['imgUrl','isPen','isRubber','text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -121,24 +122,38 @@
       imgUrl() {
         // $('.clearButton').trigger('click')
         this.clearScreen()
-        this.drawImg(this.imgUrl); // 画图
-        animatePanel('.bg-panel', '-130px', '.control-button', '60px');
+        //对于文字+图片和纯图片之间的切换 需要重新计算canvas高度,
+        this.$nextTick(() => {
+          this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
+          this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
+          this.drawImg(this.imgUrl); // 画图
+
+          //移动过的图片进行复位
+          this.scale = this.swordEle.scaleY = this.swordEle.scaleX = 1
+          this.swordEle.rotateZ = 0
+          this.swordEle.translateX = 0
+          this.swordEle.translateY = 0
+        })
+        // animatePanel('.bg-panel', '-130px', '.control-button', '60px');
       },
       text(v) {
-        this.ctx.font = '18px bold Adobe Heiti Std R'
-        this.ctx.clearRect(this.rectX,this.rectY,this.rectW,this.rectH)
-        this.ctx.fillStyle = '#ccc'
-        this.rectX = this.canvas.width/2 - this.ctx.measureText(v).width/2 - 20
-        this.rectY = (this.canvas.height - 70)
-        this.rectW = this.ctx.measureText(v).width + 40
-        this.rectH = 50
-        this.ctx.fillRect(this.rectX,this.rectY,this.rectW,this.rectH)
-        this.ctx.fillStyle = 'red'
-        this.ctx.textAlign = "center"
-        this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
+        // this.ctx.font = '18px bold Adobe Heiti Std R'
+        // this.ctx.clearRect(this.rectX,this.rectY,this.rectW,this.rectH)
+        // this.ctx.fillStyle = '#ccc'
+        // this.rectX = this.canvas.width/2 - this.ctx.measureText(v).width/2 - 20
+        // this.rectY = (this.canvas.height - 70)
+        // this.rectW = this.ctx.measureText(v).width + 40
+        // this.rectH = 50
+        // this.ctx.fillRect(this.rectX,this.rectY,this.rectW,this.rectH)
+        // this.ctx.fillStyle = 'red'
+        // this.ctx.textAlign = "center"
+        // this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
       }
     },
     methods: {
+      handleZoom(scale) {
+        this.scale = this.swordEle.scaleX = this.swordEle.scaleY = scale
+      },
       clearScreen() {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清除涂鸦画布内容
           this.offCtx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清除背景图画布内容
@@ -249,6 +264,7 @@
         context.stroke();
       },
       save() {
+        debugger
         this.imgArray = []
         if (this.imgUrl) { // 存在背景图才执行
           this.imgArray.push(this.offCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
@@ -285,7 +301,8 @@
             compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
             if (i >= document.querySelectorAll('.offImgs img').length - 1) {
               let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-              _this.$emit('exit', compositeImg)
+              console.log(compositeImg,'过来啊');
+              // _this.$emit('exit', compositeImg)
             }
           };
         }
@@ -319,16 +336,16 @@
       },
       figure() {
         // let swordEle = document.getElementsByClassName('canvas')[0]
-        let swordEle = document.getElementById('test')
+        this.swordEle = document.getElementById('test')
         let _this = this
         var Stage = AlloyPaper.Stage, Bitmap = AlloyPaper.Bitmap,Loader=AlloyPaper.Loader;
 
-        Transform(swordEle)
+        Transform(_this.swordEle)
         let bwidth, bheight, swidth, sheight;
         var initScale = 1;
-        swordEle.scaleX = swordEle.scaleY = _this.scale
-        swordEle.rotateZ = _this.rotate
-        var af = new AlloyFinger(swordEle, {
+        _this.swordEle.scaleX = _this.swordEle.scaleY = _this.scale
+        _this.swordEle.rotateZ = _this.rotate
+        var af = new AlloyFinger(_this.swordEle, {
             touchStart: function (event) {
               if(!_this.isPen&&!_this.isRubber) return
               _this.point = {x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY};
@@ -372,7 +389,7 @@
             touchCancel: function () {
             },
             multipointStart: function () {
-              initScale = swordEle.scaleX;
+              initScale = _this.swordEle.scaleX;
             },
             multipointEnd: function () {
             },
@@ -390,8 +407,8 @@
             },
             pinch(evt) {
               if(_this.isPen||_this.isRubber) return
-              swordEle.scaleX = swordEle.scaleY = initScale * evt.scale;
-              _this.scale = swordEle.scaleX
+              _this.swordEle.scaleX = _this.swordEle.scaleY = initScale * evt.scale;
+              _this.scale = _this.swordEle.scaleX
             },
             pressMove: function (evt) {
               if(_this.isPen||_this.isRubber) return
@@ -399,8 +416,8 @@
               let heightDiff = bheight - sheight;
               // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
               // } else {
-                swordEle.translateX += evt.deltaX;
-                swordEle.translateY += evt.deltaY;
+              _this.swordEle.translateX += evt.deltaX;
+              _this.swordEle.translateY += evt.deltaY;
               // }
             },
             swipe: function (evt) {

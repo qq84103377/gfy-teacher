@@ -293,3 +293,7 @@ export const setCourseTaskOrder =(params)=>{
 export const topCourseTask = (params) => {
   return axios.post('teach/topCourseTask', qs.stringify(params))
 }
+//主观题批改点评
+export const addAppraise =(params)=>{
+  return axios.post('public/addAppraise', qs.stringify(params))
+}
