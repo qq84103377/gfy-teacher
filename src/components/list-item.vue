@@ -25,7 +25,7 @@
           <van-button @click="$emit('del')" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
           <van-button v-if="up" @click="$emit('up')" style="background: #FFCD6B;height: 100%;border: none;color: #fff" square text="上移"/>
           <van-button v-if="down" @click="$emit('down')" style="background: #FEC147;height: 100%;border: none;color: #fff" square text="下移"/>
-          <van-button v-if="top" style="background: #FEB524;height: 100%;border: none;color: #fff" square text="置顶"/>
+          <van-button v-if="top" @click="$emit('top')"style="background: #FEB524;height: 100%;border: none;color: #fff" square text="置顶"/>
     </template>
   </van-swipe-cell>
 </template>

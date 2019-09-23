@@ -20,8 +20,8 @@
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
-                     :key="index" :can-slide="true" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
-                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo">
+                     :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0"  :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
+                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
@@ -52,7 +52,7 @@
   import listItem from '../../components/list-item'
   import dropdownHeader from '../../components/dropdown-header'
   import editCourse from './addCourse'
-  import {getClassTeachCourseInfo, getCourseTaskList} from '@/api/index'
+  import {getClassTeachCourseInfo, getCourseTaskList,setCourseTaskOrder,topCourseTask,deleteCourseTask} from '@/api/index'
 
   export default {
     name: "index",
@@ -227,6 +227,70 @@
           }
         })
       },
+      moveTask(item,index,type){
+        const tarTaskId = this.courseTaskList[type?index+1:index-1].taskId
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "tarTaskId": tarTaskId,
+          "oldTaskId": item.taskId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        setCourseTaskOrder(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList[index] = this.courseTaskList.splice(type?index+1:index-1,1,this.courseTaskList[index])[0]
+            this.$toast(`${type?'下':'上'}移成功`)
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      topTask(item,index){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "tchCourseId": this.tchCourseId,
+          "taskId": item.taskId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        topCourseTask(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList[index] = this.courseTaskList.splice(0,1,this.courseTaskList[index])[0]
+            this.$toast('置顶成功')
+          }else {
+            this.$toast(res.msg)
+          }
+
+        })
+      },
+      delTask(item,index){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": item.taskId,
+          "tchCourseId": this.tchCourseId
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        deleteCourseTask(params).then(res => {
+          if (res.flag) {
+            this.courseTaskList.splice(index, 1)
+            this.$toast('删除成功')
+          }else {
+            this.$toast(res.msg)
+          }
+        });
+      }
+
     }
 
   }

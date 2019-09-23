@@ -285,3 +285,11 @@ export const getDailyRemindStatus =(params)=>{
 export const getExamFinishInfo =(params)=>{
   return axios.post('teach/getExamFinishInfo', qs.stringify(params))
 }
+//上下移动任务
+export const setCourseTaskOrder =(params)=>{
+  return axios.post('teach/setCourseTaskOrder', qs.stringify(params))
+}
+//任务置顶
+export const topCourseTask = (params) => {
+  return axios.post('teach/topCourseTask', qs.stringify(params))
+}
