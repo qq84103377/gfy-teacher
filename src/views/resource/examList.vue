@@ -428,8 +428,8 @@
           return
         }
         console.log("发任务：", obj.testPaperName)
-        this.$store.commit('setSendTaskClassStudent', {})
         this.$store.commit('setResourceInfo', obj)
+        this.$store.commit("setTaskClassInfo", '')
         this.$router.push(`/addTask?type=exam&_t=new`)
       },
     }

@@ -188,7 +188,8 @@
       sendTask(obj){
         console.log("发任务：", obj.coursewareName)
         this.$store.commit('setResourceInfo', obj)
-        this.$router.push(`/addTask?type=material_t=new`)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/addTask?type=material&_t=new`)
       },
     }
   }

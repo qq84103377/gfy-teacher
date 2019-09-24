@@ -293,3 +293,7 @@ export const setCourseTaskOrder =(params)=>{
 export const topCourseTask = (params) => {
   return axios.post('teach/topCourseTask', qs.stringify(params))
 }
+//任务分享详情
+export const getCourseTaskDetailByShare = (params) => {
+  return axios.post('teach/getCourseTaskDetailByShare', qs.stringify(params))
+};

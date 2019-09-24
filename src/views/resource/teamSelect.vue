@@ -36,7 +36,7 @@
             {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
           </van-checkbox>
           <div class="team-select-wrap__body__group-wrap">
-            <div @click="handleSelectChild(s,g)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si"
+            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si"
                  :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo| getStudentName(item.classId)}}
             </div>
           </div>
@@ -102,6 +102,7 @@
     methods: {
       handleConfirm() {
         this.$store.commit('setTeamList',this.list)
+        this.$store.commit("setTaskClassInfo", JSON.stringify(this.list))
         this.$router.back()
       },
       handleSelectChild(s, item) {
@@ -128,6 +129,25 @@
             classStudent[k].active = !item.check
           }
 
+      },
+      handleSelectGroupStudent(s,group,item){
+        this.$set(s, 'active', !s.active)
+        let flag = false
+        for (let stu of  group.tchClassSubGroupStudent.tchSubGroupStudent) {
+          if (stu.active){
+            flag =true
+            break
+          }
+        }
+        group.check = flag
+        let flag1 = false
+        for (let sub of item.tchSubGroup) {
+           if (sub.check){
+             flag1= true
+             break
+           }
+        }
+        item.check = flag1
       }
     }
 
