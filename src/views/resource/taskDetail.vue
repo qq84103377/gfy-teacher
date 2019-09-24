@@ -46,7 +46,7 @@
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>类型</div>
-              <div>{{taskDetail.tastType}}</div>
+              <div>{{taskDetail.tastType|dealType(taskTypeList)}}</div>
             </div>
           </van-cell>
           <van-cell >
@@ -94,7 +94,7 @@
         remark: '',
         shareBarShow: false,
         taskList: [],
-        taskTypeList : this.$store.getters.taskTypeList,
+        taskTypeList :  this.$store.state.taskTypeList,
         examCount:0,
         taskDetail:'',
         currentClassId:'',
@@ -103,6 +103,7 @@
       }
     },
     mounted() {
+      console.log("任务类型",this.taskTypeList)
       this.initTaskDetail()
     },
     methods:{
@@ -131,6 +132,15 @@
             let start = this.taskList[0].startDate
             let end = this.taskList[0].endDate
             this.taskDetail = this.taskList[0]
+            console.log(this.taskDetail)
+
+            if (this.taskDetail.tastType =="T04"){
+              if (!this.taskDetail.testPaperId){
+                this.$set(this.taskDetail, 'tastType', 'T04_1')//学资源+心得
+              } else {
+                this.$set(this.taskDetail, 'tastType', 'T04_2')//学资源+试卷
+              }
+            }
             this.taskList.forEach((item)=>{
               this.optionList.push({
                 text:item.className,
@@ -157,6 +167,13 @@
         for (let item of this.taskList) {
           if (item.classId == value) {
             this.taskDetail = this.taskList[index]
+            if (this.taskDetail.tastType =="T04"){
+              if (!this.taskDetail.testPaperId){
+                this.$set(this.taskDetail, 'tastType', 'T04_1')//学资源+心得
+              } else {
+                this.$set(this.taskDetail, 'tastType', 'T04_2')//学资源+试卷
+              }
+            }
           }
           index++
         }
