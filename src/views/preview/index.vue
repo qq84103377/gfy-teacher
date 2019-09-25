@@ -18,7 +18,10 @@
     </dropdown-header>
     <div class="preview-wrap__body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && courseTaskList.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="courseTaskList.length>0?'没有更多了':'当前没有已发任务奥～快去新建任务吧'" @load="onLoad" :offset='80' >
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
                      :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0"  :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
                      :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
@@ -463,5 +466,11 @@
     height: 100%;
     width: 100%;
     position: absolute;
+  }
+  .null-tips{
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

@@ -2,7 +2,10 @@
   <section class="lesson-list">
     <div class="lesson-list__body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/resource/micro_empty.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有微课～快去上传吧'" @load="onLoad" :offset='80'>
           <list-item class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index"
                      :itemTitle="item.coursewareName"
                      :can-slide="true">
@@ -220,5 +223,11 @@
         font-size: 16px;
       }
     }
+  }
+  .null-tips{
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>
