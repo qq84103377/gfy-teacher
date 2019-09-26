@@ -7,6 +7,12 @@ export const stsAuthCoverAccessUrl = param => {
     return respone;
   })
 }
+export const stsAuthReplaceAccessUrl = param => {
+  return axios.post('/public/stsAuthCoverAccessUrl', qs.stringify(param)).then((respone) => {
+    console.log('stsAuthCoverAccessUrl ', respone.data);
+    return respone;
+  })
+}
 export const doUpLoad = (url, data) => {
   return new Promise((resolve, reject) => {
     console.log(data);

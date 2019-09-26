@@ -5,7 +5,7 @@
       <div class="aic" style="align-items: flex-start" @click="$emit('clickTo')">
         <div class="icon-wrap" v-if="$slots.cover"><slot name="cover"></slot></div>
         <div style="flex: 1">
-          <div class="title" @click="choose"><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-exam':taskType=='T01','icon-comment':taskType=='T02',
+          <div class="title" @click=""><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-exam':taskType=='T01','icon-comment':taskType=='T02',
           'icon-test':taskType=='T03','icon-learn-res':taskType =='T04' && testPaperId!=0,
           'icon-learn-res-exp':taskType =='T04' && testPaperId==0,'icon-discuss':taskType =='T06','icon-spoken':taskType =='T13'}"></i>
             {{itemTitle}}
@@ -22,7 +22,7 @@
       </div>
     </div>
     <template v-if="canSlide" slot="right">
-          <van-button @click="$emit('del')" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
+          <van-button @click="del" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
           <van-button v-if="up" @click="$emit('up')" style="background: #FFCD6B;height: 100%;border: none;color: #fff" square text="上移"/>
           <van-button v-if="down" @click="$emit('down')" style="background: #FEC147;height: 100%;border: none;color: #fff" square text="下移"/>
           <van-button v-if="top" @click="$emit('top')"style="background: #FEB524;height: 100%;border: none;color: #fff" square text="置顶"/>
@@ -40,7 +40,15 @@
           }
       },
       methods:{
-          choose(){
+          del(){
+            this.$dialog.confirm({
+              title: '',
+              message: '确定删除吗?'
+            }).then(() => {
+              this.$emit('del')
+            }).catch(() => {
+              // on cancel
+            });
 
           }
       }

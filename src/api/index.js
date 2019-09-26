@@ -297,3 +297,11 @@ export const topCourseTask = (params) => {
 export const addAppraise =(params)=>{
   return axios.post('public/addAppraise', qs.stringify(params))
 }
+//主观题批改打分
+export const examResultScroe =(params)=>{
+  return axios.post('teach/examResultScroe', qs.stringify(params))
+}
+//主观题点赞/取消点赞
+export const updateExamQuality =(params)=>{
+  return axios.post('teach/updateExamQuality', qs.stringify(params))
+}

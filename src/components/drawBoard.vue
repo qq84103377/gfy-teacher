@@ -77,7 +77,7 @@
   import AlloyFinger from 'alloyfinger'
   import  'alloyfinger/transformjs/transform'
   import AlloyPaper from 'alloyfinger/asset/alloy_paper.js'
-
+  import * as uploadApi from "@/api/upload";
   // import '../utils/canvas/jquery.min'
   // import '../assets/handWriting'
   // 底部操作栏和弹出框交互函数
@@ -106,7 +106,7 @@
         // isPen: false, //判断是涂鸦还是擦除
         lastLineWidth: -1,  //用于线光滑过度
         sizeWidth: 30,  //笔触宽度
-        strokeColor: '#000',  //笔触颜色
+        strokeColor: '#f00',  //笔触颜色
         ctx: '',
         rubberSize: 25,  //橡皮擦大小
         imgArray: [],  //储存背景图和涂鸦图
@@ -115,6 +115,8 @@
         rectW: 0,
         rectH: 0,
         swordEle: null,
+        oSSObject: null,
+        curFile: null,
       }
     },
     props: ['imgUrl','isPen','isRubber','text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -151,6 +153,9 @@
       }
     },
     methods: {
+      clear() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      },
       handleZoom(scale) {
         this.scale = this.swordEle.scaleX = this.swordEle.scaleY = scale
       },
@@ -163,7 +168,8 @@
         let b = this.$refs['canvas'].height
         this.offCtx.clearRect(0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height); // 先清除画布
         let changeImg = new Image();
-        changeImg.src = changeValue;
+        changeImg.setAttribute("crossOrigin",'anonymous');
+        changeImg.src = changeValue + '&' + Math.random();
         changeImg.onload = () => {
           this.offCtx.drawImage(changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
         };
@@ -264,7 +270,7 @@
         context.stroke();
       },
       save() {
-        debugger
+        this.$store.commit('setVanLoading', true)
         this.imgArray = []
         if (this.imgUrl) { // 存在背景图才执行
           this.imgArray.push(this.offCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
@@ -297,12 +303,23 @@
         let _this = this
         for (let i = 0; i < document.querySelectorAll('.offImgs img').length; i++) {
           const item = document.querySelectorAll('.offImgs img')[i];
-          item.onload = function () {
+          item.onload = async () => {
             compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
             if (i >= document.querySelectorAll('.offImgs img').length - 1) {
               let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-              console.log(compositeImg,'过来啊');
-              // _this.$emit('exit', compositeImg)
+             await this.getOSSKey()
+
+              var arr = compositeImg.split(","),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+              while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+              }
+              this.curFile = new Blob([u8arr], {type: mime});
+              this.uploadIMG(this.curFile);
+
             }
           };
         }
@@ -315,6 +332,29 @@
         //     }
         //   };
         // });
+      },
+      uploadIMG(curFile) {
+        this.$store.commit('setVanLoading', true)
+        console.log("开始上传")
+        console.log(this.oSSObject)
+        let formData = new FormData();
+        formData.append("key", this.imgUrl.substring(0, this.imgUrl.indexOf('?')));
+        console.log(123);
+        formData.append('policy', this.oSSObject.policyBase64)
+        formData.append('OSSAccessKeyId', this.oSSObject.accessid)
+        formData.append('signature', this.oSSObject.signature)
+        formData.append('file', curFile)
+        formData.append('success_action_status', '200')
+
+
+
+        // this.$store.commit('setVanLoading', false)
+        // this.$emit('submitCb')
+        // return
+        uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+          this.$store.commit('setVanLoading', false)
+          this.$emit('submitCb')
+        });
       },
       transRotate(x,y,_angle) {
         const { sin, cos, PI } = Math
@@ -423,7 +463,34 @@
             swipe: function (evt) {
             }
           });
-      }
+      },
+      async getOSSKey() {
+        this.$store.commit('setVanLoading', true)
+        let json = {
+          requestJson: JSON.stringify({
+            interUser: "runLfb",
+            interPwd: "25d55ad283aa400af464c76d713c07ad",
+            operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+            belongSchoolId: this.$store.getters.schoolId,
+            url: this.imgUrl.substring(0, this.imgUrl.indexOf('?'))
+          })
+        };
+        console.log('getOSSKey json', json);
+       await uploadApi.stsAuthReplaceAccessUrl(json).then(data => {
+          console.log('stsAuthCoverAccessUrl', data.data[0]);
+          var obj = data.data[0].tokenInfo;
+          var tmpSignatureObj = {
+            host: obj.host,
+            policyBase64: obj.policy,
+            accessid: obj.accessid,
+            signature: obj.signature,
+            expire: parseInt(obj.expire),
+            key: obj.dir + "/",
+            size: obj.sizelimit
+          };
+          this.oSSObject = tmpSignatureObj;
+        });
+      },
 
     },
     mounted() {

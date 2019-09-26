@@ -18,20 +18,26 @@
     </div>
     <i v-if="!(aswIndex==0&&stuIndex==0&&imgIndex==0)&&!isFold" class="iconGFY icon-circle-arrow"
        @click="toggle(0)"></i>
-    <i v-if="!isFold" class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
+    <i v-if="!isFold" class="iconGFY icon-circle-arrow rotate" @click="submit"></i>
     <div class="correct-wrap__side" v-show="!isFold">
       <div class="correct-wrap__side-top">
-        <div class="score-btn" @click="selectScore(aswIndex,stuArr[stuIndex].answer[aswIndex].examScore,stuArr[stuIndex].answer[aswIndex])">满分</div>
-        <div class="score-btn" style="background: #FA7373;" @click="selectScore(aswIndex,0,stuArr[stuIndex].answer[aswIndex])">零分</div>
+        <div class="score-btn"
+             @click="selectScore(aswIndex,stuArr[stuIndex].answer[aswIndex].examScore,stuArr[stuIndex].answer[aswIndex])">
+          满分
+        </div>
+        <div class="score-btn" style="background: #FA7373;"
+             @click="selectScore(aswIndex,0,stuArr[stuIndex].answer[aswIndex])">零分
+        </div>
       </div>
       <div class="correct-wrap__side-center">
         <div v-for="(asw,ai) in stuArr[stuIndex].answer" :key="ai" class="dropdown-group"><span>1{{info.groupExamList.length?`(${ai+1})`:``}}</span>
-          <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value}" :overlay="false">
+          <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value || asw.isMark==='I01'}" :overlay="false">
             <van-dropdown-item :disabled="ai !== aswIndex" :ref="'menuItem' + ai"
-                           :title="((asw.value === 0 || asw.value)? asw.value : asw.examScore) + '分'">
+                               :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">
               <div class="menu-wrap">
-                <div @click="selectScore(ai,scoreIndex,asw)" class="menu-item" v-for="(score,scoreIndex) in (asw.examScore + 1)"
-                     :key="scoreIndex">{{scoreIndex}}分
+                <div @click="selectScore(ai,score,asw)" class="menu-item"
+                     v-for="(score,scoreIndex) in  splitScore(asw.examScore)"
+                     :key="scoreIndex">{{score}}分
                 </div>
               </div>
             </van-dropdown-item>
@@ -50,8 +56,8 @@
       <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isRubber=!isRubber;isPen=false"
          class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
-      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" class="iconGFY icon-del"></i>
-      <i @click="isGood=!isGood" class="iconGFY icon-good" :class="{'icon-good-active':isGood}"></i>
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="clearCanvas" class="iconGFY icon-del"></i>
+      <i @click="updateExamQuality" class="iconGFY icon-good" :class="{'icon-good-active':stuArr[stuIndex].answer[aswIndex].qualityType === 'Q01'}"></i>
       <i @click="isFold=!isFold" class="iconGFY icon-hide" :class="{'icon-hide-active':isFold}"></i>
     </div>
     <div class="correct-wrap__body">
@@ -71,8 +77,8 @@
       <div class="correct-wrap__body__draw" :style="{flex: stuArr[stuIndex].answer[aswIndex].text? '0 0 80%':'1'}"
            v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
         <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
-        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber"
-                    :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]" @exit="handleExit"></draw-board>
+        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="toggle(1)"
+                    :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
       </div>
       <div class="correct-wrap__body__undo"
            v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
@@ -119,8 +125,8 @@
             <div class="stu-item__name">{{getStudentName(stu.accountNo,classId)}}</div>
             <div class="stu-item__score">
               <div class="stu-item__score-item" v-for="(asw,ai) in stu.answer" :key="ai">
-                <i v-if="asw.qualityType" class="iconGFY icon-good-active"></i>
-                <span>{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}} {{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
+                <i v-if="asw.qualityType==='Q01'" class="iconGFY icon-good-active"></i>
+                <span>{{$route.params.examNum}}.{{info.groupExamList.length?`(${ai+1})`:``}} {{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
               </div>
             </div>
           </div>
@@ -148,7 +154,10 @@
               </div>
             </van-dropdown-item>
           </van-dropdown-menu>
-          <textarea v-model.trim="comment" placeholder="请输入评论" rows="5"></textarea>
+          <div class="textarea-wrap">
+            <textarea v-model.trim="comment" maxlength="100" placeholder="请输入评论" rows="5"></textarea>
+            <span>{{comment.length}}/100</span>
+          </div>
         </div>
         <div class="comment-dialog__footer van-hairline--top">
           <div class="cancel van-hairline--right" @click="commentShow=false;comment=''">取消</div>
@@ -165,7 +174,7 @@
   import {mapMutations, mapGetters, mapState} from 'vuex'
   // import 'swiper/dist/css/swiper.css'////这里注意具体看使用的版本是否需要引入样式，以及具体位置。
   // import {swiper, swiperSlide} from 'vue-awesome-swiper'
-  import {getCourseTaskDetail, saveRewardScore, addAppraise} from '@/api/index'
+  import {getCourseTaskDetail, saveRewardScore, addAppraise, examResultScroe, updateExamQuality} from '@/api/index'
   import AlloyFinger from 'alloyfinger'
   import 'alloyfinger/transformjs/transform'
   import AlloyPaper from 'alloyfinger/asset/alloy_paper.js'
@@ -204,7 +213,6 @@
         viewSubject: false,
         isPen: true,
         isRubber: false,
-        isGood: false,
         isFold: false,
         value1: '10分',
         option: [
@@ -222,7 +230,7 @@
         info: JSON.parse(JSON.stringify(this.$route.params.info)),
         scale: 1,
         timer: null,
-        filterStuList: JSON.parse(JSON.stringify(this.$route.params.stuArr)),
+        // filterStuList: [],
         autoSubmit: true
       }
     },
@@ -242,6 +250,13 @@
       ...mapState({
         vanLoading: state => state.setting.vanLoading
       }),
+      filterStuList() {
+        if (this.stuName) {
+          return this.stuArr.filter(v => this.getStudentName(v.accountNo, this.classId).indexOf(this.stuName) > -1)
+        } else {
+          return this.stuArr
+        }
+      },
       progress() {
         return this.stuArr.reduce((t, v) => {
           if (v.answer.every(a => a.isMark === 'I01')) {
@@ -269,6 +284,7 @@
       }
     },
     created() {
+      // this.filterStuList = this.stuArr
 
       screen.orientation.lock('landscape')
       // this.getCourseTaskDetail()
@@ -277,16 +293,101 @@
       this.figure()
     },
     methods: {
-      submit() {
-        this.$refs['drawBoard'].save()
+      updateExamQuality() {
+        this.$store.commit('setVanLoading', true)
+        const qualityType = this.stuArr[this.stuIndex].answer[this.aswIndex].qualityType==='Q01'?'Q02':'Q01'
+        let obj = {
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          type: this.info.groupExamList.length?'T02':'T01',
+          seqId: this.stuArr[this.stuIndex].answer[this.aswIndex].seqId,
+          qualityType,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        updateExamQuality(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.stuArr[this.stuIndex].answer[this.aswIndex].qualityType = qualityType
+            // this.$set(this.filterStuList[this.stuIndex].answer[this.aswIndex],'qualityType',qualityType)
+            // this.filterStuList[this.stuIndex].answer[this.aswIndex].qualityType = qualityType
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      clearCanvas() {
+        this.$refs['drawBoard'].clear()
+      },
+      async examResultScroe() {
+        const studentScore = (this.stuArr[this.stuIndex].answer[this.aswIndex].isMark==='I01'&&this.stuArr[this.stuIndex].answer[this.aswIndex].value===undefined)?this.stuArr[this.stuIndex].answer[this.aswIndex].score:this.stuArr[this.stuIndex].answer[this.aswIndex].value
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.stuArr[this.stuIndex].accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.params.taskId,
+          examId: this.stuArr[this.stuIndex].answer[this.aswIndex].examId || this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId,
+          examScore: this.stuArr[this.stuIndex].answer[this.aswIndex].examScore,
+          studentScore,
+          groupId: this.stuArr[this.stuIndex].answer[this.aswIndex].groupId,
+          titleType: this.stuArr[this.stuIndex].answer[this.aswIndex].titleType
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+       await examResultScroe(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag) {
+            this.stuArr[this.stuIndex].answer[this.aswIndex].isMark = 'I01'
+            this.stuArr[this.stuIndex].answer[this.aswIndex].score = studentScore
+            if(!this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) this.toggle(1)
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      splitScore(score) {
+        const length = Math.floor(score * 2)
+        let arr = [score]
+        for (let i = 0; i < length; i++) {
+          score -= 0.5
+          arr.push(score)
+        }
+        return arr.reverse()
+      },
+      async submit() {
+        if (!this.stuArr[this.stuIndex].answer[this.aswIndex].value && this.stuArr[this.stuIndex].answer[this.aswIndex].value !== 0 && this.stuArr[this.stuIndex].answer[this.aswIndex].isMark === 'I02') return this.$toast('还没选择分数')
+        this.$store.commit('setVanLoading', true)
+       await this.examResultScroe()
+        if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+          this.$refs['drawBoard'].save()
+        }
       },
       clickComment() {
-       const item = this.info.appraiseList.find(v => v.objectId === this.stuArr[this.stuIndex].answer[this.aswIndex].seqId)
+        const item = this.info.appraiseList.find(v => v.objectId === this.stuArr[this.stuIndex].answer[this.aswIndex].seqId)
         this.comment = item ? item.appraiseContent : ''
         this.commentShow = true
       },
       addAppraise() {
         if (!this.comment) return this.$toast('请输入点评')
+
+        if(this.info.appraiseList.some(v => v.objectId === this.stuArr[this.stuIndex].answer[this.aswIndex].seqId)) {
+          //已有评论
+          this.$dialog.confirm({
+            title: '',
+            message: '是否更换已有的点评内容?'
+          }).then(() => {
+            this.addAppraiseAjax()
+          }).catch(() => {
+            // on cancel
+          });
+        }else {
+          this.addAppraiseAjax()
+        }
+      },
+      addAppraiseAjax() {
         this.$store.commit('setVanLoading', true)
         let params = {
           "interUser": "runLfb",
@@ -305,7 +406,10 @@
             this.$toast('点评成功')
             this.commentShow = false
             this.commentText = this.comment
-            this.info.appraiseList.unshift({objectId:this.stuArr[this.stuIndex].answer[this.aswIndex].seqId,appraiseContent:this.comment})
+            this.info.appraiseList.unshift({
+              objectId: this.stuArr[this.stuIndex].answer[this.aswIndex].seqId,
+              appraiseContent: this.comment
+            })
           } else {
             this.$toast(res.msg)
           }
@@ -348,8 +452,10 @@
         })
       },
       zoom(type) {
-        this.scale += type ? 0.1 : -0.1
-        this.$refs['drawBoard'].handleZoom(this.scale)
+        if(this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+          this.scale += type ? 0.1 : -0.1
+          this.$refs['drawBoard'].handleZoom(this.scale)
+        }
       },
       toggle(type) {
         if (type) {
@@ -535,10 +641,18 @@
           }
         })
       },
-      selectScore(i, score,asw) {
+     async selectScore(i, score, asw) {
+        console.log(asw.value);
         this.$refs['menuItem' + i][0].toggle(false)
         // this.value1 = `${index}分`
-        this.$set(asw,'value',score)
+        this.$set(asw, 'value', score)
+        if(this.autoSubmit) {
+          this.$store.commit('setVanLoading', true)
+         await this.examResultScroe()
+          if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+            this.$refs['drawBoard'].save()
+          }
+        }
       },
       handleExit(src) {
         console.log(src);
@@ -618,15 +732,22 @@
             }
 
             &__score {
-              .icon-good-active {
-                width: 10px;
-                height: 7px;
-                margin-right: 2px;
-                vertical-align: sub;
-              }
+              /*.icon-good-active {*/
+              /*  width: 10px;*/
+              /*  height: 7px;*/
+              /*  margin-right: 2px;*/
+              /*  vertical-align: sub;*/
+              /*}*/
 
               &-item {
                 margin-bottom: 2px;
+                position: relative;
+                .icon-good-active {
+                  position: absolute;
+                  width: 10px;
+                  height: 7px;
+                  left: -9px;
+                }
               }
             }
           }
@@ -771,13 +892,23 @@
           }
         }
 
-        textarea {
-          width: 100%;
-          background: #f5f6fa;
-          border-radius: 3px;
-          padding: 5px;
-          margin-bottom: 5px;
+        .textarea-wrap{
+          position: relative;
+          textarea {
+            width: 100%;
+            background: #f5f6fa;
+            border-radius: 3px;
+            padding: 5px;
+            margin-bottom: 5px;
+          }
+          span{
+            position: absolute;
+            right: 5px;
+            bottom: 10px;
+            color: #666;
+          }
         }
+
 
         .tag-wrap {
           display: flex;
@@ -881,6 +1012,7 @@
       display: flex;
       flex-direction: column;
       border-radius: 3px;
+
       &-top {
         display: flex;
         align-items: center;
@@ -935,6 +1067,7 @@
             border: 1px solid #B5B5B5;
             flex: 0 0 70%;
             height: 13px;
+
             &.is-check {
               .van-dropdown-menu__item {
                 .van-dropdown-menu__title {
@@ -944,6 +1077,7 @@
                 }
               }
             }
+
             .van-dropdown-menu__item--disabled {
               background: #eee;
             }
@@ -1009,6 +1143,7 @@
           flex: 0 0 5px;
           height: 5px;
           border: 1px solid #44B5DF;
+
           &.is-active {
             background: url("../../assets/img/icon-check.png") no-repeat center center;
             background-size: contain;

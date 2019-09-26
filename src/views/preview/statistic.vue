@@ -333,6 +333,7 @@
         })
       },
       handleComment(replyContent, item) {
+        if(!replyContent) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -975,6 +976,17 @@
       this.$store.commit('setVanLoading', false)
       // if (!this.isWk && !this.isSpoken) {
       // }
+    },
+    beforeRouteEnter(to, from, next) {
+      if(from.path === '/imgCorrect') {
+        // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
+        next(async vm => {
+         await vm.statTaskStat()
+          vm.getAppraise()
+        })
+      }else {
+        next()
+      }
     },
     async created() {
 
