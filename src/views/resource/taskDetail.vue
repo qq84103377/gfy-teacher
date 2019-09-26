@@ -9,25 +9,36 @@
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>名称</div>
-              <div class="ellipsis">{{taskDetail.taskName}}</div>
+              <div class="ellipsis">{{taskDetail.tastName}}</div>
+            </div>
+          </van-cell>
+          <van-cell v-show="showClass">
+            <div slot="title" class="task-detail__body__center__cell">
+              <div>班级</div>
+              <div >
+                <van-dropdown-menu style="height: 5vw">
+                <van-dropdown-item v-model="currentClassId" :options="optionList" />
+              </van-dropdown-menu>
+              </div>
             </div>
           </van-cell>
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>开始时间</div>
-              <div>2017-1-19 15:29</div>
+              <div>{{taskDetail.startDate}}</div>
             </div>
           </van-cell>
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>结束时间</div>
-              <div>2017-1-19 15:29</div>
+              <div>{{taskDetail.endDate}}</div>
             </div>
           </van-cell>
           <van-cell>
             <div slot="title">
               <div>描述:</div>
-              <div class="desc">{{taskDetail.desc}}</div>
+              <div class="desc" v-if="taskDetail.desc">{{taskDetail.desc}}</div>
+              <div class="desc" v-else>无</div>
             </div>
           </van-cell>
         </div>
@@ -35,13 +46,13 @@
           <van-cell>
             <div slot="title" class="task-detail__body__center__cell">
               <div>类型</div>
-              <div>{{taskDetail.taskType|dealType(taskTypeList)}}</div>
+              <div>{{taskDetail.tastType|dealType(taskTypeList)}}</div>
             </div>
           </van-cell>
-          <van-cell>
+          <van-cell >
             <div slot="title" class="task-detail__body__center__cell">
               <div>题量</div>
-              <div>{{taskDetail.examCount}}道</div>
+              <div>{{examCount}}道</div>
             </div>
           </van-cell>
           <van-cell>
@@ -72,6 +83,8 @@
 
 <script>
   import shareBar from '../../components/shareBar'
+  import {getCourseTaskDetailByShare} from '@/api/index'
+
 
   export default {
     name: "taskDetail",
@@ -80,14 +93,91 @@
       return {
         remark: '',
         shareBarShow: false,
-        taskDetail: {},
-        taskTypeList : this.$store.getters.taskTypeList
-
+        taskList: [],
+        taskTypeList :  this.$store.state.taskTypeList,
+        examCount:0,
+        taskDetail:'',
+        currentClassId:'',
+        optionList:[],
+        showClass:true,
       }
     },
     mounted() {
-      this.taskDetail = this.$store.getters.getSendTaskInfo
-      console.log(this.taskTypeList)
+      console.log("任务类型",this.taskTypeList)
+      this.initTaskDetail()
+    },
+    methods:{
+      initTaskDetail(){
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "taskId":this.$route.query.taskId,
+          "tchCourseId":this.$route.query.tchCourseId,
+
+        }
+        if (this.$route.query.classId){
+          obj.classId = this.$route.query.classId
+        }
+
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getCourseTaskDetailByShare(params).then(res => {
+          console.log(res)
+          if (res.flag){
+            this.taskList = res.data[0].taskInfoList
+            //判断是分班设置还是统一设置时间，通知设置不显示班级
+            let flag = false
+            let start = this.taskList[0].startDate
+            let end = this.taskList[0].endDate
+            this.taskDetail = this.taskList[0]
+            console.log(this.taskDetail)
+
+            if (this.taskDetail.tastType =="T04"){
+              if (!this.taskDetail.testPaperId){
+                this.$set(this.taskDetail, 'tastType', 'T04_1')//学资源+心得
+              } else {
+                this.$set(this.taskDetail, 'tastType', 'T04_2')//学资源+试卷
+              }
+            }
+            this.taskList.forEach((item)=>{
+              this.optionList.push({
+                text:item.className,
+                value:item.classId
+              })
+              if(start != item.startDate || end != item.endDate){
+                flag = true
+              }
+            })
+            this.showClass = flag
+            this.currentClassId = this.taskDetail.classId
+            if (res.data[0].testPaperInfo) {
+              this.examCount = res.data[0].testPaperInfo.subjectiveItemNum + res.data[0].testPaperInfo.objectiveItemNum
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      }
+    },
+    watch: {
+      currentClassId: function(value) {
+        let index = 0
+        for (let item of this.taskList) {
+          if (item.classId == value) {
+            this.taskDetail = this.taskList[index]
+            if (this.taskDetail.tastType =="T04"){
+              if (!this.taskDetail.testPaperId){
+                this.$set(this.taskDetail, 'tastType', 'T04_1')//学资源+心得
+              } else {
+                this.$set(this.taskDetail, 'tastType', 'T04_2')//学资源+试卷
+              }
+            }
+          }
+          index++
+        }
+      }
     }
   }
 </script>

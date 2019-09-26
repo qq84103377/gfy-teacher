@@ -64,7 +64,7 @@
           <van-cell class="save-pop__cell">
             <div slot="title" class="align">
               <div class="aic jcsb">
-                <div class="fs15"><span class="red">*</span>简介:</div>
+                <div class="fs15"><span class="red">*</span>内容:</div>
                 <div class="red fs10">{{1024 - form.desc.length}}</div>
               </div>
               <textarea v-model="form.desc" maxlength="1024" rows="4" placeholder="请输入描述，字数在1024字内"></textarea>
@@ -514,6 +514,7 @@
       sendTask(obj){
         console.log("发任务：", obj.discussName)
         this.$store.commit('setResourceInfo', obj)
+        this.$store.commit("setTaskClassInfo", '')
         this.$router.push(`/addTask?type=discuss_t=new`)
       },
     }

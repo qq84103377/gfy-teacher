@@ -53,12 +53,17 @@
         </div>
         <div class="jcsb aic mgb10">
           <span class="fs16 black">未结束任务</span>
-          <span class="blue fs12">查看更多></span>
+          <span class="blue fs12" v-show="taskList && taskList.length>0">查看更多></span>
+
         </div>
         <van-skeleton :row="3"
                       :loading="loading">
-          <div v-for="item in taskList" :key="item.taskId"  class="index-content-wrap__body__unfinish-wrap">
-          <list-item :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
+          <div v-if="!taskList||taskList.length==0" style="text-align: center;color:#999999;font-size: 14px" class="index-content-wrap__body__unfinish-wrap">
+            <img class="null-tips" src="../../assets/img/index/unfinish_task_empty.png" alt />
+            <span>当前没有未结束的任务～</span>
+          </div>
+          <div v-else v-for="item in taskList" :key="item.taskId"  class="index-content-wrap__body__unfinish-wrap">
+            <list-item :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
@@ -74,7 +79,7 @@
               </div>
             </div>
           </list-item>
-        </div>
+          </div>
         </van-skeleton>
         <div class="divider-title">教学工具</div>
         <div class="icon-group">
@@ -572,5 +577,10 @@
         }
       }
     }
+  }
+  .null-tips{
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

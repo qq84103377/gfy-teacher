@@ -372,6 +372,7 @@
         }
         console.log("发任务：", obj.spokenTitle)
         this.$store.commit('setResourceInfo', obj)
+        this.$store.commit("setTaskClassInfo", '')
         this.$router.push(`/addTask?type=spoken_t=new`)
       }
 
