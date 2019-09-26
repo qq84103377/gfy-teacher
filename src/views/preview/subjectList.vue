@@ -47,7 +47,7 @@
               <div class="answer-wrap" v-for="(asw,aswIndex) in item.answer" :key="aswIndex">
                 <div class="left">
                   <div class="mgb5">{{examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}} <i
-                    v-if="asw.qualityType" class="iconGFY icon-good-active"></i></div>
+                    v-if="asw.qualityType==='Q01'" class="iconGFY icon-good-active"></i></div>
                   <div v-if="asw.result && asw.result !== '<p></p>'">
                     <div @click="subjectCorrect(asw,index,aswIndex)" class="ellipsis" v-html="asw.text"></div>
                     <div class="img-wrap" :class="[{img4: asw.imgArr.length==4},{img56:asw.imgArr.length>4}]"
@@ -120,14 +120,15 @@
         studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList)),
         stuArr: [],
         examNum: '', // 大题题号
+        examId: this.$route.query.examId,
       }
     },
-    created() {
-      const {examId} = this.$route.query
-      const index = this.tabList.findIndex(v => v.examId === examId)
+    activated() {
+      // const {examId} = this.$route.query
+      const index = this.tabList.findIndex(v => v.examId === this.examId)
       this.$set(this.tabList[index], 'active', true)
       // this.getExamItemDetail(examId, groupId)
-      this.getExamFinishInfo(examId)
+      this.getExamFinishInfo(this.examId)
     },
     methods: {
       subjectCorrect(item, stuIndex, aswIndex, imgIndex) {
@@ -139,7 +140,7 @@
         this.$router.push({
           name: 'subjectCorrect', params: {
             accountNo: item.accountNo,
-            examId: this.$route.query.examId,
+            examId: this.examId,
             classId: this.$route.query.classId,
             imgIndex: imgIndex || 0,
             aswIndex,
@@ -188,6 +189,7 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
+        this.examId = item.examId
         // this.getExamItemDetail(item.exam_id, item.groupId)
         this.getExamFinishInfo(item.examId)
       },

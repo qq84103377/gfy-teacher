@@ -7,10 +7,6 @@
 
         <div class="stu-answer">
           <div v-html="item.text"></div>
-          <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]"
-               v-if="item.imgArr.length">
-            <div v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
-          </div>
           <div style="width: 100%;" v-if="item.audioArr.length">
             <video-player class="video-player-box"
                           v-for="(audio,index) in item.audioArr" :key="index"
@@ -23,6 +19,10 @@
           <div style="width: 100%;" v-if="item.videoArr.length">
             <video class="video-wrap" v-for="(video,index) in item.videoArr" :key="index" style="width: 100%;" controls
                    :src="video"></video>
+          </div>
+          <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]"
+               v-if="item.imgArr.length">
+            <div @click="imgCorrect(img,i,index)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
         </div>
@@ -77,6 +77,16 @@
       }
     },
     methods: {
+      imgCorrect(item,imgIndex,stuIndex) {
+        this.$router.push({name:'imgCorrect',params: {
+            list:this.list,
+            imgIndex,
+            stuIndex,
+            classId:this.classId,
+            taskId: this.$route.query.taskId,
+            termType: this.$route.query.termType
+          }})
+      },
       handlePraise(item) {
         this.$emit('praise',item)
       },
