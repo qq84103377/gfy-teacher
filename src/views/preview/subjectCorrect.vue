@@ -284,10 +284,7 @@
       }
     },
     created() {
-      // this.filterStuList = this.stuArr
-
       screen.orientation.lock('landscape')
-      // this.getCourseTaskDetail()
     },
     mounted() {
       this.figure()

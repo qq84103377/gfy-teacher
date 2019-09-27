@@ -102,6 +102,12 @@
         classId: this.$route.params.classId,
       }
     },
+    created() {
+      screen.orientation.lock('landscape')
+    },
+    beforeDestroy() {
+      screen.orientation.unlock()
+    },
     computed: {
       ...mapState({
         vanLoading: state => state.setting.vanLoading

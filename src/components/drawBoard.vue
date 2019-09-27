@@ -710,7 +710,7 @@
       //   event.preventDefault();
       // });
     },
-    destroyed() {
+    beforeDestroy() {
       window.removeEventListener('resize', this.handleResize)
     }
   }

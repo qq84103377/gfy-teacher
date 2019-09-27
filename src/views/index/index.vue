@@ -253,7 +253,7 @@
               //获取班级分组信息
 
             } else {
-              this.$toast.error(res.msg)
+              this.$toast(res.msg)
             }
           })
         },

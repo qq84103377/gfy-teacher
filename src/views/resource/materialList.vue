@@ -151,6 +151,8 @@
           url, //url网络下载路径
           targetPath, //url本地存储路径
           function(entry) {
+            _this.$toast.clear();
+            _this.$toast('下载完成');
             console.log("download complete: " + entry.toURL());
             entry.file(data => {
               console.log("showOpenWithDialog data", data);
@@ -172,6 +174,7 @@
             });
           },
           function(error) {
+            _this.$toast.clear();
             _this.$toast.fail("下载失败");
             console.log("download error source " + error.source);
             console.log("download error target " + error.target);
