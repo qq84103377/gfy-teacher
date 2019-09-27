@@ -3,7 +3,7 @@
     <div class="spoken-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}&spokenType=${item.spokenType}`)" class="mgt10" style="background: #fff;"
+          <list-item @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)" class="mgt10" style="background: #fff;"
                      v-for="(item,index) in list" :key="index"
                      @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.isSend==='S05'}"></i></div>

@@ -491,7 +491,18 @@
           this.oSSObject = tmpSignatureObj;
         });
       },
-
+      handleResize() {
+        this.offCanvas.width = window.document.body.offsetWidth
+        this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
+        // offCanvas.height = $(window).height() - footerHeight;
+        this.canvas.width = window.document.body.offsetWidth
+        this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
+        console.log(this.canvas.width);
+        console.log(this.canvas.height);
+        // canvas.height = $(window).height() - footerHeight;
+        this.clearScreen()
+        this.drawImg(this.imgUrl); // 画图
+      }
     },
     mounted() {
       let _this = this
@@ -518,18 +529,7 @@
 
 
 
-      window.addEventListener('resize', () => {
-        this.offCanvas.width = window.document.body.offsetWidth
-        this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
-        // offCanvas.height = $(window).height() - footerHeight;
-        this.canvas.width = window.document.body.offsetWidth
-        this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text']?this.$parent.$refs['text'].offsetHeight:0)
-        console.log(this.canvas.width);
-        console.log(this.canvas.height);
-        // canvas.height = $(window).height() - footerHeight;
-        this.clearScreen()
-        this.drawImg(this.imgUrl); // 画图
-      })
+      window.addEventListener('resize', this.handleResize)
 
       // 选择颜色
       // $('.lineColors span').click(function() {
@@ -709,6 +709,9 @@
       // $('.wrapper').on('touchmove', function (event) {
       //   event.preventDefault();
       // });
+    },
+    destroyed() {
+      window.removeEventListener('resize', this.handleResize)
     }
   }
 </script>

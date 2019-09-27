@@ -309,3 +309,7 @@ export const examResultScroe =(params)=>{
 export const updateExamQuality =(params)=>{
   return axios.post('teach/updateExamQuality', qs.stringify(params))
 }
+//口语详情
+export const getSpokenResourceSingle =(params)=>{
+  return axios.post('resource/getSpokenResourceSingle', qs.stringify(params))
+}
