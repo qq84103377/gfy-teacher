@@ -376,7 +376,9 @@
         flex: 1;
         // margin-top: 30px;
         margin-top: 4.5vh;
-
+        @{deep} .van-cell:not(:last-child)::after {
+          left: 0;
+        }
         .vailcode {
           display: flex;
         }
