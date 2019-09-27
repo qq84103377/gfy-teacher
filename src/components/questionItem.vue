@@ -62,7 +62,7 @@
 
     <van-popup v-model="tooltip" :get-container="'#question-item'+index" class="tooltip-pop">
       <div class="tooltip-pop-wrap">
-        <div class="tooltip-pop-wrap__item" @click="tooltip=false;$emit('correct')">纠错</div>
+        <div v-if="!isSend" class="tooltip-pop-wrap__item" @click="tooltip=false;$emit('correct')">纠错</div>
         <div v-if="up" @click="tooltip=false;$emit('move',0)" class="tooltip-pop-wrap__item">上移</div>
         <div v-if="down" @click="tooltip=false;$emit('move',1)" class="tooltip-pop-wrap__item">下移</div>
       </div>
