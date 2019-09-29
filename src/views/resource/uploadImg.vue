@@ -25,7 +25,7 @@
                                                                          v-model="item.name" v-focus="item.edit"
                                                                          type="text"><span class="red">{{20 - item.name.length}}</span>
               </div>
-              <van-icon @click="imgList.splice(index, 1)" class="clear" name="clear"/>
+              <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" class="clear" name="clear"/>
             </div>
           </draggable>
         </div>

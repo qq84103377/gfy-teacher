@@ -143,8 +143,8 @@
               <div class="statistic-wrap__view-subject-item" @click="viewSubjectList">
                 <div class="pd5">
                   <div>第1题</div>
-                  <div>平均分: {{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t,v) => t+= v.avg_score,0)}}</div>
-                  <div>总分:{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t,v) => t+= v.total_score,0)}}</div>
+                  <div>平均分: {{singleQuestionScore('avg_score')}}</div>
+                  <div>总分:{{singleQuestionScore('total_score')}}</div>
                 </div>
                 <div class="status">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v => v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
                   '已批改':'批改'}}
@@ -255,6 +255,12 @@
       })
     },
     methods: {
+      singleQuestionScore(key) {
+       return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t,v) => {
+         t+= Number(v[key].toFixed(1))
+         return Number(t.toFixed(1))
+       },0)
+      },
       isCorrect(item) {
         if (item.groupId === -1) {
          let exam = this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)
@@ -268,11 +274,11 @@
       },
       calcScore(item, key) {
         if (item.groupId === -1) {
-          return this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)[key]
+          return this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)[key].toFixed(1)
         } else {
           return item.groupExamList.reduce((t, v) => {
-            t += this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)[key]
-            return t
+            t += Number(this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)[key].toFixed(1))
+            return Number(t.toFixed(1))
           }, 0)
         }
       },

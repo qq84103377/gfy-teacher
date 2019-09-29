@@ -37,7 +37,7 @@
           <div class="img-group">
             <div class="img-wrap" v-for="(item,index) in imgList" :key="index">
               <img :src="item.url" alt="">
-              <van-icon @click="imgList.splice(index, 1)" name="clear"/>
+              <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" name="clear"/>
             </div>
           </div>
         </div>
