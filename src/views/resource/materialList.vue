@@ -132,8 +132,8 @@
         fileTransfer.onprogress = function(progressEvent) {
           if (progressEvent.lengthComputable) {
             let downloadProgress =
-              (progressEvent.loaded / progressEvent.total) * 100;
-            console.log("downloadProgress", downloadProgress + "%");
+              (progressEvent.loaded / progressEvent.total).toFixed(2) * 100;
+            console.log("progressEvent", progressEvent);
             _this.$toast.loading({
               mask: true,
               duration: 0, // 持续展示 toast
@@ -141,7 +141,6 @@
               message: "文件下载中..." + downloadProgress + "%"
             });
           } else {
-            console.log("done");
             _this.$toast.clear();
             _this.$toast('下载完成');
           }
@@ -151,10 +150,10 @@
           url, //url网络下载路径
           targetPath, //url本地存储路径
           function(entry) {
-            _this.$toast.clear();
-            _this.$toast('下载完成');
             console.log("download complete: " + entry.toURL());
             entry.file(data => {
+              _this.$toast.clear();
+              _this.$toast('下载完成');
               console.log("showOpenWithDialog data", data);
               // showOpenWithDialog使用手机上安装的程序打开下载的文件
               cordova.plugins.fileOpener2.showOpenWithDialog(

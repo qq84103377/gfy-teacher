@@ -99,7 +99,7 @@
 <script>
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
-  import {addCourseWare, createCourseSummitInfo} from '@/api/index'
+  import {addCourseWare, createCourseSummitInfo, addImportTask, addTeachCourseRes} from '@/api/index'
 
   export default {
     name: "uploadLesson",
@@ -139,7 +139,8 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "accountType": "A02",
           "belongSchoolId": this.$store.getters.schoolId,
-          "dataUrl": this.wareUrl,
+          // "dataUrl": this.wareUrl,
+          "dataUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
           "dataType": "D03",
           "resourceType": "R01",
           "resourceClass": "C01",
@@ -152,16 +153,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        createCourseSummitInfo(params).then(res => {
-          this.form.btnLoading = false
-          if(res.flag) {
-            this.$toast('添加成功')
-            this.$store.commit('setIsAddWare',true)
-            this.$router.back()
-          }else {
-            this.$toast(res.msg)
-          }
-        })
+       return createCourseSummitInfo(params)
       },
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
@@ -226,8 +218,8 @@
             "coursewareType": "T01",
             "srcUrl": this.wareUrl,
             "dstUrl": this.wareUrl,
-            // "srcUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201908/12134_1566801330_2yAS8.mp4',
-            // "dstUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201908/12134_1566801330_2yAS8.mp4',
+            // "srcUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
+            // "dstUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
             "belongSchoolId": this.$store.getters.schoolId,
             "belongAreaCode": this.$store.getters.getUserInfo.areaCode,
             "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
@@ -237,7 +229,7 @@
             "shareType": this.form.share,
             "isDownload": "I01",
             "size": this.wareSize,
-            // "size": 929324,
+            // "size": 1036474,
             "imageUrl": this.imgList.length ? this.imgList[0].url : '',
             remark: this.form.desc
           }]
@@ -245,24 +237,89 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        addCourseWare(params).then(res => {
+        addCourseWare(params).then(async res => {
           this.form.btnLoading = false
           if (res.flag) {
+            this.addImportTask(res.coursewareIdList[0])
             if(this.form.relate === '3') {
               // 关联课中
-              this.createCourseSummitInfo(res.coursewareIdList[0])
+              this.form.btnLoading = true
+              Promise.all([this.addTeachCourseRes(res.coursewareIdList[0]), this.createCourseSummitInfo(res.coursewareIdList[0])]).then(respone => {
+                this.form.btnLoading = false
+                if(respone.every(v => v.flag)) {
+                  this.$toast('添加成功')
+                  this.$store.commit('setIsAddWare', true)
+                  this.$router.back()
+                }else {
+                  this.$toast(respone.find(v => !v.flag).msg)
+                }
+              }).catch(err => {
+                throw Error(err)
+              })
             }else {
               //仅资源
-              this.$toast('添加成功')
-              this.$store.commit('setIsAddWare',true)
-              this.$router.back()
+              this.form.btnLoading = true
+              let data = await this.addTeachCourseRes(res.coursewareIdList[0])
+              this.form.btnLoading = false
+              if(data.flag) {
+                this.$toast('添加成功')
+                this.$store.commit('setIsAddWare',true)
+                this.$router.back()
+              }else {
+                this.$toast(data.msg)
+              }
             }
-
-
           } else {
             this.$toast(res.msg)
           }
         })
+      },
+      addTeachCourseRes(resourceId) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType":"A02",
+          "tchCourseId": this.$route.query.tchCourseId,
+          sysCourseId: this.$route.query.sysCourseId,
+          relationSeqId: this.$route.query.relationCourseId,
+          "resourceType":"R01",
+          resourceId,
+          "statusCd":"S04"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+       return  addTeachCourseRes(params)
+      },
+      addImportTask(resourceId) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "belongAreaCode": this.$store.getters.getUserInfo.areaCode,
+          taskType: 'T04',
+          fileName: this.wareUrl.split(this.wareOSSObject.key)[1],
+          // fileName: '12134_1569724019_sdyBZ.mp4',
+          "belongType":"B02",
+          "belongId":"0",
+          fileKey: this.wareUrl.split(this.wareOSSObject.host)[1],
+          // fileKey: '/video/201909/12134_1569724019_sdyBZ.mp4',
+          "sourceUrl":this.wareUrl,
+          "dstUrl":this.wareUrl,
+          // "sourceUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
+          // "dstUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
+          "shareType":this.form.share,
+          resourceId,
+          "resourceType":"R01"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+       return addImportTask(params)
       },
       getOSSKey(type) {
         let json = {

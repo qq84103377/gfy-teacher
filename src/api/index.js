@@ -313,3 +313,7 @@ export const updateExamQuality =(params)=>{
 export const getSpokenResourceSingle =(params)=>{
   return axios.post('resource/getSpokenResourceSingle', qs.stringify(params))
 }
+//视频转换
+export const addImportTask =(params)=>{
+  return axios.post('public/addImportTask', qs.stringify(params))
+}
