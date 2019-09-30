@@ -138,6 +138,7 @@
       submitCb() {
         this.isPen = false
         this.isRubber = false
+        this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '&' + Math.random()
       },
       save() {
         this.$refs['drawBoard'].save()

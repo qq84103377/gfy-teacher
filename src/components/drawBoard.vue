@@ -336,9 +336,9 @@
       uploadIMG(curFile) {
         this.$store.commit('setVanLoading', true)
         console.log("开始上传")
-        console.log(this.oSSObject)
+        console.log(this.imgUrl.substring(0, this.imgUrl.indexOf('?')).split(this.oSSObject.host + '/')[1],'oSSObjectoSSObjectoSSObjectoSSObjectoSSObject')
         let formData = new FormData();
-        formData.append("key", this.imgUrl.substring(0, this.imgUrl.indexOf('?')));
+        formData.append("key", this.imgUrl.substring(0, this.imgUrl.indexOf('?')).split(this.oSSObject.host + '/')[1]);
         console.log(123);
         formData.append('policy', this.oSSObject.policyBase64)
         formData.append('OSSAccessKeyId', this.oSSObject.accessid)
