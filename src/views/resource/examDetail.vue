@@ -12,7 +12,7 @@
       </div>
       <div v-for="(section,si) in list" :key="si">
         <div class="exam-detail__body__question-num">
-          <div style="font-weight: bold;">{{si + 1}}.{{section.testPaperSectionInfo.sectionName}}<span>(共{{section.testPaperSectionInfo.sectionScore}}分)</span>
+          <div style="font-weight: bold;">{{numToWord(si + 1)}}.{{section.testPaperSectionInfo.sectionName}}<span>(共{{section.testPaperSectionInfo.sectionScore}}分)</span>
           </div>
           <div class="aic">
             <div v-if="!isSend&&si>0" class="set-point" @click="updateTestPaperSectonIndex(0,si)">上移</div>
@@ -52,11 +52,15 @@
     updateTestPaperExamScore,
     delTestPaperExamInfo
   } from '@/api/index'
+  import {numToWord} from '@/utils/filter'
 
   export default {
     name: "examDetail",
     components: {questionItem, examBar, correctPop, setPointDialog},
     computed: {
+      numToWord() {
+        return numToWord
+      },
       isSend() {
         return this.$route.query.type == 1   // 0 未发 1 已发
       },
