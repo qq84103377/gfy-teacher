@@ -12,7 +12,7 @@
           <div class="btn-item" :class="{active:child.analyseShow}"
                @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
           </div>
-          <div class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
+          <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
         </div>
         <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10"
              style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="question-item-wrap__btn-group van-hairline--top" :id="'question-item'+index">
-      <van-icon @click="tooltip=true" name="ellipsis" class="fs18"></van-icon>
+      <van-icon v-if="!isSend" @click="tooltip=true" name="ellipsis" class="fs18"></van-icon>
       <div class="aic" style="flex: 1;justify-content: flex-end">
         <div v-if="isSend" class="btn-item" @click="$emit('correct')">纠错</div>
         <div class="btn-item" :class="{active:analyseShow}"
