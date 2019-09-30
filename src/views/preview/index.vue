@@ -94,7 +94,7 @@
         dropdownFinish: false,
         total: 0,
         currentTchCourseInfo: {},
-        classGrade: '',
+        // classGrade: '',
         sysCourseId: '',
       }
     },
@@ -104,7 +104,7 @@
     methods: {
       goto(item) {
         if(item.taskType === 'T03') {
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&title=${item.testPaperName}`)
         }else if(['T04'].includes(item.taskType)) {
           // 学资源
           this.getCourseTaskDetail(item)
@@ -162,7 +162,7 @@
         this.currentTchCourseInfo = tchCourseInfo
         this.$store.commit('setVanLoading', true)
         this.currentPage = 1
-        this.classGrade = tchCourseInfo.classGrade
+        // this.classGrade = tchCourseInfo.classGrade
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
         this.termType = tchCourseInfo.termType
@@ -192,7 +192,7 @@
           //首次加载
           await this.getClassTeachCourseInfo()
           this.courseName = this.courseList[0].tchCourseInfo.courseName
-          this.classGrade = this.courseList[0].tchCourseInfo.classGrade
+          // this.classGrade = this.courseList[0].tchCourseInfo.classGrade
           this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
           this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
           this.termType = this.courseList[0].tchCourseInfo.termType
