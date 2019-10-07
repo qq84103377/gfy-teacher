@@ -25,7 +25,7 @@
                                                                          v-model="item.name" v-focus="item.edit"
                                                                          type="text"><span class="red">{{20 - item.name.length}}</span>
               </div>
-              <van-icon @click="" class="clear" name="clear"/>
+              <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" class="clear" name="clear"/>
             </div>
           </draggable>
         </div>
@@ -122,8 +122,8 @@
     },
     methods: {
       showSheet() {
-        if (this.imgList.length) {
-          this.$toast('只能上传一张图片!')
+        if (this.imgList.length >= 9) {
+          this.$toast('最多上传9张图片!')
           return
         }
         this.showActionSheet = !this.showActionSheet
@@ -251,6 +251,7 @@
           courseWareList.push({
             knowledgePointId: this.$route.query.sysCourseId,
             coursewareName: v.name,
+            // coursewareName: 'BB鸡',
             "coursewareClassify": "C03",
             "coursewareType": "T02",
             "srcUrl": v.src,
@@ -280,30 +281,36 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        addCourseWare(params).then(res => {
+        addCourseWare(params).then(async res => {
           this.form.btnLoading = false
           if (res.flag) {
             if (this.form.relate === '3') {
               // 关联课中
-              // this.addTeachCourseResList(res.coursewareIdList)
-              // this.createCourseSummitInfoList(res.coursewareIdList)
               this.form.btnLoading = true
-
               Promise.all([this.addTeachCourseResList(res.coursewareIdList), this.createCourseSummitInfoList(res.coursewareInfoList)]).then(respone => {
+                this.form.btnLoading = false
                 if(respone.every(v => v.flag)) {
                   this.$toast('添加成功')
                   this.$store.commit('setIsAddWare', true)
-                  this.form.btnLoading = false
                   this.$router.back()
+                }else {
+                  this.$toast(respone.find(v => !v.flag).msg)
                 }
               }).catch(err => {
                 throw Error(err)
               })
             } else {
               //仅资源
-              this.$toast('添加成功')
-              this.$store.commit('setIsAddWare', true)
-              this.$router.back()
+              this.form.btnLoading = true
+              let respone = await this.addTeachCourseResList(res.coursewareIdList)
+              this.form.btnLoading = false
+              if(respone.flag) {
+                this.$toast('添加成功')
+                this.$store.commit('setIsAddWare', true)
+                this.$router.back()
+              }else {
+                this.$toast(respone.msg)
+              }
             }
           } else {
             this.$toast(res.msg)

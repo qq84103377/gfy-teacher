@@ -3,7 +3,7 @@
     <div class="exam-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${$route.query.subjectType}&classGrade=${$route.query.classGrade}&title=${item.testPaperName}`)" class="mgt10"
+          <list-item @clickTo="$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${$route.query.subjectType}&title=${item.testPaperName}`)" class="mgt10"
                      style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list"
                      :key="index"
                      :itemTitle="item.testPaperName"
@@ -428,8 +428,8 @@
           return
         }
         console.log("发任务：", obj.testPaperName)
-        this.$store.commit('setSendTaskClassStudent', {})
         this.$store.commit('setResourceInfo', obj)
+        this.$store.commit("setTaskClassInfo", '')
         this.$router.push(`/addTask?type=exam&_t=new`)
       },
     }

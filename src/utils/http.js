@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import QS from 'qs';
-
+import store from '../store/store'
 import {
   Toast
 } from 'vant'
@@ -67,7 +67,7 @@ axios.interceptors.response.use(function (response) {
   } else {
     error.message = '网络错误，请求超时!';
   }
-
+  store.commit('setVanLoading',false)
   Toast(error.message)
   return Promise.reject(error)
 })

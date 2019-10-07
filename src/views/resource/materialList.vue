@@ -2,7 +2,10 @@
     <section class="material-list-wrap">
       <div class="material-list-wrap__body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-          <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+          <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+            <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
+          </div>
+          <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有素材～快去上传吧'" @load="onLoad" :offset='80'>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index"
                        :itemTitle="item.coursewareName"
                        :can-slide="true">
@@ -25,7 +28,7 @@
                   <van-icon :name="item.statusCd=='S02'?'closed-eye':'eye'" class="eye"></van-icon>
                   <span>{{item.statusCd=='S02'?'不':''}}可见</span>
                 </div>
-                <div @click="">
+                <div @click="download(item)">
                   <i class="iconGFY icon-download-orange"></i>
                   <span>下载</span>
                 </div>
@@ -49,7 +52,7 @@
 
 <script>
   import listItem from '../../components/list-item'
-  import {teachApi} from '@/api/parent-GFY'
+  import {teachApi, pubApi} from '@/api/parent-GFY'
   import {modifyTeachCourseRes} from '@/api/index'
   import store from '../../store/store'
   export default {
@@ -63,6 +66,7 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        accessUrl: ''
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -82,6 +86,101 @@
       }
     },
     methods: {
+      async download(item) {
+        let url = item.srcUrl;
+        if (url.indexOf("pubquanlang") > -1) {
+          this.accessUrl = url;
+        } else {
+          let json = {
+            requestJson: JSON.stringify({
+              interUser: "runLfb",
+              interPwd: "25d55ad283aa400af464c76d713c07ad",
+              "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+              "belongSchoolId": this.$store.getters.schoolId,
+              url: url,
+              sysTypeCd: "S03"
+            })
+          };
+          await pubApi.checkUrlPermission(json).then(data => {
+            console.log(data, "checkUrlPermission");
+            if (data.flag) {
+              this.accessUrl = data.data[0].accessUrl;
+            }
+          });
+        }
+          this.downLoadToOpen(item);
+      },
+      downLoadToOpen(item) {
+
+        var _this = this;
+        // 文件后缀
+        var type = item.srcUrl
+          .substring(item.srcUrl.lastIndexOf(".") + 1)
+          .toLowerCase();
+        var fileName = item.coursewareName + "." + type;
+        var url = _this.accessUrl; //课件路径
+        var targetPath = cordova.file.externalCacheDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
+        var trustHosts = true;
+
+        console.log("url:" + url);
+        console.log("targetPah:" + targetPath);
+        console.log("trustHost:" + trustHosts);
+
+        // 初始化FileTransfer对象
+        var fileTransfer = new FileTransfer();
+        // 下载进度
+        fileTransfer.onprogress = function(progressEvent) {
+          if (progressEvent.lengthComputable) {
+            let downloadProgress =
+              (progressEvent.loaded / progressEvent.total).toFixed(2) * 100;
+            console.log("progressEvent", progressEvent);
+            _this.$toast.loading({
+              mask: true,
+              duration: 0, // 持续展示 toast
+              forbidClick: true, // 禁用背景点击
+              message: "文件下载中..." + downloadProgress + "%"
+            });
+          } else {
+            _this.$toast.clear();
+            _this.$toast('下载完成');
+          }
+        };
+        // 调用download方法
+        fileTransfer.download(
+          url, //url网络下载路径
+          targetPath, //url本地存储路径
+          function(entry) {
+            console.log("download complete: " + entry.toURL());
+            entry.file(data => {
+              _this.$toast.clear();
+              _this.$toast('下载完成');
+              console.log("showOpenWithDialog data", data);
+              // showOpenWithDialog使用手机上安装的程序打开下载的文件
+              cordova.plugins.fileOpener2.showOpenWithDialog(
+                targetPath,
+                data.type,
+                function onSuccess(data) {
+                  console.log("成功预览:" + targetPath);
+                },
+                function onError(error) {
+                  console.log(
+                    "出错！请在" +
+                    cordova.file.externalDataDirectory +
+                    "目录下查看"
+                  );
+                }
+              );
+            });
+          },
+          function(error) {
+            _this.$toast.clear();
+            _this.$toast.fail("下载失败");
+            console.log("download error source " + error.source);
+            console.log("download error target " + error.target);
+            console.log("upload error code" + error.code);
+          }
+        );
+      },
       handleIcon (item) {
         var t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {
@@ -188,7 +287,8 @@
       sendTask(obj){
         console.log("发任务：", obj.coursewareName)
         this.$store.commit('setResourceInfo', obj)
-        this.$router.push(`/addTask?type=material_t=new`)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/addTask?type=material&_t=new`)
       },
     }
   }
@@ -253,5 +353,11 @@
         }
       }
     }
+  }
+  .null-tips{
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

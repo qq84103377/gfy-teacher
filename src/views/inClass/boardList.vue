@@ -8,45 +8,30 @@
       <van-pull-refresh v-show="!tabIndex" v-model="teacher.refLoading" @refresh="onRefresh">
         <van-list v-model="teacher.listLoading" :finished="teacher.finished" finished-text="没有更多了" @load="onLoad"
                   :offset='80'>
-          <list-item @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;"
-                     @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in teacher.list" :key="index"
-                     :itemTitle="item.ClassTeachingData.name"
-                     :can-slide="true">
-            <div slot="cover" class="cover"><img :src="item.ClassTeachingData.dataUrl" alt=""></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.ClassTeachingData.shareType === 'S01','icon-school':item.ClassTeachingData.shareType === 'S02','icon-share':item.ClassTeachingData.shareType === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.ClassTeachingData.qualityType === 'Q01','icon-boutique':item.ClassTeachingData.qualityType === 'Q02'}"></i>
-              </div>
-              <div class="desc-bottom">
-                <div v-if="item.ClassTeachingData.belongAccountName"><i class="iconGFY icon-feather"></i>{{item.ClassTeachingData.belongAccountName}}
-                </div>
-              </div>
+          <van-swipe-cell v-for="(item,index) in teacher.list" :key="index" class="mgt10" style="background: #fff;">
+            <div class="board-list__body__item">
+              <img :src="item.ClassTeachingData.dataUrl" alt="">
+              <div class="board-list__body__item-name">{{item.ClassTeachingData.name}}</div>
+              <div class="board-list__body__item-time">{{item.ClassTeachingData.createDate}}</div>
             </div>
-          </list-item>
+            <template slot="right">
+              <van-button @click="handleDelete(item.ClassTeachingData,index)" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
+            </template>
+          </van-swipe-cell>
         </van-list>
       </van-pull-refresh>
       <van-pull-refresh v-show="tabIndex" v-model="stu.refLoading" @refresh="onRefresh">
         <van-list v-model="stu.listLoading" :finished="stu.finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
-          <list-item @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;"
-                     @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in stu.list" :key="index"
-                     :itemTitle="item.ClassTeachingData.name"
-                     :can-slide="true">
-            <div slot="cover" class="cover"><img :src="item.ClassTeachingData.dataUrl" alt=""></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY icon-personal"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.ClassTeachingData.qualityType === 'Q01','icon-boutique':item.ClassTeachingData.qualityType === 'Q02'}"></i>
-              </div>
-              <div class="desc-bottom">
-                <div v-if="item.ClassTeachingData.belongAccountName"><i class="iconGFY icon-feather"></i>{{item.ClassTeachingData.belongAccountName}}
-                </div>
-              </div>
+          <van-swipe-cell v-for="(item,index) in stu.list" :key="index" class="mgt10" style="background: #fff;">
+            <div class="board-list__body__item">
+              <img :src="item.ClassTeachingData.dataUrl" alt="">
+              <div class="board-list__body__item-name">{{item.ClassTeachingData.name}}</div>
+              <div class="board-list__body__item-time">{{item.ClassTeachingData.createDate}}</div>
             </div>
-          </list-item>
+            <template slot="right">
+              <van-button @click="handleDelete(item.ClassTeachingData,index)" style="background: #ccc;height: 100%;border: none;color: #fff" square text="删除" />
+            </template>
+          </van-swipe-cell>
         </van-list>
       </van-pull-refresh>
 
@@ -55,13 +40,11 @@
 </template>
 
 <script>
-  import listItem from '../../components/list-item'
   import {deleteCourseSummitInfo} from '@/api/index'
   import {teachApi} from '@/api/parent-GFY'
 
   export default {
     name: "boardList",
-    components: {listItem},
     data() {
       return {
         tabIndex: 0,
@@ -90,8 +73,8 @@
       changeTab(index) {
         this.tabIndex = index
         if(this.tabIndex) {
+          this.teacher.scrollTop = this.$refs['body'].scrollTop
           if(this.firstFlag) {
-            this.teacher.scrollTop = this.$refs['body'].scrollTop
             this.$nextTick(() => {
               this.$refs['body'].scrollTo(0,this.stu.scrollTop)
             })
@@ -104,7 +87,6 @@
           this.$nextTick(() => {
             this.$refs['body'].scrollTo(0,this.teacher.scrollTop)
           })
-
         }
       },
       goto(item) {
@@ -201,30 +183,36 @@
         })
       },
       handleDelete(item, index) {
-        let obj = {
-          "interUser": "runLfb",
-          "interPwd": "25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          "seqId": item.seqId,
-          "tchCourseId": item.tchCourseId,
-          "classId": item.classId
-        }
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        deleteCourseSummitInfo(params).then(res => {
-          if (res.flag) {
-            if (this.tabIndex) {
-              this.stu.list.splice(index, 1)
-            } else {
-              this.teacher.list.splice(index, 1)
-            }
-            this.$toast('删除成功')
+        this.$dialog.confirm({
+          title: '',
+          message: '确定删除吗?'
+        }).then(() => {
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "seqId": item.seqId,
+            "tchCourseId": item.tchCourseId,
+            "classId": item.classId
           }
-        })
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          deleteCourseSummitInfo(params).then(res => {
+            if (res.flag) {
+              if (this.tabIndex) {
+                this.stu.list.splice(index, 1)
+              } else {
+                this.teacher.list.splice(index, 1)
+              }
+              this.$toast('删除成功')
+            }
+          })
+        }).catch(() => {
+          // on cancel
+        });
       },
-
     }
   }
 </script>
@@ -258,42 +246,21 @@
       flex: 1;
       overflow-y: auto;
 
-      .cover {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        border-radius: 5px;
-        img{
+      &__item {
+        padding: 10px;
+        img {
           width: 100%;
-          height: 100%;
+          height: 204px;
         }
-      }
-
-      .desc-top {
-        display: flex;
-        margin-bottom: 6px;
-
-
-        .iconGFY {
-          margin-right: 5px;
+        &-name {
+          margin-top: 9px;
+          margin-bottom: 8px;
+          font-size: 14px;
+          color: #333;
         }
-      }
-
-      .desc-bottom {
-        display: flex;
-        font-size: 12px;
-        color: #666;
-
-        .iconGFY {
-          margin-right: 3px;
-        }
-
-        > div {
-          margin-right: 18px;
-          display: flex;
-          align-items: center;
+        &-time {
+          color: #999;
+          font-size: 12px;
         }
       }
     }

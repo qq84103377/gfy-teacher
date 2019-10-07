@@ -293,3 +293,27 @@ export const setCourseTaskOrder =(params)=>{
 export const topCourseTask = (params) => {
   return axios.post('teach/topCourseTask', qs.stringify(params))
 }
+//任务分享详情
+export const getCourseTaskDetailByShare = (params) => {
+  return axios.post('teach/getCourseTaskDetailByShare', qs.stringify(params))
+};
+//主观题批改点评
+export const addAppraise =(params)=>{
+  return axios.post('public/addAppraise', qs.stringify(params))
+}
+//主观题批改打分
+export const examResultScroe =(params)=>{
+  return axios.post('teach/examResultScroe', qs.stringify(params))
+}
+//主观题点赞/取消点赞
+export const updateExamQuality =(params)=>{
+  return axios.post('teach/updateExamQuality', qs.stringify(params))
+}
+//口语详情
+export const getSpokenResourceSingle =(params)=>{
+  return axios.post('resource/getSpokenResourceSingle', qs.stringify(params))
+}
+//视频转换
+export const addImportTask =(params)=>{
+  return axios.post('public/addImportTask', qs.stringify(params))
+}

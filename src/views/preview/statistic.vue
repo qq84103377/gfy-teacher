@@ -61,10 +61,10 @@
                v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">学生讨论详情
           </div>
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
-               v-if="isTestPaper || $route.query.taskType === 'T13'">按题目查看
+               v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
           <div @click="viewStu"
-               v-if="isTestPaper|| $route.query.taskType === 'T13'">按学生查看
+               v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
           </div>
         </div>
 
@@ -135,8 +135,26 @@
               </div>
             </div>
           </div>
-          <div v-if="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')">
-            <div class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
+
+<!--          单道试题-->
+          <div v-if="$route.query.resourceType === 'R03' && taskFinishInfo.examstat.some(v => v.auto_scoring === '0')">
+            <div class="fs12 black statistic-wrap__view-label">主观题</div>
+            <div class="statistic-wrap__view-subject">
+              <div class="statistic-wrap__view-subject-item" @click="viewSubjectList">
+                <div class="pd5">
+                  <div>第1题</div>
+                  <div>平均分: {{singleQuestionScore('avg_score')}}</div>
+                  <div>总分:{{singleQuestionScore('total_score')}}</div>
+                </div>
+                <div class="status">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v => v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
+                  '已批改':'批改'}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div >
+            <div v-show="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')" class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
             <div id="myChart3" ref="myChart3" class="subject-pie"></div>
           </div>
         </div>
@@ -237,6 +255,12 @@
       })
     },
     methods: {
+      singleQuestionScore(key) {
+       return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t,v) => {
+         t+= Number(v[key].toFixed(1))
+         return Number(t.toFixed(1))
+       },0)
+      },
       isCorrect(item) {
         if (item.groupId === -1) {
          let exam = this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)
@@ -250,11 +274,11 @@
       },
       calcScore(item, key) {
         if (item.groupId === -1) {
-          return this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)[key]
+          return this.taskFinishInfo.examstat.find(v => v.exam_id == item.examId)[key].toFixed(1)
         } else {
           return item.groupExamList.reduce((t, v) => {
-            t += this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)[key]
-            return t
+            t += Number(this.taskFinishInfo.examstat.find(e => e.exam_id == v.examGroupId)[key].toFixed(1))
+            return Number(t.toFixed(1))
           }, 0)
         }
       },
@@ -315,6 +339,7 @@
         })
       },
       handleComment(replyContent, item) {
+        if(!replyContent) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -493,7 +518,7 @@
                 const audioArr = dom.querySelectorAll('audio')
                 const videoArr = dom.querySelectorAll('video')
                 for (let i = 0; i < imgArr.length; i++) {
-                  v.imgArr.push(imgArr[i].src)
+                  v.imgArr.push(imgArr[i].src + '&' + Math.random())
                   let parent = imgArr[i].parentElement
                   parent.removeChild(imgArr[i])
                 }
@@ -632,21 +657,26 @@
       },
       viewSubjectList(item) {
         let questionList = []
-        this.taskFinishInfo.paperDataList.forEach((v,i) => {
-          if(v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length)) {
-            questionList.push({...v,num:i+1})
-          }
-        })
+        if(this.$route.query.resourceType === 'R03') {
+          questionList.push({examId:this.taskFinishInfo.resourceId,num: 1})
+        }else {
+          this.taskFinishInfo.paperDataList.forEach((v,i) => {
+            if(v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length)) {
+              questionList.push({...v,num:i+1})
+            }
+          })
+        }
         const classId = this.info.tchClassTastInfo.find(t => t.active).classId
         this.$router.push({
           path: '/subjectList', query: {
             taskId: this.info.taskId,
-            examId: item.examId,
-            groupId: item.groupId,
+            examId: this.$route.query.resourceType === 'R03'?this.taskFinishInfo.resourceId:item.examId,
+            // groupId: item.groupId,
             tchCourseId: this.$route.query.tchCourseId,
             classId,
             questionList,
-            info: this.taskFinishInfo
+            info: this.taskFinishInfo,
+            termType:this.$route.query.termType
           }
         })
       },
@@ -683,7 +713,7 @@
           this.$set(v, 'active', false)
         })
         item.active = true
-
+        this.getDailyRemindStatus()
         await this.statTaskStat(item.classId)
         this.drawPie()
         if (this.isTestPaper) {
@@ -839,21 +869,32 @@
       drawObjectivePie() {
         //有客观题才渲染
         if (this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
-          var myChart = echarts.init(document.getElementById('myChart3'));
+          let myChart = echarts.init(this.$refs.myChart3);
           let objectiveList = []
-          this.taskFinishInfo.paperDataList.forEach((v,i) => {
-            if(v.autoScoring === '1') {
-              objectiveList.push({...v,num:i+1,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present})
-            }
-            let group = []
-            v.groupExamList.forEach((g,gi) => {
-              if(g.autoScoring === '1') {
-                group.push({...g,num:`${i+1}(${gi+1})`,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present})
+          if(this.$route.query.resourceType === 'R03') {
+            // 单试题
+            this.taskFinishInfo.examstat.forEach((v,i) => {
+              if(v.auto_scoring === '1') {
+                objectiveList.push({...v,num:`1${this.taskFinishInfo.examstat.length > 1?`(${i+1})`:``}`})
               }
             })
-            objectiveList = objectiveList.concat(group)
-          })
-          myChart.getDom().style.height = Math.ceil(objectiveList.length / 6) * 60 + 'px'
+          }else {
+            //试卷
+            this.taskFinishInfo.paperDataList.forEach((v,i) => {
+              if(v.autoScoring === '1') {
+                objectiveList.push({...v,num:i+1,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present})
+              }
+              let group = []
+              v.groupExamList.forEach((g,gi) => {
+                if(g.autoScoring === '1') {
+                  group.push({...g,num:`${i+1}(${gi+1})`,exam_present:this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present})
+                }
+              })
+              objectiveList = objectiveList.concat(group)
+            })
+          }
+          const count = Math.floor(window.screen.width / 65) //一行显示的个数
+          myChart.getDom().style.height = Math.ceil(objectiveList.length / count) * 60 + 'px'
           myChart.resize()
           // 指定图表的配置项和数据
           let arr = []
@@ -863,7 +904,7 @@
               name: `第${objectiveList[i].num}题`,
               type: 'pie',
               radius: [22, 26],
-              center: [28 + i % 6 * 60, 28 + (((i + 1) / 6 > 1) ? Math.floor(i / 6) * 60 : 0)],
+              center: [28 + i % count * 60, 28 + (((i + 1) / count > 1) ? Math.floor(i / count) * 60 : 0)],
               label: {
                 show: false,
                 position: 'center',
@@ -902,10 +943,11 @@
             this.$router.push({
               path: '/subjectAnalyse', query: {
                 taskId: this.info.taskId,
-                examId: item.examId||item.examGroupId,
-                groupId: item.groupId,
+                examId: this.$route.query.resourceType === 'R03'? item.exam_id :(item.examId||item.examGroupId),
+                groupId: this.$route.query.resourceType === 'R03'?item.group_id:item.groupId,
                 classId,
-                questionList:objectiveList
+                questionList:objectiveList,
+                resourceType: this.$route.query.resourceType
               }
             })
           })
@@ -940,6 +982,17 @@
       this.$store.commit('setVanLoading', false)
       // if (!this.isWk && !this.isSpoken) {
       // }
+    },
+    beforeRouteEnter(to, from, next) {
+      if(from.path === '/imgCorrect') {
+        // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
+        next(async vm => {
+         await vm.statTaskStat()
+          vm.getAppraise()
+        })
+      }else {
+        next()
+      }
     },
     async created() {
 

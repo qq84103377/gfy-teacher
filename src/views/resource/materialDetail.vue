@@ -31,7 +31,7 @@
               {{info.createDate}}
             </div>
             <div><i class="iconGFY icon-points"></i>{{info.useCount}}</div>
-            <div><i class="iconGFY icon-download"></i>{{info.downLoadCount}}</div>
+            <div><i class="iconGFY icon-download"></i>{{info.downLoadCount || info.downCount || 0}}</div>
           </div>
         </div>
       </list-item>

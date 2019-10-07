@@ -11,7 +11,7 @@
     </div>
     <div class="exam-view-wrap__body">
       <score-table @jump="jump" :list="classList" :classView="true" v-show="classView"></score-table>
-      <score-table :list="groupList" :classView="false" v-show="!classView"></score-table>
+      <score-table @jump="jump" :list="groupList" :classView="false" v-show="!classView"></score-table>
     </div>
   </section>
 </template>
@@ -70,8 +70,6 @@
     components: {scoreTable},
     methods: {
       jump(item) {
-        // this.$router.push(this.isSpoken?`/spokenAnalyse?type=personal`:`/stuAnalyse?accountNo=${item.accountNo}`)
-        debugger
         if(this.isSpoken) {
          let info = this.info.finishResultBySplit.reduce((t,v) => {
             let answer = v.splitInfoStudentAnswers.find(value => value.accountNo === item.accountNo)

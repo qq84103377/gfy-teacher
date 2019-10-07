@@ -40,7 +40,7 @@
       }
     },
     methods: {
-      getDetail() {
+     async getDetail() {
         let obj = {
           "spokenId": this.$route.query.spokenId,
           "belongSchoolId": this.$store.getters.schoolId,
@@ -49,7 +49,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getSpokenResourceSingle(params).then(res => {
+       await getSpokenResourceSingle(params).then(res => {
             if(res.flag) {
               this.info = res.data[0]
             }else {
@@ -64,13 +64,13 @@
         }
         getSysDictList(params).then(res => {
           if(res.flag && res.data.length) {
-           this.spokenType = res.data[0].sysDictInfoList.find(v => v.dictKey === this.$route.query.spokenType).dictValue
+           this.spokenType = res.data[0].sysDictInfoList.find(v => v.dictKey === this.info.spokenType).dictValue
           }
         })
       }
     },
-    created() {
-      this.getDetail()
+    async created() {
+     await this.getDetail()
       this.getDict()
     }
   }

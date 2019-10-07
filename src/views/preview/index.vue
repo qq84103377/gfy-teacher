@@ -3,14 +3,14 @@
     <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
-                      @selectCourse="selectCourse">
+                     @selectCourse="selectCourse">
       <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
       <!--      <div slot="right" ><i class="iconGFY icon-edit-blue"></i> 编辑</div>-->
 
       <div slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true" :editCourseInfo.sync = "currentTchCourseInfo" class="editClass"></edit-course>
+            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass"></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -18,10 +18,19 @@
     </dropdown-header>
     <div class="preview-wrap__body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && courseTaskList.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/task_null.png" alt/>
+        </div>
+        <van-list v-model="listLoading" :finished="finished"
+                  :finished-text="courseTaskList.length>0?'没有更多了':'当前没有已发任务奥～快去新建任务吧'" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
-                     :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0"  :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId"
-                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
+                     @clickTo="goto(item)"
+                     :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0"
+                     :up="courseTaskList.length>1 &&index!=0"
+                     :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName"
+                     :test-paper-id="item.testPaperId"
+                     :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)"
+                     @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
@@ -52,7 +61,14 @@
   import listItem from '../../components/list-item'
   import dropdownHeader from '../../components/dropdown-header'
   import editCourse from './addCourse'
-  import {getClassTeachCourseInfo, getCourseTaskList,setCourseTaskOrder,topCourseTask,deleteCourseTask} from '@/api/index'
+  import {
+    getClassTeachCourseInfo,
+    getCourseTaskList,
+    setCourseTaskOrder,
+    topCourseTask,
+    deleteCourseTask,
+    getCourseTaskDetail
+  } from '@/api/index'
 
   export default {
     name: "index",
@@ -77,27 +93,83 @@
         dropdownListLoading: false,
         dropdownFinish: false,
         total: 0,
-        currentTchCourseInfo:{}
+        currentTchCourseInfo: {},
+        // classGrade: '',
+        sysCourseId: '',
       }
     },
     mounted() {
       // this.getClassTeachCourseInfo()
     },
     methods: {
-      viewStat(item) {
-        this.$router.push({path:'/statistic',query:{info:item,testPaperId: item.testPaperId,termType:this.termType,tchCourseId:item.tchCourseId,taskId:item.taskId,taskType:item.taskType}})
-        localStorage.setItem('stat',JSON.stringify(item))
+      goto(item) {
+        if(item.taskType === 'T03') {
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&title=${item.testPaperName}`)
+        }else if(['T04'].includes(item.taskType)) {
+          // 学资源
+          this.getCourseTaskDetail(item)
+        }else if (['T01','T02'].includes(item.taskType)) {
+          //微课   由于需要自动横屏全屏播放 暂时不弄
+        }else if (['T06'].includes(item.taskType)) {
+          //讨论
+          this.getCourseTaskDetail(item)
+        }else if (['T13'].includes(item.taskType)) {
+          //口语
+          this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${this.sysCourseId}`)
+        }
       },
-     async selectCourse(tchCourseInfo) {
-       this.currentTchCourseInfo = tchCourseInfo
-       this.$store.commit('setVanLoading',true)
-       this.currentPage = 1
+      getCourseTaskDetail(item) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          operateRoleType: 'A02',
+          tchCourseId: this.tchCourseId,
+          "taskId": item.taskId,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getCourseTaskDetail(params).then(res => {
+          if (res.flag) {
+            if(['T04'].includes(item.taskType)) {
+              this.$router.push({path:'/materialDetail',query:{data:res.data[0].courseware}})
+            }else if(['T06'].includes(item.taskType)) {
+              this.$router.push({path:`/discussDetail`,query:{data:res.data[0].discussInfo}})
+            }
+          }
+        })
+      },
+      viewStat(item) {
+        this.$store.commit('setVanLoading', true)
+        this.$router.push({
+          path: '/statistic',
+          query: {
+            info: item,
+            testPaperId: item.testPaperId,
+            termType: this.termType,
+            tchCourseId: item.tchCourseId,
+            taskId: item.taskId,
+            taskType: item.taskType,
+            resourceType: item.resourceType
+          }
+        })
+        localStorage.setItem('stat', JSON.stringify(item))
+      },
+      async selectCourse(tchCourseInfo) {
+        this.currentTchCourseInfo = tchCourseInfo
+        this.$store.commit('setVanLoading', true)
+        this.currentPage = 1
+        // this.classGrade = tchCourseInfo.classGrade
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
         this.termType = tchCourseInfo.termType
-       await this.getCourseTaskList(this.courseName, this.tchCourseId)
-       this.$store.commit('setVanLoading',false)
-     },
+        this.sysCourseId = tchCourseInfo.sysCourseId
+        await this.getCourseTaskList(this.courseName, this.tchCourseId)
+        this.$store.commit('setVanLoading', false)
+      },
       dropdownOnLoad() {
         this.dropdownPage++
 
@@ -112,7 +184,7 @@
       },
       async onLoad() {
         this.currentPage++
-        if(this.currentPage > this.total && this.currentPage > 1) {
+        if (this.currentPage > this.total && this.currentPage > 1) {
           return
         }
 
@@ -120,6 +192,8 @@
           //首次加载
           await this.getClassTeachCourseInfo()
           this.courseName = this.courseList[0].tchCourseInfo.courseName
+          // this.classGrade = this.courseList[0].tchCourseInfo.classGrade
+          this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
           this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
           this.termType = this.courseList[0].tchCourseInfo.termType
         }
@@ -198,8 +272,8 @@
                 let finishCount = 0
                 let allCount = 0
                 if (item.tchClassTastInfo) {
-                  item.tchClassTastInfo.forEach((obj,i) => {
-                    if(i==0) {
+                  item.tchClassTastInfo.forEach((obj, i) => {
+                    if (i == 0) {
                       //跳转到任务统计页面时自动将第一个班级设置为选中状态
                       obj.active = true
                     }
@@ -218,7 +292,7 @@
             }
             if (this.currentPage >= res.total) {
               this.finished = true
-            }else {
+            } else {
               this.finished = false
             }
           } else {
@@ -227,8 +301,8 @@
           }
         })
       },
-      moveTask(item,index,type){
-        const tarTaskId = this.courseTaskList[type?index+1:index-1].taskId
+      moveTask(item, index, type) {
+        const tarTaskId = this.courseTaskList[type ? index + 1 : index - 1].taskId
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -242,14 +316,14 @@
         }
         setCourseTaskOrder(params).then(res => {
           if (res.flag) {
-            this.courseTaskList[index] = this.courseTaskList.splice(type?index+1:index-1,1,this.courseTaskList[index])[0]
-            this.$toast(`${type?'下':'上'}移成功`)
-          }else {
+            this.courseTaskList[index] = this.courseTaskList.splice(type ? index + 1 : index - 1, 1, this.courseTaskList[index])[0]
+            this.$toast(`${type ? '下' : '上'}移成功`)
+          } else {
             this.$toast(res.msg)
           }
         })
       },
-      topTask(item,index){
+      topTask(item, index) {
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -261,15 +335,15 @@
         }
         topCourseTask(params).then(res => {
           if (res.flag) {
-            this.courseTaskList[index] = this.courseTaskList.splice(0,1,this.courseTaskList[index])[0]
+            this.courseTaskList[index] = this.courseTaskList.splice(0, 1, this.courseTaskList[index])[0]
             this.$toast('置顶成功')
-          }else {
+          } else {
             this.$toast(res.msg)
           }
 
         })
       },
-      delTask(item,index){
+      delTask(item, index) {
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -285,7 +359,7 @@
           if (res.flag) {
             this.courseTaskList.splice(index, 1)
             this.$toast('删除成功')
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         });
@@ -403,6 +477,7 @@
 
     .preview-wrap-header-right {
       flex: 0 0 40px;
+
       .edit-btn {
         font-size: 14px;
         display: flex;
@@ -424,9 +499,11 @@
           display: inline-block;
           color: #16AAB7;
           white-space: nowrap;
+
           .van-ellipsis {
             display: inline;
           }
+
           &::after {
             right: 6px;
             top: 6px;
@@ -459,9 +536,17 @@
       }
     }
   }
-  .editClass{
+
+  .editClass {
     height: 100%;
     width: 100%;
     position: absolute;
+  }
+
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>
