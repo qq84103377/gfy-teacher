@@ -20,15 +20,15 @@
       </div>
       <div class="level-wrap-detail_body">
         <div class="item">
-          <div>2000</div>
+          <div>{{loginCount}}</div>
           <span>登录</span>
         </div>
         <div class="item">
-          <div>700</div>
+          <div>{{createResource}}</div>
           <span>创建资源</span>
         </div>
         <div class="item">
-          <div>900</div>
+          <div>{{pubInfo}}</div>
           <span>发布信息</span>
         </div>
 
@@ -86,7 +86,10 @@
         currentLevel: 0,
         progress: "",
         percentage: 0,
-        showTips: false
+        showTips: false,
+        loginCount: 0,
+        createResource: 0,
+        pubInfo: 0,
       }
     },
     methods: {
@@ -145,6 +148,18 @@
             this.currentLevel = res.data[0].level;
             // this.progress = res.data[0].levelPoint +'/'+res.data[0].nextlevelPoint;
             this.percentage = Math.ceil(res.data[0].levelPoint / res.data[0].nextlevelPoint * 100);
+            let userDetailCount = res.data[0].intUserDetailCountResultVo || [];
+            var arrLen = userDetailCount.length;
+            for (let i = 0; i < arrLen; i++) {
+              if (userDetailCount[i].originType == 'O01') {
+                this.loginCount = userDetailCount[i].counterValue;
+              } else if (userDetailCount[i].originType == 'O11') {
+                this.createResource = userDetailCount[i].counterValue;
+              } else if (userDetailCount[i].originType == 'O05') {
+                this.pubInfo = userDetailCount[i].counterValue;
+              }
+
+            }
           }
         })
       }
@@ -324,6 +339,7 @@
     @{deep} .van-popup {
       width: 308px;
       height: 255px;
+
       .title {
         height: 58px;
         position: relative;
@@ -354,7 +370,8 @@
 
       .content {
         padding: 0 20px;
-        p{
+
+        p {
           font-size: 15px;
           line-height: 26px;
           color: #000;
