@@ -426,11 +426,14 @@
         top: 55px;
         left: 0;
 
+
         &-in {
           display: flex;
           background: #fff;
           height: 100%;
           /*box-shadow: 0px 2px 11px 2px rgba(0, 0, 0, 0.06);*/
+          border-radius: 5px;
+
 
           .avatar {
             width: 86px;
@@ -500,6 +503,7 @@
           background: #fff;
           height: 100%;
           /*box-shadow: 0px 2px 11px 2px rgba(0, 0, 0, 0.06);*/
+          border-radius: 5px;
 
           > div {
             position: relative;
@@ -515,9 +519,11 @@
       &-menu {
         padding: 0 10px;
         width: 100%;
-        border-radius: 5px;
         margin-top: 10px;
-
+        @{deep} .van-grid {
+          border-radius: 5px;
+          overflow: hidden;
+        }
         @{deep} .van-icon__image {
           width: 26px;
           height: 26px;
