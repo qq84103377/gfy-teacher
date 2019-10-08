@@ -217,7 +217,8 @@
     delPraise,
     addPraise,
     topAppraise,
-    untopAppraise
+    untopAppraise,
+    statTaskStatV2
   } from '@/api/index'
   import {getStudentName} from '@/utils/filter'
 
@@ -288,7 +289,7 @@
         // }else {
         this.$router.push({
           name: `examView`,
-          params: {info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13'}
+          params: {info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13',taskType:this.$route.query.taskType}
         })
         // }
       },
@@ -695,8 +696,15 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        await statTaskStat(params).then(res => {
-          if (res.flag) {
+        let api
+        if(['T10'].includes(this.$route.query.taskType)) {
+          //从堂测统计进入
+          api = statTaskStatV2
+        }else {
+          api = statTaskStat
+        }
+        await api(params).then(res => {
+          if (res.flag&&res.data[0]) {
             if (this.$route.query.taskType === 'T13') {
               res.data[0].studentStatList = res.data[0].examstat
             }
@@ -952,12 +960,13 @@
             })
           })
         }
-      }
+      },
     },
     async mounted() {
       this.$store.commit('setVanLoading', true)
       this.getDailyRemindStatus()
       await this.statTaskStat()
+
       this.drawPie()
       if (this.isTestPaper) {
         this.drawHistogram()

@@ -37,6 +37,8 @@
         classId: '',
         tchClassCourseInfo: [],
         index: 0, //选中的课程index
+        classGrade: '',
+        termType: '',
       }
     },
     created() {
@@ -46,8 +48,8 @@
     },
     methods: {
       goto(path) {
-        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo} = this
-        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo}})
+        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,termType} = this
+        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,termType}})
       },
       async changeCourse(type) {
         if (type) {
@@ -89,6 +91,8 @@
         this.sysCourseId = tchCourseInfo.sysCourseId
         this.relationCourseId = tchCourseInfo.relationCourseId
         this.subjectType = tchCourseInfo.subjectType
+        this.classGrade = tchCourseInfo.classGrade
+        this.termType = tchCourseInfo.termType
         this.classId = tchCourseInfo.tchClassCourseInfo[0].classId
         this.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo
       },
@@ -138,6 +142,8 @@
               this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
               this.relationCourseId = this.courseList[0].tchCourseInfo.relationCourseId
               this.subjectType = this.courseList[0].tchCourseInfo.subjectType
+              this.classGrade = this.courseList[0].tchCourseInfo.classGrade
+              this.termType = this.courseList[0].tchCourseInfo.termType
               this.classId = this.courseList[0].tchCourseInfo.tchClassCourseInfo[0].classId
               this.tchClassCourseInfo = this.courseList[0].tchCourseInfo.tchClassCourseInfo
             }

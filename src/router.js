@@ -242,6 +242,11 @@ export default new Router({
           component: () => import('./views/resource/examDetail.vue')
         },
         {
+          path: '/questionDetail',
+          name: 'questionDetail',
+          component: () => import('./views/resource/questionDetail.vue')
+        },
+        {
           path: '/materialDetail',
           name: 'materialDetail',
           component: () => import('./views/resource/materialDetail.vue')

@@ -33,7 +33,7 @@
           if(this.pwd1 === this.pwd2) {
 
           }else {
-            this.$toast('两次密码不一致,请重新输入')
+           return this.$toast('两次密码不一致,请重新输入')
           }
 
           let params ={
