@@ -26,6 +26,11 @@ export const getMylevelInfo = (params) => {
   return axios.post('counter/getMylevelInfo', qs.stringify(params))
 }
 
+// 获取我的朗币
+export const getMyCoinInfo = (params) => {
+  return axios.post('counter/getMyCoinInfo', qs.stringify(params))
+}
+
 // 修改个人信息（头像、性别）
 export const updateUserInfo = (params) => {
   return axios.post('user/updateUserInfo', qs.stringify(params))
@@ -45,3 +50,18 @@ export const replacementPhone = (params) => {
 export const getPubRemindInfo = (params) => {
   return axios.post('public/getPubRemindInfo', qs.stringify(params))
 }
+
+//region==================意见反馈相关API========================================
+
+// 获取我的反馈记录
+export const getMyFeedBackList = (params) => {
+  return axios.post('oprParentFeedback/getMyFeedBackList', qs.stringify(params))
+}
+
+
+// 更新意见反馈记录
+export const updateFeedback = (params) => {
+  return axios.post('oprParentFeedback/updateFeedback', qs.stringify(params))
+}
+
+//endregion===============意见反馈相关API========================================
