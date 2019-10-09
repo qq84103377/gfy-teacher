@@ -321,7 +321,11 @@ export const getSpokenResourceSingle =(params)=>{
 export const addImportTask =(params)=>{
   return axios.post('public/addImportTask', qs.stringify(params))
 }
-//视频转换
+//任务统计(旧)
 export const statTaskStatV2 =(params)=>{
   return axios.post('teach/statTaskStat', qs.stringify(params))
+}
+//课程删除
+export const deleteTeachCourse =(params)=>{
+  return axios.post('teach/deleteTeachCourse', qs.stringify(params))
 }

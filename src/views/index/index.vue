@@ -87,7 +87,7 @@
             <i class="iconGFY icon-user"></i>
             <span>我的班级</span>
           </div>
-          <div>
+          <div @click="$router.push(`/myCourseList`)">
             <i class="iconGFY icon-tv"></i>
             <span>我的课程</span>
           </div>
@@ -300,6 +300,7 @@
                   })
                 }
               })
+              localStorage.setItem("subjectTypeList", JSON.stringify(that.subjectTypeList));
               console.log(that.subjectTypeList)
               console.log(hisClassMap)
               console.log(classMap)

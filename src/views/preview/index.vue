@@ -149,6 +149,9 @@
         })
       },
       viewStat(item) {
+        if(item.tchClassTastInfo.some(v => v.classId === 0)) {
+          return this.$toast('任务班级已不在当前课程的班级中，无法查看任务统计！')
+        }
         this.$store.commit('setVanLoading', true)
         this.$router.push({
           path: '/statistic',

@@ -134,6 +134,8 @@
               this.$set(v, 'check', this.selectArr.some(s => s.resourceId === (this.activeType.coursewareClassify ? v.coursewareId : v.testPaperId)))
             })
             this.courseList = res.data[0][key]
+          }else {
+            this.courseList = []
           }
         })
       },

@@ -83,7 +83,7 @@
           difficult: false,
           type: false,
           sort: false,
-          sortList: [{name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
+          sortList: [{name: '全部', value: ''},{name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
             name: '使用量',
             value: 'T02'
           }, {name: '收藏量', value: 'T03'}],
@@ -92,7 +92,7 @@
             value: 'd03'
           }],
           questionTypeList: [{examTypeName: '全部'}],
-          typeList: []
+          typeList: [{dictValue: '全部'}]
         },
         list: [],
         listLoading: false,
@@ -190,7 +190,7 @@
         }
         getSysDictList(params).then(res => {
           if (res.flag) {
-            this.tab.typeList = res.data[0].sysDictInfoList
+            this.tab.typeList.push(...res.data[0].sysDictInfoList)
           }
         })
       },

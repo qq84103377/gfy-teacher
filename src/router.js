@@ -394,6 +394,11 @@ export default new Router({
             title: '未结束任务'
           }
         },
+        {
+          path: '/myCourseList',
+          name: 'myCourseList',
+          component: () => import('./views/myCourse/index.vue')
+        },
       ]
     },
     {

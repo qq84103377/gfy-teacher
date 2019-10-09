@@ -11,8 +11,11 @@
         @click="gradeDropdown = false;termDropdown=false;versionDropdown=false"/>
 
       <div class="course-filter-wrap__header van-hairline--bottom">
-        <div class="course-filter-wrap__header-tab">
-          <span class="active">{{subjectName}}</span>
+        <div v-if="type==='myCourse'" class="course-filter-wrap__header-tab">
+          <span :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
+        </div>
+        <div v-else class="course-filter-wrap__header-tab">
+          <span>{{subjectName}}</span>
         </div>
         <van-icon class="icon-close" @click="show=false" name="close"/>
       </div>
@@ -85,7 +88,7 @@
 
   export default {
     name: "courseFilter",
-    props: ['visible','sysCourseId'],
+    props: ['visible','sysCourseId','type'],
     data() {
       return {
         gradeDropdown: false,
@@ -97,7 +100,8 @@
         },],
         unitList:[],
         unitIndex:0,
-        subjectList: [{name: '语文', active: false}],
+        subjectList: [],
+        // subjectList: {'S01':'语文','S02':'数学'},
         courseList:[],
         //sysCourseId:'',
         termTypeList:[],
@@ -174,8 +178,13 @@
       }
     },
     created(){
-
-
+      for(let key in JSON.parse(localStorage.getItem("subjectTypeList"))) {
+        this.subjectList.push({
+          key,
+          value:JSON.parse(localStorage.getItem("subjectTypeList"))[key],
+        })
+      }
+      this.$set(this.subjectList[0],'active',true)
     },
     methods: {
       handleSelect(item) {

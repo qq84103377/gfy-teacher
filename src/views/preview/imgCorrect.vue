@@ -79,7 +79,7 @@
     name: "imgCorrect",
     data() {
       return {
-        isPen: true,
+        isPen: false,
         isRubber: false,
         isGood: false,
         isTop: false,
