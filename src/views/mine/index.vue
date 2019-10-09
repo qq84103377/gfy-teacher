@@ -32,11 +32,11 @@
             <span>{{courseNum}}</span>
             <div>课程数</div>
           </div>
-          <div>
+          <div @click="$router.push('/myLangCoin')">
             <span>{{langCoin}}</span>
             <div>郎币数</div>
           </div>
-          <div>
+          <div  @click="$router.push('/myLevel')">
             <span>{{level}}</span>
             <div>等级</div>
           </div>
@@ -168,7 +168,8 @@
             title: "",
             message: "确定退出登录吗？",
             cancelButtonText: "确定",
-            confirmButtonText: "取消"
+            confirmButtonText: "取消",
+            confirmButtonColor:'#39F0DD'
           })
           .then(() => {
             // on confirm
