@@ -6,7 +6,10 @@
     </div>
     <div class="board-list__body" ref="body">
       <van-pull-refresh v-show="!tabIndex" v-model="teacher.refLoading" @refresh="onRefresh">
-        <van-list v-model="teacher.listLoading" :finished="teacher.finished" finished-text="没有更多了" @load="onLoad"
+        <div v-if="!teacher.listLoading && teacher.list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/board_empty.png" alt />
+        </div>
+        <van-list v-model="teacher.listLoading" :finished="teacher.finished" :finished-text="teacher.list.length>0?'没有更多了':'当前没有白板～'" @load="onLoad"
                   :offset='80'>
           <van-swipe-cell v-for="(item,index) in teacher.list" :key="index" class="mgt10" style="background: #fff;">
             <div class="board-list__body__item">
@@ -21,7 +24,10 @@
         </van-list>
       </van-pull-refresh>
       <van-pull-refresh v-show="tabIndex" v-model="stu.refLoading" @refresh="onRefresh">
-        <van-list v-model="stu.listLoading" :finished="stu.finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!stu.listLoading && stu.list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/board_empty.png" alt />
+        </div>
+        <van-list v-model="stu.listLoading" :finished="stu.finished" :finished-text="stu.list.length>0?'没有更多了':'当前没有白板～'" @load="onLoad" :offset='80'>
           <van-swipe-cell v-for="(item,index) in stu.list" :key="index" class="mgt10" style="background: #fff;">
             <div class="board-list__body__item">
               <img :src="item.ClassTeachingData.dataUrl" alt="">
@@ -264,5 +270,11 @@
         }
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

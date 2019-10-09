@@ -22,7 +22,7 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt/>
         </div>
         <van-list v-model="listLoading" :finished="finished"
-                  :finished-text="courseTaskList.length>0?'没有更多了':'当前没有已发任务奥～快去新建任务吧'" @load="onLoad" :offset='80'>
+                  :finished-text="courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList"
                      @clickTo="goto(item)"
                      :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0"

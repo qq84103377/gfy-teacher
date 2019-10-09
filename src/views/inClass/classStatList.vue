@@ -2,7 +2,10 @@
   <section class="class-stat-list">
     <div class="class-stat-list__body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/class_stat_empty.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有内容～'" @load="onLoad" :offset='80'>
           <!--            this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)-->
           <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
                      @del="handleDelete(item,index)" v-for="(item,index) in list" :key="index"
@@ -210,5 +213,11 @@
         }
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>
