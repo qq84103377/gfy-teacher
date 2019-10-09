@@ -245,6 +245,10 @@ export const saveRewardScore =(params)=>{
 export const getCourseTaskDetail =(params)=>{
   return axios.post('teachNew/getCourseTaskDetail', qs.stringify(params))
 }
+//获取资源详情
+export const getCourseTaskDetailV2 =(params)=>{
+  return axios.post('teach/getCourseTaskDetail', qs.stringify(params))
+}
 //获取评价
 export const getAppraiseV2 =(params)=>{
   return axios.post('public/getAppraiseV2', qs.stringify(params))
@@ -316,4 +320,8 @@ export const getSpokenResourceSingle =(params)=>{
 //视频转换
 export const addImportTask =(params)=>{
   return axios.post('public/addImportTask', qs.stringify(params))
+}
+//视频转换
+export const statTaskStatV2 =(params)=>{
+  return axios.post('teach/statTaskStat', qs.stringify(params))
 }

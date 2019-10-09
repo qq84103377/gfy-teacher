@@ -1,37 +1,41 @@
 <template>
-    <section class="class-stat-list">
-      <div class="class-stat-list__body">
-        <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-          <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
-            <list-item @clickTo="$router.push(`/examDetail?type=1`)" class="mgt10" style="background: #fff;"
-                       @del="handleDelete(item,index)" v-for="(item,index) in list" :key="index"
-                       :itemTitle="item.taskName"
-                       :can-slide="true">
-              <div slot="desc">
-                <div class="desc-bottom">
-                  <div v-for="(c,ci) in item.tchClassTastInfo" :key="ci">{{handleClassName(c.classId)}}:{{c.startDate}} -- {{c.endDate}}</div>
+  <section class="class-stat-list">
+    <div class="class-stat-list__body">
+      <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
+        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+          <!--            this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)-->
+          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                     @del="handleDelete(item,index)" v-for="(item,index) in list" :key="index"
+                     :itemTitle="item.taskName"
+                     :can-slide="true">
+            <div slot="desc">
+              <div class="desc-bottom">
+                <div v-for="(c,ci) in item.tchClassTastInfo" :key="ci">{{handleClassName(c.classId)}}:{{c.startDate}} --
+                  {{c.endDate}}
                 </div>
               </div>
-              <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="$router.push(`/statistic?type=inClass`)">
-                  <i class="iconGFY icon-statistics"></i>
-                  <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
-                </div>
+            </div>
+            <div slot="btn" class="btn-group van-hairline--top">
+              <div @click="viewStat(item)">
+                <i class="iconGFY icon-statistics"></i>
+                <span>{{item.tchClassTastInfo[0].finshCount}}/{{item.tchClassTastInfo[0].allCount}}</span>
               </div>
-            </list-item>
-          </van-list>
-        </van-pull-refresh>
+            </div>
+          </list-item>
+        </van-list>
+      </van-pull-refresh>
 
 
-      </div>
-    </section>
+    </div>
+  </section>
 </template>
 
 <script>
   import listItem from '../../components/list-item'
   import {getClassTeachCourseInfo, getCourseTaskList, deleteCourseTask} from '@/api/index'
+
   export default {
-        name: "classStatList",
+    name: "classStatList",
     components: {listItem},
     data() {
       return {
@@ -42,9 +46,35 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo))
       }
     },
     methods: {
+      viewStat(item) {
+        this.$store.commit('setVanLoading', true)
+        this.$router.push({
+          path: '/statistic',
+          query: {
+            info: item,
+            testPaperId: item.testPaperId,
+            termType: this.$route.query.termType,
+            tchCourseId: item.tchCourseId,
+            taskId: item.taskId,
+            taskType: item.taskType,
+            resourceType: item.resourceType
+          }
+        })
+        localStorage.setItem('stat', JSON.stringify(item))
+      },
+      goto(item) {
+        if (item.resourceType === 'R03') {
+          //单道试题
+          this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
+        } else {
+          //试卷
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+        }
+      },
       handleDelete(item, index) {
         let obj = {
           "interUser": "runLfb",
@@ -65,7 +95,7 @@
         })
       },
       handleClassName(id) {
-        return this.$route.query.tchClassCourseInfo.find(v => v.classId === id).className
+        return this.tchClassCourseInfo.find(v => v.classId === id).className
       },
       async onLoad() {
         this.currentPage++
@@ -109,8 +139,16 @@
             if (localStorage.getItem("classMap")) {
               let classMap = JSON.parse(localStorage.getItem("classMap"))
               this.list.forEach(item => {
+                let finishCount = 0
+                let allCount = 0
                 if (item.tchClassTastInfo) {
-                  item.tchClassTastInfo.forEach(obj => {
+                  item.tchClassTastInfo.forEach((obj,i) => {
+                    if (i == 0) {
+                      //跳转到任务统计页面时自动将第一个班级设置为选中状态
+                      obj.active = true
+                    }
+                    finishCount += obj.finshCount
+                    allCount += obj.allCount
                     if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                       obj['className'] = "--"
                     } else {
@@ -118,6 +156,8 @@
                     }
                   })
                 }
+                item.finishCount = finishCount
+                item.allCount = allCount
               })
             }
             if (this.currentPage >= res.total) {
@@ -139,26 +179,31 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     &__body {
       flex: 1;
       overflow-y: auto;
+
       .desc-top {
         display: flex;
-        margin-bottom: 6px;
+        margin-bottom: 10px;
 
         .iconGFY {
           margin-right: 5px;
         }
       }
+
       .desc-bottom {
         margin-top: 18px;
         display: flex;
         font-size: 12px;
         color: #666;
+
         .iconGFY {
           margin-right: 3px;
         }
-        >div {
+
+        > div {
           margin-right: 18px;
           display: flex;
           align-items: center;

@@ -7,9 +7,11 @@
     </van-nav-bar>
     <analyse-wrap @toggle="toggleQuestion">
       <div class="scroll-tab" slot="tab">
-        <div class="scroll-tab__item" @click="toggleTab(item,index)" v-for="(item,index) in info.questionList" :key="index">
-          <div class="scroll-tab__item-icon" :class="handleStyle(item)"><i v-if="handleStyle(item) != 'undo' || handleStyle(item) != 'uncrt'" class="iconGFY"
-                                                                           :class="'icon-'+handleStyle(item)"></i></div>
+        <div class="scroll-tab__item" @click="toggleTab(item,index)" v-for="(item,index) in info.questionList"
+             :key="index">
+          <div class="scroll-tab__item-icon" :class="handleStyle(item)"><i
+            v-if="handleStyle(item) != 'undo' || handleStyle(item) != 'uncrt'" class="iconGFY"
+            :class="'icon-'+handleStyle(item)"></i></div>
           <div class="black fs10" :class="{blue:item.active}">第{{index + 1}}题</div>
         </div>
       </div>
@@ -29,7 +31,7 @@
 
 <script>
   import analyseWrap from '../../components/analyseWrap'
-  import {getCourseTaskDetail} from '@/api/index'
+  import {getCourseTaskDetail, getCourseTaskDetailV2} from '@/api/index'
   import {getStudentName} from '@/utils/filter'
 
   export default {
@@ -37,7 +39,7 @@
     components: {analyseWrap},
     data() {
       return {
-        info: {examQuestionInfo:{},testPaperInfo:[],questionList:[]},
+        info: {examQuestionInfo: {}, testPaperInfo: [], questionList: []},
         curIndex: 0,
       }
     },
@@ -50,27 +52,27 @@
       }
     },
     methods: {
-      toggleTab(item,index) {
-        if(item.active) return
+      toggleTab(item, index) {
+        if (item.active) return
         this.curIndex = index;
         this.info.questionList.forEach(v => {
-          this.$set(v,'active',false)
+          this.$set(v, 'active', false)
         })
-        this.$set(item,'active',true)
+        this.$set(item, 'active', true)
       },
       toggleQuestion(bol) {
         const index = this.info.questionList.findIndex(v => v.active)
         if (bol) {
           // 下一题
           if (index < this.info.questionList.length - 1) {
-            this.toggleTab(this.info.questionList[index + 1],index + 1)
+            this.toggleTab(this.info.questionList[index + 1], index + 1)
           } else {
             this.$toast('没有下一题了')
           }
         } else {
           //上一题
           if (index > 0) {
-            this.toggleTab(this.info.questionList[index - 1],index -1)
+            this.toggleTab(this.info.questionList[index - 1], index - 1)
           } else {
             this.$toast('没有上一题了')
           }
@@ -92,34 +94,35 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getCourseTaskDetail(params).then(res => {
+        let api = this.$route.query.taskType === 'T10' ? getCourseTaskDetailV2 : getCourseTaskDetail
+        api(params).then(res => {
           this.$store.commit('setVanLoading', false)
-          if(res.flag) {
+          if (res.flag && res.data[0]) {
             let arr = []
-            if(res.data[0].resourceType === 'R03') {
-              if(res.data[0].examQuestionInfo.groupExamList.length) {
+            if (res.data[0].resourceType === 'R03') {
+              if (res.data[0].examQuestionInfo.groupExamList.length) {
                 //单题有小题
-                res.data[0].examQuestionInfo.groupExamList.forEach((v,i) => {
-                  if(i === 0) v.active = true
+                res.data[0].examQuestionInfo.groupExamList.forEach((v, i) => {
+                  if (i === 0) v.active = true
                   v.title = res.data[0].examQuestionInfo.title + v.title
                   arr.push(v)
                 })
-              }else {
+              } else {
                 //单题无小题
                 res.data[0].examQuestionInfo.active = true
                 arr.push(res.data[0].examQuestionInfo)
               }
-            }else {
-              res.data[0].testPaperInfo.forEach((v,index) => {
-                v.sectionExam.forEach((s,i) => {
-                  if(s.testPaperExamGroup.length) {
-                    s.testPaperExamGroup.forEach((t,ti) => {
-                      if(i===0&&index===0&&ti===0) this.$set(t.groupExamInfo,'active',true)
+            } else {
+              res.data[0].testPaperInfo.forEach((v, index) => {
+                v.sectionExam.forEach((s, i) => {
+                  if (s.testPaperExamGroup.length) {
+                    s.testPaperExamGroup.forEach((t, ti) => {
+                      if (i === 0 && index === 0 && ti === 0) this.$set(t.groupExamInfo, 'active', true)
                       t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
                       arr.push(t.groupExamInfo)
                     })
-                  }else {
-                    if(i===0&&index===0) this.$set(s.examQuestion,'active',true)
+                  } else {
+                    if (i === 0 && index === 0) this.$set(s.examQuestion, 'active', true)
                     arr.push(s.examQuestion)
                   }
                 })
@@ -128,22 +131,22 @@
 
             res.data[0].questionList = arr
             this.info = res.data[0]
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
       },
       handleStyle(item) {
-       const status = item.isRight
+        const status = item.isRight
         if (status == 'I02') {
           return 'somewhat'
         } else if (status == 'I03') {
           return 'error'
         } else if (status == 'I01') {
           return 'correct'
-        } else if(item.studentAnswer === ''){
+        } else if (item.studentAnswer === '') {
           return 'undo'
-        }else {
+        } else {
           return 'uncrt'
         }
       },
@@ -196,6 +199,7 @@
               color: #333;
             }
           }
+
           &.uncrt {
             background: #ddd;
 

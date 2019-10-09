@@ -188,11 +188,12 @@
         img{
           width: 100%;
           height: 100%;
+          border-radius: 5px;
         }
       }
       .desc-top {
         display: flex;
-        margin-bottom: 6px;
+        margin-bottom: 10px;
         .iconGFY {
           margin-right: 5px;
         }

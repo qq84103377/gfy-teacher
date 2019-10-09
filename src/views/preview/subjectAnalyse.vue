@@ -16,7 +16,7 @@
         <div class="subject-analyse__body-bottom" v-for="(item,index) in info.statStudentAnswer.stuAnswer" :key="index">
           <div class="mgb20">答案为<span class="inline" v-html="item.answer"></span>的同学:</div>
           <div style="display: flex;flex-wrap: wrap;" class="pdlt10">
-            <div v-for="(stu,stuIndex) in item.studentsNew" :key="stuIndex" class="mgr10">
+            <div v-for="(stu,stuIndex) in item.studentsNew" :key="stuIndex" class="stu-error">
               {{getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?(stu.percent*100+'%'):'--'}})</span>
             </div>
           </div>
@@ -143,6 +143,9 @@
         padding: 12px 15px;
         background: #fff;
         margin-top: 10px;
+        .stu-error {
+          flex: 0 0 50%;
+        }
       }
     }
   }

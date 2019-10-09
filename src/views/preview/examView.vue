@@ -26,7 +26,8 @@
         classView: true, //按班级查看
         info: JSON.parse(JSON.stringify(this.$route.params.info)),
         title: this.$route.params.title,
-        isSpoken: this.$route.params.isSpoken
+        isSpoken: this.$route.params.isSpoken,
+        taskType: this.$route.params.taskType,
       }
     },
     computed: {
@@ -78,7 +79,7 @@
           },[])
           this.$router.push({name:'spokenAnalyse',params:{type:'personal',info,classId:this.info.classId,index:0}})
         }else {
-          this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId}})
+          this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId,taskType:this.taskType}})
         }
       },
       handleToggle(bol) {

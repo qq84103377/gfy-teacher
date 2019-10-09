@@ -3,11 +3,11 @@
     <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <div class="question-item-wrap__ctn">
       <slot name="num"></slot>
-      <div v-html="item.title"></div>
+      <div v-html="item.title" class="html-img"></div>
       <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
         ({{childIndex+1}})本小题{{child.examScore}}分
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
-        <div v-html="child.title"></div>
+        <div v-html="child.title" class="html-img"></div>
         <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
           <div class="btn-item" :class="{active:child.analyseShow}"
                @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="icon-group">
-        <span><i v-if="isQuestion" class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
+        <span v-if="isQuestion"><i class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
         <span><i class="iconGFY icon-points"></i>{{item.useCount||0}}</span>
         <span><i class="iconGFY icon-star"></i>{{item.collectCount||0}}</span>
         <span><i class="iconGFY icon-difficult"></i>{{item.titleDegree==='D01'?'容易':item.titleDegree==='D02'?'中等':'困难'}}</span>

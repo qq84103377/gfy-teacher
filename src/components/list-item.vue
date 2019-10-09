@@ -2,15 +2,15 @@
   <van-swipe-cell class="list-item-wrap">
     <div class="pd10">
       <div class="badge"><slot name="badge"></slot></div>
-      <div class="aic" style="align-items: flex-start" @click="$emit('clickTo')">
+      <div class="aic" style="align-items: stretch" @click="$emit('clickTo')">
         <div class="icon-wrap" v-if="$slots.cover"><slot name="cover"></slot></div>
-        <div style="flex: 1">
+        <div style="flex: 1;min-width: 0;display: flex;flex-direction: column;justify-content: space-between">
           <div class="title" @click=""><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-exam':taskType=='T01','icon-comment':taskType=='T02',
           'icon-test':taskType=='T03','icon-learn-res':taskType =='T04' && testPaperId!=0,
           'icon-learn-res-exp':taskType =='T04' && testPaperId==0,'icon-discuss':taskType =='T06','icon-spoken':taskType =='T13'}"></i>
             {{itemTitle}}
           </div>
-          <div v-if="$slots.desc" class="mgt5"><slot name="desc"></slot></div>
+          <div v-if="$slots.desc"><slot name="desc"></slot></div>
           <div v-else class="mgt15">
             <div class="time" v-for="(item,index) in classInfoList" :key="index" v-if="(index<2&&!fold) || fold">{{item.className}}:{{item.startDate}} -- {{item.endDate}}</div>
           </div>
@@ -67,24 +67,21 @@
       top: 0;
     }
     .icon-wrap {
-      flex: 0 0 115px;
-      height: 80px;
+      flex: 0 0 104px;
+      height: 68px;
       margin-right: 10px;
     }
     .title {
       i {
         vertical-align: middle;
       }
-      word-break: break-all;
       font-size: 14px;
       font-weight: bold;
       color: #333;
       width: 100%;
       overflow : hidden;
       text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;      /* 可以显示的行数，超出部分用...表示*/
-      -webkit-box-orient: vertical;
+      white-space: nowrap;
       line-height: 20px;
     }
       .time {

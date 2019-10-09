@@ -40,13 +40,13 @@
         </div>
         <div @click="handleScore(item,'T01')"><i class="iconGFY icon-circle-plus"></i>加分</div>
         <div @click="handleScore(item,'T02')"><i class="iconGFY icon-circle-sub"></i>减分</div>
-        <div @click="showComment = !showComment"><i class="iconGFY icon-talk"></i>评论</div>
+        <div @click="$set(item,'showComment',!item.showComment)"><i class="iconGFY icon-talk"></i>评论</div>
       </div>
       <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active"></i><span
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
-      <div class="comment-wrap" v-if="showComment" >
-        <van-field style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
+      <div class="comment-wrap" v-if="item.showComment" >
+        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
         <van-button @click="$emit('comment',item.comment,item)" class="submit-btn" type="info">发表</van-button>
       </div>
       <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{getStudentName(rep.replyAccount,classId)}}:
@@ -73,7 +73,6 @@
     data() {
       return {
         comment: '',
-        showComment: false
       }
     },
     methods: {

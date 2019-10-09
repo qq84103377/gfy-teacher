@@ -242,6 +242,11 @@ export default new Router({
           component: () => import('./views/resource/examDetail.vue')
         },
         {
+          path: '/questionDetail',
+          name: 'questionDetail',
+          component: () => import('./views/resource/questionDetail.vue')
+        },
+        {
           path: '/materialDetail',
           name: 'materialDetail',
           component: () => import('./views/resource/materialDetail.vue')
@@ -388,6 +393,15 @@ export default new Router({
           //   isShowHeader: true,
           //   title: '意见反馈'
           // }
+        },
+        {
+          path: '/unfinishTaskList',
+          name: 'unfinishTaskList',
+          component: () => import('./views/index/unfinishTaskList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '未结束任务'
+          }
         },
       ]
     },

@@ -139,8 +139,8 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "accountType": "A02",
           "belongSchoolId": this.$store.getters.schoolId,
-          // "dataUrl": this.wareUrl,
-          "dataUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
+          "dataUrl": this.wareUrl,
+          // "dataUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
           "dataType": "D03",
           "resourceType": "R01",
           "resourceClass": "C01",
@@ -369,8 +369,11 @@
         let formData = new FormData();
         formData.append("key", this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
           filetime +
-          randomStr
+          randomStr + '.' + curFile.type.split('/')[1]
         );
+        console.log(this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
+          filetime +
+          randomStr + '.' + curFile.type.split('/')[1],'路径');
         formData.append('policy', this.wareOSSObject.policyBase64)
         formData.append('OSSAccessKeyId', this.wareOSSObject.accessid)
         formData.append('signature', this.wareOSSObject.signature)
@@ -383,7 +386,7 @@
             "/" +
             this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
             filetime +
-            randomStr
+            randomStr + '.' + curFile.type.split('/')[1]
         });
       },
       uploadIMG(curFile) {
