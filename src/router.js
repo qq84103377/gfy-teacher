@@ -385,6 +385,15 @@ export default new Router({
             title: '意见反馈'
           }
         },
+        {
+          path: '/unfinishTaskList',
+          name: 'unfinishTaskList',
+          component: () => import('./views/index/unfinishTaskList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '未结束任务'
+          }
+        },
       ]
     },
     {

@@ -20,7 +20,7 @@
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
-      <div class="statistic-wrap__achievement">
+      <div class="statistic-wrap__achievement" v-if="isTestPaper">
         <div class="statistic-wrap__achievement-label divider">全班成绩概况:</div>
         <div class="statistic-wrap__achievement-score">
           <div>
@@ -69,7 +69,7 @@
         </div>
 
         <!--        学生心得-->
-        <stu-exp @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
                  :classId="info.tchClassTastInfo.find(t => t.active).classId"
                  v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
                  :list="appraiseList">
@@ -167,7 +167,7 @@
       </div>
     </div>
 
-    <div class="statistic-wrap__footer" v-if="$route.query.taskType !== 'T13'">
+    <div class="statistic-wrap__footer" v-if="$route.query.taskType !== 'T13' && showFooter">
       <van-button v-if="isTestPaper" class="btn" type="info"
                   @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
         加分/减分
@@ -227,6 +227,7 @@
     components: {stuExp, spokenTable, listItem},
     data() {
       return {
+        showFooter: true,
         appraiseList: [],
         type: '', //学资源类型
         wareDetail: {courseware: {srcUrl: ''}, discussInfo: {}}, // 学资源详情
@@ -761,7 +762,7 @@
                 name: '文言文全章复习与巩固',
                 type: 'pie',
                 radius: [0, 53],
-                // center: [150, 170],
+                // center: ['50%', '60%'],
                 label: {
                   // normal: {
                   //   show: true
@@ -1017,7 +1018,7 @@
 
     .pie-chart {
       width: 100%;
-      height: 160px;
+      height: 200px;
       margin: 0 auto;
       margin-top: 20px;
     }

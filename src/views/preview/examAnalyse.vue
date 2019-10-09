@@ -52,7 +52,7 @@
       <div id="myChart4" ref="myChart4" v-show="scoreChartShow" class="chart-histogram mgt10"></div>
       <i @click="backTop" class="iconGFY icon-backtop backtop"></i>
     </div>
-    <div v-else class="pd10" style="text-align: center;">
+    <div v-if="!isExam&&!scoreInfo.length" class="pd10" style="text-align: center;">
       暂无学生完成情况!
     </div>
   </section>
@@ -235,6 +235,7 @@
               type: 'pie',
               selectedMode: 'single',
               radius: [0, '30%'],
+              center: ['50%', '60%'],
               // tooltip: {
               //   trigger: 'item',
               //   formatter: "{a} <br/>{b}: {c}题 ({d}%)"
@@ -261,6 +262,7 @@
               //   formatter: "{a} <br/>{b}:{d}%"
               // },
               radius: ['40%', '55%'],
+              center: ['50%', '60%'],
               label: {
                 normal: {
                   formatter: ' {b}：{d}% ',
@@ -570,7 +572,7 @@
 
       .chart-pie {
         width: 100%;
-        height: 200px;
+        height: 300px;
       }
     }
 

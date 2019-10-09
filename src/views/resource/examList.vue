@@ -488,7 +488,7 @@
 
       .desc-top {
         display: flex;
-        margin: 3px 0;
+        margin-bottom: 10px;
 
         .iconGFY {
           margin-right: 5px;
