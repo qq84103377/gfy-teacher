@@ -50,6 +50,7 @@
 <style scoped lang="less">
   @deep: ~'>>>';
   .service {
+    background-color: #F5F6FA;
     &-header {
       width: 138px;
       height: 138px;
