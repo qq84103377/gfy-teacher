@@ -2,7 +2,10 @@
   <section class="lecture-list">
     <div class="lecture-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有讲义，快去选择课件吧！'" @load="onLoad" :offset='80'>
           <list-item @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;"
                      @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in list" :key="index"
                      :itemTitle="item.ClassTeachingData.name" @up="moveItem(item.ClassTeachingData,index,0)"
@@ -274,5 +277,11 @@
         font-size: 18px;
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

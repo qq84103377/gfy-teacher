@@ -349,6 +349,15 @@ export default new Router({
           //   title: '我的等级'
           // }
         },
+        {
+          path: '/myLangCoin',
+          name: 'myLangCoin',
+          component: () => import('./views/mine/myLangCoin.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '我的朗币'
+          }
+        },
         // {
         //   path: '/myNotice',
         //   name: 'myNotice',
@@ -380,10 +389,10 @@ export default new Router({
           path: '/feedback',
           name: 'feedback',
           component: () => import('./views/mine/feedback/index.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '意见反馈'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '意见反馈'
+          // }
         },
         {
           path: '/unfinishTaskList',

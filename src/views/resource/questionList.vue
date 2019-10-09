@@ -47,7 +47,10 @@
     </div>
     <div class="question-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'" @load="onLoad" :offset='80'>
 <!--          <div class="question-num">1.选择题</div>-->
           <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index"
                      :item="item" :index="index"></question-item>
@@ -364,5 +367,11 @@
         padding: 0 10px;
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>
