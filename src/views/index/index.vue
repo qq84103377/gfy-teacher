@@ -123,6 +123,10 @@
             publishList:[]
           }
       },
+    activated() {
+          //在别的地方修改科目以后返回到首页要重新获取对应的科目
+          this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
+    },
     mounted() {
       this.getMySchoolInfo()
       this.getGradeTermInfo()
@@ -267,6 +271,7 @@
               let classMap = {}
               let hisClassMap={}
               let that = this
+              let gradeList = []
               mySchool.forEach(item=>{
                 schoolMap[item.schoolId] = {
                   schoolId:item.schoolId,
@@ -275,6 +280,10 @@
                 }
                 if (item.myClassInfo) {
                   item.myClassInfo.forEach(obj=>{
+                    if(!gradeList.some(v => v.classGrade === obj.classGrade)) {
+                      gradeList.push({classGrade:obj.classGrade,gradeName:obj.gradeName,teacherInfoList:obj.teacherInfoList || []})
+                    }
+
                     classMap[obj.classId] = obj
                     if (obj.teacherInfoList) {
                       obj.teacherInfoList.forEach(obj2=>{
@@ -301,6 +310,7 @@
                 }
               })
               localStorage.setItem("subjectTypeList", JSON.stringify(that.subjectTypeList));
+              localStorage.setItem("gradeList", JSON.stringify(gradeList));
               console.log(that.subjectTypeList)
               console.log(hisClassMap)
               console.log(classMap)

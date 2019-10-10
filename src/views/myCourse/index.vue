@@ -32,7 +32,7 @@
         <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
       </div>
 
-      <course-filter :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
+      <course-filter @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
     </section>
 </template>
 
@@ -91,7 +91,7 @@
           this.currentPage = 0
           this.onLoad()
         },
-        async getClassTeachCourseInfo() {
+        async getClassTeachCourseInfo(classGrade='',termType='',classId='') {
           const page = this.currentPage
           let obj = {
             "interUser": "runLfb",
@@ -101,11 +101,11 @@
             "operateRoleType": "A02",
             "accountNo": this.$store.getters.getUserInfo.accountNo,
             "subjectType": localStorage.getItem("currentSubjectType"),
-            "classGrade": "",
-            "termType": "",
+            classGrade,
+            termType,
+            classId,
             "pageSize": "10",
             "courseType": "C01",
-            "classId": "",
             "currentPage": page
           }
           let params = {

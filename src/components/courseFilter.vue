@@ -3,23 +3,54 @@
   <van-popup
     v-model="show"
     position="bottom"
-    :style="{ height: '93%' }">
+    :style="{ height: type==='myCourse'?'50%':'93%' }">
     <div class="course-filter-wrap">
       <van-overlay
         class-name="mask"
-        :show="gradeDropdown||termDropdown||versionDropdown"
-        @click="gradeDropdown = false;termDropdown=false;versionDropdown=false"/>
+        :show="gradeDropdown||termDropdown||versionDropdown||classDropdown"
+        @click="gradeDropdown = false;termDropdown=false;versionDropdown=false;classDropdown=false"/>
 
       <div class="course-filter-wrap__header van-hairline--bottom">
         <div v-if="type==='myCourse'" class="course-filter-wrap__header-tab">
-          <span :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
+          <span @click="handleSubject(item)" :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
         </div>
         <div v-else class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
         <van-icon class="icon-close" @click="show=false" name="close"/>
       </div>
-      <div class="course-filter-wrap__dropdown van-hairline--bottom">
+      <div v-if="type === 'myCourse'" class="course-filter-wrap__dropdown van-hairline--bottom">
+        <div>
+          <div @click="gradeDropdown=!gradeDropdown">{{gradeList[gradeIndex]?gradeList[gradeIndex].gradeName:'年级'}}
+            <van-icon :name="gradeDropdown?'arrow-up':'arrow-down'"/></div>
+          <div v-show="gradeDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" :class="{active: gradeIndex === index}" v-if="item.teacherInfoList.some(t => t.subjectType === subjectList.find(v => v.active).key)||index===0" v-for="(item,index) in gradeList" :key="index" @click="changeGrade(index)">{{item.gradeName}}
+              <van-icon v-show="gradeIndex === index " class="check blue" name="success"/>
+            </div>
+          </div>
+        </div>
+
+        <div >
+          <div @click="termDropdown=!termDropdown">{{termList[termIndex]?termList[termIndex].name:'学期'}}
+            <van-icon :name="termDropdown?'arrow-up':'arrow-down'"/></div>
+          <div v-show="termDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" @click="changeTermType(index)" :class="{active: termIndex === index}" v-for="(item,index) in termList" :key="index">{{item.name}}
+              <van-icon v-show="termIndex === index " class="check blue" name="success"/>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div @click="classDropdown=!classDropdown">{{classList[classIndex]?classList[classIndex].className:'班级'}}
+            <van-icon :name="classDropdown?'arrow-up':'arrow-down'"/></div>
+          <div v-show="classDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" @click="changeClass(key)" :class="{active: classIndex === key}" v-if="gradeIndex===0||gradeIndex===''||key==='0'||(gradeList[gradeIndex].classGrade === value.classGrade)" v-for="(value ,key) in classList" :key="key">{{value.className}}
+              <van-icon v-show="classIndex === key" class="check blue" name="success"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>
           <div @click="gradeDropdown=!gradeDropdown" v-if="classGradeList.length>0">{{classGradeList[gradeIndex].classGrade|getGradeName}}
             <van-icon :name="gradeDropdown?'arrow-up':'arrow-down'"/></div>
@@ -51,12 +82,12 @@
         </div>
       </div>
       <div class="course-filter-wrap__body">
-        <div class="course-filter-wrap__body-left">
+        <div v-if="type!=='myCourse'" class="course-filter-wrap__body-left">
           <div :class="{'active':unitIndex ==index }" v-for="(item,index) in unitList" :key="index" @click="handleUnit(index)">
             {{item.nodeName}}
           </div>
         </div>
-        <div class="course-filter-wrap__body-right">
+        <div v-if="type!=='myCourse'" class="course-filter-wrap__body-right">
           <div class="" v-for="(item,index) in courseList" :key="index">
             <div v-if="item.childNodeList && item.childNodeList.length>0">
               <div class="course-first van-hairline--bottom" @click="$set(item,'fold',!item.fold)"><span>{{item.nodeName}}</span>
@@ -105,11 +136,11 @@
         courseList:[],
         //sysCourseId:'',
         termTypeList:[],
-        termIndex:0,
+        termIndex:this.type==='myCourse'?'':0,
         gradeTermList: this.$store.getters.getGradeTermInfo,
         subjectName: localStorage.getItem("currentSubjectTypeName"),
         classGradeMap:[],
-        gradeIndex:0,
+        gradeIndex:this.type==='myCourse'?'':0,
         textBookList:[],
         bookIndex:0,
         currentSysCourseId:this.sysCourseId,
@@ -118,7 +149,12 @@
         classGradeList:[],
         bookInfoList:[],
         isNowTerm:0,
-        gradeTermMap:''
+        gradeTermMap:'',
+        gradeList: [{gradeName:'全部',classGrade:'',teacherInfoList:[]},...JSON.parse(localStorage.getItem("gradeList"))] ,
+        termList: [{name:'全部',value:''},{name:'上学期',value:'T01'},{name:'下学期',value:'T02'}],
+        classList: {0:{classGrade:'',className:'全部'},...JSON.parse(localStorage.getItem("classMap"))},
+        classDropdown: false,
+        classIndex: '',
       }
     },
     computed: {
@@ -132,50 +168,54 @@
       }
     },
     mounted(){
-
-      //获取上下学期
-      let now = new Date();
-      let month = now .getMonth();
-      if (7 >= month && month >= 2){
-        this.isNowTerm = 1
-      } else{
-        this.isNowTerm = 0
-      }
-      //学科信息获取
-      if (localStorage.getItem("deployList")){
-        this.classGradeList = JSON.parse(localStorage.getItem("deployList"))
-        this.bookInfoList = this.classGradeList[this.gradeIndex].bookInfo
-        this.termTypeList = this.classGradeList[this.gradeIndex].termInfo
-        if (this.termTypeList && this.termTypeList.length > 1) {
-          if (this.isNowTerm === 1){
-            this.termTypeList.forEach((item,index)=>{
-              if (item == "T02") {
-                this.termIndex = index
-              }
-            })
-          } else {
-            this.termTypeList.forEach((item,index)=>{
-              if (item == "T01") {
-                this.termIndex = index
-              }
-            })
-          }
-        } else {
-          this.termIndex = 0
+      if(this.type === 'myCourse') {
+        // this.getTextBookCourseInfo()
+      }else {
+        //获取上下学期
+        let now = new Date();
+        let month = now .getMonth();
+        if (7 >= month && month >= 2){
+          this.isNowTerm = 1
+        } else{
+          this.isNowTerm = 0
         }
-        this.isDeploy = true;
-      } else {
-        this.$toast("未配置年级学科信息")
+        //学科信息获取
+        if (localStorage.getItem("deployList")){
+          this.classGradeList = JSON.parse(localStorage.getItem("deployList"))
+          this.bookInfoList = this.classGradeList[this.gradeIndex].bookInfo
+          this.termTypeList = this.classGradeList[this.gradeIndex].termInfo
+          if (this.termTypeList && this.termTypeList.length > 1) {
+            if (this.isNowTerm === 1){
+              this.termTypeList.forEach((item,index)=>{
+                if (item == "T02") {
+                  this.termIndex = index
+                }
+              })
+            } else {
+              this.termTypeList.forEach((item,index)=>{
+                if (item == "T01") {
+                  this.termIndex = index
+                }
+              })
+            }
+          } else {
+            this.termIndex = 0
+          }
+          this.isDeploy = true;
+        } else {
+          this.$toast("未配置年级学科信息")
+        }
+
+        if (localStorage.getItem('gradeTermMap')){
+          this.gradeTermMap = JSON.parse(localStorage.getItem("gradeTermMap"))
+        } else{
+          this.$toast("年级信息错误")
+        }
+        if(this.isDeploy){
+          this.getTextBookCourseInfo()
+        }
       }
 
-      if (localStorage.getItem('gradeTermMap')){
-        this.gradeTermMap = JSON.parse(localStorage.getItem("gradeTermMap"))
-      } else{
-        this.$toast("年级信息错误")
-      }
-      if(this.isDeploy){
-        this.getTextBookCourseInfo()
-      }
     },
     created(){
       for(let key in JSON.parse(localStorage.getItem("subjectTypeList"))) {
@@ -184,7 +224,8 @@
           value:JSON.parse(localStorage.getItem("subjectTypeList"))[key],
         })
       }
-      this.$set(this.subjectList[0],'active',true)
+     const index = this.subjectList.findIndex(v => localStorage.getItem("currentSubjectType") === v.key)
+      this.$set(this.subjectList[index],'active',true)
     },
     methods: {
       handleSelect(item) {
@@ -197,10 +238,22 @@
       },
       handleSubject(item) {
         if (item.active) return
-        this.subjectList.forEach(v => {
-          v.active = false
-        })
-        item.active = true
+        this.$dialog.confirm({
+          title: '提示',
+          message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换'
+        }).then(() => {
+          this.subjectList.forEach(v => {
+            v.active = false
+          })
+          item.active = true
+          localStorage.setItem("currentSubjectTypeName", item.value);
+          localStorage.setItem("currentSubjectType", item.key);
+          this.gradeIndex = ''
+          this.classIndex = ''
+          // this.getTextBookCourseInfo()
+        }).catch(() => {
+          // on cancel
+        });
       },
       handleUnit(index) {
         this.unitIndex = index;
@@ -208,32 +261,48 @@
       },
 
       async getTextBookCourseInfo(){
+        this.$store.commit('setVanLoading',true)
         this.unitIndex = 0
         this.bookIndex = 0
-        this.unitList = []
-        this.courseList = []
-        //年级计算
-        let key = this.classGradeList[this.gradeIndex].classGrade + "_" + this.termTypeList[this.termIndex];
-        let gradeId = this.gradeTermMap[key]
+        // this.unitList = []
+        // this.courseList = []
+        let obj
+        if(this.type === 'myCourse') {
+          obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "termType": this.termList[this.termIndex].value, //学期
+            "classGrade": this.gradeList[this.gradeIndex]?this.gradeList[this.gradeIndex].classGrade:'', //年级
+            "classId": this.classIndex || '', //班级
+            "subjectType": localStorage.getItem("currentSubjectType") //科目
+          }
+        }else {
+          //年级计算
+          let key = this.classGradeList[this.gradeIndex].classGrade + "_" + this.termTypeList[this.termIndex];
+          let gradeId = this.gradeTermMap[key]
 
-        if (!this.bookInfoList || !this.bookInfoList[this.bookIndex].textBookId){
-          this.$toast("版本配置错误")
-          return
-        }
-        let obj = {
-          "interUser": "runLfb",
-          "interPwd": "25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          "textBookId": this.bookInfoList[this.bookIndex].textBookId,
-          "gradeTermId": gradeId,
-          "subjectType": localStorage.getItem("currentSubjectType")
+          if (!this.bookInfoList || !this.bookInfoList[this.bookIndex].textBookId){
+            this.$toast("版本配置错误")
+            return
+          }
+          obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "textBookId": this.bookInfoList[this.bookIndex].textBookId,
+            "gradeTermId": gradeId,
+            "subjectType": localStorage.getItem("currentSubjectType")
+          }
         }
         let params ={
           requestJson: JSON.stringify(obj)
         }
 
         getTextBookCourseInfo(params).then(res=>{
+          this.$store.commit('setVanLoading',false)
           console.log("课程：" ,res)
           if (res.flag){
             //重构数据
@@ -285,36 +354,52 @@
         this.currentSysCourseId = id
         this.currentSysCourseName =name
       },
+      changeClass(key) {
+        this.classIndex = key
+        this.classDropdown = false
+        // this.getTextBookCourseInfo()
+      },
       changeTermType(index){
         this.termIndex = index
         this.termDropdown = !this.termDropdown
-        this.getTextBookCourseInfo()
+        if(this.type==='myCourse') {
+          // this.getTextBookCourseInfo()
+        }else {
+          this.getTextBookCourseInfo()
+        }
       },
       changeGrade(index){
-        this.gradeIndex = index
-        this.bookInfoList = this.classGradeList[index].bookInfo
-        this.termTypeList =this.classGradeList[index].termInfo
-        if (this.termTypeList && this.termTypeList.length > 1) {
-          if (this.isNowTerm === 1){
-            this.termTypeList.forEach((item,index)=>{
-              if (item == "T02") {
-                this.termIndex = index
-              }
-            })
+        if(this.type === 'myCourse') {
+          this.gradeIndex = index
+          this.classIndex = ''
+          this.gradeDropdown = !this.gradeDropdown
+          // this.getTextBookCourseInfo()
+        }else {
+          this.gradeIndex = index
+          this.bookInfoList = this.classGradeList[index].bookInfo
+          this.termTypeList =this.classGradeList[index].termInfo
+          if (this.termTypeList && this.termTypeList.length > 1) {
+            if (this.isNowTerm === 1){
+              this.termTypeList.forEach((item,index)=>{
+                if (item == "T02") {
+                  this.termIndex = index
+                }
+              })
+            } else {
+              this.termTypeList.forEach((item,index)=>{
+                if (item == "T01") {
+                  this.termIndex = index
+                }
+              })
+            }
           } else {
-            this.termTypeList.forEach((item,index)=>{
-              if (item == "T01") {
-                this.termIndex = index
-              }
-            })
+            this.termIndex = 0
           }
-        } else {
-          this.termIndex = 0
-        }
 
-        this.bookIndex = 0
-        this.gradeDropdown = !this.gradeDropdown
-        this.getTextBookCourseInfo()
+          this.bookIndex = 0
+          this.gradeDropdown = !this.gradeDropdown
+          this.getTextBookCourseInfo()
+        }
       },
       changeBook(index){
         this.bookIndex = index
@@ -325,7 +410,11 @@
         this.show = false
         this.$emit('update:visible', false)
         this.$emit('update:sysCourseId', this.currentSysCourseId)
-        this.$parent.handleSysCourse(this.currentSysCourseName,this.currentSysCourseId,this.classGradeList[this.gradeIndex].classGrade)
+        if(this.type==='myCourse') {
+          this.$emit('confirm',this.gradeList[this.gradeIndex]?this.gradeList[this.gradeIndex].classGrade:'',this.termList[this.termIndex]?this.termList[this.termIndex].value:'',this.classIndex>0?this.classIndex:'')
+        }else {
+          this.$parent.handleSysCourse(this.currentSysCourseName,this.currentSysCourseId,this.classGradeList[this.gradeIndex].classGrade)
+        }
       },
 
 
@@ -404,6 +493,8 @@
           color: #333;
           font-size: 14px;
           background: #fff;
+          max-height: 220px;
+          overflow-y: auto;
 
           &-item {
             line-height: 44px;
