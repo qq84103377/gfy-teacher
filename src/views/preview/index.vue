@@ -4,10 +4,11 @@
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
                      @selectCourse="selectCourse">
-      <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
+      <div v-if="$route.query.from==='course'" slot="left" class="fs14" style="color: #16AAB7" @click="changeCourse(0)">上一课</div>
+      <div v-else slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
       <!--      <div slot="right" ><i class="iconGFY icon-edit-blue"></i> 编辑</div>-->
-
-      <div slot="right" class="preview-wrap-header-right">
+      <div v-if="$route.query.from==='course'" slot="right" class="fs14" style="color: #16AAB7" @click="changeCourse(1)">下一课</div>
+      <div v-else slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
             <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass"></edit-course>
@@ -78,7 +79,6 @@
         show: false,
         list: [{name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1}, {name: 1},],
         courseList: [],
-        courseIndex: 0,
         courseTaskList: [],
         courseName: '',
         tchCourseId: '',
@@ -96,30 +96,65 @@
         currentTchCourseInfo: {},
         classGrade: '',
         sysCourseId: '',
+        courseIndex: 0, //选中的课程index
+        currCourse: JSON.parse(JSON.stringify(this.$route.query.currCourse))
       }
     },
     mounted() {
       // this.getClassTeachCourseInfo()
     },
     methods: {
+      async changeCourse(type) {
+        if (type) {
+          //下一题
+          if (this.courseIndex >= this.courseList.length - 1) {
+            // 当前课程已是列表的最后一个
+            if (!this.dropdownFinish) {
+              //还能加载下一页
+              await this.dropdownOnLoad()
+              this.courseIndex++
+              this.selectCourse(this.courseList[this.courseIndex].tchCourseInfo, this.courseIndex)
+            } else {
+              //最后一页
+              this.$toast('没有下一课了')
+            }
+          } else {
+            this.courseIndex++
+            this.selectCourse(this.courseList[this.courseIndex].tchCourseInfo, this.courseIndex)
+          }
+
+        } else {
+          //上一题
+          if (this.courseIndex <= 0) {
+            // 当前课程已是列表的第一个
+            this.$toast('没有上一课了')
+          } else {
+            this.courseIndex--
+            if (this.courseIndex > this.courseList.length - 1) {
+              //如果跳转过来选中的课程的index超过首次加载第一页的数量,
+            }
+            this.selectCourse(this.courseList[this.courseIndex].tchCourseInfo, this.courseIndex)
+          }
+        }
+      },
       goto(item) {
-        if(item.taskType === 'T03') {
-          if(item.resourceType === 'R03') {
+        if (item.taskType === 'T03') {
+          if (item.resourceType === 'R03') {
             //单道试题
             this.$router.push(`/questionDetail?tchCourseId=${this.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
-          }else {
+          } else {
             //试卷
             this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
           }
-        }else if(['T04'].includes(item.taskType)) {
+        } else if (['T04'].includes(item.taskType)) {
           // 学资源
           this.getCourseTaskDetail(item)
-        }else if (['T01','T02'].includes(item.taskType)) {
+        } else if (['T01', 'T02'].includes(item.taskType)) {
           //微课   由于需要自动横屏全屏播放 暂时不弄
-        }else if (['T06'].includes(item.taskType)) {
+        } else if (['T06'].includes(item.taskType)) {
           //讨论
           this.getCourseTaskDetail(item)
-        }else if (['T13'].includes(item.taskType)) {
+        } else if (['T13'].includes(item.taskType)) {
           //口语
           this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${this.sysCourseId}`)
         }
@@ -140,16 +175,16 @@
         }
         getCourseTaskDetail(params).then(res => {
           if (res.flag) {
-            if(['T04'].includes(item.taskType)) {
-              this.$router.push({path:'/materialDetail',query:{data:res.data[0].courseware}})
-            }else if(['T06'].includes(item.taskType)) {
-              this.$router.push({path:`/discussDetail`,query:{data:res.data[0].discussInfo}})
+            if (['T04'].includes(item.taskType)) {
+              this.$router.push({path: '/materialDetail', query: {data: res.data[0].courseware}})
+            } else if (['T06'].includes(item.taskType)) {
+              this.$router.push({path: `/discussDetail`, query: {data: res.data[0].discussInfo}})
             }
           }
         })
       },
       viewStat(item) {
-        if(item.tchClassTastInfo.some(v => v.classId === 0)) {
+        if (item.tchClassTastInfo.some(v => v.classId === 0)) {
           return this.$toast('任务班级已不在当前课程的班级中，无法查看任务统计！')
         }
         this.$store.commit('setVanLoading', true)
@@ -167,7 +202,8 @@
         })
         localStorage.setItem('stat', JSON.stringify(item))
       },
-      async selectCourse(tchCourseInfo) {
+      async selectCourse(tchCourseInfo, index) {
+        this.courseIndex = index
         this.currentTchCourseInfo = tchCourseInfo
         this.$store.commit('setVanLoading', true)
         this.currentPage = 1
@@ -179,10 +215,10 @@
         await this.getCourseTaskList(this.courseName, this.tchCourseId)
         this.$store.commit('setVanLoading', false)
       },
-      dropdownOnLoad() {
+      async dropdownOnLoad() {
         this.dropdownPage++
 
-        this.getClassTeachCourseInfo()
+        await this.getClassTeachCourseInfo()
       },
       async dropdownRefresh() {
         this.dropdownListLoading = false
@@ -200,11 +236,20 @@
         if (!this.courseList.length) {
           //首次加载
           await this.getClassTeachCourseInfo()
-          this.courseName = this.courseList[0].tchCourseInfo.courseName
-          this.classGrade = this.courseList[0].tchCourseInfo.classGrade
-          this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
-          this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
-          this.termType = this.courseList[0].tchCourseInfo.termType
+          if (this.$route.query.from === 'course') {
+            this.courseName = this.$route.query.courseName
+            this.classGrade = this.$route.query.classGrade
+            this.sysCourseId = this.$route.query.sysCourseId
+            this.tchCourseId = this.$route.query.tchCourseId
+            this.termType = this.$route.query.termType
+          } else {
+            this.courseName = this.courseList[0].tchCourseInfo.courseName
+            this.classGrade = this.courseList[0].tchCourseInfo.classGrade
+            this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
+            this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
+            this.termType = this.courseList[0].tchCourseInfo.termType
+          }
+
         }
         this.getCourseTaskList(this.courseName, this.tchCourseId)
       },
@@ -226,11 +271,11 @@
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "subjectType": localStorage.getItem("currentSubjectType"),
-          "classGrade": "",
-          "termType": "",
+          "classGrade": this.$route.query.fltGrade || '',
+          "termType": this.$route.query.fltTerm || '',
+          "classId": this.$route.query.fltClassId || '',
           "pageSize": "20",
           "courseType": "C01",
-          "classId": "",
           "currentPage": page
         }
         let params = {
@@ -240,7 +285,23 @@
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
           if (res.flag && res.data && res.data[0]) {
-            this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            if (this.$route.query.from === 'course') {
+              const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.$route.query.tchCourseId)
+              if (index > -1) {
+                res.data.splice(index, 1)
+              }
+              if (page === 1) {
+                console.log(this.currCourse,'this.$route.query.currCoursethis.$route.query.currCourse');
+                res.data.unshift({...this.currCourse})
+                this.courseList = res.data
+              } else {
+                this.courseList = this.courseList.concat(res.data)
+              }
+              // this.courseList = page === 1 ? res.data.unshift(...this.$route.query.currCourse) : this.courseList.concat(res.data)
+
+            } else {
+              this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            }
             this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
             if (page >= res.total) {
               this.dropdownFinish = true

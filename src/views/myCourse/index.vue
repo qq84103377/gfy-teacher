@@ -9,7 +9,7 @@
       <div class="my-course-list__body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
           <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
-            <list-item @clickTo="" class="mgt10" style="background: #fff;" :fold="item.fold"
+            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold"
                        @del="deleteTeachCourse(item,index)" v-for="(item,index) in list" :key="index"
                        :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo"
                        :can-slide="true">
@@ -53,9 +53,25 @@
             finished: false,
             currentPage: 0,
             total: 0,
+            filterParams: {
+              classGrade:'',termType:'',classId:''
+            }
           }
       },
       methods: {
+        goto(item) {
+          this.$router.push({path:'/courseDetail',query:{
+              courseName: item.tchCourseInfo.courseName,
+              tchCourseId: item.tchCourseInfo.tchCourseId,
+              classGrade: item.tchCourseInfo.classGrade,
+              sysCourseId: item.tchCourseInfo.sysCourseId,
+              termType: item.tchCourseInfo.termType,
+              fltGrade: this.filterParams.classGrade,
+              fltTerm: this.filterParams.termType,
+              fltClassId: this.filterParams.classId,
+              currCourse: item
+            }})
+        },
         deleteTeachCourse(item, index) {
           let obj = {
             "interUser": "runLfb",
@@ -92,6 +108,9 @@
           this.onLoad()
         },
         async getClassTeachCourseInfo(classGrade='',termType='',classId='') {
+          this.filterParams = {
+            classGrade,termType,classId
+          }
           const page = this.currentPage
           let obj = {
             "interUser": "runLfb",

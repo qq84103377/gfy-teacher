@@ -408,6 +408,11 @@ export default new Router({
           name: 'myCourseList',
           component: () => import('./views/myCourse/index.vue')
         },
+        {
+          path: '/courseDetail',
+          name: 'courseDetail',
+          component: () => import('./views/myCourse/courseDetail.vue')
+        },
       ]
     },
     {
