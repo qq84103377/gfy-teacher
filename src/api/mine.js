@@ -43,13 +43,18 @@ export const resetPassword = (params) => {
 
 // 更换手机（教师app的修改手机号调用接口）
 export const replacementPhone = (params) => {
-  return axios.post('user/replacementPhone', qs.stringify(params))
+  return axios.post('user/updatePhoneNo', qs.stringify(params))
 }
 
 // 获取提醒信息
-export const getPubRemindInfo = (params) => {
-  return axios.post('public/getPubRemindInfo', qs.stringify(params))
+export const getPubRemindInfoGroupByDay = (params) => {
+  return axios.post('public/getPubRemindInfoGroupByDay', qs.stringify(params))
 }
+// 读新消息
+export const savePubRemindInfo = (params) => {
+  return axios.post('public/savePubRemindInfo', qs.stringify(params))
+}
+
 
 //region==================意见反馈相关API========================================
 
@@ -65,3 +70,5 @@ export const updateFeedback = (params) => {
 }
 
 //endregion===============意见反馈相关API========================================
+
+
