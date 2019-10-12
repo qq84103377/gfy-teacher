@@ -34,8 +34,8 @@
             <span>资源收藏</span>
           </div>
           <div class="item">
-            <div>{{pubInfo}}</div>
-            <span>收藏</span>
+            <div>{{coinDetail.O44}}</div>
+            <span>上课</span>
           </div>
         </div>
 
@@ -94,13 +94,13 @@
         total: 1,
         langCoin: 0,
         showTips: false,
-        pubInfo: 0,
         coinDetail:{
           O01:0,    //登录
           O08:0,    //资源共享
           O10:0,    //资源收藏
           O11:0,    //资源创建
           O12:0,    //资源被使用
+          O44:0,    //上课
         }
       }
     },
@@ -184,6 +184,9 @@
                   break;
                 case 'O12':     //资源被使用
                   this.coinDetail.O12= userDetailCount[i].counterValue;
+                  break;
+                case 'O44':     //上课
+                  this.coinDetail.O44= userDetailCount[i].counterValue;
                   break;
 
               }
