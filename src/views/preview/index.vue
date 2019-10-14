@@ -97,7 +97,7 @@
         classGrade: '',
         sysCourseId: '',
         courseIndex: 0, //选中的课程index
-        currCourse: JSON.parse(JSON.stringify(this.$route.query.currCourse))
+        currCourse: this.$route.query.currCourse?JSON.parse(JSON.stringify(this.$route.query.currCourse)):''  //我的课程跳过来才有的
       }
     },
     mounted() {

@@ -413,6 +413,39 @@ export default new Router({
           name: 'courseDetail',
           component: () => import('./views/myCourse/courseDetail.vue')
         },
+        {
+          path: '/myClassList',
+          name: 'myClassList',
+          component: () => import('./views/myClass/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '我的班级'
+          }
+        },
+        {
+          path: '/classDetail',
+          name: 'classDetail',
+          component: () => import('./views/myClass/classDetail.vue')
+        },
+        {
+          path: '/addGroup',
+          name: 'addGroup',
+          component: () => import('./views/myClass/addGroup.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '新建小组'
+          }
+        },
+        {
+          path: '/copyGroup',
+          name: 'copyGroup',
+          component: () => import('./views/myClass/copyGroup.vue')
+        },
+        {
+          path: '/groupDetail',
+          name: 'groupDetail',
+          component: () => import('./views/myClass/groupDetail.vue')
+        },
       ]
     },
     {

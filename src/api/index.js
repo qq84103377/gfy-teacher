@@ -329,3 +329,23 @@ export const statTaskStatV2 =(params)=>{
 export const deleteTeachCourse =(params)=>{
   return axios.post('teach/deleteTeachCourse', qs.stringify(params))
 }
+//获取班级老师
+export const getClassTeacher =(params)=>{
+  return axios.post('school/getClassTeacher', qs.stringify(params))
+}
+//更新班长信息
+export const updateClassStudent =(params)=>{
+  return axios.post('school/updateClassStudent', qs.stringify(params))
+}
+//更新组长信息
+export const setSubGroupStudentType =(params)=>{
+  return axios.post('teach/setSubGroupStudentType', qs.stringify(params))
+}
+//新建小组
+export const createClassSubGroup =(params)=>{
+  return axios.post('teach/createClassSubGroup', qs.stringify(params))
+}
+//复制老师分组
+export const copyGroupByTeacherInfo =(params)=>{
+  return axios.post('teach/copyGroupByTeacherInfo', qs.stringify(params))
+}

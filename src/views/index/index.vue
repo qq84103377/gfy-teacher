@@ -83,7 +83,7 @@
         </van-skeleton>
         <div class="divider-title">教学工具</div>
         <div class="icon-group">
-          <div>
+          <div @click="$router.push(`/myClassList`)">
             <i class="iconGFY icon-user"></i>
             <span>我的班级</span>
           </div>
