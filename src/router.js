@@ -326,11 +326,39 @@ export default new Router({
           path: '/shop',
           name: 'shop',
           component: () => import('./views/mine/shop/index.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '积分商城'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '积分商城'
+          // }
         },
+        // {
+        //   path: '/convertRule',
+        //   name: 'convertRule',
+        //   component: () => import('./views/mine/shop/convertRule.vue'),
+        // },
+        // {
+        //   path: '/goodsDetail/:id',
+        //   name: 'goodsDetail',
+        //   component: () => import('./views/mine/shop/goodsDetail.vue'),
+        // },
+        // {
+        //   path: '/myCollect',
+        //   name: 'myCollect',
+        //   component: () => import('./views/mine/shop/myCollect.vue'),
+        //   meta: {
+        //     isShowHeader: true,
+        //     title: '我的收藏'
+        //   }
+        // },
+        // {
+        //   path: '/converseRecord',
+        //   name: 'converseRecord',
+        //   component: () => import('./views/mine/shop/converseRecord.vue'),
+        //   meta: {
+        //     isShowHeader: true,
+        //     title: '兑换记录'
+        //   }
+        // },
         {
           path: '/help',
           name: 'help',
@@ -358,15 +386,15 @@ export default new Router({
             title: '我的朗币'
           }
         },
-        // {
-        //   path: '/myNotice',
-        //   name: 'myNotice',
-        //   component: () => import('./views/mine/myNotice.vue'),
-        //   meta: {
-        //     isShowHeader: true,
-        //     title: '我的提醒'
-        //   }
-        // },
+        {
+          path: '/myNotice',
+          name: 'myNotice',
+          component: () => import('./views/mine/myNotice.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '我的提醒'
+          }
+        },
         {
           path: '/setting',
           name: 'setting',
@@ -374,6 +402,24 @@ export default new Router({
           meta: {
             isShowHeader: true,
             title: '个人设置'
+          }
+        },
+        {
+          path: '/modifyPhoneNo',
+          name: 'modifyPhoneNo',
+          component: () => import('./views/mine/setting/modifyPhoneNo.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '修改手机号'
+          }
+        },
+        {
+          path: '/modifyPassword',
+          name: 'modifyPassword',
+          component: () => import('./views/mine/setting/modifyPassword.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '修改密码'
           }
         },
         {
@@ -393,6 +439,24 @@ export default new Router({
           //   isShowHeader: true,
           //   title: '意见反馈'
           // }
+        },
+        {
+          path: '/feedbackList',
+          name: 'FeedbackList',
+          component: () => import('./views/mine/feedback/feedbackList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '问题反馈',
+          },
+        },
+        {
+          path: '/feedbackDetail',
+          name: 'FeedbackDetail',
+          component: () => import('./views/mine/feedback/feedbackDetail.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '反馈详情',
+          }
         },
         {
           path: '/unfinishTaskList',

@@ -58,7 +58,8 @@ import {
   Grid,
   GridItem,
   Progress,
-  Picker
+  Picker,
+  Stepper
 } from 'vant'
 // import AlloyFinger from 'alloyfinger'
 // import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger_vue'
@@ -79,7 +80,7 @@ Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)
   .use(Tabs).use(Swipe).use(SwipeItem).use(Cell).use(CellGroup).use(Collapse).use(CollapseItem)
   .use(List).use(PullRefresh).use(Search).use(Tag).use(Popup).use(IndexBar).use(IndexAnchor).use(Row).use(Col).use(Divider)
-  .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview).use(SwipeCell).use(DatetimePicker ).use(Skeleton).use(Grid).use(GridItem).use(Progress).use(Picker)
+  .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview).use(SwipeCell).use(DatetimePicker ).use(Skeleton).use(Grid).use(GridItem).use(Progress).use(Picker).use(Stepper)
 
 // 配置fundebug
 // fundebug.apikey = 'cfa2bb54f98fa9956f7bf365ac408cc085faaab93013d5ffbd1394a508eb380e'

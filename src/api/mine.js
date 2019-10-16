@@ -43,13 +43,18 @@ export const resetPassword = (params) => {
 
 // 更换手机（教师app的修改手机号调用接口）
 export const replacementPhone = (params) => {
-  return axios.post('user/replacementPhone', qs.stringify(params))
+  return axios.post('user/updatePhoneNo', qs.stringify(params))
 }
 
 // 获取提醒信息
-export const getPubRemindInfo = (params) => {
-  return axios.post('public/getPubRemindInfo', qs.stringify(params))
+export const getPubRemindInfoGroupByDay = (params) => {
+  return axios.post('public/getPubRemindInfoGroupByDay', qs.stringify(params))
 }
+// 读新消息
+export const savePubRemindInfo = (params) => {
+  return axios.post('public/savePubRemindInfo', qs.stringify(params))
+}
+
 
 //region==================意见反馈相关API========================================
 
@@ -65,3 +70,35 @@ export const updateFeedback = (params) => {
 }
 
 //endregion===============意见反馈相关API========================================
+
+//region==================积分商城相关API========================================
+
+// 获取商品列表
+export const getGoodsList = (params) => {
+  return axios.post('mall/getMallGoodsInfoForSchool.action', qs.stringify(params))
+}
+
+// 获取我能兑换的商品列表
+export const oneKeyReadRemindInfo = (params) => {
+  return axios.post('public/oneKeyReadRemindInfo', qs.stringify(params))
+}
+
+// 获取收藏记录
+export const getCollectInfo = (params) => {
+  return axios.post('mall/getMallCollectInfo.action', qs.stringify(params))
+}
+
+// 获取兑换记录
+export const getConvertRecordInfo = (params) => {
+  return axios.post('mall/getMallConvertRecordInfo.action', qs.stringify(params))
+}
+
+// 商品收藏
+export const addMallCollectInfo = (params) => {
+  return axios.post('mall/addMallCollectInfo.action', qs.stringify(params))
+}
+
+
+//endregion===============积分商城相关API========================================
+
+
