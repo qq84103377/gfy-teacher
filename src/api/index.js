@@ -349,3 +349,7 @@ export const createClassSubGroup =(params)=>{
 export const copyGroupByTeacherInfo =(params)=>{
   return axios.post('teach/copyGroupByTeacherInfo', qs.stringify(params))
 }
+//教学统计-任务统计
+export const statCourseByTeacher =(params)=>{
+  return axios.post('teach/statCourseByTeacher', qs.stringify(params))
+}

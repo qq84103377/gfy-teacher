@@ -437,6 +437,30 @@ export default new Router({
           }
         },
         {
+          path: '/',
+          component: () => import('./views/teachStat/index.vue'),
+          children: [
+            {
+              path: '/teachStat',
+              name: 'teachStat',
+              component: () => import('./views/teachStat/teachStat.vue'),
+              meta: {
+                isShowHeader: true,
+                title: '教学统计'
+              },
+            },
+            {
+              path: '/taskStat',
+              name: 'taskStat',
+              component: () => import('./views/teachStat/taskStat.vue'),
+              meta: {
+                isShowHeader: true,
+                title: '任务统计'
+              },
+            },
+          ]
+        },
+        {
           path: '/copyGroup',
           name: 'copyGroup',
           component: () => import('./views/myClass/copyGroup.vue')

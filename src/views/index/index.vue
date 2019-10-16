@@ -282,6 +282,14 @@
                   item.myClassInfo.forEach(obj=>{
                     if(!gradeList.some(v => v.classGrade === obj.classGrade)) {
                       gradeList.push({classGrade:obj.classGrade,gradeName:obj.gradeName,teacherInfoList:obj.teacherInfoList || []})
+                    }else {
+                      //有的时候
+                      const index =  gradeList.findIndex(v => v.classGrade === obj.classGrade)
+                      obj.teacherInfoList.forEach(s => {
+                        if(!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
+                          gradeList[index].teacherInfoList.push(s)
+                        }
+                      })
                     }
 
                     classMap[obj.classId] = obj
