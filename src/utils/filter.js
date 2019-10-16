@@ -122,6 +122,54 @@ let getGradeName = (grade)=>{
   }
   return gradeName
 }
+let getSubjectName = (subjectType)=>{
+  let subjectName = "其他"
+  switch (subjectType) {
+    case 'S01':
+      subjectName = "语文"
+      break
+    case 'S02':
+      subjectName = "数学"
+      break
+    case 'S03':
+      subjectName = "英语"
+      break
+    case 'S04':
+      subjectName = "物理"
+      break
+    case 'S05':
+      subjectName = "化学"
+      break
+    case 'S06':
+      subjectName = "政治"
+      break
+    case 'S07':
+      subjectName = "历史"
+      break
+    case 'S08':
+      subjectName = "生物"
+      break
+    case 'S09':
+      subjectName = "地理"
+      break
+    case 'S19':
+      subjectName = "体育"
+      break
+    case 'S20':
+      subjectName = "家庭教育"
+      break
+    case 'S21':
+      subjectName = "教育学习"
+      break
+    case 'S22':
+      subjectName = "名著导读"
+      break
+    case 'S23':
+      subjectName = "在线家课"
+      break
+  }
+  return subjectName
+}
 let getTermName = (type) => {
   if (type == "T01") {
     return "上学期"
@@ -183,4 +231,4 @@ const numToWord = section => {
   return chnStr;
 }
 
-export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getStudentName,getGradeName,getTermName,dealType, numToWord}
+export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}

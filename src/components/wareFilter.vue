@@ -35,6 +35,10 @@
           </div>
         </div>
         <div class="ware-filter-wrap__body-right">
+          <div v-if="!isLoading&&courseList.length==0" style="text-align: center;color: #999999">
+            <img class="null-tips" src="../assets/img/empty-1.png" alt />
+            <span style="font-size: 14px">当前没有{{currentTypeName}}，快去上传{{currentTypeName}}吧！</span>
+          </div>
           <div v-for="(item,index) in courseList" :key="index" @click="handleSelect(item)"
                :class="['cell__item',{active:item.check}]">
             {{item.coursewareName || item.testPaperName}}
@@ -69,7 +73,9 @@
           resourceType: 'R01'
         }, {name: '试卷', coursewareClassify: '', resourceType: 'R02'}],
         courseList: [],
-        selectArr: []
+        selectArr: [],
+        currentTypeName: "课件",
+        isLoading: false
       }
     },
     watch: {
@@ -104,6 +110,8 @@
         this.$emit('confirm',this.selectArr)
       },
       getList() {
+        this.courseList = []
+        this.isLoading = true
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -127,6 +135,7 @@
         }
         teachApi.getTeachCourseResDetail(params).then(res => {
           this.$store.commit('setVanLoading', false)
+          this.isLoading = false
           const key = this.activeType.coursewareClassify ? 'courseware' : 'testPaperInfo'
           if (res.flag && res.data.length && res.data[0][key]) {
             res.data[0][key].forEach(v => {
@@ -134,6 +143,8 @@
               this.$set(v, 'check', this.selectArr.some(s => s.resourceId === (this.activeType.coursewareClassify ? v.coursewareId : v.testPaperId)))
             })
             this.courseList = res.data[0][key]
+          }else {
+            this.courseList = []
           }
         })
       },
@@ -182,6 +193,7 @@
       },
       handleType(item) {
         if (item.active) return
+        this.currentTypeName = item.name
         this.typeList.forEach(v => {
           this.$set(v, 'active', false)
         })
@@ -340,5 +352,11 @@
         font-size: 18px;
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

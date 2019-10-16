@@ -2,7 +2,10 @@
   <section class="spoken-list">
     <div class="spoken-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/resource/spoken_empty.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有口语～'" @load="onLoad" :offset='80'>
           <list-item @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)" class="mgt10" style="background: #fff;"
                      v-for="(item,index) in list" :key="index"
                      @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
@@ -373,7 +376,7 @@
         console.log("发任务：", obj.spokenTitle)
         this.$store.commit('setResourceInfo', obj)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/addTask?type=spoken_t=new`)
+        this.$router.push(`/addTask?type=spoken&_t=new`)
       }
 
     }
@@ -455,5 +458,11 @@
         }
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

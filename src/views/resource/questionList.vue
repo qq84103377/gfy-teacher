@@ -47,7 +47,10 @@
     </div>
     <div class="question-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-        <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'" @load="onLoad" :offset='80'>
 <!--          <div class="question-num">1.选择题</div>-->
           <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index"
                      :item="item" :index="index"></question-item>
@@ -83,7 +86,7 @@
           difficult: false,
           type: false,
           sort: false,
-          sortList: [{name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
+          sortList: [{name: '全部', value: ''},{name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
             name: '使用量',
             value: 'T02'
           }, {name: '收藏量', value: 'T03'}],
@@ -92,7 +95,7 @@
             value: 'd03'
           }],
           questionTypeList: [{examTypeName: '全部'}],
-          typeList: []
+          typeList: [{dictValue: '全部'}]
         },
         list: [],
         listLoading: false,
@@ -190,7 +193,7 @@
         }
         getSysDictList(params).then(res => {
           if (res.flag) {
-            this.tab.typeList = res.data[0].sysDictInfoList
+            this.tab.typeList.push(...res.data[0].sysDictInfoList)
           }
         })
       },
@@ -364,5 +367,11 @@
         padding: 0 10px;
       }
     }
+  }
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
   }
 </style>

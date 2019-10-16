@@ -52,7 +52,7 @@
       </van-cell>
       <van-cell class="class-group">
         <div slot="title">
-          <div class="gfy-label class-label"><span style="color: red">*</span>选择班级:{{sysCourseId}}</div>
+          <div class="gfy-label class-label"><span style="color: red">*</span>选择班级:</div>
           <van-checkbox-group class="gfy-checkbox-group" v-model="result">
             <van-checkbox
               class="gfy-checkbox-group-item"

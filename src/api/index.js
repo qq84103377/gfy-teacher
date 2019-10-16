@@ -321,7 +321,31 @@ export const getSpokenResourceSingle =(params)=>{
 export const addImportTask =(params)=>{
   return axios.post('public/addImportTask', qs.stringify(params))
 }
-//视频转换
+//任务统计(旧)
 export const statTaskStatV2 =(params)=>{
   return axios.post('teach/statTaskStat', qs.stringify(params))
+}
+//课程删除
+export const deleteTeachCourse =(params)=>{
+  return axios.post('teach/deleteTeachCourse', qs.stringify(params))
+}
+//获取班级老师
+export const getClassTeacher =(params)=>{
+  return axios.post('school/getClassTeacher', qs.stringify(params))
+}
+//更新班长信息
+export const updateClassStudent =(params)=>{
+  return axios.post('school/updateClassStudent', qs.stringify(params))
+}
+//更新组长信息
+export const setSubGroupStudentType =(params)=>{
+  return axios.post('teach/setSubGroupStudentType', qs.stringify(params))
+}
+//新建小组
+export const createClassSubGroup =(params)=>{
+  return axios.post('teach/createClassSubGroup', qs.stringify(params))
+}
+//复制老师分组
+export const copyGroupByTeacherInfo =(params)=>{
+  return axios.post('teach/copyGroupByTeacherInfo', qs.stringify(params))
 }

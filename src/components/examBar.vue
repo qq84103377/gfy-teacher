@@ -80,7 +80,7 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell class="add-exam-wrap__cell">
+        <van-cell v-if="false" class="add-exam-wrap__cell">
           <div slot="title">
             <div class="aic">
               <div class="fs15" style="flex: 1"><span class="red">*</span>添加到课程: {{$route.query.courseName}}</div>

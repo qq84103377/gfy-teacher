@@ -5,7 +5,7 @@
           <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
             <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
           </div>
-          <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有素材～快去上传吧'" @load="onLoad" :offset='80'>
+          <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有素材，快去上传吧！'" @load="onLoad" :offset='80'>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index"
                        :itemTitle="item.coursewareName"
                        :can-slide="true">

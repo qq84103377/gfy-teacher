@@ -1,0 +1,180 @@
+<template>
+    <section class="group-detail-wrap">
+      <van-nav-bar
+        :title="groupList[curIndex].tchClassSubGroupStudent.tchClassSubGroup.subgroupName"
+        @click-left="$router.back()"
+        left-arrow>
+      </van-nav-bar>
+      <div class="group-detail-wrap__body">
+        <div class="mgb10" :class="{disabled:isAdd}" style="position: relative;">
+          <van-cell title="组员"/>
+          <van-cell v-for="(item,index) in groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent" :key="index">
+            <div @click="$set(item,'check',!item.check);stuInfo=item" class="aic" slot="title">
+              <div class="check-box" :class="{'is-active':item.check}"></div>
+              <div>{{item.studentName}}</div>
+            </div>
+            <van-icon name="arrow" @click="stuInfo=item;visible=true" style="vertical-align: middle;" />
+          </van-cell>
+          <div class="disabled-mask"></div>
+        </div>
+        <div style="position: relative;" :class="{disabled: isDel}">
+          <van-cell title="添加学生"/>
+          <div>
+            <div v-if="gi !== curIndex" v-for="(g,gi) in groupList" :key="gi">
+              <van-cell :title="g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName"/>
+              <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
+                  <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
+                    <div class="check-box" :class="{'is-active':s.check}"></div>
+                    <div>{{s.studentName}}</div>
+                  </div>
+                  <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;" />
+                </van-cell>
+            </div>
+          </div>
+          <div class="disabled-mask"></div>
+        </div>
+      </div>
+      <div class="group-detail-wrap__footer">
+        <van-button type="info" class="btn">{{isAdd?'添加':isDel?'删除':'添加/删除'}}</van-button>
+      </div>
+      <setting-dialog @success="$toast('设置成功');getSubGroupStudent()" :visible.sync="visible" :classId="$route.params.classId" :stuInfo="stuInfo" :monitorInfo="monitor" :groupLeaderInfo="groupLeader"></setting-dialog>
+    </section>
+</template>
+
+<script>
+  import settingDialog from './components/settingDialog'
+  import {getSubGroupStudent} from '@/api/index'
+    export default {
+        name: "groupDetail",
+      components: {settingDialog},
+      computed: {
+        isAdd() {
+         return this.groupList.some((g,gi) => {
+            if(gi !== this.curIndex && g.tchClassSubGroupStudent.tchSubGroupStudent) {
+             return  g.tchClassSubGroupStudent.tchSubGroupStudent.some(s => s.check)
+            }
+          })
+        },
+        isDel() {
+          return this.groupList[this.curIndex].tchClassSubGroupStudent.tchSubGroupStudent?
+            this.groupList[this.curIndex].tchClassSubGroupStudent.tchSubGroupStudent.some(s => s.check):false
+        },
+        monitor() {
+          let obj = {}
+          for(let k in this.groupList) {
+            const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
+              this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.cadreType === 'T02') : ''
+            if(item) {
+              obj = item
+              break
+            }
+          }
+          return obj
+        },
+        groupLeader() {
+          let obj = {}
+          for(let k in this.groupList) {
+            const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
+              this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.identityType === 'I02') : ''
+            if(item) {
+              obj = item
+              break
+            }
+          }
+          return obj
+        }
+      },
+      data() {
+          return {
+            groupList: JSON.parse(JSON.stringify(this.$route.params.groupList)),
+            curIndex: this.$route.params.curIndex,
+            visible: false,
+            stuInfo: {}
+          }
+      },
+      methods: {
+        getSubGroupStudent() {
+          this.$store.commit('setVanLoading',true)
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "classId": this.$route.params.classId,
+            "subjectType": localStorage.currentSubjectType
+          };
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+          getSubGroupStudent(params).then(res => {
+            this.$store.commit('setVanLoading',false)
+            if(res.flag) {
+              this.groupList = res.data
+            }else {
+              this.$toast(res.msg)
+            }
+          })
+        }
+      }
+    }
+</script>
+
+<style lang="less" scoped>
+  .group-detail-wrap {
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    &__body {
+      flex: 1;
+      overflow-y: auto;
+      .check-box {
+        flex: 0 0 16px;
+        height: 16px;
+        border: 1px solid #999;
+        border-radius: 1.5px;
+        margin-right: 9px;
+
+        &.is-active {
+          background: url("../../assets/img/icon-check.png") no-repeat center center;
+          background-size: contain;
+          border: 1px solid transparent;
+        }
+      }
+      .disabled-mask {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: none;
+      }
+      .disabled {
+        .van-cell {
+          color: #ccc;
+        }
+        .check-box {
+          border: 1px solid #ccc;
+        }
+        .van-icon-arrow {
+          color: #ccc;
+        }
+        .disabled-mask{
+          display: block;
+        }
+      }
+    }
+    &__footer {
+      flex: 0 0 55px;
+      padding: 5px 18px;
+      background: #fff;
+
+      .btn {
+        border-radius: 20px;
+        color: #fff;
+        font-size: 18px;
+        width: 100%;
+      }
+    }
+  }
+</style>

@@ -121,10 +121,11 @@
           </div>
         </div>
         <div class="stu-info-wrap__body">
-          <div class="stu-item" v-for="(stu,si) in filterStuList" :key="si">
-            <div class="stu-item__name">{{getStudentName(stu.accountNo,classId)}}</div>
+<!--          <div class="stu-item" v-for="(stu,si) in filterStuList" :key="si">-->
+          <div class="stu-item" v-if="getStudentName(stu.accountNo, classId).indexOf(stuName) > -1" v-for="(stu,si) in stuArr" :key="si">
+            <div class="stu-item__name" @click="selectAnswer(si)">{{getStudentName(stu.accountNo,classId)}}</div>
             <div class="stu-item__score">
-              <div class="stu-item__score-item" v-for="(asw,ai) in stu.answer" :key="ai">
+              <div class="stu-item__score-item" @click="selectAnswer(si,ai)" v-for="(asw,ai) in stu.answer" :key="ai">
                 <i v-if="asw.qualityType==='Q01'" class="iconGFY icon-good-active"></i>
                 <span>{{$route.params.examNum}}.{{info.groupExamList.length?`(${ai+1})`:``}} {{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
               </div>
@@ -235,16 +236,16 @@
       }
     },
     watch: {
-      stuName() {
-        clearTimeout(this.timer)
-        this.timer = setTimeout(() => {
-          if (this.stuName) {
-            this.filterStuList = this.stuArr.filter(v => this.getStudentName(v.accountNo, this.classId).indexOf(this.stuName) > -1)
-          } else {
-            this.filterStuList = this.stuArr
-          }
-        }, 500)
-      }
+      // stuName() {
+      //   clearTimeout(this.timer)
+      //   this.timer = setTimeout(() => {
+      //     if (this.stuName) {
+      //       this.filterStuList = this.stuArr.filter(v => this.getStudentName(v.accountNo, this.classId).indexOf(this.stuName) > -1)
+      //     } else {
+      //       this.filterStuList = this.stuArr
+      //     }
+      //   }, 500)
+      // }
     },
     computed: {
       ...mapState({
@@ -454,6 +455,12 @@
           this.$refs['drawBoard'].handleZoom(this.scale)
         }
       },
+      selectAnswer(stuIndex,aswIndex) {
+        this.stuIndex = stuIndex
+        this.aswIndex = aswIndex || 0
+        this.imgIndex = 0
+        this.scale = 1
+      },
       toggle(type) {
         if (type) {
           // 下一个
@@ -562,7 +569,18 @@
             // } else {
             swordEle.translateX += evt.deltaX;
             swordEle.translateY += evt.deltaY;
-            // }
+            if(swordEle.translateX>0) {
+              swordEle.translateX = 0
+            }
+            if(swordEle.translateY>0) {
+              swordEle.translateY = 0
+            }
+            if(swordEle.translateX<-(window.document.body.offsetWidth - swordEle.offsetWidth)) {
+              swordEle.translateX = -(window.document.body.offsetWidth - swordEle.offsetWidth)
+            }
+            if(swordEle.translateY<-(window.document.body.offsetHeight - swordEle.offsetHeight)) {
+              swordEle.translateY = -(window.document.body.offsetHeight - swordEle.offsetHeight)
+            }
           },
           swipe: function (evt) {
           }

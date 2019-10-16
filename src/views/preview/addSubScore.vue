@@ -252,6 +252,7 @@
       }
 
       .score-pop {
+        border-radius: 10px;
         bottom: 55px;
         position: absolute;
         max-height: inherit;
