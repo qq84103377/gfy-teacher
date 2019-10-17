@@ -55,6 +55,10 @@ export const savePubRemindInfo = (params) => {
   return axios.post('public/savePubRemindInfo', qs.stringify(params))
 }
 
+// 全部标为已读
+export const oneKeyReadRemindInfo = (params) => {
+  return axios.post('public/oneKeyReadRemindInfo', qs.stringify(params))
+}
 
 //region==================意见反馈相关API========================================
 
@@ -78,10 +82,7 @@ export const getGoodsList = (params) => {
   return axios.post('mall/getMallGoodsInfoForSchool.action', qs.stringify(params))
 }
 
-// 获取我能兑换的商品列表
-export const oneKeyReadRemindInfo = (params) => {
-  return axios.post('public/oneKeyReadRemindInfo', qs.stringify(params))
-}
+
 
 // 获取收藏记录
 export const getCollectInfo = (params) => {
@@ -97,6 +98,17 @@ export const getConvertRecordInfo = (params) => {
 export const addMallCollectInfo = (params) => {
   return axios.post('mall/addMallCollectInfo.action', qs.stringify(params))
 }
+
+// 取消商品收藏
+export const cancelMallCollectInfo = (params) => {
+  return axios.post('mall/cancelMallCollectInfo', qs.stringify(params))
+}
+
+// 兑换商品
+export const addExchangeApplyGoodsInfo = (params) => {
+  return axios.post('mall/addExchangeApplyGoodsInfo', qs.stringify(params))
+}
+
 
 
 //endregion===============积分商城相关API========================================
