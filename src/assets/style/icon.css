@@ -1,585 +1,582 @@
-
-.iconGFY{
+.iconGFY {
   display: inline-block;
   vertical-align: middle;
 }
-.icon-book{
+.icon-book {
   width: 25px;
   height: 15px;
   background: url(../../assets/img/icon-book.png) no-repeat;
   background-size: contain;
 }
-.icon-play1{
+.icon-play1 {
   width: 25px;
   height: 19px;
   background: url(../../assets/img/icon-play.png) no-repeat;
   background-size: contain;
 }
-.icon-res{
+.icon-res {
   width: 16px;
   height: 25px;
   background: url(../../assets/img/icon-res.png) no-repeat;
   background-size: contain;
 }
-.icon-plus{
+.icon-plus {
   width: 25px;
   height: 25px;
   background: url(../../assets/img/icon-plus.png) no-repeat;
   background-size: contain;
 }
-.icon-arrow{
+.icon-arrow {
   width: 10px;
   height: 12px;
   background: url(../../assets/img/icon-arrow.png) no-repeat;
   background-size: contain;
 }
-.icon-edit{
+.icon-edit {
   width: 15px;
   height: 14px;
   background: url(../../assets/img/icon-edit.png) no-repeat;
   background-size: contain;
 }
-.icon-statistics{
+.icon-statistics {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-statistics.png) no-repeat;
   background-size: contain;
 }
-.icon-bell{
+.icon-bell {
   width: 18px;
   height: 20px;
   background: url(../../assets/img/icon-bell.png) no-repeat;
   background-size: contain;
 }
-.icon-user{
+.icon-user {
   width: 22px;
   height: 17px;
   background: url(../../assets/img/icon-user.png) no-repeat;
   background-size: contain;
 }
-.icon-tv{
+.icon-tv {
   width: 21px;
   height: 14px;
   background: url(../../assets/img/icon-tv.png) no-repeat;
   background-size: contain;
 }
-.icon-errors{
+.icon-errors {
   width: 17px;
   height: 20px;
   background: url(../../assets/img/icon-errors.png) no-repeat;
   background-size: contain;
 }
-.icon-res-plus{
+.icon-res-plus {
   width: 17px;
   height: 20px;
   background: url(../../assets/img/icon-res-plus.png) no-repeat;
   background-size: contain;
 }
-.icon-course{
+.icon-course {
   width: 63px;
   height: 18px;
   background: url(../../assets/img/icon-course.png) no-repeat;
   background-size: contain;
 }
-.icon-test{
+.icon-test {
   width: 34px;
   height: 18px;
   background: url(../../assets/img/icon-test.png) no-repeat;
   background-size: contain;
 }
-.icon-discuss{
+.icon-discuss {
   width: 34px;
   height: 18px;
   background: url(../../assets/img/icon-discuss.png) no-repeat;
   background-size: contain;
 }
-.icon-spoken{
+.icon-spoken {
   width: 34px;
   height: 18px;
   background: url(../../assets/img/icon-spoken.png) no-repeat;
   background-size: contain;
 }
-.icon-learn-res{
+.icon-learn-res {
   width: 63px;
   height: 18px;
   background: url(../../assets/img/icon-learn-res.png) no-repeat;
   background-size: contain;
 }
-.icon-learn-res-exp{
+.icon-learn-res-exp {
   width: 63px;
   height: 18px;
   background: url(../../assets/img/icon-learn-res-exp.png) no-repeat;
   background-size: contain;
 }
-.icon-exam{
+.icon-exam {
   width: 63px;
   height: 18px;
   background: url(../../assets/img/icon-exam.png) no-repeat;
   background-size: contain;
 }
-.icon-comment{
+.icon-comment {
   width: 63px;
   height: 18px;
   background: url(../../assets/img/icon-comment.png) no-repeat;
   background-size: contain;
 }
-.icon-edit-blue{
+.icon-edit-blue {
   width: 11px;
   height: 10px;
   background: url(../../assets/img/icon-edit-blue.png) no-repeat;
   background-size: contain;
 }
-.icon-fold{
+.icon-fold {
   width: 25px;
   height: 25px;
   background: url(../../assets/img/icon-fold.png) no-repeat;
   background-size: contain;
 }
-.icon-check{
+.icon-check {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-check.png) no-repeat;
   background-size: contain;
   vertical-align: baseline;
 }
-.icon-radio-active{
+.icon-radio-active {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-radio-active.png) no-repeat;
   background-size: contain;
   vertical-align: baseline;
 }
-.icon-radio-disable{
+.icon-radio-disable {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-radio-disable.png) no-repeat;
   background-size: contain;
   vertical-align: baseline;
 }
-.icon-backtop{
+.icon-backtop {
   width: 47px;
   height: 47px;
   background: url(../../assets/img/icon-backtop.png) no-repeat;
   background-size: contain;
 }
-.icon-somewhat{
+.icon-somewhat {
   width: 18px;
   height: 13px;
   background: url(../../assets/img/icon-somewhat.png) no-repeat;
   background-size: contain;
 }
-.icon-correct{
+.icon-correct {
   width: 18px;
   height: 13px;
   background: url(../../assets/img/icon-correct.png) no-repeat;
   background-size: contain;
 }
-.icon-error{
+.icon-error {
   width: 16.5px;
   height: 17px;
   background: url(../../assets/img/icon-error.png) no-repeat;
   background-size: contain;
 }
-.icon-wx{
+.icon-wx {
   width: 42px;
   height: 42px;
   background: url(../../assets/img/icon-wx.png) no-repeat;
   background-size: contain;
 }
-.icon-qq{
+.icon-qq {
   width: 42px;
   height: 42px;
   background: url(../../assets/img/icon-qq.png) no-repeat;
   background-size: contain;
 }
-.icon-timeline{
+.icon-timeline {
   width: 42px;
   height: 42px;
   background: url(../../assets/img/icon-timeline.png) no-repeat;
   background-size: contain;
 }
-.icon-qzone{
+.icon-qzone {
   width: 42px;
   height: 42px;
   background: url(../../assets/img/icon-qzone.png) no-repeat;
   background-size: contain;
 }
-.icon-copy-link{
+.icon-copy-link {
   width: 42px;
   height: 42px;
   background: url(../../assets/img/icon-copy-link.png) no-repeat;
   background-size: contain;
 }
-.icon-enlarge{
+.icon-enlarge {
   width: 9px;
   height: 9px;
   background: url(../../assets/img/icon-enlarge.png) no-repeat;
   background-size: contain;
 }
-
-.icon-reduce{
+.icon-reduce {
   width: 9px;
   height: 9px;
   background: url(../../assets/img/icon-reduce.png) no-repeat;
   background-size: contain;
 }
-.icon-rotate-left{
+.icon-rotate-left {
   width: 9px;
   height: 9px;
   background: url(../../assets/img/icon-rotate.png) no-repeat;
   background-size: contain;
 }
-.icon-rotate-right{
+.icon-rotate-right {
   width: 9px;
   height: 9px;
   background: url(../../assets/img/icon-rotate.png) no-repeat;
   background-size: contain;
   transform: rotateY(180deg);
 }
-
-.icon-pen-white{
+.icon-pen-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-pen-white.png) no-repeat;
   background-size: contain;
 }
-.icon-hide{
+.icon-hide {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-hide.png) no-repeat;
   background-size: contain;
 }
-.icon-hide-active{
+.icon-hide-active {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-hide-active.png) no-repeat;
   background-size: contain;
 }
-.icon-good-white{
+.icon-good-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-good-white.png) no-repeat;
   background-size: contain;
 }
-.icon-top-white{
+.icon-top-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-top-white.png) no-repeat;
   background-size: contain;
 }
-.icon-essence-white{
+.icon-essence-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-essence-white.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-plus-white{
+.icon-circle-plus-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-circle-plus-white.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-sub-white{
+.icon-circle-sub-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-circle-sub-white.png) no-repeat;
   background-size: contain;
 }
-.icon-talk-white{
+.icon-talk-white {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-talk-white.png) no-repeat;
   background-size: contain;
 }
-.icon-pen{
+.icon-pen {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-pen.png) no-repeat;
   background-size: contain;
 }
-.icon-pen-active{
+.icon-pen-active {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-pen-active.png) no-repeat;
   background-size: contain;
 }
-.icon-rubber{
+.icon-rubber {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-rubber.png) no-repeat;
   background-size: contain;
 }
-.icon-rubber-active{
+.icon-rubber-active {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-rubber-active.png) no-repeat;
   background-size: contain;
 }
-.icon-del{
+.icon-del {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-del.png) no-repeat;
   background-size: contain;
 }
-.icon-good{
+.icon-good {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-good.png) no-repeat;
   background-size: contain;
 }
-.icon-good-active{
+.icon-good-active {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-good-active.png) no-repeat;
   background-size: contain;
 }
-.icon-top{
+.icon-top {
   width: 14px;
   height: 15px;
   background: url(../../assets/img/icon-top.png) no-repeat;
   background-size: contain;
 }
-.icon-top-active{
+.icon-top-active {
   width: 14px;
   height: 15px;
   background: url(../../assets/img/icon-top-active.png) no-repeat;
   background-size: contain;
 }
-.icon-essence{
+.icon-essence {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-essence.png) no-repeat;
   background-size: contain;
 }
-.icon-essence-active{
+.icon-essence-active {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-essence-active.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-plus{
+.icon-circle-plus {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-circle-plus.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-sub{
+.icon-circle-sub {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-circle-sub.png) no-repeat;
   background-size: contain;
 }
-.icon-talk{
+.icon-talk {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-talk.png) no-repeat;
   background-size: contain;
 }
-.icon-save{
+.icon-save {
   width: 10px;
   height: 10px;
   background: url(../../assets/img/icon-save.png) no-repeat;
   background-size: contain;
 }
-.icon-ellipsis{
-  width:15px;
+.icon-ellipsis {
+  width: 15px;
   height: 3.5px;
   background: url(../../assets/img/icon-ellipsis.png) no-repeat;
   background-size: contain;
 }
-.icon-video{
+.icon-video {
   width: 59px;
   height: 49px;
   background: url(../../assets/img/icon-video.png) no-repeat;
   background-size: contain;
 }
-.icon-send{
+.icon-send {
   width: 35px;
   height: 22.5px;
   background: url(../../assets/img/icon-send.png) no-repeat;
   background-size: contain;
 }
-.icon-share{
+.icon-share {
   width: 30px;
   height: 15px;
   background: url(../../assets/img/icon-share.png) no-repeat;
   background-size: contain;
 }
-.icon-choice{
+.icon-choice {
   width: 30px;
   height: 15px;
   background: url(../../assets/img/icon-choice.png) no-repeat;
   background-size: contain;
 }
-.icon-school{
+.icon-school {
   width: 30px;
   height: 15px;
   background: url(../../assets/img/icon-school.png) no-repeat;
   background-size: contain;
 }
-.icon-boutique{
+.icon-boutique {
   width: 30px;
   height: 15px;
   background: url(../../assets/img/icon-boutique.png) no-repeat;
   background-size: contain;
 }
-.icon-personal{
+.icon-personal {
   width: 30px;
   height: 15px;
   background: url(../../assets/img/icon-personal.png) no-repeat;
   background-size: contain;
 }
-.icon-feather{
+.icon-feather {
   width: 11.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-feather.png) no-repeat;
   background-size: contain;
 }
-.icon-star{
+.icon-star {
   width: 11.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-star.png) no-repeat;
   background-size: contain;
 }
-.icon-plane{
+.icon-plane {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-plane.png) no-repeat;
   background-size: contain;
 }
-.icon-points{
+.icon-points {
   width: 10.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-points.png) no-repeat;
   background-size: contain;
 }
-.icon-download{
+.icon-download {
   width: 10.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-download.png) no-repeat;
   background-size: contain;
 }
-.icon-download-orange{
+.icon-download-orange {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-download-orange.png) no-repeat;
   background-size: contain;
 }
-.icon-pdf{
+.icon-pdf {
   width: 52px;
   height: 49px;
   background: url(../../assets/img/icon-pdf.png) no-repeat;
   background-size: contain;
 }
-.icon-doc{
+.icon-doc {
   width: 52px;
   height: 49px;
   background: url(../../assets/img/icon-doc.png) no-repeat;
   background-size: contain;
 }
-.icon-ppt{
+.icon-ppt {
   width: 52px;
   height: 49px;
   background: url(../../assets/img/icon-ppt.png) no-repeat;
   background-size: contain;
 }
-.icon-xls{
+.icon-xls {
   width: 52px;
   height: 49px;
   background: url(../../assets/img/icon-xls.png) no-repeat;
   background-size: contain;
 }
-.icon-img{
+.icon-img {
   width: 52px;
   height: 49px;
   background: url(../../assets/img/icon-img.png) no-repeat;
   background-size: contain;
 }
-.icon-edit-orange{
+.icon-edit-orange {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-edit-orange.png) no-repeat;
   background-size: contain;
 }
-.icon-copy-orange{
+.icon-copy-orange {
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-copy-orange.png) no-repeat;
   background-size: contain;
 }
-.icon-difficult{
+.icon-difficult {
   width: 10px;
   height: 11.5px;
   background: url(../../assets/img/icon-difficult.png) no-repeat;
   background-size: contain;
 }
-.icon-zhu{
+.icon-zhu {
   width: 9px;
   height: 11.5px;
   background: url(../../assets/img/icon-zhu.png) no-repeat;
   background-size: contain;
 }
-.icon-ke{
+.icon-ke {
   width: 9px;
   height: 11.5px;
   background: url(../../assets/img/icon-ke.png) no-repeat;
   background-size: contain;
 }
-.icon-exam-100{
+.icon-exam-100 {
   width: 52.5px;
   height: 49px;
   background: url(../../assets/img/icon-exam-100.png) no-repeat;
   background-size: contain;
 }
-.icon-file{
+.icon-file {
   width: 22px;
   height: 19px;
   background: url(../../assets/img/icon-file.png) no-repeat;
   background-size: contain;
 }
-.icon-auto{
+.icon-auto {
   width: 35px;
   height: 22.5px;
   background: url(../../assets/img/icon-auto.png) no-repeat;
   background-size: contain;
 }
-.icon-chat{
+.icon-chat {
   width: 52px;
   height: 50px;
   background: url(../../assets/img/icon-chat.png) no-repeat;
   background-size: contain;
 }
-.icon-en{
+.icon-en {
   width: 52px;
   height: 50px;
   background: url(../../assets/img/icon-en.png) no-repeat;
   background-size: contain;
 }
-.icon-lamp{
+.icon-lamp {
   width: 8.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-lamp.png) no-repeat;
   background-size: contain;
 }
-.icon-accuracy{
+.icon-accuracy {
   width: 10px;
   height: 11.5px;
   background: url(../../assets/img/icon-accuracy.png) no-repeat;
   background-size: contain;
 }
-.icon-player{
+.icon-player {
   width: 200px;
   height: 25px;
   background: url(../../assets/img/icon-player.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-arrow{
+.icon-circle-arrow {
   width: 20px;
   height: 20px;
   background: url(../../assets/img/icon-circle-arrow.png) no-repeat;
   background-size: contain;
 }
-.icon-circle-logo{
+.icon-circle-logo {
   width: 50px;
   height: 50px;
   background: url(../../assets/img/icon-circle-logo.png) no-repeat;

@@ -47,7 +47,7 @@ export default {
           title: "教学统计",
           normal: require("../../assets/img/icon-linear.png"),
           active: require("../../assets/img/icon-linear-aactive.png"),
-          // path: "/mine"
+          path: "/teachStat"
         },
         {
           title: "我的",
@@ -60,7 +60,9 @@ export default {
   },
   methods: {
     handleChange(item) {
-      if (item.path) {
+      if (item.path === '/teachStat') {
+        this.$router.push(item.path);
+      }else {
         this.$router.replace(item.path);
       }
     }

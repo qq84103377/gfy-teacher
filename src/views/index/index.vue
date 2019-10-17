@@ -39,7 +39,7 @@
             <div>预习</div>
           </div>
           <div @click="$router.push(`/inClass`)" class="index-content-wrap__body__main-icon-item">
-            <div class="icon-wrap green"><i class="iconGFY icon-play"></i></div>
+            <div class="icon-wrap green"><i class="iconGFY icon-play1"></i></div>
             <div>课中</div>
           </div>
           <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/resource`)">
@@ -282,6 +282,14 @@
                   item.myClassInfo.forEach(obj=>{
                     if(!gradeList.some(v => v.classGrade === obj.classGrade)) {
                       gradeList.push({classGrade:obj.classGrade,gradeName:obj.gradeName,teacherInfoList:obj.teacherInfoList || []})
+                    }else {
+                      //有的时候
+                      const index =  gradeList.findIndex(v => v.classGrade === obj.classGrade)
+                      obj.teacherInfoList.forEach(s => {
+                        if(!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
+                          gradeList[index].teacherInfoList.push(s)
+                        }
+                      })
                     }
 
                     classMap[obj.classId] = obj

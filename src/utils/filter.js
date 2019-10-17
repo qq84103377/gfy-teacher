@@ -58,7 +58,14 @@ let formatTime = (t = new Date()) => {
   let result = `${year}-${fillZero(month)}-${fillZero(date)} ${fillZero(hours)}:${fillZero(minutes)}:${fillZero(seconds)}`;
   return result;
 }
-
+// 秒数转换为时分秒
+const formathms = time => {
+  var min=Math.floor(time%3600);
+  const hour = Math.floor(time/3600)>=10?Math.floor(time/3600):('0' + Math.floor(time/3600))
+  const minutes = Math.floor(min/60)>=10?Math.floor(min/60):('0' + Math.floor(min/60))
+  const second = time%60>=10?time%60:('0' + time%60)
+ return hour + ":" + minutes + ":"+ second
+}
 let getStudentName = (accountNo,classId) => {
   if(accountNo === JSON.parse(localStorage.userInfo).accountNo) {
     return JSON.parse(localStorage.userInfo).userName
@@ -230,5 +237,82 @@ const numToWord = section => {
   }
   return chnStr;
 }
-
-export {ellipsis, formatSeconds, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+const mutualType = type => {
+  let value = ''
+  switch (type) {
+    case 'O01':
+      value = "点名"
+      break
+    case 'O02':
+      value = "抢答"
+      break
+    case 'O03':
+      value = "全班白板"
+      break
+    case 'O04':
+      value = "小组白板"
+      break
+    case 'O05':
+      value = "全班互批"
+      break
+    case 'O06':
+      value = "小组互批"
+      break
+    case 'O07':
+      value = "白板任务结束"
+      break
+    case 'O08':
+      value = "奖励"
+      break
+    case 'O09':
+      value = "减分"
+      break
+    case 'O10':
+      value = "推试卷"
+      break
+    case 'O11':
+      value = "推试题"
+      break
+    case 'O12':
+      value = "推送范例"
+      break
+    case 'O13':
+      value = "计时"
+      break
+    case 'O14':
+      value = "推屏"
+      break
+    case 'O15':
+      value = "推屏结束"
+      break
+    case 'O16':
+      value = "投屏"
+      break
+    case 'O17':
+      value = "投屏结束"
+      break
+    case 'O18':
+      value = "投票"
+      break
+    case 'O19':
+      value = "锁屏"
+      break
+    case 'O20':
+      value = "锁屏结束"
+      break
+    case 'O21':
+      value = "涂鸦"
+      break
+    case 'O22':
+      value = "截屏白板"
+      break
+    case 'O23':
+      value = "查看"
+      break
+    case 'O24':
+      value = "题型"
+      break
+  }
+  return value
+}
+export {ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}

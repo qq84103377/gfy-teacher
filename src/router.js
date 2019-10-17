@@ -257,6 +257,11 @@ export default new Router({
           component: () => import('./views/resource/addTask.vue')
         },
         {
+          path: '/videoPage',
+          name: 'videoPage',
+          component: () => import('./views/resource/videoPage.vue'),
+        },
+        {
           path: '/inClass',
           name: 'inClass',
           component: () => import('./views/inClass/index.vue'),
@@ -499,6 +504,30 @@ export default new Router({
             isShowHeader: true,
             title: '新建小组'
           }
+        },
+        {
+          path: '/',
+          component: () => import('./views/teachStat/index.vue'),
+          children: [
+            {
+              path: '/teachStat',
+              name: 'teachStat',
+              component: () => import('./views/teachStat/teachStat.vue'),
+              meta: {
+                isShowHeader: true,
+                title: '教学统计'
+              },
+            },
+            {
+              path: '/taskStat',
+              name: 'taskStat',
+              component: () => import('./views/teachStat/taskStat.vue'),
+              meta: {
+                isShowHeader: true,
+                title: '任务统计'
+              },
+            },
+          ]
         },
         {
           path: '/copyGroup',
