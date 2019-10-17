@@ -257,6 +257,11 @@ export default new Router({
           component: () => import('./views/resource/addTask.vue')
         },
         {
+          path: '/videoPage',
+          name: 'videoPage',
+          component: () => import('./views/resource/videoPage.vue'),
+        },
+        {
           path: '/inClass',
           name: 'inClass',
           component: () => import('./views/inClass/index.vue'),
