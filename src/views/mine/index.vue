@@ -10,14 +10,23 @@
             </div>
           </div>
           <div class="userinfo">
-            <div class="userinfo-top">
-              <span>{{userName}}</span>
-              <van-tag color="#F7DB3F" v-for="item in tagList">{{item}}</van-tag>
-            </div>
-            <div class="userinfo-bottom">
-              <span v-for="item in schoolList">{{item}}</span>
-            </div>
+
+            <van-skeleton
+              title
+              :row="3"
+              :loading="loading"
+            >
+              <div class="userinfo-top">
+                <span>{{userName}}</span>
+                <van-tag color="#F7DB3F" v-for="item in tagList">{{item}}</van-tag>
+              </div>
+              <div class="userinfo-bottom">
+                <span v-for="item in schoolList">{{item}}</span>
+              </div>
+            </van-skeleton>
           </div>
+
+
         </div>
       </div>
     </div>
@@ -34,9 +43,9 @@
           </div>
           <div @click="$router.push('/myLangCoin')">
             <span>{{langCoin}}</span>
-            <div>郎币数</div>
+            <div>朗币数</div>
           </div>
-          <div  @click="$router.push('/myLevel')">
+          <div @click="$router.push('/myLevel')">
             <span>{{level}}</span>
             <div>等级</div>
           </div>
@@ -141,7 +150,8 @@
         actions: [{name: "从相册选取"}, {name: "拍照"}],
         showActionSheet: false,
         blob: null,
-        avatar:""
+        avatar: "",
+        loading: true
       };
     },
     components: {
@@ -169,7 +179,7 @@
             message: "确定退出登录吗？",
             cancelButtonText: "确定",
             confirmButtonText: "取消",
-            confirmButtonColor:'#39F0DD'
+            confirmButtonColor: '#39F0DD'
           })
           .then(() => {
             // on confirm
@@ -214,6 +224,7 @@
                 this.tagList = Array.from(new Set([...this.tagList, ...arr]));
               }
             }
+            this.loading = false;
           }
         })
       },
@@ -275,6 +286,7 @@
                   counterDataArray[i].counterValue == null
                     ? 0
                     : counterDataArray[i].counterValue;
+                window.localStorage.setItem('langCoin', this.langCoin);
               }
             }
           } else {
@@ -286,11 +298,13 @@
 
       // 点击头像上传图片
       fileSelect() {
-        if ("cordova" in window) {
-          this.showActionSheet = !this.showActionSheet;
-        } else {
-
-        }
+        // if ("cordova" in window) {
+        //   this.showActionSheet = !this.showActionSheet;
+        // } else {
+        //   this.showActionSheet = !this.showActionSheet;
+        //
+        // }
+        this.$router.push('/userInfo')
       },
       // 选择上传图片方式  app端
       handleSelect(item, index) {
@@ -455,7 +469,8 @@
 
           .userinfo {
             flex: 1;
-            padding: 32px 35px 32px 17px;
+            align-self: center;
+            padding: 10px 35px 10px 17px;
 
             &-top {
               margin-bottom: 5px;
@@ -521,10 +536,12 @@
         padding: 0 10px;
         width: 100%;
         margin-top: 10px;
+
         @{deep} .van-grid {
           border-radius: 5px;
           overflow: hidden;
         }
+
         @{deep} .van-icon__image {
           width: 26px;
           height: 26px;
