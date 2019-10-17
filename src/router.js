@@ -331,34 +331,34 @@ export default new Router({
           //   title: '积分商城'
           // }
         },
-        // {
-        //   path: '/convertRule',
-        //   name: 'convertRule',
-        //   component: () => import('./views/mine/shop/convertRule.vue'),
-        // },
-        // {
-        //   path: '/goodsDetail/:id',
-        //   name: 'goodsDetail',
-        //   component: () => import('./views/mine/shop/goodsDetail.vue'),
-        // },
-        // {
-        //   path: '/myCollect',
-        //   name: 'myCollect',
-        //   component: () => import('./views/mine/shop/myCollect.vue'),
-        //   meta: {
-        //     isShowHeader: true,
-        //     title: '我的收藏'
-        //   }
-        // },
-        // {
-        //   path: '/converseRecord',
-        //   name: 'converseRecord',
-        //   component: () => import('./views/mine/shop/converseRecord.vue'),
-        //   meta: {
-        //     isShowHeader: true,
-        //     title: '兑换记录'
-        //   }
-        // },
+        {
+          path: '/convertRule',
+          name: 'convertRule',
+          component: () => import('./views/mine/shop/convertRule.vue'),
+        },
+        {
+          path: '/goodsDetail/:id',
+          name: 'goodsDetail',
+          component: () => import('./views/mine/shop/goodsDetail.vue'),
+        },
+        {
+          path: '/myCollect',
+          name: 'myCollect',
+          component: () => import('./views/mine/shop/myCollect.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '我的收藏'
+          }
+        },
+        {
+          path: '/converseRecord',
+          name: 'converseRecord',
+          component: () => import('./views/mine/shop/converseRecord.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '兑换记录'
+          }
+        },
         {
           path: '/help',
           name: 'help',
