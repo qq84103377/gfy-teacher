@@ -353,3 +353,19 @@ export const copyGroupByTeacherInfo =(params)=>{
 export const statCourseByTeacher =(params)=>{
   return axios.post('teach/statCourseByTeacher', qs.stringify(params))
 }
+//教学统计-教师统计
+export const statByTeacher =(params)=>{
+  return axios.post('teach/statByTeacher', qs.stringify(params))
+}
+//教师统计-课堂情况
+export const getClassroomInfoByTeacher =(params)=>{
+  return axios.post('teach/getClassroomInfoByTeacher', qs.stringify(params))
+}
+//教师统计-交互功能
+export const getClassroomDetailInfo =(params)=>{
+  return axios.post('teach/getClassroomDetailInfo', qs.stringify(params))
+}
+//教学统计-班级统计
+export const statByClass =(params)=>{
+  return axios.post('teach/statByClass', qs.stringify(params))
+}
