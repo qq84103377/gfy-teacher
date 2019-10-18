@@ -506,11 +506,11 @@ export default new Router({
           }
         },
         {
-          path: '/',
+          path: '/teachStat',
           component: () => import('./views/teachStat/index.vue'),
           children: [
             {
-              path: '/teachStat',
+              path: '/',
               name: 'teachStat',
               component: () => import('./views/teachStat/teachStat.vue'),
               meta: {
@@ -525,6 +525,15 @@ export default new Router({
               meta: {
                 isShowHeader: true,
                 title: '任务统计'
+              },
+            },
+            {
+              path: '/studySituation',
+              name: 'studySituation',
+              component: () => import('./views/teachStat/studySituation.vue'),
+              meta: {
+                isShowHeader: true,
+                title: '学情'
               },
             },
           ]

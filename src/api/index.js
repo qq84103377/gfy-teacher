@@ -369,3 +369,11 @@ export const getClassroomDetailInfo =(params)=>{
 export const statByClass =(params)=>{
   return axios.post('teach/statByClass', qs.stringify(params))
 }
+//教学统计-个人统计
+export const statByPersonal =(params)=>{
+  return axios.post('teach/statByPersonal', qs.stringify(params))
+}
+//学情-班级
+export const getUserKnowledgePointCounter =(params)=>{
+  return axios.post('counter/getUserKnowledgePointCounter', qs.stringify(params))
+}

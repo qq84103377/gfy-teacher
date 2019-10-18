@@ -109,10 +109,11 @@
         showTime: false,
         currentDate: '',
         maxDate:new Date(),
-        gradeSubjectList: [{name: '全部', classGrade: '', subjectType: ''}],
+        gradeSubjectList: [],
         gradeIndex: 0,
-        classIndex: 0,
-        classList: {0:{gradeName:'全部',schoolYear:'',className:'',classId:'',active:true},...JSON.parse(localStorage.getItem("classMap"))},
+        classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
+        // classList: {0:{gradeName:'全部',schoolYear:'',className:'',classId:'',active:true},...JSON.parse(localStorage.getItem("classMap"))},
+        classList: JSON.parse(localStorage.getItem("classMap")),
         filterTime: {
           start: '',
           end: generateTimeReqestNumber(new Date()),
@@ -152,9 +153,9 @@
           if (time1.getTime() > time2.getTime()) {
             return this.$toast('开始时间不能大于结束时间')
           }
-          if(this.$route.path === '/taskStat') {
+          // if(this.$route.path === '/taskStat') {
             this.$refs['routerView'].init()
-          }
+          // }
         this.showTime = false
       },
       formatter(type,value){
@@ -205,7 +206,7 @@
         if(flag) {
           for(let key in this.classList) {
             if(this.classList[key].active) {
-              this.classIndex = key
+              this.classIndex = key * 1
               break
             }
           }
@@ -220,10 +221,14 @@
     },
     created() {
       let arr = []
+      let flag = true
       JSON.parse(localStorage.gradeList).forEach(v => {
         v.teacherInfoList.forEach(t => {
           if (t.subjectType !== 'S20') {
-            arr.push({name: v.gradeName + t.subjectName, classGrade: v.classGrade, subjectType: t.subjectType})
+            arr.push({name: v.gradeName + t.subjectName, classGrade: v.classGrade, subjectType: t.subjectType, active: localStorage.currentSubjectType === t.subjectType && flag})
+            if(localStorage.currentSubjectType === t.subjectType && flag) {
+              flag = false
+            }
           }
         })
       })
