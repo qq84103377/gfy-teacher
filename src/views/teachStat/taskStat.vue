@@ -155,7 +155,7 @@
 
         </div>
       </van-collapse-item>
-      <van-collapse-item title="班级统计" name="3">
+      <van-collapse-item v-if="handleShowItem()" title="班级统计" name="3">
         <div class="stat-table">
           <div class="row-wrap" style="margin-left: 0;border-left: 1px solid #eee;">
             <div class="row" style="font-weight: bold;">
@@ -184,7 +184,31 @@
 
       </van-collapse-item>
       <van-collapse-item title="个人统计" name="4">
-
+        <div class="stat-table">
+          <div class="row-wrap" style="margin-left: 0;border-left: 1px solid #eee;">
+            <div class="row" style="font-weight: bold;">
+              <div style="flex: 0 0 25%">班级</div>
+              <div style="flex: 0 0 25%">已结束课程</div>
+              <div style="flex: 0 0 25%">已结束任务数</div>
+              <div style="flex: 0 0 25%">已完成任务数</div>
+              <div style="flex: 0 0 25%">学生任务完成率</div>
+              <div style="flex: 0 0 25%">课前任务数</div>
+              <div style="flex: 0 0 25%">学生课前完成率</div>
+              <div style="flex: 0 0 25%">随堂任务数</div>
+            </div>
+            <div class="row" v-for="(item,index) in personStatList" :key="index">
+              <div style="flex: 0 0 25%;line-height: 1">{{item.className}}</div>
+              <div style="flex: 0 0 25%">{{item.course_count}}</div>
+              <div style="flex: 0 0 25%">{{item.task_count}}</div>
+              <div style="flex: 0 0 25%">{{item.task_finish}}</div>
+              <div style="flex: 0 0 25%">{{item.finish_precent}}</div>
+              <div style="flex: 0 0 25%">{{item.outsideClassNum}}</div>
+              <div style="flex: 0 0 25%">{{item.outsideClassPrecent}}</div>
+              <div style="flex: 0 0 25%">{{item.insideClassNum}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
       </van-collapse-item>
     </van-collapse>
   </section>
@@ -196,7 +220,8 @@
     statByTeacher,
     getClassroomInfoByTeacher,
     getClassroomDetailInfo,
-    statByClass
+    statByClass,
+    statByPersonal
   } from '@/api/index'
   import echarts from "echarts";
   import {mutualType} from '@/utils/filter'
@@ -213,7 +238,8 @@
         showClassDetail: false,
         showMutual: false,
         mutualInfoList: [],
-        classStatList: []
+        classStatList: [],
+        personStatList: []
       }
     },
     computed: {
@@ -240,7 +266,43 @@
       this.init()
     },
     methods: {
+      handleShowItem() {
+        if(this.$parent.classIndex > 0 && this.filterParams.subjectType) {
+          const item = JSON.parse(localStorage.classMap)[this.$parent.classIndex].teacherInfoList.find(v => v.subjectType === this.filterParams.subjectType)
+            if(item) {
+              return item.teacherType === 'T01'
+            }else {
+              return true
+            }
+        }else {
+          return true
+        }
+      },
+      statByPersonal() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          startDate: this.$parent.filterTime.start,
+          endDate: this.$parent.filterTime.end,
+          pageSize: '999',
+          currentPage: '1',
+          ...this.filterParams,
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        statByPersonal(params).then(res => {
+          if (res.flag) {
+            this.personStatList = res.data.length ? res.data[0].classCoureStat : []
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       statByClass() {
+        if(!this.handleShowItem()) return
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -365,6 +427,7 @@
       async init() {
         this.statByTeacher()
         this.statByClass()
+        this.statByPersonal()
         await this.statCourseByTeacher()
         this.drawPie()
         this.drawHistogram()
