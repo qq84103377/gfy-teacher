@@ -77,7 +77,7 @@
           {title:'课程——预习',url:'/preview'},
           {title:'课程——课中',url:'/inClass'},
           {title:'课程——资源',url:'/resource'},
-          {title:'资源中心',url:''},
+          {title:'资源中心',url:'/resCentre'},
           {title:'教学统计',url:'/teachStat'},
           {title:'我的',url:'/mine'},
           {title:'错题本',url:''},

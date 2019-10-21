@@ -1,25 +1,33 @@
 <template>
   <section class="notice">
-    <div class="readAll">
-      <van-button type="primary" plain color="#39F0DD" @click="readAll()">全标已读</van-button>
+    <div class="readAll" @click="readAll">
+      <van-button type="primary" plain color="#39F0DD">全标已读</van-button>
     </div>
     <van-tabs v-model="active" @click="handleTab">
       <van-tab title="未读">
         <van-list
           v-model="loading"
           :finished="finished"
-          finished-text="没有更多了"
+          finished-text=""
           @load="onLoad"
         >
-          <div class="item" v-for="(value, name) in noticeList">
-            <div class="item-title">{{name }}{{ value.weekDay}}</div>
-            <div class="item-content" v-for="(item,index) in value.detailList"
-                 @click="readNotice(item.remindId,name,index,value.weekDay)">
-              <span class="item-content-txt">{{item.content}}</span>
-              <span class="item-content-icon">
+          <div v-if="Object.keys(noticeList).length>0">
+            <div class="item" v-for="(value, name) in noticeList">
+              <div class="item-title">{{name }}{{ value.weekDay}}</div>
+              <div class="item-content" v-for="(item,index) in value.detailList"
+                   @click="readNotice(item.remindId,name,index,value.weekDay)">
+                <span class="item-content-txt">{{item.content}}</span>
+                <span class="item-content-icon">
                   <img src="@assets/img/icon-1.png" alt="">
                 </span>
+              </div>
             </div>
+          </div>
+
+
+          <div v-else class="placeholderImg" v-show="!loading">
+            <img src="@assets/img/blank.png"/>
+            <p>暂无消息~</p>
           </div>
         </van-list>
       </van-tab>
@@ -27,15 +35,23 @@
         <van-list
           v-model="loading1"
           :finished="finished1"
-          finished-text="没有更多了"
+          finished-text=""
           @load="onLoad1"
         >
-          <div class="item" v-for="(value, name) in noticeList1">
-            <div class="item-title">{{name }}{{ value.weekDay}}</div>
-            <div class="item-content" v-for="item in value.detailList">
-              <span class="item-content-txt" v-html="item.content"></span>
+          <div v-if="Object.keys(noticeList1).length>0">
+            <div class="item" v-for="(value, name) in noticeList1">
+              <div class="item-title">{{name }}{{ value.weekDay}}</div>
+              <div class="item-content" v-for="item in value.detailList">
+                <span class="item-content-txt" v-html="item.content"></span>
+              </div>
             </div>
           </div>
+
+          <div v-else class="placeholderImg" v-show="!loading1">
+            <img src="@assets/img/blank.png"/>
+            <p>暂无消息~</p>
+          </div>
+
         </van-list>
       </van-tab>
     </van-tabs>
@@ -44,7 +60,7 @@
 
 <script>
 
-  import {getPubRemindInfoGroupByDay, savePubRemindInfo} from '@/api/mine';
+  import {getPubRemindInfoGroupByDay, savePubRemindInfo, oneKeyReadRemindInfo} from '@/api/mine';
 
   export default {
     name: "myNotice",
@@ -177,7 +193,26 @@
       },
       // 全部标为已读
       readAll() {
-        console.log('全部标为已读')
+        if (JSON.stringify(this.noticeList) == '{}') {
+          this.$toast('没有未读消息');
+          return;
+        }
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        };
+        oneKeyReadRemindInfo(params).then(res => {
+          if (res.flag) {
+            this.$toast.success('操作成功');
+            this.noticeList = {};
+          } else {
+            this.$toast.fail(res.msg);
+          }
+        })
       },
       handleTab(name, title) {
         // console.log(name, title)
@@ -210,6 +245,7 @@
       position: absolute;
       right: 10px;
       top: 10px;
+      z-index: 999;
 
       @{deep} .van-button {
         border-radius: 20px;
@@ -285,6 +321,25 @@
             width: 14px;
           }
         }
+      }
+    }
+
+    .placeholderImg {
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      .column-center;
+
+      img {
+        width: 300px;
+        margin: 10px auto;
+      }
+
+      p {
+        font-size: 12px;
+        color: #999999;
+        text-align: center;
+        margin-top: 15px;
       }
     }
   }
