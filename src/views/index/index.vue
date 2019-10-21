@@ -91,7 +91,7 @@
             <i class="iconGFY icon-tv"></i>
             <span>我的课程</span>
           </div>
-          <div>
+          <div @click="$router.push(`/errorBook`)">
             <i class="iconGFY icon-errors"></i>
             <span>错题集</span>
           </div>

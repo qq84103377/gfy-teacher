@@ -1,24 +1,52 @@
 <template>
   <section class="study-situation">
     <div class="study-situation__tab">
-      <div class="study-situation__tab-item" :class="{active:isClass}" @click="isClass=true">班级</div>
-      <div class="study-situation__tab-item" :class="{active:!isClass}" @click="isClass=false">个人</div>
+      <div class="study-situation__tab-item" :class="{active:isClass}" @click="toggleTab(true)">班级</div>
+      <div class="study-situation__tab-item" :class="{active:!isClass}" @click="toggleTab(false)">个人</div>
     </div>
-    <div style="position: relative;">
-      <div class="echart-label">章节掌握情况</div>
-      <div class="eahcrt-legend">
-        <div class="eahcrt-legend-item">班级</div>
-        <div class="eahcrt-legend-item">学校</div>
+    <div v-show="isClass">
+      <div style="position: relative;">
+        <div class="echart-label">章节掌握情况</div>
+        <div class="eahcrt-legend">
+          <div class="eahcrt-legend-item">班级</div>
+          <div class="eahcrt-legend-item">学校</div>
+        </div>
+        <div v-show="!sectionNotEnough" id="myChart1" ref="myChart1" class="radar-chart"></div>
+        <div v-if="sectionNotEnough">章节数据不足</div>
       </div>
-      <div v-show="!sectionNotEnough" id="myChart1" ref="myChart1" class="radar-chart"></div>
-      <div v-if="sectionNotEnough">章节数据不足</div>
+      <div>
+        <div class="echart-label">知识点掌握情况</div>
+        <div v-show="!kwgNotEnough" id="myChart2" ref="myChart2" class="histogram-chart mgt10"></div>
+        <div v-if="kwgNotEnough">知识点数据不足</div>
+      </div>
     </div>
-    <div>
-      <div class="echart-label">知识点掌握情况</div>
-      <div v-show="!kwgNotEnough" id="myChart2" ref="myChart2" class="histogram-chart mgt10"></div>
-      <div v-if="kwgNotEnough">知识点数据不足</div>
+    <div v-show="!isClass">
+      <div class="cell-label">学生列表</div>
+      <van-cell v-for="(item,index) in stuList" :key="index">
+        <div slot="title">
+          <div @click="selectStu(item,index)" class="aic jcsb">
+            <span :class="{blue:false}">{{item.accountNo|getStudentName(item.classId)}}</span>
+            <van-icon :name="item.fold?'arrow-up':'arrow-down'"/>
+          </div>
+          <div v-show="item.fold">
+            <div style="position: relative;">
+              <div class="echart-label">章节掌握情况</div>
+              <div class="eahcrt-legend">
+                <div class="eahcrt-legend-item">班级</div>
+                <div class="eahcrt-legend-item">学校</div>
+              </div>
+              <div v-show="!item.sectionNotEnough" :id="'radar-stu'+index" class="radar-chart"></div>
+              <div v-if="item.sectionNotEnough">章节数据不足</div>
+            </div>
+            <div>
+              <div class="echart-label">知识点掌握情况</div>
+              <div v-show="!item.kwgNotEnough" :id="'his-stu'+index" class="histogram-chart mgt10"></div>
+              <div v-if="item.kwgNotEnough">知识点数据不足</div>
+            </div>
+          </div>
+        </div>
+      </van-cell>
     </div>
-
   </section>
 </template>
 
@@ -34,15 +62,30 @@
         sectionNotEnough: false,
         kwgNotEnough: false,
         isClass: true,
+        stuList: JSON.parse(localStorage.classMap)[this.$parent.classIndex].studentInfo,
+        stuAccountNo: '',
+        stuIndex: 0
       }
     },
     watch: {
       filterParams: {
         handler() {
-          this.init()
+          if (this.isClass) {
+            this.init()
+          }else {
+            this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
+            this.stuAccountNo = ''
+          }
         },
-        deep: true
-      }
+        deep: true,
+        immediate: true
+      },
+      // 'filterParams.classId': {
+      //   handler() {
+      //     this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
+      //     this.stuAccountNo = ''
+      //   },
+      // }
     },
     computed: {
       filterParams() {
@@ -54,10 +97,29 @@
       }
     },
     mounted() {
-      this.init()
+      // this.init()
     },
     methods: {
-      init() {
+      toggleTab(bol) {
+        if(this.isClass === bol) return
+        this.isClass = bol
+        if(bol) {
+        this.init()
+        }
+      },
+      selectStu(item, index) {
+
+        this.$set(item, 'fold', !item.fold)
+        if (this.stuAccountNo !== item.accountNo) {
+          this.stuAccountNo = item.accountNo
+          this.stuIndex = index
+          this.$nextTick(() =>{
+            this.init(item.accountNo, index)
+          })
+        }
+
+      },
+      init(accountNo, index) {
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -65,9 +127,10 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "schoolId": this.$store.getters.schoolId,
-          roleType: 'A02',
+          roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          accountNo
         };
         let params = {
           requestJson: JSON.stringify(obj)
@@ -119,14 +182,9 @@
                 }
               })
             })
-            if (max > 0) {
-              this.kwgNotEnough = true
-              this.$nextTick(() => {
-                this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max);
-              })
-            } else {
-              this.kwgNotEnough = false
-            }
+            //柱状图
+            this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max, index);
+
 
             sessionList.forEach(o => {
               let sectionPercent = o.sectionAllCount == 0 ? '0%' : this.toPercent(o.sectionRightCount / o.sectionAllCount);
@@ -139,7 +197,8 @@
                 sectionPercent
               });
             })
-            this.setOption(knowledgeRadar);
+            //雷达图
+            this.setOption(knowledgeRadar, index);
 
           } else {
             this.$store.commit('setVanLoading', false)
@@ -147,7 +206,7 @@
           }
         })
       },
-      setCourseOption(xData, total, right, mastery, max) {
+      setCourseOption(xData, total, right, mastery, max, index) {
         let option1 = {
           grid: {
             // top: '25%',
@@ -236,9 +295,24 @@
             }
           ]
         };
-        this.drawHistogramX(option1)
+        if (max > 0) {
+          if (this.isClass) {
+            this.kwgNotEnough = false
+          } else {
+            this.$set(this.stuList[index], 'kwgNotEnough', false)
+          }
+          this.$nextTick(() => {
+            this.drawHistogramX(option1, index)
+          })
+        } else {
+          if (this.isClass) {
+            this.kwgNotEnough = true
+          } else {
+            this.$set(this.stuList[index], 'kwgNotEnough', true)
+          }
+        }
       },
-      setOption(data) {
+      setOption(data, index) {
         let tmpRadarIndicator = [];
         for (let d = 0; d < data.length; d++) {
           let name = "";
@@ -278,12 +352,20 @@
           }]
         };
         if (tmpRadarIndicator.length >= 3) {
-          this.sectionNotEnough = false;
+          if (this.isClass) {
+            this.sectionNotEnough = false
+          } else {
+            this.$set(this.stuList[index], 'sectionNotEnough', false)
+          }
           this.$nextTick(() => {
-            this.drawRadar(option)
+            this.drawRadar(option, index)
           })
         } else {
-          this.sectionNotEnough = true;
+          if (this.isClass) {
+            this.sectionNotEnough = true
+          } else {
+            this.$set(this.stuList[index], 'sectionNotEnough', true)
+          }
           this.$store.commit('setVanLoading', false)
         }
 
@@ -295,8 +377,8 @@
         var ret = strData.toString() + "%";
         return ret;
       },
-      drawRadar(option) {
-        var myChart = echarts.init(document.getElementById('myChart1'));
+      drawRadar(option, index) {
+        var myChart = echarts.init(document.getElementById(this.isClass ? 'myChart1' : 'radar-stu' + index));
         // 指定图表的配置项和数据
         // var option = {
         //   title: {
@@ -341,8 +423,8 @@
         myChart.setOption(option, true);
         this.$store.commit('setVanLoading', false)
       },
-      drawHistogramX(option) {
-        let myChart = echarts.init(document.getElementById('myChart2'));
+      drawHistogramX(option, index) {
+        let myChart = echarts.init(document.getElementById(this.isClass ? 'myChart2' : 'his-stu' + index));
         myChart.setOption(option, true);
       },
 
@@ -363,7 +445,6 @@
 
       &-item {
         font-size: 14px;
-        margin-bottom: 6px;
 
         &:before {
           content: ' ';
@@ -410,7 +491,7 @@
         }
 
         &.active {
-          background: linear-gradient(0deg, rgba(140, 247, 238, 1), rgba(57, 240, 221, 1));
+          background: linear-gradient(0deg,rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
           color: #fff;
         }
       }
@@ -428,6 +509,22 @@
         background: @blue;
         display: block;
         content: ' ';
+      }
+    }
+
+    .cell-label {
+      font-size: 16px;
+      color: #333;
+      line-height: 44px;
+      display: flex;
+      align-items: center;
+
+      &:before {
+        margin-right: 5px;
+        width: 2px;
+        background: @blue;
+        height: 17px;
+        content: '';
       }
     }
   }

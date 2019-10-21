@@ -377,3 +377,7 @@ export const statByPersonal =(params)=>{
 export const getUserKnowledgePointCounter =(params)=>{
   return axios.post('counter/getUserKnowledgePointCounter', qs.stringify(params))
 }
+//错题本列表
+export const getTeacherErrorExamList =(params)=>{
+  return axios.post('teach/getTeacherErrorExamList', qs.stringify(params))
+}

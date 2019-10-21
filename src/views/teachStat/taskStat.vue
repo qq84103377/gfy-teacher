@@ -1,7 +1,7 @@
 <template>
   <section class="task-stat-wrap">
     <van-cell title="资源类型" style="background: #f5f5f5;color: #999"/>
-    <van-collapse @change="handleChange" v-model="activeNames">
+    <van-collapse v-model="activeNames">
       <van-collapse-item title="学生任务统计" name="1">
         <div class="van-hairline--bottom">
           <div class="echart-label">各类任务数分布情况:</div>
