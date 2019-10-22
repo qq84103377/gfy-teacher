@@ -43,7 +43,7 @@
 
 <script>
 import listItem from '../../components/list-item'
-import { teachApi } from '@/api/parent-GFY'
+import { teachApi, pubApi } from '@/api/parent-GFY'
 import { modifyTeachCourseRes } from '@/api/index'
 import store from '../../store/store'
 
@@ -79,7 +79,47 @@ export default {
     goVideoPage(url) {
       console.log("点击");
       if (!url) return
-      this.$router.push({ name: 'videoPage', query: { src: url } })
+
+      this.checkUrlPermission(url)
+
+    },
+    checkUrlPermission(url) {
+      // 课件鉴权
+      let permissionParams = {
+        'interUser': 'runLfb',
+        'interPwd': '25d55ad283aa400af464c76d713c07ad',
+        'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+        'belongSchoolId': this.$store.getters.schoolId,
+        'url': url,
+        'sysTypeCd': 'S03'
+      }
+      this.$store.commit('setVanLoading', true)
+      pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
+        this.$store.commit('setVanLoading', false)
+        if (respone.flag) {
+          if (this.type == 'office' || this.type == 'pdf') {
+            if (url.indexOf('pubquanlang') > -1) {
+              url = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
+
+            } else {
+              url = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
+            }
+          } else {
+            url = respone.data[0].accessUrl
+          }
+        } else {
+          url = ''
+        }
+
+        if (!url) {
+          this.$toast('暂无资源')
+          return
+        }
+
+        this.$router.push({ name: 'videoPage', query: { src: url } })
+      }).catch(() => {
+        this.$toast('资源错误')
+      })
     },
     modifyTeachCourseRes(item, index, type) {
       let obj = {
