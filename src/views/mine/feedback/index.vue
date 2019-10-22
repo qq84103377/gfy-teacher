@@ -515,7 +515,7 @@
       this.getSysDictList();
     },
     mounted() {
-      // this.getOSSKey();
+      this.getOSSKey();
     }
   };
 

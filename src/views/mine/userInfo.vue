@@ -444,6 +444,7 @@
     created: function () {
       this.initUserInfo();
       this.getMySchoolInfo();
+      this.getOSSKey();
     }
   };
 </script>
