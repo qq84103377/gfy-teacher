@@ -116,12 +116,55 @@ export default {
       },
       isShowControl: true,
       timeID: '', // 标题控制条
-      mql: window.matchMedia("(orientation: portrait)"),
+      // mql: window.matchMedia("(orientation: portrait)"),
       isLandscape: false,
       showMore: false,
       isMove: false,
       isIphone: false
     }
+  },
+  computed: {
+    ...(mapState({
+      fullscreen: state => state.setting.fullscreen,
+    })),
+  },
+  watch: {
+    fullscreen(nv, ov) {
+      console.log('fullscreen');
+      console.log(nv, 'fullscreen nv');
+      console.log(ov, 'fullscreen ov');
+      if (nv == false) {
+        console.log(this.isFullscreen, "this.isFullscreen");
+        // if (this.isFullscreen == false && this.isApp) {
+        if (document.cancelFullScreen) {
+          document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+          document.webkitCancelFullScreen();
+        } else if (document.webkitExitFullScreen) {
+          document.webkitExitFullScreen()
+        }
+        this.isFullscreen = false
+
+        if (this.isIphone) {
+          console.log('苹果设备');
+
+          var docHtml = document.documentElement;
+          var docBody = document.body;
+          var videobox = document.querySelector('.video-box');
+          docHtml.style.cssText = "";
+          docBody.style.cssText = "";
+          videobox.style.cssText = "";
+        } else {
+          screen.orientation.unlock()
+          var videobox = document.querySelector('.video-box');
+          videobox.style.cssText = "";
+        }
+
+        // }
+      }
+    },
   },
   mounted() {
     setTimeout(() => {
@@ -276,8 +319,8 @@ export default {
       }, false);
 
     }
-    this.onMatchMeidaChange(this.mql);
-    this.mql.addListener(this.onMatchMeidaChange);
+    // this.onMatchMeidaChange(this.mql);
+    // this.mql.addListener(this.onMatchMeidaChange);
   },
   deactivated() {
 
@@ -307,19 +350,19 @@ export default {
     }
   },
   methods: {
-    onMatchMeidaChange(mql) {
-      if (mql.matches) {
-        // 竖屏
-        console.log("竖屏");
+    // onMatchMeidaChange(mql) {
+    //   if (mql.matches) {
+    //     // 竖屏
+    //     console.log("竖屏");
 
-        this.isLandscape = false
-      } else {
-        // 横屏
-        console.log("横屏");
+    //     this.isLandscape = false
+    //   } else {
+    //     // 横屏
+    //     console.log("横屏");
 
-        this.isLandscape = true
-      }
-    },
+    //     this.isLandscape = true
+    //   }
+    // },
     goVideoDetail(url) {
       if (!url) return
       this.$router.push({ name: 'videoDetail', query: { src: url } })
@@ -492,6 +535,13 @@ export default {
         }
         this.isFullscreen = true
         console.log(this.isFullscreen, "进去全屏的isFullscreen");
+        
+        setTimeout(() => {
+          if (this.$refs.video) {
+            this.$refs.video.play()
+          }
+        }, 0);
+        
       } else {
 
 
@@ -523,6 +573,8 @@ export default {
           videobox.style.cssText = "";
         } else {
           screen.orientation.unlock()
+          var videobox = document.querySelector('.video-box');
+          videobox.style.cssText = "";
         }
 
         this.isFullscreen = false
