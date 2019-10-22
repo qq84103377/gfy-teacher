@@ -27,7 +27,7 @@
 
     <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"
                    type="myCourse"></course-filter>
-    <exam-bar v-model="selectList" @clear="clear"></exam-bar>
+    <exam-bar v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>
 
@@ -84,9 +84,8 @@
         return this.errorPercent.find(v => v.active).value
       }
     },
-    created() {
-      this.filterName = localStorage.currentSubjectTypeName
-      this.getList()
+    mounted() {
+      this.$refs['courseFilter'].handleSubmit()
     },
     activated() {
       //试题详情返回的时候要对选中的试题重新赋值

@@ -3,7 +3,7 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn">选择其他</div>
+    <div class="select-btn" v-if="canSelect">选择其他</div>
     <div class="add-btn" @click="handleSubmit">{{type=='task'?'发任务':'生成试卷'}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
@@ -80,7 +80,7 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell v-if="false" class="add-exam-wrap__cell">
+        <van-cell v-if="canAddCourse" class="add-exam-wrap__cell">
           <div slot="title">
             <div class="aic">
               <div class="fs15" style="flex: 1"><span class="red">*</span>添加到课程: {{$route.query.courseName}}</div>
@@ -105,7 +105,7 @@
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo} from '@/api/index'
 
   export default {
-    props: ['type', 'selectList'],
+    props: ['type', 'selectList','canSelect','canAddCourse'],
     name: "examBar",
     components: {filterPanel},
     model: {

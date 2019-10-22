@@ -31,7 +31,7 @@
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-        <exam-bar v-model="selectList" @clear="clear" type="task" v-if="!isSend"></exam-bar>
+        <exam-bar v-model="selectList" @clear="clear" type="task" v-if="!isSend" :can-select="true"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
     <!--      设置分数-->

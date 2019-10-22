@@ -11,7 +11,7 @@
 <!--          <span>总分: {{info.score}}</span>-->
 <!--        </div>-->
         <div v-html="info.title" class="html-img"></div>
-        <span class="fs12"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.titleDegree==='D01'?'容易':info.titleDegree==='D02'?'中等':'困难'}}</span>
+        <span class="fs12 mgt15" style="display: block;"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.titleDegree==='D01'?'容易':info.titleDegree==='D02'?'中等':'困难'}}</span>
         <div style="display: flex;justify-content: flex-end">
           <div class="question-detail__body__qst-wrap__btn" :class="{active:analyseShow}" @click="analyseShow=!analyseShow">查看解析</div>
         </div>
