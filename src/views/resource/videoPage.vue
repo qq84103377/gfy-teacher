@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 let startx, starty, curLength;
 
 //获得角度
