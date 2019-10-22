@@ -89,8 +89,8 @@
           "errorType":this.selectItem.dictKey,
           "examId":this.correctInfo.examId,
           "knowledgePointId":this.correctInfo.knowledgePointId,
-          "subjectType":this.$route.query.subjectType,
-          "classGrade":this.$route.query.classGrade,
+          "subjectType":this.$route.query.subjectType || localStorage.currentSubjectType,
+          "classGrade": this.correctInfo.classGrade || this.$route.query.classGrade,
           "phoneNo":this.$store.getters.getUserInfo.phoneNo,
           "correctInfo":this.remark
         }

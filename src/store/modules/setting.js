@@ -9,48 +9,58 @@ const state = {
   sendTaskClassStudent: {}, //发任务班级学生信息
   sendTaskClassSubGroup: {}, //发任务班级分组信息
   sendTaskInfo: {}, //发布的任务信息
-  fullscreen: false
+  fullscreen: false,
+  errorBookSelected: [],  //错题本选择的试题
+  errorBookCourse: [], //错题本选择的课程
 }
 
 const mutations = {
-  setVanLoading(state, data) {
+  setVanLoading (state, data) {
     state.vanLoading = data
   },
-  setTeamList(state, data) {
+  setTeamList (state,data) {
     state.teamList = data
   },
   setResourceInfo(state, data) {
     console.log("resourceInfo", data)
     state.resourceInfo = data
   },
-  setTchCourseInfo(state, tch) {
+  setTchCourseInfo(state,tch){
     state.tchCourseInfo = tch
   },
-  setTaskClassInfo(state, data) {
+  setTaskClassInfo(state,data){
     state.taskClassInfo = data
   },
-  setGradeTermList(state, data) {
+  setGradeTermList(state,data){
     state.gradeTermList = data
   },
-  setIsAddWare(state, data) {
+  setIsAddWare (state,data) {
     state.isAddWare = data
   },
-  setSendTaskClassStudent(state, data) {
+  setSendTaskClassStudent(state, data){
     state.sendTaskClassStudent = data
   },
-  setSendTaskClassSubGroup(state, data) {
+  setSendTaskClassSubGroup(state, data){
     state.sendTaskClassSubGroup = data
   },
-  setSendTaskInfo(state, data) {
+  setSendTaskInfo(state, data){
     state.sendTaskInfo = data
   },
   setFullscreen(state, fullscreen) {
     state.fullscreen = fullscreen
     localStorage.setItem("fullscreen", JSON.stringify(fullscreen))
+  },
+  setErrorBookSelected(state,data) {
+    state.errorBookSelected = data
+  },
+  setErrorBookCourse(state,data) {
+    state.errorBookCourse = data
   }
 }
 
-const actions = {}
+const actions = {
+
+}
 
 const getters = {
   getVanLoading(state) {
@@ -68,8 +78,10 @@ const getters = {
   getSendTaskInfo: state => state.sendTaskInfo,
   getIsAddWare(state) {
     return state.isAddWare
-  }
-}
+  },
+  getErrorBookSelected: state => state.errorBookSelected,
+  getErrorBookCourse: state => state.errorBookCourse,
+};
 
 export default {
   state,
