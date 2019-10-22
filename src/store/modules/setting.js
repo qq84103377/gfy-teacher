@@ -9,6 +9,8 @@ const state = {
   sendTaskClassStudent:{},//发任务班级学生信息
   sendTaskClassSubGroup:{},//发任务班级分组信息
   sendTaskInfo:{},//发布的任务信息
+  errorBookSelected: [],  //错题本选择的试题
+  errorBookCourse: [], //错题本选择的课程
 }
 
 const mutations = {
@@ -42,6 +44,12 @@ const mutations = {
   },
   setSendTaskInfo(state, data){
     state.sendTaskInfo = data
+  },
+  setErrorBookSelected(state,data) {
+    state.errorBookSelected = data
+  },
+  setErrorBookCourse(state,data) {
+    state.errorBookCourse = data
   }
 }
 
@@ -65,7 +73,9 @@ const getters = {
   getSendTaskInfo: state => state.sendTaskInfo,
   getIsAddWare(state) {
     return state.isAddWare
-  }
+  },
+  getErrorBookSelected: state => state.errorBookSelected,
+  getErrorBookCourse: state => state.errorBookCourse,
 };
 
 export default {

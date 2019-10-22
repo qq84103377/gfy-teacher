@@ -381,3 +381,19 @@ export const getUserKnowledgePointCounter =(params)=>{
 export const getTeacherErrorExamList =(params)=>{
   return axios.post('teach/getTeacherErrorExamList', qs.stringify(params))
 }
+//批量添加小组成员
+export const addSubGroupStudentByBatch =(params)=>{
+  return axios.post('teach/addSubGroupStudentByBatch', qs.stringify(params))
+}
+//批量删除小组成员
+export const delSubGroupStudentByBatch =(params)=>{
+  return axios.post('teach/delSubGroupStudentByBatch', qs.stringify(params))
+}
+//获取课程内错题的试题详情
+export const getTeacherErrorExamDetail =(params)=>{
+  return axios.post('teach/getTeacherErrorExamDetail', qs.stringify(params))
+}
+//获取所有试题题型
+export const getAllExamTypeList =(params)=>{
+  return axios.post('resource/getAllExamTypeList', qs.stringify(params))
+}

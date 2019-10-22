@@ -5,7 +5,7 @@
       <slot name="num"></slot>
       <div v-html="item.title" class="html-img"></div>
       <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
-        ({{childIndex+1}})本小题{{child.examScore}}分
+        ({{childIndex+1}})<span v-if="child.examScore>=0">本小题{{child.examScore}}分</span>
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
         <div v-html="child.title" class="html-img"></div>
         <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
@@ -49,7 +49,7 @@
     </div>
     <div v-if="analyseShow" class="question-item-wrap__analyse">
       <div>试题编号:{{item.examId}}</div>
-      <div>知识点:{{item.knowledgePointName}}</div>
+      <div v-if="item.knowledgePointName">知识点:{{item.knowledgePointName}}</div>
       <div v-if="!item.groupExamList.length">
         <div>正确答案及相关解析</div>
         <div>正确答案:</div>
@@ -89,14 +89,14 @@
           Dialog.confirm({
             title: '确定移除当前试题?'
           }).then(() => {
-            this.$emit('add', this.item.isRemove);
             this.$set(this.item, 'isRemove', !this.item.isRemove)
+            this.$emit('add', !this.item.isRemove);
           }).catch(() => {
             // on cancel
           });
         }else {
-          this.$emit('add', this.item.isRemove);
           this.$set(this.item, 'isRemove', !this.item.isRemove)
+          this.$emit('add', !this.item.isRemove);
         }
       },
       handleCollect(v) {
