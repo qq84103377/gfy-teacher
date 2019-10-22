@@ -174,7 +174,8 @@
           currentPage: this.currentPage,
           goodsType: this.goodsType,
           schoolIdList: this.$store.getters.schoolIdList,
-          redeemType: this.redeemType
+          redeemType: this.redeemType,
+          limitNumber:this.langCoin
         }
         let params = {
           requestJson: JSON.stringify(obj)

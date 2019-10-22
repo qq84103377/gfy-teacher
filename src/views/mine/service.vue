@@ -30,15 +30,24 @@
           confirmButtonColor: '#39F0DD'
         }).then(() => {
           // on confirm
-          console.log('呼叫电话')
-          if ("cordova" in window) {
-            console.log('试试aapp呼叫电话')
-
-            this.$refs["telBox"].click();
-
-          } else {
-            this.$refs["telBox"].click();
-          }
+          console.log('呼叫电话');
+          this.$refs["telBox"].click();
+          // if ("cordova" in window) {
+          //   console.log('试试aapp呼叫电话')
+          //
+          //   this.$refs["telBox"].click();
+          //   /* window.plugins.CallNumber.callNumber(
+          //      function onSuccess(result) {
+          //        console.log("Success:call number" + result);
+          //      },
+          //      function onError(result) {
+          //        console.log("Error:call number" + result);
+          //      },
+          //      "18589082142", true);*/
+          //
+          // } else {
+          //   this.$refs["telBox"].click();
+          // }
         }).catch(() => {
           // on cancel
         });
@@ -51,6 +60,7 @@
   @deep: ~'>>>';
   .service {
     background-color: #F5F6FA;
+
     &-header {
       width: 138px;
       height: 138px;

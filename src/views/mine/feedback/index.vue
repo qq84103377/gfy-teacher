@@ -450,15 +450,6 @@
           }
         });
       },
-      getSysDictList() {
-        const json = {
-          requestJson: JSON.stringify({
-            interUser: "123",
-            interPwd: "123",
-            dictCode: "Domain_FeedbackT03_Question_Type"
-          })
-        };
-      },
       myPhoto(id) {
         var imgUploadList = [];
 
@@ -524,7 +515,7 @@
       this.getSysDictList();
     },
     mounted() {
-      // this.getOSSKey();
+      this.getOSSKey();
     }
   };
 

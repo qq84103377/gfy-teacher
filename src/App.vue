@@ -6,6 +6,37 @@
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {
+      mql: window.matchMedia("(orientation: portrait)"),
+    }
+  },
+  mounted() {
+    console.log('app页面 mounted')
+
+    this.onMatchMeidaChange(this.mql);
+    this.mql.addListener(this.onMatchMeidaChange);
+  },
+  methods: {
+    onMatchMeidaChange(mql) {
+      if (mql.matches) {
+        // 竖屏
+        console.log("竖屏");
+        this.$store.commit('setFullscreen', false)
+
+      } else {
+        // 横屏
+        console.log("横屏");
+
+        // this.isLandscape = true
+      }
+    },
+  },
+}
+</script>
+
 <style lang="less">
 @import "./assets/style/reset.less";
 @import "./assets/style/common.less";

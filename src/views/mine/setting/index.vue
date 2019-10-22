@@ -178,15 +178,16 @@
         var param = {
           interUser: "control_app",
           interPwd: "E10ADC3949BA59ABBE56E057F20F883E",
-          moduleType: "T06",
+          moduleType: "T09",
           schoolId: -1,
           classId: -1
         };
-        if (platformType == "Android") {
-          param["moduleType"] = "T06";
-        } else if (platformType == "iOS") {
-          param["moduleType"] = "T07";
-        }
+        // Domain_Module_Type  模块类型
+        // if (platformType == "Android") {
+        //   param["moduleType"] = "T09";
+        // } else if (platformType == "iOS") {
+        //   param["moduleType"] = "T09";
+        // }
         sysModuleVersionApi
           .getLatestModuleVerion({requestJson: JSON.stringify(param)})
           .then(
