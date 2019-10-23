@@ -72,7 +72,7 @@
                   </div>
                   <div v-else @click="subjectCorrect(asw,index,aswIndex)" class="undo">学生未作答</div>
                 </div>
-                <div class="right">{{asw.error}}</div>
+                <div class="right" :class="{black:asw.error == '--'}">{{asw.error}}</div>
               </div>
             </div>
           </div>
@@ -462,6 +462,9 @@
                 flex: 0 0 18%;
                 color: red;
                 text-align: center;
+                &.black {
+                  color: #333;
+                }
               }
             }
 

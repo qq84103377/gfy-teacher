@@ -12,6 +12,7 @@ const state = {
   fullscreen: false,
   errorBookSelected: [],  //错题本选择的试题
   errorBookCourse: [], //错题本选择的课程
+  errorFilterParams: {}, //错题本筛选条件
 }
 
 const mutations = {
@@ -55,6 +56,9 @@ const mutations = {
   },
   setErrorBookCourse(state,data) {
     state.errorBookCourse = data
+  },
+  setErrorFilterParams(state,data) {
+    state.errorFilterParams = data
   }
 }
 
@@ -81,6 +85,7 @@ const getters = {
   },
   getErrorBookSelected: state => state.errorBookSelected,
   getErrorBookCourse: state => state.errorBookCourse,
+  getErrorFilterParams: state => state.errorFilterParams,
 };
 
 export default {

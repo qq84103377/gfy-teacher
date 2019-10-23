@@ -27,7 +27,7 @@
 
     <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"
                    type="myCourse"></course-filter>
-    <exam-bar v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
+    <exam-bar type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>
 
@@ -84,6 +84,15 @@
         return this.errorPercent.find(v => v.active).value
       }
     },
+    beforeRouteLeave(to, from ,next) {
+      if(to.path === '/index') {
+        //去首页 需要清空储存的值
+        this.$store.commit('setErrorBookCourse',[])
+        this.$store.commit('setErrorBookSelected',[])
+        this.$store.commit('setErrorFilterParams',{})
+      }
+      next()
+    },
     mounted() {
       this.$refs['courseFilter'].handleSubmit()
     },
@@ -133,6 +142,7 @@
         this.filterParams.classGrade = classGrade
         this.filterParams.termType = termType
         this.filterParams.classId = classId
+        this.$store.commit('setErrorFilterParams',this.filterParams)
         this.getList()
       },
       getList() {
