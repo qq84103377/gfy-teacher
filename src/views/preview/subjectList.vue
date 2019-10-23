@@ -10,20 +10,22 @@
         <div class="subject-list-wrap__body-top">
           <div class="fs16">
             <div class="detail html-img" :class="{'fold':fold}">
-              <div v-html="info.title"></div>
-              <div v-if="info.groupExamList.length">
-                <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
-                  <div class="mgt10" v-html="item.title"></div>
-                  <div class="mgt10">正确答案: <span class="blue" v-html="item.answer"></span></div>
-                  <div class="mgt10">答案解析:</div>
-                  <div v-html="item.examExplain"></div>
+              <div style="flex: 1;word-break: break-all">
+                <div v-html="info.title"></div>
+                <div v-if="info.groupExamList.length">
+                  <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
+                    <div class="mgt10" v-html="item.title"></div>
+                    <div class="mgt10">正确答案: <span class="blue" v-html="item.answer"></span></div>
+                    <div class="mgt10">答案解析:</div>
+                    <div v-html="item.examExplain"></div>
+                  </div>
                 </div>
-              </div>
-              <div v-else>
-                <div class="fs14">
-                  <div class="mgt10">正确答案: <span class="blue" v-html="info.answer"></span></div>
-                  <div class="mgt10">答案解析:</div>
-                  <div v-html="info.examExplain"></div>
+                <div v-else>
+                  <div class="fs14">
+                    <div class="mgt10">正确答案: <span class="blue" v-html="info.answer"></span></div>
+                    <div class="mgt10">答案解析:</div>
+                    <div v-html="info.examExplain"></div>
+                  </div>
                 </div>
               </div>
               <div @click="fold = !fold" class="blue fold-btn" :class="{active:fold}">{{fold?'展开原题':'收起'}}</div>
@@ -380,26 +382,21 @@
 
         .detail {
           position: relative;
-
+          display: flex;
+          flex-direction: column;
           &.fold {
-            height: 45px;
+            height: 22px;
             overflow: hidden;
+            flex-direction: row;
           }
 
           .fold-btn {
             font-size: 14px;
-            position: relative;
-            width: 100%;
-            bottom: -5px;
-            left: 0;
-            text-align: center;
-            line-height: 40px;
+            flex: 0 0 20%;
+            text-align: right;
+            line-height: 22px;
             background: #fff;
 
-            &.active {
-              background: linear-gradient(-180deg, rgba(255, 255, 255, 0) 0%, #fff 40%);
-              position: absolute;
-            }
           }
         }
 
