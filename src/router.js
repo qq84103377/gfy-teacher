@@ -544,6 +544,11 @@ export default new Router({
           component: () => import('./views/errorBook/index.vue')
         },
         {
+          path: '/errorQuestionDetail',
+          name: 'errorQuestionDetail',
+          component: () => import('./views/errorBook/errorQuestionDetail.vue')
+        },
+        {
           path: '/copyGroup',
           name: 'copyGroup',
           component: () => import('./views/myClass/copyGroup.vue')

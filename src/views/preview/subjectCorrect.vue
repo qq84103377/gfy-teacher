@@ -340,7 +340,13 @@
           if (res.flag) {
             this.stuArr[this.stuIndex].answer[this.aswIndex].isMark = 'I01'
             this.stuArr[this.stuIndex].answer[this.aswIndex].score = studentScore
-            if(!this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) this.toggle(1)
+            // if(!this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) this.toggle(1)
+
+            if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+              this.$refs['drawBoard'].save()
+            }else {
+              this.toggle(1)
+            }
           } else {
             this.$toast(res.msg)
           }
@@ -359,9 +365,7 @@
         if (!this.stuArr[this.stuIndex].answer[this.aswIndex].value && this.stuArr[this.stuIndex].answer[this.aswIndex].value !== 0 && this.stuArr[this.stuIndex].answer[this.aswIndex].isMark === 'I02') return this.$toast('还没选择分数')
         this.$store.commit('setVanLoading', true)
        await this.examResultScroe()
-        if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
-          this.$refs['drawBoard'].save()
-        }
+
       },
       clickComment() {
         const item = this.info.appraiseList.find(v => v.objectId === this.stuArr[this.stuIndex].answer[this.aswIndex].seqId)
@@ -664,9 +668,7 @@
         if(this.autoSubmit) {
           this.$store.commit('setVanLoading', true)
          await this.examResultScroe()
-          if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
-            this.$refs['drawBoard'].save()
-          }
+
         }
       },
       handleExit(src) {

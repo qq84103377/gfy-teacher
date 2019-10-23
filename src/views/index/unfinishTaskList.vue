@@ -154,7 +154,8 @@
           let obj = {
             operateAccountNo:this.$store.getters.getUserInfo.accountNo,
             currentPage:page,
-            pageSize:this.pageSize
+            pageSize:this.pageSize,
+            courseType: 'C01'
           }
           let params = {
             requestJson: JSON.stringify(obj)

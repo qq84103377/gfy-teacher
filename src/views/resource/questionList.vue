@@ -61,7 +61,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar v-model="selectList" @clear="clear"></exam-bar>
+    <exam-bar v-model="selectList" @clear="clear" :can-select="true"></exam-bar>
   </section>
 </template>
 

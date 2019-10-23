@@ -1,129 +1,175 @@
 <template>
-    <section class="add-group-wrap">
-      <div class="add-group-wrap__body">
-        <div class="add-group-wrap__body__group-name">
-          <div class="aic jcsb mgb15">
-            <span class="fs15">填写小组名称</span>
-            <span class="red fs10">{{64 - groupName.length}}</span>
-          </div>
-          <van-field class="group-name-input" v-model="groupName" maxlength="64" placeholder="请输入名称，字数在64字内" />
+  <section class="add-group-wrap">
+    <div class="add-group-wrap__body">
+      <div class="add-group-wrap__body__group-name">
+        <div class="aic jcsb mgb15">
+          <span class="fs15">填写小组名称</span>
+          <span class="red fs10">{{64 - groupName.length}}</span>
         </div>
-        <div class="add-group-wrap__body__group-list">
-          <van-cell title="选择学生"/>
-          <div v-for="(g,gi) in groupList" :key="gi">
-            <van-cell :title="g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName"/>
-            <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
-              <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
-                <div class="check-box" :class="{'is-active':s.check}"></div>
-                <div>{{s.studentName}}</div>
-              </div>
-              <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;" />
-            </van-cell>
-          </div>
+        <van-field class="group-name-input" v-model="groupName" maxlength="64" placeholder="请输入名称，字数在64字内"/>
+      </div>
+      <div class="add-group-wrap__body__group-list">
+        <van-cell title="选择学生"/>
+        <div v-for="(g,gi) in groupList" :key="gi">
+          <van-cell :title="g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName"/>
+          <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
+            <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
+              <div class="check-box" :class="{'is-active':s.check}"></div>
+              <div>{{s.studentName}}</div>
+            </div>
+            <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;"/>
+          </van-cell>
+        </div>
 
-        </div>
       </div>
-      <div class="add-group-wrap__footer">
-        <van-button @click="submit" :loading="btnLoading" loading-text="确定" type="info" class="btn">确定</van-button>
-      </div>
-      <setting-dialog @success="$toast('设置成功');getSubGroupStudent()" :visible.sync="visible" :classId="$route.params.classId" :stuInfo="stuInfo" :monitorInfo="monitor" :groupLeaderInfo="groupLeader"></setting-dialog>
-    </section>
+    </div>
+    <div class="add-group-wrap__footer">
+      <van-button @click="submit" :loading="btnLoading" loading-text="确定" type="info" class="btn">确定</van-button>
+    </div>
+    <setting-dialog @success="$toast('设置成功');getSubGroupStudent()" :visible.sync="visible"
+                    :classId="$route.params.classId" :stuInfo="stuInfo" :monitorInfo="monitor"
+                    :groupLeaderInfo="groupLeader"></setting-dialog>
+  </section>
 </template>
 
 <script>
-  import {createClassSubGroup, getSubGroupStudent} from '@/api/index'
+  import {createClassSubGroup, getSubGroupStudent, addSubGroupStudentByBatch} from '@/api/index'
   import settingDialog from './components/settingDialog'
+
   export default {
-        name: "addGroup",
+    name: "addGroup",
     components: {settingDialog},
     computed: {
-        monitor() {
-          let obj = {}
-          for(let k in this.groupList) {
-            const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
-              this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.cadreType === 'T02') : ''
-            if(item) {
-              obj = item
-              break
-            }
+      monitor() {
+        let obj = {}
+        for (let k in this.groupList) {
+          const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
+            this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.cadreType === 'T02') : ''
+          if (item) {
+            obj = item
+            break
           }
-          return obj
-        },
-        groupLeader() {
-          let obj = {}
-          for(let k in this.groupList) {
-            const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
-              this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.identityType === 'I02') : ''
-            if(item) {
-              obj = item
-              break
-            }
-          }
-          return obj
         }
+        return obj
       },
-      data() {
-          return {
-            groupName: '',
-            groupList: JSON.parse(JSON.stringify(this.$route.params.groupList)),
-            visible: false,
-            stuInfo: {},
-            btnLoading: false
+      groupLeader() {
+        let obj = {}
+        for (let k in this.groupList) {
+          const item = this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent ?
+            this.groupList[k].tchClassSubGroupStudent.tchSubGroupStudent.find(s => s.identityType === 'I02') : ''
+          if (item) {
+            obj = item
+            break
           }
-      },
-      methods: {
-        getSubGroupStudent() {
-          this.$store.commit('setVanLoading',true)
-          let obj = {
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "accountNo": this.$store.getters.getUserInfo.accountNo,
-            "classId": this.$route.params.classId,
-            "subjectType": localStorage.currentSubjectType
-          };
-          let params ={
-            requestJson: JSON.stringify(obj)
-          }
-          getSubGroupStudent(params).then(res => {
-            this.$store.commit('setVanLoading',false)
-            if(res.flag) {
-              this.groupList = res.data
-            }else {
-              this.$toast(res.msg)
-            }
-          })
-        },
-        submit() {
-          this.createClassSubGroup()
-        },
-        createClassSubGroup() {
-          this.btnLoading = true
-          let obj = {
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            subGroupName: this.groupName,
-            "subjectType": localStorage.currentSubjectType,
-            classId: this.$route.params.classId
-          };
-          let params ={
-            requestJson: JSON.stringify(obj)
-          }
-          createClassSubGroup(params).then(res => {
-            this.btnLoading = false
-            if(res.flag) {
-              this.getSubGroupStudent()
-              this.groupName = ''
-            }else {
-              this.$toast(res.msg)
-            }
-          })
         }
+        return obj
       }
+    },
+    data() {
+      return {
+        groupName: '',
+        groupList: JSON.parse(JSON.stringify(this.$route.params.groupList)),
+        visible: false,
+        stuInfo: {},
+        btnLoading: false
+      }
+    },
+    methods: {
+      getSubGroupStudent() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "classId": this.$route.params.classId,
+          "subjectType": localStorage.currentSubjectType
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getSubGroupStudent(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag) {
+            this.groupList = res.data
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      submit() {
+        if (this.groupName) {
+          const studentList = this.groupList.reduce((total, v, i) => {
+            if (v.tchClassSubGroupStudent.tchSubGroupStudent) {
+              let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
+                if (s.check) {
+                  t.push({accountNo: s.accountNo, oldSubGroupId: s.subgroupId})
+                }
+                return t
+              }, [])
+              total.push(...arr)
+            }
+            return total
+          }, [])
+          if (studentList.length) {
+            this.createClassSubGroup(studentList)
+          } else {
+            this.$toast('请选择学生')
+          }
+        } else {
+          this.$toast('请输入组名')
+        }
+      },
+      createClassSubGroup(studentList) {
+        this.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          subGroupName: this.groupName,
+          "subjectType": localStorage.currentSubjectType,
+          classId: this.$route.params.classId
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        createClassSubGroup(params).then(res => {
+          this.btnLoading = false
+          if (res.flag) {
+            this.addSubGroupStudentByBatch(res.data[0].tchClassSubGroup.subgroupId,studentList)
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addSubGroupStudentByBatch(subGroupId,studentList) {
+        this.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          subGroupId,
+          studentList
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addSubGroupStudentByBatch(params).then(res => {
+          this.btnLoading = false
+          if (res.flag) {
+            this.$toast('新建成功')
+            this.groupName = ''
+            this.$router.back()
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
     }
+  }
 </script>
 
 <style lang="less" scoped>
@@ -131,21 +177,26 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     &__body {
       flex: 1;
       overflow-y: auto;
+
       &__group-name {
         background: #fff;
         padding: 10px;
         margin-bottom: 10px;
+
         .group-name-input {
           width: 100%;
           background: #f5f6fa;
           border-radius: 5px;
         }
       }
+
       &__group-list {
         background: #fff;
+
         .check-box {
           flex: 0 0 16px;
           height: 16px;
@@ -161,11 +212,13 @@
         }
       }
     }
+
     &__footer {
       flex: 0 0 55px;
       padding: 5px 18px;
       background: #fff;
-      .btn{
+
+      .btn {
         width: 100%;
         border-radius: 20px;
         color: #fff;

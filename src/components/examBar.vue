@@ -3,8 +3,8 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn">选择其他</div>
-    <div class="add-btn" @click="handleSubmit">{{type=='task'?'发任务':'生成试卷'}}</div>
+    <div class="select-btn" v-if="canSelect">选择其他</div>
+    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务':'生成试卷'}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
       :show="selectPop"
@@ -80,17 +80,19 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell v-if="false" class="add-exam-wrap__cell">
+        <van-cell v-if="canAddCourse" class="add-exam-wrap__cell">
           <div slot="title">
-            <div class="aic">
-              <div class="fs15" style="flex: 1"><span class="red">*</span>添加到课程: {{$route.query.courseName}}</div>
-              <van-icon v-if="!$route.query.courseName" @click="showFilter" name="add" class="add"></van-icon>
+            <div style="display: flex;">
+              <div class="fs15 mgr10"><span class="red">*</span>添加到课程: </div>
+              <div class="fs15" style="flex: 1;word-break: break-all">{{courseName}}</div>
+              <van-icon @click="showFilter" name="add" class="add"></van-icon>
             </div>
             <div class="red fs12 mgt10">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
           </div>
         </van-cell>
         <div class="add-exam-wrap__footer">
-          <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="addTestPaper">提交</van-button>
+          <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="addTestPaper">提交
+          </van-button>
         </div>
       </div>
     </van-popup>
@@ -102,10 +104,10 @@
 <script>
   import filterPanel from './filterPanel'
   import {Dialog} from 'vant';
-  import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo} from '@/api/index'
+  import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
 
   export default {
-    props: ['type', 'selectList'],
+    props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务
     name: "examBar",
     components: {filterPanel},
     model: {
@@ -118,6 +120,9 @@
           t += v.child.length
           return t
         }, 0)
+      },
+      courseName() {
+       return this.courseList.find(v => v.check).tchCourseInfo.courseName
       }
     },
     data() {
@@ -132,7 +137,8 @@
           btnLoading: false
         },
         tempList: [],
-        selectCourse: ''
+        selectCourse: '',
+        courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
       }
     },
     watch: {
@@ -144,10 +150,42 @@
             share: 'S02',
             btnLoading: false
           }
+        }else {
+          //每次点开生成试卷弹窗请求课程列表
+          if(this.type === 'error') {
+            this.getClassTeachCourseInfo()
+          }
         }
       }
     },
+    created() {
+
+    },
     methods: {
+      getClassTeachCourseInfo() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectType": localStorage.getItem("currentSubjectType"),
+           ...this.$store.getters.getErrorFilterParams,
+          "pageSize": "999",
+          "courseType": "C01",
+          "currentPage": 1,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeachCourseInfo(params).then(res => {
+            if(res.flag) {
+               this.courseList = res.data || []
+              this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
+            }
+        })
+      },
       addTestPaper() {
         if (!this.form.name) {
           return this.$toast('请输入试卷名称')
@@ -160,8 +198,8 @@
           "belongSchoolId": this.$store.getters.schoolId,
           "testPaperInfo": {
             "testPaperId": "",
-            "classGrade": this.$route.query.classGrade,//归属年级
-            "subjectType": this.$route.query.subjectType,//学科
+            "classGrade": this.$route.query.classGrade || this.$store.getters.getErrorFilterParams.classGrade,//归属年级
+            "subjectType": localStorage.currentSubjectType,//学科
             "shareType": this.form.share,//共享级别
             "belongSchoolId": this.$store.getters.schoolId,//归属学校
             "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
@@ -185,7 +223,13 @@
         addTestPaper(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
+            if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId || this.$route.query.sysCourseId) {
+              // 有选择加入的课程
+              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
+            }else {
+              //没有选择加入的课程
+              this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
+            }
           } else {
             this.$toast(res.msg)
           }
@@ -199,9 +243,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": this.$route.query.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId,
+          "tchCourseId": this.$route.query.tchCourseId || this.courseList.find(v => v.check).tchCourseInfo.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId || this.courseList.find(v => v.check).tchCourseInfo.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId || this.courseList.find(v => v.check).tchCourseInfo.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -269,7 +313,7 @@
         })
       },
       clearQuestion() {
-        if(this.selectList.length) {
+        if (this.selectList.length) {
           Dialog.confirm({
             title: '确定清空已选试题吗?',
             // message: '弹窗内容'
@@ -282,21 +326,18 @@
         }
       },
       handleFilter(item) {
-        this.selectCourse = item.name
-        this.list.forEach(v => {
-          v.child.forEach(_v => {
-            this.$set(_v, 'check', _v.name === item.name)
-          })
-        })
+        this.courseList = JSON.parse(JSON.stringify(this.tempList))
       },
       showFilter() {
         this.filterShow = true
         // this.$set(this.list[0], 'active', true)
-        // this.tempList = JSON.parse(JSON.stringify(this.list))
+        this.tempList = JSON.parse(JSON.stringify(this.courseList))
       },
       handleSubmit() {
         if (this.type === 'task') {
-          this.$router.push(`/addTask?type=exam`)
+          if (this.length) {
+            this.$router.push(`/addTask?type=exam`)
+          }
         } else {
           this.addExam = true
           //examDetail

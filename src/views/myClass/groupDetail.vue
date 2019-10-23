@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="group-detail-wrap__footer">
-        <van-button type="info" class="btn">{{isAdd?'添加':isDel?'删除':'添加/删除'}}</van-button>
+        <van-button @click="modifyByBatch" type="info" class="btn">{{isAdd?'添加':isDel?'删除':'添加/删除'}}</van-button>
       </div>
       <setting-dialog @success="$toast('设置成功');getSubGroupStudent()" :visible.sync="visible" :classId="$route.params.classId" :stuInfo="stuInfo" :monitorInfo="monitor" :groupLeaderInfo="groupLeader"></setting-dialog>
     </section>
@@ -43,7 +43,7 @@
 
 <script>
   import settingDialog from './components/settingDialog'
-  import {getSubGroupStudent} from '@/api/index'
+  import {getSubGroupStudent, addSubGroupStudentByBatch, delSubGroupStudentByBatch} from '@/api/index'
     export default {
         name: "groupDetail",
       components: {settingDialog},
@@ -93,6 +93,43 @@
           }
       },
       methods: {
+        modifyByBatch() {
+          if(!this.isAdd&&!this.isDel) return this.$toast('请选择学生')
+          this.$store.commit('setVanLoading',true)
+          const studentList = this.groupList.reduce((total,v,i) => {
+            if(v.tchClassSubGroupStudent.tchSubGroupStudent && (this.isAdd?(this.curIndex !== i):(this.curIndex === i))) {
+              let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t,s) => {
+                if(s.check) {
+                  t.push({accountNo: s.accountNo,oldSubGroupId: s.subgroupId})
+                }
+                return t
+              },[])
+              total.push(...arr)
+            }
+            return total
+          },[])
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            subGroupId: this.groupList[this.curIndex].tchClassSubGroupStudent.tchClassSubGroup.subgroupId,
+            studentList
+          };
+          let params ={
+            requestJson: JSON.stringify(obj)
+          }
+          let api = this.isAdd?addSubGroupStudentByBatch:delSubGroupStudentByBatch
+          api(params).then(res => {
+            this.$store.commit('setVanLoading',false)
+            if(res.flag) {
+              this.$toast(this.isAdd?'添加成功':'删除成功')
+              this.getSubGroupStudent()
+            }else {
+              this.$toast(res.msg)
+            }
+          })
+        },
         getSubGroupStudent() {
           this.$store.commit('setVanLoading',true)
           let obj = {
