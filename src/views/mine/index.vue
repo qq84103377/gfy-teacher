@@ -250,8 +250,8 @@
         getUserCurriculum(params).then(res => {
           console.log('getUserCurriculum', res)
           if (res.flag && res.data.length > 0) {
-            this.courseNum = res.data[0].counterValue;
-            this.taskNum = res.data[1].counterValue;
+            this.taskNum = res.data[0].counterValue;
+            this.courseNum = res.data[1].counterValue;
           }
         })
       },
