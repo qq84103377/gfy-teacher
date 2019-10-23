@@ -166,11 +166,12 @@ export default {
       }
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
+          console.log(item.tastType,"item.tastType");
           if (['T04'].includes(item.taskType)) {
             this.$router.push({ path: '/materialDetail', query: { data: res.data[0].courseware } })
           } else if (['T06'].includes(item.taskType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
-          } else if (['T01', 'T02'].includes(item.tastType)) {
+          } else if (['T01', 'T02'].includes(item.taskType)) {
             console.log(res.data[0], 'res.data[0]////////////');
             if (res.data[0] && res.data[0].courseware && res.data[0].courseware.srcUrl) {
               this.checkUrlPermission(res.data[0].courseware.srcUrl)
