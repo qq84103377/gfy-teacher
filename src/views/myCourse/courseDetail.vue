@@ -6,7 +6,7 @@
         left-arrow>
       </van-nav-bar>
       <div class="course-detail__body">
-        <van-cell @click="gotoPreview" :title="`预习(${currCourse.resourceCount.find(v => v.resourceType === 'R11').resourceCount})`" is-link/>
+        <van-cell class="fs16" @click="gotoPreview" :title="`预习(${currCourse.resourceCount.find(v => v.resourceType === 'R11').resourceCount})`" is-link/>
         <van-collapse v-model="activeNames">
           <van-collapse-item :title="`课中(${currCourse.resourceCount.find(v => v.resourceType === 'R12').resourceCount})`" name="1">
             <van-cell title="讲义" @click="goInClass('/lectureList')" is-link/>
@@ -72,6 +72,10 @@
       overflow-y: auto;
       @{deep} .van-collapse-item__content {
         padding: 0;
+        padding-left: 5px;
+      }
+      @{deep} .van-collapse-item__title {
+        font-size: 16px;
       }
     }
   }

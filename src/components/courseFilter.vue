@@ -1,6 +1,7 @@
 <template>
   <!--    <section class="course-filter-wrap"></section>-->
   <van-popup
+    :close-on-click-overlay="false"
     v-model="show"
     position="bottom"
     :style="{ height: type==='myCourse'?'50%':'93%' }">
@@ -28,7 +29,7 @@
           </div>
           <div v-show="gradeDropdown" class="dropdown-menu">
             <div class="dropdown-menu-item" :class="{active: gradeIndex === index}"
-                 v-if="item.teacherInfoList.some(t => t.subjectType === subjectList.find(v => v.active).key)||index===0"
+                 v-if="item.teacherInfoList.some(t => t.subjectType === subjectList.find(v => v.active).key)"
                  v-for="(item,index) in gradeList" :key="index" @click="changeGrade(index)">{{item.gradeName}}
               <van-icon v-show="gradeIndex === index " class="check blue" name="success"/>
             </div>
@@ -147,10 +148,6 @@
         gradeDropdown: false,
         termDropdown: false,
         versionDropdown: false,
-        unit: [{name: '语文', active: false}, {name: '语文', active: false}, {name: '语文', active: false}, {
-          name: '语文',
-          active: false
-        },],
         unitList: [],
         unitIndex: 0,
         subjectList: [],
@@ -158,11 +155,11 @@
         courseList: [],
         //sysCourseId:'',
         termTypeList: [],
-        termIndex: this.type === 'myCourse' ? '' : 0,
+        termIndex: ((new Date().getMonth() + 1) >= 2 && (new Date().getMonth() + 1) <= 7)?0:1,
         gradeTermList: this.$store.getters.getGradeTermInfo,
         subjectName: localStorage.getItem("currentSubjectTypeName"),
         classGradeMap: [],
-        gradeIndex: this.type === 'myCourse' ? '' : 0,
+        gradeIndex: 0,
         textBookList: [],
         bookIndex: 0,
         currentSysCourseId: this.sysCourseId,
@@ -172,14 +169,11 @@
         bookInfoList: [],
         isNowTerm: 0,
         gradeTermMap: '',
-        gradeList: [{
-          gradeName: '全部',
-          classGrade: '',
-          teacherInfoList: []
-        }, ...JSON.parse(localStorage.getItem("gradeList"))],
+        gradeList: JSON.parse(localStorage.getItem("gradeList")),
         termList: [{name: '上学期', value: 'T01'}, {name: '下学期', value: 'T02'}],
-        classList: {0: {classGrade: '', className: '全部'}, ...JSON.parse(localStorage.getItem("classMap"))},
+        classList: JSON.parse(localStorage.getItem("classMap")),
         classDropdown: false,
+        // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
         classIndex: '',
       }
     },
@@ -252,18 +246,24 @@
       }
       const index = this.subjectList.findIndex(v => localStorage.getItem("currentSubjectType") === v.key)
       this.$set(this.subjectList[index], 'active', true)
+      this.initClassIndex()
     },
     methods: {
-      classVisible(value, key) {
-        if (key == 0) {
-          return true
-        } else {
-          if (this.gradeIndex !== '') {
-            return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
-          } else {
-            return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
+      initClassIndex() {
+        for(let key in JSON.parse(localStorage.getItem("classMap"))) {
+          const value = JSON.parse(localStorage.getItem("classMap"))[key]
+          if(this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
+            this.classIndex = key
+            break
           }
         }
+      },
+      classVisible(value, key) {
+          // if (this.gradeIndex !== '') {
+            return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
+          // } else {
+          //   return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
+          // }
       },
       handleSelect(item) {
         this.courseList.forEach(v => {
@@ -285,8 +285,8 @@
           item.active = true
           localStorage.setItem("currentSubjectTypeName", item.value);
           localStorage.setItem("currentSubjectType", item.key);
-          this.gradeIndex = ''
-          this.classIndex = ''
+          this.gradeIndex = 0
+          this.initClassIndex()
           // this.getTextBookCourseInfo()
         }).catch(() => {
           // on cancel
@@ -408,7 +408,7 @@
       changeGrade(index) {
         if (this.type === 'myCourse') {
           this.gradeIndex = index
-          this.classIndex = ''
+          this.initClassIndex()
           this.gradeDropdown = !this.gradeDropdown
           // this.getTextBookCourseInfo()
         } else {

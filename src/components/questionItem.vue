@@ -123,6 +123,7 @@
           createCollectInfo(params).then(res => {
             if (res.flag) {
               this.item.collectId = res.resCollectInfo.collectId
+              this.item.collectCount++
               this.$toast('收藏成功')
             } else {
               this.$toast(res.msg)
@@ -150,6 +151,7 @@
           delCollectInfo(params).then(res => {
             if (res.flag) {
               this.item.collectId = 0
+              this.item.collectCount--
               this.$toast('取消收藏')
             } else {
               this.$toast(res.msg)

@@ -169,7 +169,13 @@
 
 //用于v-html时控制里面的图片宽度
 .html-img {
+    overflow-x: hidden;
+    width: 100%;
     img {
         width: 100% !important;
+    }
+    table {
+        display: block !important;
+        overflow-x: auto !important;
     }
 }

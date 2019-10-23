@@ -34,7 +34,7 @@
       classList() {
        return  this.info.studentStatList.reduce((t,v) => {
           if(v.endDate) {
-            t.push({...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`})
+            t.push({...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分${v.duration%60}秒`})
           }
           return t
         },[])
@@ -43,7 +43,7 @@
         return  this.info.studentStatList.reduce((t,v) => {
           if(v.endDate) {
             const index = t.findIndex(g => g.groupId === v.groupId)
-            const item = {...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分钟${v.duration%60}秒`}
+            const item = {...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分${v.duration%60}秒`}
             if(index > -1) {
               // 已存在相同组
               t[index].stu.push(item)

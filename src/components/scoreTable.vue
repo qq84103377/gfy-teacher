@@ -120,23 +120,27 @@
     margin-bottom: 15px;
 
     .header {
-      line-height: 44px;
       display: flex;
       align-items: center;
+      font-weight: bold;
       .header-item {
+        height: 44px;
         flex: 1;
         text-align: center;
         border-right: 1px solid #F5F6FA;
         border-bottom: 1px solid #F5F6FA;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         &.team-col {
           flex: 0 0 10%;
         }
         &.average {
-          flex: 0 0 15%;
+          flex: 1;
         }
 
         &.score {
-          flex: 0 0 18%;
+          flex: 1;
         }
         &:last-child {
           border-right: none;
@@ -160,10 +164,10 @@
         }
 
         &.average {
-          flex: 0 0 15%;
+          flex: 1;
         }
         &.score {
-          flex: 0 0 18%;
+          flex: 1;
         }
         &:last-child {
           border-right: none;

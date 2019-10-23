@@ -11,17 +11,17 @@
         </div>
       </div>
       <div class="ware-filter-wrap__body">
-        <div class="ware-filter-wrap__body-left">
-          <div @click="selectParent(item,index)" v-for="(item,index) in list" :key="index"
-               :class="{active:item.active}">{{item.name}}
-          </div>
-        </div>
+<!--        <div class="ware-filter-wrap__body-left">-->
+<!--          <div @click="selectParent(item,index)" v-for="(item,index) in list" :key="index"-->
+<!--               :class="{active:item.active}">{{item.name}}-->
+<!--          </div>-->
+<!--        </div>-->
         <div class="ware-filter-wrap__body-right">
-          <div class="" v-for="(item,index) in childList" :key="index">
+          <div class="" v-for="(item,index) in list" :key="index">
             <div @click="handleSelect(item)" class="van-hairline--bottom">
-              <div :class="['cell__item',{active:item.check}]">{{item[label]}}
+              <div :class="['cell__item',{active:item.check}]">{{item.tchCourseInfo.courseName}}
                 <van-icon v-show="item.check" class="check blue" name="success"/></div>
-              <div v-if="item.name==='无'" class="fs12 red tip">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
+              <div v-if="!item.tchCourseInfo.sysCourseId" class="fs12 red tip">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
             </div>
           </div>
         </div>
@@ -41,8 +41,6 @@
     data() {
       return {
         index: 0,
-        // typeList: [{name:'课件'},{name:'视频'},{name:'试卷'}],
-        // courseList: [{child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]}, {child: [{}, {}]},]
       }
     },
     computed: {
@@ -54,10 +52,10 @@
           this.$emit('update:visible', false)
         }
       },
-      childList() {
-
-        return this.list[this.index] ? this.list[this.index].child : []
-      },
+      // childList() {
+      //
+      //   return this.list[this.index] ? this.list[this.index].child : []
+      // },
     },
     watch: {
       // list: {
@@ -90,7 +88,7 @@
           });
         } else {
           this.show = false
-          let item = this.childList.find(v => v.check)
+          let item = this.list.find(v => v.check)
           console.log(item);
           this.$emit('filter',item||{})
         }
@@ -98,18 +96,10 @@
       },
       handleSelect(item) {
         if (item.check) return
-
         this.list.forEach(v => {
-          v.child.forEach(_v => {
-            this.$set(_v,'check',false)
-          })
+            this.$set(v,'check',false)
         })
         this.$set(item, 'check', true)
-
-        // this.childList.forEach(v => {
-        //   this.$set(v, 'check', false)
-        // })
-        // this.$set(item, 'check', true)
       },
       selectParent(item, index) {
         this.index = index

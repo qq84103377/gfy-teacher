@@ -158,7 +158,7 @@
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
           this.wareFile = obj.curFile;
-          this.form.name = obj.curFile.name
+          this.form.name = obj.curFile.name.split('.')[0]
           this.wareSize = obj.curFile.size
           this.wareName = obj.curFile.name
           this.uploadWare(obj.curFile);
