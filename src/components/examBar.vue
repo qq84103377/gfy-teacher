@@ -4,7 +4,7 @@
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
     <div class="select-btn" v-if="canSelect">选择其他</div>
-    <div class="add-btn" @click="handleSubmit">{{type=='task'?'发任务':'生成试卷'}}</div>
+    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务':'生成试卷'}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
       :show="selectPop"
@@ -90,7 +90,8 @@
           </div>
         </van-cell>
         <div class="add-exam-wrap__footer">
-          <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="addTestPaper">提交</van-button>
+          <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="addTestPaper">提交
+          </van-button>
         </div>
       </div>
     </van-popup>
@@ -105,7 +106,7 @@
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo} from '@/api/index'
 
   export default {
-    props: ['type', 'selectList','canSelect','canAddCourse'],
+    props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务
     name: "examBar",
     components: {filterPanel},
     model: {
@@ -269,7 +270,7 @@
         })
       },
       clearQuestion() {
-        if(this.selectList.length) {
+        if (this.selectList.length) {
           Dialog.confirm({
             title: '确定清空已选试题吗?',
             // message: '弹窗内容'
@@ -296,7 +297,9 @@
       },
       handleSubmit() {
         if (this.type === 'task') {
-          this.$router.push(`/addTask?type=exam`)
+          if (this.length) {
+            this.$router.push(`/addTask?type=exam`)
+          }
         } else {
           this.addExam = true
           //examDetail
