@@ -22,7 +22,7 @@
         </van-popup>
 
       </div>
-      <i class="iconGFY icon-bell"></i>
+      <i @click="$router.push(`/myNotice`)" class="iconGFY icon-bell"></i>
     </div>
     <div class="index-content-wrap__body">
       <van-swipe :autoplay="3000">

@@ -3,11 +3,11 @@
     <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <div class="question-item-wrap__ctn">
       <slot name="num"></slot>
-      <div v-html="item.title" class="html-img"></div>
+      <div v-html="item.title" class="html-img" @click="previewImg"></div>
       <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
         ({{childIndex+1}})<span v-if="child.examScore>=0">本小题{{child.examScore}}分</span>
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
-        <div v-html="child.title" class="html-img"></div>
+        <div v-html="child.title" class="html-img" @click="previewImg"></div>
         <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
           <div class="btn-item" :class="{active:child.analyseShow}"
                @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
@@ -73,6 +73,7 @@
 <script>
   import {createCollectInfo, delCollectInfo} from '@/api/index'
   import { Dialog } from 'vant';
+  import { ImagePreview } from "vant";
   export default {
     name: "questionItem",
     props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item'],//isQuestion 是否试题页面适用
@@ -84,6 +85,19 @@
       }
     },
     methods: {
+      previewImg($event) {
+        if ($event.target.nodeName == "IMG") {
+          console.log($event.target.src);
+          ImagePreview({
+            images: [$event.target.src],
+            // startPosition: 1,
+            onClose() {
+              // do something
+              console.log("close");
+            }
+          });
+        }
+      },
       handleAdd() {
         if(this.item.isRemove) {
           Dialog.confirm({

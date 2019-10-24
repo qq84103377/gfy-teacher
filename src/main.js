@@ -98,6 +98,12 @@ router.beforeEach((to, from, next) => {
       next('/index')
     }
   }
+  if (from.path == "/login" && (to.path == "/mine" || to.path == "/setting")) {
+    console.log("退出登录不能返回我的页面")
+    if (!localStorage.getItem('isLogin')) {
+      next("/login")
+    }
+  }
   next()
 })
 new Vue({

@@ -10,7 +10,7 @@
 <!--        <div class="question-detail__body__qst-wrap__score">-->
 <!--          <span>总分: {{info.score}}</span>-->
 <!--        </div>-->
-        <div v-html="info.title" class="html-img"></div>
+        <div v-html="info.title" class="html-img" @click="previewImg"></div>
         <span class="fs12 mgt15" style="display: block;"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.titleDegree==='D01'?'容易':info.titleDegree==='D02'?'中等':'困难'}}</span>
         <div style="display: flex;justify-content: flex-end">
           <div class="question-detail__body__qst-wrap__btn" :class="{active:analyseShow}" @click="analyseShow=!analyseShow">查看解析</div>
@@ -29,6 +29,7 @@
 
 <script>
   import {getCourseTaskDetail} from '@/api/index'
+  import { ImagePreview } from "vant";
 
   export default {
     name: "questionDetail",
@@ -39,6 +40,19 @@
       }
     },
     methods: {
+      previewImg($event) {
+        if ($event.target.nodeName == "IMG") {
+          console.log($event.target.src);
+          ImagePreview({
+            images: [$event.target.src],
+            // startPosition: 1,
+            onClose() {
+              // do something
+              console.log("close");
+            }
+          });
+        }
+      },
       getCourseTaskDetail() {
         this.$store.commit('setVanLoading',true)
         let obj = {

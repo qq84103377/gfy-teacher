@@ -8,7 +8,8 @@
       <div>
         <div class="dropdown__title" @click="tab.questionType=!tab.questionType">
           <div class="ellipsis">{{tab.questionTypeList.find(v => v.active)?tab.questionTypeList.find(v => v.active).examTypeName:'题型'}}</div>
-          <van-icon :name="tab.questionType?'arrow-up':'arrow-down'"/>
+<!--          <van-icon :name="tab.questionType?'arrow-up':'arrow-down'"/>-->
+          <span :class="['triangle',{up:tab.questionType}]"></span>
         </div>
         <div v-show="tab.questionType" class="dropdown-menu">
           <div class="dropdown-menu-item" :class="{active:item.active}" @click="selectMenu(item,'questionTypeList')"
@@ -19,7 +20,8 @@
       <div>
         <div class="dropdown__title" @click="tab.difficult=!tab.difficult">
           <div class="ellipsis">{{tab.difficultList.find(v => v.active)?tab.difficultList.find(v => v.active).name:'难度'}}</div>
-          <van-icon :name="tab.difficult?'arrow-up':'arrow-down'"/>
+<!--          <van-icon :name="tab.difficult?'arrow-up':'arrow-down'"/>-->
+          <span :class="['triangle',{up:tab.difficult}]"></span>
         </div>
         <div v-show="tab.difficult" class="dropdown-menu">
           <div class="dropdown-menu-item" @click="selectMenu(item,'difficultList')" :class="{active:item.active}" v-for="(item,index) in tab.difficultList" :key="index">{{item.name}}</div>
@@ -28,7 +30,8 @@
       <div>
         <div class="dropdown__title" @click="tab.type=!tab.type">
           <div class="ellipsis">{{tab.typeList.find(v => v.active)?tab.typeList.find(v => v.active).dictValue:'类型'}}</div>
-          <van-icon :name="tab.type?'arrow-up':'arrow-down'"/>
+<!--          <van-icon :name="tab.type?'arrow-up':'arrow-down'"/>-->
+          <span :class="['triangle',{up:tab.type}]"></span>
         </div>
         <div v-show="tab.type" class="dropdown-menu">
           <div class="dropdown-menu-item" @click="selectMenu(item,'typeList')" :class="{active:item.active}" v-for="(item,index) in tab.typeList" :key="index">{{item.dictValue}}</div>
@@ -38,7 +41,8 @@
       <div>
         <div class="dropdown__title" @click="tab.sort=!tab.sort">
           <div class="ellipsis">{{tab.sortList.find(v => v.active)?tab.sortList.find(v => v.active).name:'排序'}}</div>
-          <van-icon :name="tab.sort?'arrow-up':'arrow-down'"/>
+<!--          <van-icon :name="tab.sort?'arrow-up':'arrow-down'"/>-->
+          <span :class="['triangle',{up:tab.sort}]"></span>
         </div>
         <div v-show="tab.sort" class="dropdown-menu">
           <div class="dropdown-menu-item" @click="selectMenu(item,'sortList')" :class="{active:item.active}" v-for="(item,index) in tab.sortList" :key="index">{{item.name}}</div>
@@ -323,11 +327,15 @@
         position: relative;
         padding: 0 8px;
 
-        i {
+        .triangle {
           position: absolute;
-          right: -5px;
+          right: -8px;
           top: 50%;
-          transform: translateY(-50%);
+          border-width: 0 6px 6px;
+          transform: rotateZ(180deg) translateY(50%);
+          &.up {
+            transform: rotateZ(0deg) translateY(50%);
+          }
         }
       }
 
