@@ -14,7 +14,7 @@
       </div>
 
     </dropdown-header>
-    <div class="preview-wrap__body">
+    <div class="preview-wrap__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && courseTaskList.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
@@ -92,6 +92,10 @@ export default {
   },
   mounted() {
     // this.getClassTeachCourseInfo()
+  },
+  beforeRouteLeave(to,from,next) {
+
+    next()
   },
   methods: {
     async changeCourse(type) {

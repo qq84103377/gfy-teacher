@@ -397,3 +397,19 @@ export const getTeacherErrorExamDetail =(params)=>{
 export const getAllExamTypeList =(params)=>{
   return axios.post('resource/getAllExamTypeList', qs.stringify(params))
 }
+//添加口语资源
+export const addSpokenResource =(params)=>{
+  return axios.post('resource/addSpokenResource', qs.stringify(params))
+}
+//添加口语资源(共享)
+export const addShareSpokenResource =(params)=>{
+  return axios.post('resource/addShareSpokenResource', qs.stringify(params))
+}
+//修改口语资源
+export const modifySpokenResource =(params)=>{
+  return axios.post('resource/modifySpokenResource', qs.stringify(params))
+}
+//修改口语资源(共享)
+export const modifyShareSpokenResource =(params)=>{
+  return axios.post('resource/modifyShareSpokenResource', qs.stringify(params))
+}
