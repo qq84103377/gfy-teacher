@@ -9,38 +9,37 @@
         placeholder="请输入原手机号"
       />
 
-      <van-cell-group>
-        <van-field v-model="vailcode" center clearable placeholder="请输入6位验证码">
-          <!-- <van-button slot="button" size="small" type="info">发送验证码</van-button> -->
-          <van-button
-            class="btn-vailcode"
-            v-if="!timer"
-            size="small"
-            slot="button"
-            type="info"
-            :loading="codeBtnLoading"
-            loading-text="获取验证码"
-            @click="getVailCode"
-          >获取验证码
-          </van-button>
-          <van-button
-            class="btn-vailcode"
-            v-else
-            :disabled="disabled"
-            size="small"
-            slot="button"
-            type="info"
-            @click="getVailCode"
-          >{{second}}秒后重新获取
-          </van-button>
-        </van-field>
-      </van-cell-group>
+      <van-field v-model="vailcode" center clearable placeholder="请输入6位验证码">
+        <!-- <van-button slot="button" size="small" type="info">发送验证码</van-button> -->
+        <van-button
+          class="btn-vailcode"
+          v-if="!timer"
+          size="small"
+          slot="button"
+          type="info"
+          :loading="codeBtnLoading"
+          loading-text="获取验证码"
+          @click="getVailCode"
+        >获取验证码
+        </van-button>
+        <van-button
+          class="btn-vailcode"
+          v-else
+          :disabled="disabled"
+          size="small"
+          slot="button"
+          type="info"
+          @click="getVailCode"
+        >{{second}}秒后重新获取
+        </van-button>
+      </van-field>
       <van-field
         v-model="newTel"
         type="tel"
         placeholder="请输入新手机号"
       />
     </van-cell-group>
+
     <div class="confirm">
       <van-button type="info" size="large" @click="verifyCode()">保存修改</van-button>
     </div>
@@ -54,7 +53,7 @@
   import {getVailCode} from "@/api/login";
   import {replacementPhone} from "@/api/mine";
   import {hex_md5} from "@/utils/md5";
-  import { userApi } from "@/api/parent-GFY";
+  import {userApi} from "@/api/parent-GFY";
 
 
   export default {
@@ -63,7 +62,7 @@
         phoneNo: "",
         timer: null,
         mobile: "",
-        newTel:"",
+        newTel: "",
         vailcode: "",
         second: 60,
         codeBtnLoading: false,
@@ -144,7 +143,7 @@
             this.phoneNo = this.newTel;
             this.mobileNo = this.phoneNo.substr(0, 3) + '****' + this.phoneNo.substr(this.phoneNo.length - 4);
             this.$store.commit("setUserInfo", res.data[0].usrInfo);
-            setTimeout( ()=> {
+            setTimeout(() => {
               this.$router.push('/setting')
             }, 1000)
           } else {
@@ -167,11 +166,12 @@
 <style lang="less" scoped>
   @deep: ~">>>";
   .updateTel {
-    .telInput{
-      @{deep} .van-field__control{
+    .telInput {
+      @{deep} .van-field__control {
         color: #333333;
       }
     }
+
     @{deep} .van-button {
       border-radius: 5px;
     }
