@@ -60,7 +60,7 @@
                   {{item.discountIntegral}}
                 </div>
                 <div class="store">
-                  库存：{{item.mallGoodsStockInfo.stockNumber-item.mallGoodsStockInfo.convertNumber}}/{{item.mallGoodsStockInfo.stockNumber}}
+                  库存：{{item.mallGoodsStockInfo.convertNumber}}/{{item.mallGoodsStockInfo.stockNumber}}
                 </div>
               </div>
             </li>

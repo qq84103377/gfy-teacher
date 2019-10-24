@@ -25,7 +25,7 @@
           <span>选择颜色款式：</span> 颜色款式随机
         </div>
         <div class="otherInfo">
-          <span>库存：</span>{{goodsInfo.mallGoodsStockInfo.stockNumber-goodsInfo.mallGoodsStockInfo.convertNumber}}/{{goodsInfo.mallGoodsStockInfo.stockNumber}}
+          <span>库存：</span>{{goodsInfo.mallGoodsStockInfo.convertNumber}}/{{goodsInfo.mallGoodsStockInfo.stockNumber}}
         </div>
       </div>
       <div class="remark" v-if="goodsInfo" v-html="goodsInfo.remark"></div>
