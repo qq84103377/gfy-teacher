@@ -1,8 +1,8 @@
 <template>
   <div>
-    <van-nav-bar title="" left-arrow @click-left="$router.back()" v-if='!isFullscreen' />
+    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' />
     <div class="video-box">
-      <van-nav-bar left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
+      <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
 
       <video class="video" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
@@ -105,6 +105,7 @@ export default {
   name: 'videoPage',
   data() {
     return {
+      title: this.$route.query.title,
       isFullscreen: false,
       initVideo: {
         play: false,//播放还是暂停 true播放中
@@ -536,13 +537,13 @@ export default {
         }
         this.isFullscreen = true
         console.log(this.isFullscreen, "进去全屏的isFullscreen");
-        
+
         setTimeout(() => {
           if (this.$refs.video) {
             this.$refs.video.play()
           }
         }, 0);
-        
+
       } else {
 
 

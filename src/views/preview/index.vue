@@ -170,7 +170,7 @@ export default {
       }
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
-          console.log(item.tastType,"item.tastType");
+          console.log(item.tastType, "item.tastType");
           if (['T04'].includes(item.taskType)) {
             this.$router.push({ path: '/materialDetail', query: { data: res.data[0].courseware } })
           } else if (['T06'].includes(item.taskType)) {
@@ -178,7 +178,7 @@ export default {
           } else if (['T01', 'T02'].includes(item.taskType)) {
             console.log(res.data[0], 'res.data[0]////////////');
             if (res.data[0] && res.data[0].courseware && res.data[0].courseware.srcUrl) {
-              this.checkUrlPermission(res.data[0].courseware.srcUrl)
+              this.checkUrlPermission(res.data[0].courseware.srcUrl, item.taskName)
             }
           }
         }
@@ -435,7 +435,7 @@ export default {
         }
       });
     },
-    checkUrlPermission(url) {
+    checkUrlPermission(url, title) {
       // 课件鉴权
       let permissionParams = {
         'interUser': 'runLfb',
@@ -468,7 +468,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: url } })
+        this.$router.push({ name: 'videoPage', query: { src: url, title } })
       }).catch(() => {
         this.$toast('资源错误')
       })

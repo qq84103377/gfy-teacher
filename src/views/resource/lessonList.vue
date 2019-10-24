@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/micro_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有微课，快去上传吧！'" @load="onLoad" :offset='80'>
-          <list-item class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true" @clickTo="goVideoPage(item.url)">
+          <list-item class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true" @clickTo="goVideoPage(item)">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
             <div slot="cover" class="cover" :style="{'background':item.imageUrl?'none':'#67E0A3'}"><img v-if="item.imageUrl" :src="item.imageUrl" alt=""><i v-else class="iconGFY icon-video"></i></div>
             <div slot="desc">
@@ -76,14 +76,14 @@ export default {
     }
   },
   methods: {
-    goVideoPage(url) {
+    goVideoPage(item) {
       console.log("点击");
-      if (!url) return
+      if (!item.url) return
 
-      this.checkUrlPermission(url)
+      this.checkUrlPermission(item.url,item.coursewareName)
 
     },
-    checkUrlPermission(url) {
+    checkUrlPermission(url,title) {
       // 课件鉴权
       let permissionParams = {
         'interUser': 'runLfb',
@@ -116,7 +116,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: url } })
+        this.$router.push({ name: 'videoPage', query: { src: url, title } })
       }).catch(() => {
         this.$toast('资源错误')
       })
