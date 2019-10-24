@@ -8,12 +8,13 @@
     <div class="spoken-detail__body">
       <div class="pd10">{{spokenType}}</div>
       <div class="spoken-detail__body__cell van-hairline--bottom" v-for="(item,index) in info.spokenSplitSentenceList" :key="index">
-        <video-player class="video-player-box"
-                      ref="videoPlayer"
-                      :options="{ sources: [{type: 'audio/mp4',src: item.referenceAnswer}],}"
-                      :playsinline="true"
-                      customEventName="customstatechangedeventname">
-        </video-player>
+<!--        <video-player class="video-player-box"-->
+<!--                      ref="videoPlayer"-->
+<!--                      :options="{ sources: [{type: 'audio/mp4',src: item.referenceAnswer}],}"-->
+<!--                      :playsinline="true"-->
+<!--                      customEventName="customstatechangedeventname">-->
+<!--        </video-player>-->
+        <audio controls controlsList="nodownload" :src="item.referenceAnswer"></audio>
         <div class="mgt15">{{index + 1}}、{{item.sentenceContent}}</div>
         <div class="mgt15">{{item.referenceExplain}}</div>
         <div class="grey6 fs12 mgt15 aic"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.spokenDegree==='D01'?'容易':info.spokenDegree==='D02'?'中等':'困难'}}</div>

@@ -8,16 +8,17 @@
         <div class="stu-answer">
           <div v-html="item.text"></div>
           <div style="width: 100%;" v-if="item.audioArr.length">
-            <video-player class="video-player-box"
-                          v-for="(audio,index) in item.audioArr" :key="index"
-                          ref="videoPlayer"
-                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"
-                          :playsinline="true"
-                          customEventName="customstatechangedeventname">
-            </video-player>
+<!--            <video-player class="video-player-box"-->
+<!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
+<!--                          ref="videoPlayer"-->
+<!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
+<!--                          :playsinline="true"-->
+<!--                          customEventName="customstatechangedeventname">-->
+<!--            </video-player>-->
+            <audio controls controlsList="nodownload" v-for="(audio,index) in item.audioArr" :key="index" :src="audio"></audio>
           </div>
           <div style="width: 100%;" v-if="item.videoArr.length">
-            <video class="video-wrap" v-for="(video,index) in item.videoArr" :key="index" style="width: 100%;" controls
+            <video poster="../assets/img/video-poster.png" class="video-wrap" v-for="(video,index) in item.videoArr" :key="index" style="width: 100%;" controls
                    :src="video"></video>
           </div>
           <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]"

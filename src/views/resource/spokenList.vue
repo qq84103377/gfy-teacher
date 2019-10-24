@@ -3,22 +3,23 @@
     <div class="spoken-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
-          <img class="null-tips" src="../../assets/img/resource/spoken_empty.png" alt />
+          <img class="null-tips" src="../../assets/img/resource/spoken_empty.png" alt/>
         </div>
-        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有口语～'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)" class="mgt10" style="background: #fff;"
-                     v-for="(item,index) in list" :key="index"
-                     @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有口语～'"
+                  @load="onLoad" :offset='80'>
+          <list-item
+            @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)"
+            class="mgt10" style="background: #fff;"
+            v-for="(item,index) in list" :key="index"
+            @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.isSend==='S05'}"></i></div>
             <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
             <div slot="desc">
               <div class="desc-top">
-                <div class="desc-top">
-                  <i class="iconGFY"
-                     :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
-                  <i class="iconGFY"
-                     :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
-                </div>
+                <i class="iconGFY"
+                   :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
+                <i class="iconGFY"
+                   :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
               </div>
               <div class="desc-bottom">
                 <div>难度: {{item.spokenDegree==='D01'?'容易':item.spokenDegree==='D02'?'中等':'困难'}}</div>
@@ -156,8 +157,8 @@
       }
     },
     methods: {
-      modify(item,bol) {
-        if(bol) {
+      modify(item, bol) {
+        if (bol) {
           //编辑
           this.form.share = item.shareType
           this.form.difficult = item.spokenDegree
@@ -202,15 +203,15 @@
           })
         }
         let response = await modifySpokenResource(params)
-        if(response.flag) {
+        if (response.flag) {
           let r = await modifyShareSpokenResource({
-           requestJson: JSON.stringify({
-              "interUser":"value",
-              "interPwd":"value",
-              "operateAccountNo":this.$store.getters.getUserInfo.accountNo,
-              "belongSchoolId":this.$store.getters.schoolId,
-              "shareId":res.data[0].shareSpokenResourceList[0].shareId,
-              "spokenId":this.form.spokenId,
+            requestJson: JSON.stringify({
+              "interUser": "value",
+              "interPwd": "value",
+              "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+              "belongSchoolId": this.$store.getters.schoolId,
+              "shareId": res.data[0].shareSpokenResourceList[0].shareId,
+              "spokenId": this.form.spokenId,
               "classGrade": res.data[0].shareSpokenResourceList[0].classGrade,
               "subjectType": res.data[0].shareSpokenResourceList[0].subjectType,
               "termType": res.data[0].shareSpokenResourceList[0].termType,
@@ -218,17 +219,17 @@
               "createAccountNo": res.data[0].shareSpokenResourceList[0].createAccountNo
             })
           })
-          if(r.flag) {
+          if (r.flag) {
             this.$toast('编辑成功')
             const index = this.list.findIndex(v => v.spokenId === this.form.spokenId)
             this.list[index].spokenTitle = this.form.name
             this.list[index].spokenDegree = this.form.difficult
             this.list[index].shareType = this.form.share
             this.popShow = false
-          }else {
+          } else {
             this.$toast(r.msg)
           }
-        }else {
+        } else {
           this.$toast(response.msg)
         }
         this.form.btnLoading = false
@@ -368,7 +369,7 @@
           }
         })
       },
-      sendTask(obj){
+      sendTask(obj) {
         if (!obj.wordCount || obj.sentenceCount) {
           this.$toast("该口语不含单词或者句子")
           return
@@ -459,6 +460,7 @@
       }
     }
   }
+
   .null-tips {
     margin-top: 50px;
     margin-left: 50%;

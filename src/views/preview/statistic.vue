@@ -66,7 +66,7 @@
         <div class="ware-detail" v-if="$route.query.taskType !== 'T06'" v-show="!isSpoken&&tabIndex === 0">
           <!-- <video v-if="type === 'mp4'" controls="controls"
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video> -->
-          <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/viideo-default-pictures.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
+          <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
 
           </video>
           <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio>
@@ -235,7 +235,7 @@ export default {
   methods: {
     goVideoPage(url) {
       if (!url) return
-      this.$router.push({ name: 'videoPage', query: { src: url } })
+      this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
     },
     singleQuestionScore(key) {
       return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t, v) => {
