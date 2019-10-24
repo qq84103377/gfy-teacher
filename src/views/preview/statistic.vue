@@ -235,7 +235,7 @@ export default {
   methods: {
     goVideoPage(url) {
       if (!url) return
-      this.$router.push({ name: 'videoPage', query: { src: url } })
+      this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
     },
     singleQuestionScore(key) {
       return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t, v) => {
