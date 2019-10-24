@@ -317,7 +317,7 @@
             this.cropperData.visible = true;
           },
           failMsg => {
-            this.$toast.fail(failMsg);
+            // this.$toast.fail(failMsg);
           },
           {
             quality: 50, //像素质量[0,100]
