@@ -16,7 +16,7 @@
               </div>
             </template>
           </van-cell>
-          <van-cell title="性别" is-link value="请选择" @click="showGenderPicker = true"/>
+          <van-cell title="性别" is-link :value="gender" @click="showGenderPicker = true"/>
           <van-cell title="学校" is-link :value="schoolName" @click="showschoolSheet = true"></van-cell>
           <van-cell title="学科" is-link :value="subjectName" @click="showsubjectSheet = true"></van-cell>
           <van-cell title="职务" is-link :value="postName" @click="showpostSheet = true"></van-cell>
