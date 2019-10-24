@@ -87,15 +87,23 @@ export default {
       classGrade: '',
       sysCourseId: '',
       courseIndex: 0, //选中的课程index
-      currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : ''  //我的课程跳过来才有的
+      currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //我的课程跳过来才有的
+      scrollTop: 0,
     }
   },
   mounted() {
     // this.getClassTeachCourseInfo()
   },
-  beforeRouteLeave(to,from,next) {
-
-    next()
+  beforeRouteLeave(to, from, next) {
+    this.scrollTop = this.$refs["body"].scrollTop;
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.$nextTick(() => {
+        vm.$refs["body"].scrollTo(0, vm.scrollTop);
+      });
+    });
   },
   methods: {
     async changeCourse(type) {

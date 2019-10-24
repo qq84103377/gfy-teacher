@@ -1,6 +1,6 @@
 <template>
   <section class="class-stat-list">
-    <div class="class-stat-list__body">
+    <div class="class-stat-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/preview/class_stat_empty.png" alt />
@@ -49,8 +49,20 @@
         finished: false,
         currentPage: 0,
         total: 0,
-        tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo))
+        tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo)),
+        scrollTop: 0,
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       viewStat(item) {

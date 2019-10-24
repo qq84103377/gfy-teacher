@@ -108,12 +108,24 @@
           "titleDegree": "", //难度
           "belongType": "", //类型
           "orderByType": "T05"//排序类型 T05综合排序，T01:时间排序，T02：使用量，T03：收藏量
-        }
+        },
+        scrollTop: 0
       }
     },
     created() {
       this.getExamSectionTypeRelation()
       this.getSysDictList()
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       clear() {

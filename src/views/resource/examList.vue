@@ -146,6 +146,7 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        scrollTop: 0,
       }
     },
     computed: {
@@ -161,6 +162,17 @@
           this.addExam.share = 'S02'
         }
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       copy(item) {

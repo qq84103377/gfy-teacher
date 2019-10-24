@@ -1,6 +1,6 @@
 <template>
   <section class="lesson-list">
-    <div class="lesson-list__body">
+    <div class="lesson-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/resource/micro_empty.png" alt />
@@ -58,7 +58,12 @@ export default {
       finished: false,
       currentPage: 0,
       total: 0,
+      scrollTop: 0,
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    this.scrollTop = this.$refs["body"].scrollTop;
+    next();
   },
   beforeRouteEnter(to, from, next) {
     if (from.path === '/uploadLesson' && store.getters.getIsAddWare) {
@@ -70,9 +75,16 @@ export default {
         vm.total = 0
         vm.$store.commit('setIsAddWare', false)
         vm.onLoad()
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
       })
     } else {
-      next()
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      })
     }
   },
   methods: {

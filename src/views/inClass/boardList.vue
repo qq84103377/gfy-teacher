@@ -75,6 +75,21 @@
         firstFlag: false // 首次加载学生白板
       }
     },
+    beforeRouteLeave(to, from, next) {
+      if(this.tabIndex) {
+        this.teacher.scrollTop = this.$refs['body'].scrollTop
+      }else {
+        this.stu.scrollTop = this.$refs['body'].scrollTop
+      }
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.tabIndex?vm.stu.scrollTop:vm.teacher.scrollTop);
+        });
+      });
+    },
     methods: {
       changeTab(index) {
         this.tabIndex = index

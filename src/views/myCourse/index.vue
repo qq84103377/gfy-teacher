@@ -6,7 +6,7 @@
         left-arrow>
         <div slot="right" class="fs12 blue" @click="filterShow=true">筛选</div>
       </van-nav-bar>
-      <div class="my-course-list__body">
+      <div class="my-course-list__body" ref="body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
           <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold"
@@ -55,8 +55,20 @@
             total: 0,
             filterParams: {
               classGrade:'',termType:'',classId:''
-            }
+            },
+            scrollTop: 0,
           }
+      },
+      beforeRouteLeave(to, from, next) {
+        this.scrollTop = this.$refs["body"].scrollTop;
+        next();
+      },
+      beforeRouteEnter(to, from, next) {
+        next(vm => {
+          vm.$nextTick(() => {
+            vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          });
+        });
       },
       methods: {
         goto(item) {

@@ -189,22 +189,22 @@
             <div class="row" style="font-weight: bold;">
               <div style="flex: 0 0 25%">班级</div>
               <div style="flex: 0 0 25%">已结束课程</div>
-              <div style="flex: 0 0 25%">已结束任务数</div>
-              <div style="flex: 0 0 25%">已完成任务数</div>
-              <div style="flex: 0 0 25%">学生任务完成率</div>
               <div style="flex: 0 0 25%">课前任务数</div>
               <div style="flex: 0 0 25%">学生课前完成率</div>
               <div style="flex: 0 0 25%">随堂任务数</div>
+              <div style="flex: 0 0 25%">已结束任务数</div>
+<!--              <div style="flex: 0 0 25%">已完成任务数</div>-->
+              <div style="flex: 0 0 25%">学生任务完成率</div>
             </div>
             <div class="row" v-for="(item,index) in personStatList" :key="index">
               <div style="flex: 0 0 25%;line-height: 1">{{item.className}}</div>
               <div style="flex: 0 0 25%">{{item.course_count}}</div>
-              <div style="flex: 0 0 25%">{{item.task_count}}</div>
-              <div style="flex: 0 0 25%">{{item.task_finish}}</div>
-              <div style="flex: 0 0 25%">{{item.finish_precent}}</div>
               <div style="flex: 0 0 25%">{{item.outsideClassNum}}</div>
               <div style="flex: 0 0 25%">{{item.outsideClassPrecent}}</div>
               <div style="flex: 0 0 25%">{{item.insideClassNum}}</div>
+              <div style="flex: 0 0 25%">{{item.task_count}}</div>
+<!--              <div style="flex: 0 0 25%">{{item.task_finish}}</div>-->
+              <div style="flex: 0 0 25%">{{item.finish_precent}}</div>
             </div>
           </div>
         </div>

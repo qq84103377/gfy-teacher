@@ -1,6 +1,6 @@
 <template>
   <section class="unfinish-task-list">
-    <div class="unfinish-task-list__body">
+    <div class="unfinish-task-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && taskList.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
@@ -44,7 +44,19 @@ export default {
       pageSize: 10,
       taskList: [],
       total: 0,
+      scrollTop: 0
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    this.scrollTop = this.$refs["body"].scrollTop;
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.$nextTick(() => {
+        vm.$refs["body"].scrollTo(0, vm.scrollTop);
+      });
+    });
   },
   methods: {
     viewStat(item) {
