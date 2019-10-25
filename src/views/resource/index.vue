@@ -1,6 +1,6 @@
 <template>
   <section class="resource-wrap">
-    <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
+    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
                      @selectCourse="selectCourse">
@@ -15,12 +15,21 @@
 
     </dropdown-header>
     <div class="resource-wrap__body">
-      <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
-      <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
-      <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
-      <van-cell class="fs16" title="试题" is-link @click="goto('/questionList')"/>
-      <van-cell class="fs16" title="讨论" is-link @click="goto('/discussList')"/>
-      <van-cell v-if="currentSubjectType === 'S03'" class="fs16" title="口语" is-link @click="goto('/spokenList')"/>
+      <div v-if="!courseList.length && !firstFlag" style="text-align: center;color: #999999">
+        <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+        <div class="grey9 fs12">当前没有课程,快去新建课程吧！</div>
+        <div style="display: flex;justify-content: center;">
+          <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+        </div>
+      </div>
+      <div v-if="courseList.length || firstFlag">
+        <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
+        <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
+        <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
+        <van-cell class="fs16" title="试题" is-link @click="goto('/questionList')"/>
+        <van-cell class="fs16" title="讨论" is-link @click="goto('/discussList')"/>
+        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" title="口语" is-link @click="goto('/spokenList')"/>
+      </div>
     </div>
   </section>
 </template>
@@ -47,7 +56,8 @@
         classId: '',
         tchClassCourseInfo: [],
         classGrade: '',
-        tchCourseInfo:{}
+        tchCourseInfo:{},
+        firstFlag: true
       }
     },
     computed: {
@@ -131,6 +141,9 @@
           } else {
             this.$toast(res.msg)
           }
+          this.firstFlag = false
+        }).catch(err => {
+          this.firstFlag = false
         })
       },
     },
@@ -269,6 +282,19 @@
     }
     &__body {
       margin-top: 5px;
+      .null-tips {
+        margin-top: 50px;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+      }
+      .add-course {
+        width: 190px;
+        height: 44px;
+        border-radius: 22px;
+        font-size: 16px;
+        margin-top: 10px;
+      }
     }
   }
 </style>

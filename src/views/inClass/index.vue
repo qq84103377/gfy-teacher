@@ -1,6 +1,6 @@
 <template>
   <section class="in-class-wrap">
-    <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
+    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
                      @selectCourse="selectCourse">
@@ -8,9 +8,15 @@
       <div slot="right" class="fs14" @click="changeCourse(1)">下一课</div>
     </dropdown-header>
     <div class="in-class-wrap__body">
-      <van-cell class="fs16" title="讲义" is-link @click="goto('/lectureList')"/>
-      <van-cell class="fs16" title="白板" is-link @click="goto('/boardList')"/>
-      <van-cell class="fs16" title="堂测统计" is-link @click="goto('/classStatList')"/>
+      <div v-if="!courseList.length && !firstFlag" style="text-align: center;color: #999999">
+        <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+        <div class="grey9 fs12">当前没有课程,快去新建课程吧！</div>
+      </div>
+      <div v-if="courseList.length || firstFlag">
+        <van-cell class="fs16" title="讲义" is-link @click="goto('/lectureList')"/>
+        <van-cell class="fs16" title="白板" is-link @click="goto('/boardList')"/>
+        <van-cell class="fs16" title="堂测统计" is-link @click="goto('/classStatList')"/>
+      </div>
     </div>
   </section>
 </template>
@@ -39,6 +45,7 @@
         index: 0, //选中的课程index
         classGrade: '',
         termType: '',
+        firstFlag: true
       }
     },
     created() {
@@ -153,6 +160,9 @@
           } else {
             this.$toast(res.msg)
           }
+          this.firstFlag = false
+        }).catch(err => {
+          this.firstFlag = false
         })
       },
 
@@ -170,6 +180,12 @@
       margin-top: 10px;
       flex: 1;
       overflow-y: auto;
+      .null-tips {
+        margin-top: 50px;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+      }
     }
   }
 </style>

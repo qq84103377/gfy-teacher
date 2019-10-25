@@ -8,7 +8,10 @@
       </van-nav-bar>
       <div class="my-course-list__body" ref="body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-          <van-list v-model="listLoading" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
+          <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
+            <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+          </div>
+          <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold"
                        @del="deleteTeachCourse(item,index)" v-for="(item,index) in list" :key="index"
                        :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo"
@@ -26,9 +29,11 @@
             </list-item>
           </van-list>
         </van-pull-refresh>
-
+        <div v-if="!listLoading && !list.length" class="empty-btn">
+          <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+        </div>
       </div>
-      <div class="my-course-list__footer van-hairline--top">
+      <div v-if="list.length" class="my-course-list__footer van-hairline--top">
         <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
       </div>
 
@@ -170,6 +175,21 @@
     &__body {
       flex: 1;
       overflow-y: auto;
+      .null-tips {
+        margin-top: 50px;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+      }
+
+      .empty-btn {
+        width: 190px;
+        margin: 0 auto;
+        .add-course {
+          width: 100%;
+          border-radius: 22px;
+        }
+      }
     }
     &__footer {
       flex: 0 0 44px;
@@ -180,5 +200,6 @@
         border-radius: 22px;
       }
     }
+
   }
 </style>

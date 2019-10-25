@@ -34,7 +34,7 @@
               </div>
               <div @click="modify(item,false)">
                 <i class="iconGFY icon-copy-orange"></i>
-                <span>复制任务</span>
+                <span>复制口语</span>
               </div>
               <div @click="sendTask(item)">
                 <i class="iconGFY icon-plane"></i>
