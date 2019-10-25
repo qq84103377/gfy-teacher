@@ -12,6 +12,10 @@
     <div class="exam-view-wrap__body">
       <score-table @jump="jump" :list="classList" :classView="true" v-show="classView"></score-table>
       <score-table @jump="jump" :list="groupList" :classView="false" v-show="!classView"></score-table>
+      <div v-if="!classList.length" style="text-align: center;color: #999999" class="fs12">
+        <img class="null-tips" src="../../assets/img/empty-1.png" alt />
+        <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
+      </div>
     </div>
   </section>
 </template>

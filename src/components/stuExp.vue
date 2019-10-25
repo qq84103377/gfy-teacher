@@ -54,6 +54,10 @@
         {{rep.replyContent}}
       </div>
     </div>
+    <div v-if="!list.length" style="text-align: center;color: #999999" class="fs12">
+      <img class="null-tips" style="width: 70%;" src="../assets/img/empty-1.png" alt />
+      <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
+    </div>
   </section>
 </template>
 
@@ -106,6 +110,7 @@
 <style lang="less" scoped>
   @deep: ~">>>";
   .stu-exp-wrap {
+    overflow-x: hidden;
     &__item {
       border: 1px solid #eee;
       border-radius: 5px;
