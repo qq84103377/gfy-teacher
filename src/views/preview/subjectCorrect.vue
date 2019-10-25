@@ -271,7 +271,7 @@
       },
       examTitle() {
         if (this.info.groupExamList.length) {
-          return this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).title
+          return this.info.title + this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).title
         } else {
           return this.info.title
         }

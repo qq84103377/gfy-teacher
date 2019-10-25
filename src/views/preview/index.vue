@@ -145,26 +145,19 @@ export default {
       }
     },
     goto(item) {
-      if (item.taskType === 'T03') {
+      if(item.testPaperId > 0) {
+        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+      }else if (item.taskType === 'T03'){
         if (item.resourceType === 'R03') {
           //单道试题
           this.$router.push(`/questionDetail?tchCourseId=${this.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
-        } else {
-          //试卷
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
         }
-      } else if (['T04'].includes(item.taskType)) {
-        // 学资源
-        this.getCourseTaskDetail(item)
-      } else if (['T01', 'T02'].includes(item.taskType)) {
-        //微课   由于需要自动横屏全屏播放 暂时不弄
-        this.getCourseTaskDetail(item)
-      } else if (['T06'].includes(item.taskType)) {
-        //讨论
-        this.getCourseTaskDetail(item)
       } else if (['T13'].includes(item.taskType)) {
         //口语
         this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${this.sysCourseId}`)
+      } else if (['T02','T04','T06'].includes(item.taskType)) {
+        // 学资源 微课+心得 讨论  跳任务统计
+        this.viewStat(item)
       }
     },
     getCourseTaskDetail(item) {
