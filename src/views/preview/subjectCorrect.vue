@@ -70,7 +70,7 @@
              v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案
         </div>
       </div>
-      <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length">
+      <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length && !stuArr[stuIndex].answer[aswIndex].text">
         <i class="iconGFY icon-circle-logo"></i>
         <audio autoplay controls controlsList="nodownload" :src="stuArr[stuIndex].answer[aswIndex].audioArr[0]"></audio>
       </div>

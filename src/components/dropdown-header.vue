@@ -131,7 +131,7 @@
         }
       }
       @{deep} .van-dropdown-item__content {
-        max-height: 95%;
+        height: 95%;
         padding: 8px;
         display: flex;
         flex-direction: column;

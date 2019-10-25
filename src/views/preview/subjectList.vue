@@ -14,17 +14,17 @@
                 <div v-html="info.title"></div>
                 <div v-if="info.groupExamList.length">
                   <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
-                    <div class="mgt10" v-html="item.title"></div>
+                    <div class="mgt10 html-img" v-html="item.title"></div>
                     <div class="mgt10">正确答案: <span class="blue" v-html="item.answer"></span></div>
                     <div class="mgt10">答案解析:</div>
-                    <div v-html="item.examExplain"></div>
+                    <div v-html="item.examExplain" class="html-img"></div>
                   </div>
                 </div>
                 <div v-else>
                   <div class="fs14">
-                    <div class="mgt10">正确答案: <span class="blue" v-html="info.answer"></span></div>
+                    <div class="mgt10">正确答案: <span class="blue html-img" v-html="info.answer"></span></div>
                     <div class="mgt10">答案解析:</div>
-                    <div v-html="info.examExplain"></div>
+                    <div v-html="info.examExplain" class="html-img"></div>
                   </div>
                 </div>
               </div>
@@ -57,7 +57,7 @@
                       <div @click="subjectCorrect(asw,index,aswIndex,i)" v-for="(img,i) in asw.imgArr" :key="i"><img
                         :src="img" alt=""></div>
                     </div>
-                    <div style="width: 100%;" v-if="asw.audioArr.length">
+                    <div style="width: 100%;" v-if="asw.audioArr.length && !asw.text">
                       <!--                    <video-player  class="video-player-box"-->
                       <!--                                   v-for="(audio,i) in asw.audioArr" :key="i"-->
                       <!--                                   ref="videoPlayer"-->
@@ -385,7 +385,7 @@
           display: flex;
           flex-direction: column;
           &.fold {
-            height: 22px;
+            height: 48px;
             overflow: hidden;
             flex-direction: row;
           }
@@ -394,7 +394,9 @@
             font-size: 14px;
             flex: 0 0 20%;
             text-align: right;
-            line-height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
             background: #fff;
 
           }
