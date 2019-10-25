@@ -15,8 +15,8 @@
 
     </dropdown-header>
     <div class="resource-wrap__body">
-      <div v-if="!courseList.length && !firstFlag" style="text-align: center;color: #999999">
-        <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+      <div v-if="!courseList.length && !firstFlag" class="empty-page">
+        <img src="../../assets/img/preview/task_null.png" alt />
         <div class="grey9 fs12">当前没有课程,快去新建课程吧！</div>
         <div style="display: flex;justify-content: center;">
           <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>

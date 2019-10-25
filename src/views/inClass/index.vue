@@ -8,8 +8,8 @@
       <div slot="right" class="fs14" @click="changeCourse(1)">下一课</div>
     </dropdown-header>
     <div class="in-class-wrap__body">
-      <div v-if="!courseList.length && !firstFlag" style="text-align: center;color: #999999">
-        <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+      <div v-if="!courseList.length && !firstFlag" class="empty-page">
+        <img src="../../assets/img/preview/task_null.png" alt />
         <div class="grey9 fs12">当前没有课程,快去新建课程吧！</div>
       </div>
       <div v-if="courseList.length || firstFlag">

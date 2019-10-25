@@ -114,6 +114,9 @@
           }
           this.$router.push({path:'/boardDetail',query:{data:item}})
 
+        }else {
+          //试卷
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.resourceId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.$route.query.classGrade}&title=${item.name}`)
         }
       },
       moveItem(item, index, type) {

@@ -8,8 +8,8 @@
       </van-nav-bar>
       <div class="my-course-list__body" ref="body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
-          <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
-            <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+          <div v-if="!listLoading && list.length==0" class="empty-page">
+            <img src="../../assets/img/preview/task_null.png" alt />
           </div>
           <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold"

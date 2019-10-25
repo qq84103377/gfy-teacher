@@ -18,41 +18,47 @@
         <div class="mgt10">
           <div class="echart-label">学生任务完成情况</div>
           <div class="fs10 grey9 mgt5">（需要查看更加详细的数据，请登录PC端）</div>
-
-          <div class="stat-table">
-            <div class="col">
-              <div style="font-weight: bold;">姓名</div>
-              <div v-for="(item,index) in stuStatInfo.statAccountList" :key="index">
-                {{item.account_no|getStudentName(60)}}
+          <div v-if="stuStatInfo.statAccountList.length">
+            <div class="stat-table">
+              <div class="col">
+                <div style="font-weight: bold;">姓名</div>
+                <div v-for="(item,index) in stuStatInfo.statAccountList" :key="index">
+                  {{item.account_no|getStudentName(60)}}
+                </div>
+              </div>
+              <div class="row-wrap">
+                <div class="row" style="font-weight: bold;">
+                  <div style="flex: 0 0 33.3%">总任务数</div>
+                  <div style="flex: 0 0 33.3%">完成总任务数</div>
+                  <div style="flex: 0 0 33.3%">完成微课程任务数</div>
+                  <div style="flex: 0 0 33.3%">完成素材任务数</div>
+                  <div style="flex: 0 0 33.3%">完成试卷任务数</div>
+                  <div style="flex: 0 0 33.3%">完成讨论任务数</div>
+                  <div style="flex: 0 0 33.3%" v-if="filterParams.subjectType === 'S03'">完成口语任务数</div>
+                  <div style="flex: 0 0 33.3%">做题正确率</div>
+                  <div style="flex: 0 0 33.3%">任务完成率</div>
+                </div>
+                <div class="row" v-for="(item,index) in stuStatInfo.statAccountList" :key="index">
+                  <div style="flex: 0 0 33.3%">{{item.total_count}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.total_finish}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.tv_count}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.T04_count}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.paper_count}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.discuss_count}}</div>
+                  <div style="flex: 0 0 33.3%" v-if="filterParams.subjectType === 'S03'">{{item.T13_count}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.accuracy || 0}}</div>
+                  <div style="flex: 0 0 33.3%">{{item.finish_precent}}</div>
+                </div>
               </div>
             </div>
-            <div class="row-wrap">
-              <div class="row" style="font-weight: bold;">
-                <div style="flex: 0 0 33.3%">总任务数</div>
-                <div style="flex: 0 0 33.3%">完成总任务数</div>
-                <div style="flex: 0 0 33.3%">完成微课程任务数</div>
-                <div style="flex: 0 0 33.3%">完成素材任务数</div>
-                <div style="flex: 0 0 33.3%">完成试卷任务数</div>
-                <div style="flex: 0 0 33.3%">完成讨论任务数</div>
-                <div style="flex: 0 0 33.3%" v-if="filterParams.subjectType === 'S03'">完成口语任务数</div>
-                <div style="flex: 0 0 33.3%">做题正确率</div>
-                <div style="flex: 0 0 33.3%">任务完成率</div>
-              </div>
-              <div class="row" v-for="(item,index) in stuStatInfo.statAccountList" :key="index">
-                <div style="flex: 0 0 33.3%">{{item.total_count}}</div>
-                <div style="flex: 0 0 33.3%">{{item.total_finish}}</div>
-                <div style="flex: 0 0 33.3%">{{item.tv_count}}</div>
-                <div style="flex: 0 0 33.3%">{{item.T04_count}}</div>
-                <div style="flex: 0 0 33.3%">{{item.paper_count}}</div>
-                <div style="flex: 0 0 33.3%">{{item.discuss_count}}</div>
-                <div style="flex: 0 0 33.3%" v-if="filterParams.subjectType === 'S03'">{{item.T13_count}}</div>
-                <div style="flex: 0 0 33.3%">{{item.accuracy || 0}}</div>
-                <div style="flex: 0 0 33.3%">{{item.finish_precent}}</div>
-              </div>
-            </div>
+            <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
           </div>
-          <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
+          <div v-if="!stuStatInfo.statAccountList.length" class="empty-page">
+            <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+            <div class="grey9 fs12">当前没有数据~</div>
+          </div>
         </div>
+
       </van-collapse-item>
       <van-collapse-item title="教师统计" name="2">
         <div>
@@ -193,7 +199,7 @@
               <div style="flex: 0 0 25%">学生课前完成率</div>
               <div style="flex: 0 0 25%">随堂任务数</div>
               <div style="flex: 0 0 25%">已结束任务数</div>
-<!--              <div style="flex: 0 0 25%">已完成任务数</div>-->
+              <!--              <div style="flex: 0 0 25%">已完成任务数</div>-->
               <div style="flex: 0 0 25%">学生任务完成率</div>
             </div>
             <div class="row" v-for="(item,index) in personStatList" :key="index">
@@ -203,7 +209,7 @@
               <div style="flex: 0 0 25%">{{item.outsideClassPrecent}}</div>
               <div style="flex: 0 0 25%">{{item.insideClassNum}}</div>
               <div style="flex: 0 0 25%">{{item.task_count}}</div>
-<!--              <div style="flex: 0 0 25%">{{item.task_finish}}</div>-->
+              <!--              <div style="flex: 0 0 25%">{{item.task_finish}}</div>-->
               <div style="flex: 0 0 25%">{{item.finish_precent}}</div>
             </div>
           </div>
@@ -267,14 +273,14 @@
     },
     methods: {
       handleShowItem() {
-        if(this.$parent.classIndex > 0 && this.filterParams.subjectType) {
+        if (this.$parent.classIndex > 0 && this.filterParams.subjectType) {
           const item = JSON.parse(localStorage.classMap)[this.$parent.classIndex].teacherInfoList.find(v => v.subjectType === this.filterParams.subjectType)
-            if(item) {
-              return item.teacherType === 'T01'
-            }else {
-              return true
-            }
-        }else {
+          if (item) {
+            return item.teacherType === 'T01'
+          } else {
+            return true
+          }
+        } else {
           return true
         }
       },
@@ -302,7 +308,7 @@
         })
       },
       statByClass() {
-        if(!this.handleShowItem()) return
+        if (!this.handleShowItem()) return
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -552,9 +558,9 @@
                   shadowColor: '#ccc',
                 }
               },
-              data: this.stuStatInfo.taskTypeCount.map(v => {
+              data: this.stuStatInfo.taskTypeCount.length ? this.stuStatInfo.taskTypeCount.map(v => {
                 return {value: v.taskTypeCount, name: v.taskTypeName}
-              })
+              }) : [{value:0,name:'无数据'}]
             }
           ],
           // toolbox: {

@@ -693,6 +693,7 @@ export default {
       border: 1px solid #eee;
       border-radius: 5px;
       margin-bottom: 10px;
+      overflow-x: hidden;
     }
     .divider-title {
       margin: 30px 0 15px;

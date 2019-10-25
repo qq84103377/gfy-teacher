@@ -13,8 +13,8 @@
                   :title="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupName"
                   @click="$router.push({name:'groupDetail',params:{curIndex:index,groupList,classId:$route.query.classId}})"
                   is-link/>
-        <div v-if="groupList.filter(v => v.tchClassSubGroupStudent.tchClassSubGroup.subgroupId>0).length === 0 && !vanLoading" style="text-align: center;color: #999999;background: #fff;" class="fs12">
-          <img class="null-tips" style="width: 70%" src="../../assets/img/empty-1.png" alt />
+        <div v-if="groupList.filter(v => v.tchClassSubGroupStudent.tchClassSubGroup.subgroupId>0).length === 0 && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
+          <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
           <div class="pd10">当前没有分组信息,快去分小组吧!</div>
         </div>
       </div>
@@ -24,8 +24,8 @@
                   @click="visible=true;stuInfo=item"
                   v-for="(item,index) in groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
                   :key="index" :title="item.studentName" is-link/>
-        <div v-if="(!groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent || !groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent.length) && !vanLoading" style="text-align: center;color: #999999;background: #fff;" class="fs12">
-          <img class="null-tips" style="width: 70%" src="../../assets/img/empty-1.png" alt />
+        <div v-if="(!groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent || !groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent.length) && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
+          <img style="width: 70%" src="../../assets/img/empty-1.png" alt />
           <div class="pd10">当前无数据~</div>
         </div>
       </div>
