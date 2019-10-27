@@ -103,6 +103,7 @@
 
 <script>
   import filterPanel from './filterPanel'
+  import {generateTimeReqestNumber} from '@/utils/filter'
   import {Dialog} from 'vant';
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
 
@@ -132,8 +133,8 @@
         filterShow: false,
         form: {
           name: '',
-          difficult: 'D01',
-          share: 'S02',
+          difficult: 'D02',
+          share: 'S01',
           btnLoading: false
         },
         tempList: [],
@@ -146,13 +147,14 @@
         if (!v) {
           this.form = {
             name: '',
-            difficult: 'D01',
-            share: 'S02',
+            difficult: 'D02',
+            share: 'S01',
             btnLoading: false
           }
         }else {
           //每次点开生成试卷弹窗请求课程列表
           if(this.type === 'error') {
+            this.form.name = `错题集试题${generateTimeReqestNumber()}`
             this.getClassTeachCourseInfo()
           }
         }

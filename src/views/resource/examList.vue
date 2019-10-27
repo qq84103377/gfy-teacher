@@ -147,6 +147,7 @@
         currentPage: 0,
         total: 0,
         scrollTop: 0,
+        currentItem: {}
       }
     },
     computed: {
@@ -180,6 +181,7 @@
         this.addExam.show = true
         this.addExam.testPaperId = item.testPaperId
         this.addExam.name = item.testPaperName + '-副本'
+        this.currentItem = item
       },
       copyTestPaper(copyTestPaperId) {
         this.addExam.btnLoading = true
@@ -296,7 +298,7 @@
             "testPaperId": "",
             "classGrade": this.$route.query.classGrade,//归属年级
             "subjectType": this.$route.query.subjectType,//学科
-            "shareType": this.addExam.share,//共享级别
+            "shareType": this.addExam.title == '复制' ? 'S01' : this.addExam.share,//共享级别
             "belongSchoolId": this.$store.getters.schoolId,//归属学校
             "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
             "testPaperName": this.addExam.name,//试卷名称
@@ -306,9 +308,9 @@
             "belongYear": new Date().getFullYear(),//归属年份
             "testPaperMode": "M01",//试卷模式
             "testPaperDegree": this.addExam.difficult,//试卷难度
-            "score": 0,//试卷分数，默认0分
-            "subjectiveItemNum": 0,//主观题数量
-            "objectiveItemNum": 0,//客观题数量
+            "score": this.addExam.title == '复制' ? this.currentItem.score : 0,//试卷分数，默认0分
+            "subjectiveItemNum": this.addExam.title == '复制' ? this.currentItem.subjectiveItemNum : 0,//主观题数量
+            "objectiveItemNum": this.addExam.title == '复制' ? this.currentItem.objectiveItemNum : 0,//客观题数量
             "duration": 10,//试卷时长
             "statusCd": "S01"//状态
           }
