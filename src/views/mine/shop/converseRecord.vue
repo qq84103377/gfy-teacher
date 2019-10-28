@@ -115,7 +115,7 @@
     beforeRouteEnter(to, from, next) {
       next(vm => {
         vm.$nextTick(() => {
-          vm.$refs["record"].scrollTo(0, vm.record);
+          vm.$refs["record"].scrollTop = vm.record;
         });
       });
     },

@@ -2,7 +2,7 @@
   <section class="goodsDetail" @scroll="scroll" ref="goodsDetail">
 
     <div class="goodsDetail-header">
-      <van-nav-bar title="" left-arrow @click-left="$router.back()"/>
+      <van-nav-bar :title="title" left-arrow @click-left="$router.back()"/>
       <!--      <img v-if="goodsInfo" :src="goodsInfo.goodsPhotoUrl" alt="">-->
       <van-swipe v-if="goodsInfo" :autoplay="3000" @change="swiperChange">
         <van-swipe-item v-for="(image, index) in images" :key="index" @click="previewImg">
@@ -33,12 +33,12 @@
     <div class="goodsDetail-footer" v-if="goodsInfo">
       <div class="count">
         <p>数量：</p>
-        <van-stepper v-model="goodsCount" min="1" max="5" integer/>
+        <van-stepper v-model="goodsCount" min="1" max="5" integer :disabled="disabled" />
       </div>
       <div class="btns">
         <van-button type="primary" icon="star-o" color="#FFFCE0" v-show="!isCollect" @click="collect">收藏</van-button>
         <van-button type="primary" icon="star" color="#FFFCE0" v-show="isCollect" @click="cancelCollect">取消</van-button>
-        <van-button type="info" @click="convert" :disabled="langCoin<goodsInfo.discountIntegral">
+        <van-button type="info" @click="convert" :disabled="langCoin<goodsInfo.discountIntegral || disabled">
           {{langCoin < goodsInfo.discountIntegral ? '朗币不足':'立即兑换'}}
         </van-button>
       </div>
@@ -69,8 +69,19 @@
         startPosition: 0,//图片预览起始位置索引
         isCollect: false,
         collectId: 0,
-        langCoin: 0
+        langCoin: 0,
+        title:'商品详情',
+        disabled:false
       }
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        if (from.path == "/converseRecord") {
+          vm.title = '兑换详情';
+          vm.disabled = true;
+
+        }
+      });
     },
     methods: {
       // 轮播图滑动改变索引
@@ -106,10 +117,13 @@
         let timer = setInterval(() => {
           let speed = Math.floor(-this.scrollTop / 5);
           let top = this.scrollTop + speed;
-          this.$refs['goodsDetail'].scrollTo(0, top);
+          this.$refs['goodsDetail'].scrollTop = top;
           if (this.scrollTop === 0) {
             clearInterval(timer);
           }
+          setTimeout(()=>{
+            clearInterval(timer);
+          },2000)
         }, 24);
       },
       // 收藏商品
@@ -173,7 +187,8 @@
         };
         addExchangeApplyGoodsInfo(params).then(res => {
           if (res.flag) {
-            this.$toast.success('兑换成功')
+            this.$toast.success('兑换成功');
+            this.$router.replace('/converseRecord');
           } else {
             this.$toast.fail(res.msg)
           }
@@ -220,26 +235,28 @@
     position: relative;
 
     &-header {
-      height: 333px;
+      height: 348px;
       background-color: #eee;
       position: relative;
 
       @{deep} .van-nav-bar {
-        position: absolute;
+        position: fixed;
+        width: 100%;
+        height: 44px;
         top: 0;
-        background-color: rgba(200, 200, 200, 0);
-        border-bottom: 1px solid #eee;
+        /*background-color: rgba(200, 200, 200, 0);*/
+        /*border-bottom: 1px solid #eee;*/
 
         .van-nav-bar__left .van-icon-arrow-left {
-          font-size: 20px;
-          padding: 5px;
-          background-color: rgba(0, 0, 0, .3);
-          border-radius: 50%;
-          color: #fff;
+          /*font-size: 20px;*/
+          /*padding: 5px;*/
+          /*background-color: rgba(0, 0, 0, .3);*/
+          /*border-radius: 50%;*/
+          /*color: #fff;*/
         }
 
         .van-nav-bar__title {
-          color: #fff;
+          /*color: #fff;*/
         }
       }
 
@@ -249,7 +266,10 @@
 
       @{deep} .van-swipe {
         height: 100%;
-
+        margin-top: 44px;
+        /*.van-swipe-item{*/
+        /*  margin: 0 10px;*/
+        /*}*/
       }
 
       img {
@@ -383,6 +403,10 @@
               font-size: 18px;
               color: #FAD528;
             }
+          }
+          &.van-button--disabled{
+            background-color: rgba(0,0,0,0.5)!important;
+            border: none;
           }
         }
       }
