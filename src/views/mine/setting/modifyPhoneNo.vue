@@ -129,6 +129,11 @@
       },
       // 确定更换手机号
       confirmChange() {
+        var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+        if (!reg.test(this.newTel)) {
+          this.$toast("新手机号格式不正确!");
+          return;
+        }
         let obj = {
           interUser: "runLfb",
           interPwd: hex_md5(1234578),

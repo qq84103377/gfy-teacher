@@ -1,6 +1,5 @@
 <template>
   <div class="updatePassword">
-    <form action="">
       <van-cell-group>
         <van-field
           class="telInput"
@@ -51,7 +50,6 @@
           <span class="error" v-show="isDifferent">*两次密码不一致</span>
         </div>
       </van-cell-group>
-    </form>
     <div class="tips">
       收不到验证码？请点击<span @click="$router.push('/service')">为您服务</span>咨询
     </div>
