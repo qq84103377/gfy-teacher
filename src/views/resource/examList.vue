@@ -6,7 +6,7 @@
         <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
       </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试卷，快去创建吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${$route.query.subjectType}&classGrade=${$route.query.classGrade}&title=${item.testPaperName}`)" class="mgt10"
+          <list-item @clickTo="viewDetail(item)" class="mgt10"
                      style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list"
                      :key="index"
                      :itemTitle="item.testPaperName"
@@ -134,7 +134,7 @@
           show: false,
           title: '',
           name: '',
-          difficult: 'D01',
+          difficult: 'D02',
           share: 'S02',
           testPaperId: '',
           btnLoading: false,
@@ -158,9 +158,9 @@
     watch: {
       show(v) {
         if (!v) {
-          this.addExam.name = ''
-          this.addExam.difficult = 'D01'
+          this.addExam.difficult = 'D02'
           this.addExam.share = 'S02'
+          this.addExam.name=`《${this.$route.query.courseName}》标准测试卷1`
         }
       }
     },
@@ -176,6 +176,11 @@
       });
     },
     methods: {
+      viewDetail(item) {
+        this.$store.commit('setResourceInfo', item)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${this.$route.query.subjectType}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+      },
       copy(item) {
         this.addExam.title = '复制';
         this.addExam.show = true

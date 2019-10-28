@@ -174,11 +174,14 @@
           //编辑
           this.form.share = item.shareType
           this.form.difficult = item.spokenDegree
+          this.form.name = item.spokenTitle
+        }else {
+          //复制
+          this.form.name = item.spokenTitle + '-副本'
         }
         this.isEdit = bol;
         this.popShow = true;
         this.form.spokenId = item.spokenId;
-        this.form.name = item.spokenTitle
       },
       async submit() {
         if (!this.form.name) {
