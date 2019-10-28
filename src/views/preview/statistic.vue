@@ -657,8 +657,9 @@ export default {
           tchCourseId: this.$route.query.tchCourseId,
           classId,
           questionList,
-          info: this.taskFinishInfo,
-          termType: this.$route.query.termType
+          // info: this.taskFinishInfo,
+          termType: this.$route.query.termType,
+          taskType: this.$route.query.taskType
         }
       })
     },
@@ -1166,7 +1167,7 @@ export default {
       > video,
       > iframe {
         width: 100%;
-        height: 200px;
+        height: 350px;
       }
 
       > audio {

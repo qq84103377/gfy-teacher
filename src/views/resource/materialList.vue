@@ -1,6 +1,6 @@
 <template>
     <section class="material-list-wrap">
-      <div class="material-list-wrap__body">
+      <div class="material-list-wrap__body" ref="body">
         <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
           <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
             <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
@@ -69,6 +69,10 @@
         accessUrl: ''
       }
     },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
     beforeRouteEnter(to, from, next) {
       if((from.path === '/uploadWare'|| from.path === '/uploadImg') && store.getters.getIsAddWare) {
         // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
@@ -80,9 +84,16 @@
           vm.total= 0
           vm.$store.commit('setIsAddWare',false)
           vm.onLoad()
+          vm.$nextTick(() => {
+            vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          });
         })
       }else {
-        next()
+        next(vm => {
+          vm.$nextTick(() => {
+            vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          });
+        })
       }
     },
     methods: {

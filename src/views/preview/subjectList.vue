@@ -14,17 +14,17 @@
                 <div v-html="info.title"></div>
                 <div v-if="info.groupExamList.length">
                   <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
-                    <div class="mgt10" v-html="item.title"></div>
+                    <div class="mgt10 html-img" v-html="item.title"></div>
                     <div class="mgt10">正确答案: <span class="blue" v-html="item.answer"></span></div>
                     <div class="mgt10">答案解析:</div>
-                    <div v-html="item.examExplain"></div>
+                    <div v-html="item.examExplain" class="html-img"></div>
                   </div>
                 </div>
                 <div v-else>
                   <div class="fs14">
-                    <div class="mgt10">正确答案: <span class="blue" v-html="info.answer"></span></div>
+                    <div class="mgt10">正确答案: <span class="blue html-img" v-html="info.answer"></span></div>
                     <div class="mgt10">答案解析:</div>
-                    <div v-html="info.examExplain"></div>
+                    <div v-html="info.examExplain" class="html-img"></div>
                   </div>
                 </div>
               </div>
@@ -57,7 +57,7 @@
                       <div @click="subjectCorrect(asw,index,aswIndex,i)" v-for="(img,i) in asw.imgArr" :key="i"><img
                         :src="img" alt=""></div>
                     </div>
-                    <div style="width: 100%;" v-if="asw.audioArr.length">
+                    <div style="width: 100%;" v-if="asw.audioArr.length && !asw.text">
                       <!--                    <video-player  class="video-player-box"-->
                       <!--                                   v-for="(audio,i) in asw.audioArr" :key="i"-->
                       <!--                                   ref="videoPlayer"-->
@@ -86,7 +86,7 @@
 <script>
   import analyseWrap from '../../components/analyseWrap'
   import 'video.js/dist/video-js.css'
-  import {getExamItemDetail, getExamFinishInfo} from '@/api/index'
+  import {getExamItemDetail, getExamFinishInfo, statTaskStatV2, statTaskStat} from '@/api/index'
   import {getStudentName} from '@/utils/filter'
 
   import {videoPlayer} from 'vue-video-player'
@@ -119,20 +119,56 @@
         tabList: JSON.parse(JSON.stringify(this.$route.query.questionList)),
         // info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}},
         info: {groupFinishMap: {}, groupExamList: []},
-        studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList)),
+        // studentStatList: JSON.parse(JSON.stringify(this.$route.query.info.studentStatList)),
+        studentStatList: [],
         stuArr: [],
         examNum: '', // 大题题号
         examId: this.$route.query.examId,
       }
     },
-    activated() {
+    async activated() {
       // const {examId} = this.$route.query
       const index = this.tabList.findIndex(v => v.examId === this.examId)
       this.$set(this.tabList[index], 'active', true)
       // this.getExamItemDetail(examId, groupId)
+
+      //因为在主观题批改里面加减分以后返回到主观题批改列表需要statTaskStat这个接口去更新学生的分数,所以只能每次进来都调这个接口 (有点坑)
+      await this.statTaskStat()
       this.getExamFinishInfo(this.examId)
     },
     methods: {
+      async statTaskStat() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.query.taskId,
+          classId: this.$route.query.classId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        let api
+        if (['T10'].includes(this.$route.query.taskType)) {
+          //从堂测统计进入
+          api = statTaskStatV2
+        } else {
+          api = statTaskStat
+        }
+        await api(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag && res.data[0]) {
+            if (this.$route.query.taskType === 'T13') {
+              res.data[0].studentStatList = res.data[0].examstat
+            }
+            this.studentStatList = res.data[0].studentStatList
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       subjectCorrect(item, stuIndex, aswIndex, imgIndex) {
         console.log(item);
         // 点击图片
@@ -385,7 +421,7 @@
           display: flex;
           flex-direction: column;
           &.fold {
-            height: 22px;
+            height: 48px;
             overflow: hidden;
             flex-direction: row;
           }
@@ -394,7 +430,9 @@
             font-size: 14px;
             flex: 0 0 20%;
             text-align: right;
-            line-height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
             background: #fff;
 
           }

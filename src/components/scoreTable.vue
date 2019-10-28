@@ -23,7 +23,7 @@
     </div>
     <div v-else>
       <div class="row" v-for="(item,index) in list" :key="index">
-        <div class="row-item team-col">{{item.groupName}}</div>
+        <div class="row-item team-col">{{item.groupName || '未分组'}}</div>
         <div class="row-item average">{{item.average}}</div>
         <div class="row-item">
           <div :class="{stuName:s.redoTimes>0}" v-for="(s,index1) in item.stu" :key="index1">{{s.name}}</div>

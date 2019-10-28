@@ -15,6 +15,10 @@
     <div class="error-book__body">
       <div class="error-book__body-title van-hairline--bottom">课程列表 <span class="blue">| {{filterName}}</span></div>
       <div class="error-book__body-list">
+        <div v-if="!courseList.length && !vanLoading" class="empty-page">
+          <img src="../../assets/img/preview/task_null.png" alt />
+          <div class="grey9 fs12">当前没有课程错题~</div>
+        </div>
         <div v-for="(item,index) in courseList" :key="index" class="list-item van-hairline--bottom">
           <div style="flex:1" @click="viewDetail(item)">
             <div class="fs15 black" style="word-break: break-all">《{{item.sysCourseName}}》</div>
@@ -35,6 +39,7 @@
   import courseFilter from '../../components/courseFilter'
   import examBar from '../../components/examBar'
   import {getTeacherErrorExamList} from '@/api/index'
+  import { mapMutations, mapGetters, mapState } from 'vuex'
   export default {
     components: {courseFilter, examBar},
     name: "index",
@@ -80,9 +85,12 @@
       },
     },
     computed: {
+      ...mapState({
+        vanLoading: state => state.setting.vanLoading
+      }),
       errorValue() {
         return this.errorPercent.find(v => v.active).value
-      }
+      },
     },
     beforeRouteLeave(to, from ,next) {
       if(to.path === '/index') {

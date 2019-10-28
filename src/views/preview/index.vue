@@ -1,6 +1,6 @@
 <template>
   <section class="preview-wrap">
-    <dropdown-header :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
+    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
       <div v-if="$route.query.from==='course'" slot="left" class="fs14" style="color: #16AAB7" @click="changeCourse(0)">上一课</div>
       <div v-else slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
       <!--      <div slot="right" ><i class="iconGFY icon-edit-blue"></i> 编辑</div>-->
@@ -19,7 +19,7 @@
         <div v-if="!listLoading && courseTaskList.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
-        <van-list v-model="listLoading" :finished="finished" :finished-text="courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'" @load="onLoad" :offset='80'>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="courseList.length?(courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'):'当前没有课程,快去新建课程吧！'" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="$set(item,'fold',!item.fold)">
@@ -38,8 +38,12 @@
           </list-item>
         </van-list>
       </van-pull-refresh>
+      <div v-if="!courseList.length && !firstFlag" style="display: flex;justify-content: center;">
+        <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+      </div>
+
     </div>
-    <div class="preview-wrap__footer van-hairline--top">
+    <div class="preview-wrap__footer van-hairline--top" v-if="courseList.length || firstFlag">
       <van-button class="add-mission" type="info" @click="$router.push(`/resource`)">新建任务</van-button>
     </div>
 
@@ -87,15 +91,24 @@ export default {
       classGrade: '',
       sysCourseId: '',
       courseIndex: 0, //选中的课程index
-      currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : ''  //我的课程跳过来才有的
+      currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //我的课程跳过来才有的
+      scrollTop: 0,
+      firstFlag: true
     }
   },
   mounted() {
     // this.getClassTeachCourseInfo()
   },
-  beforeRouteLeave(to,from,next) {
-
-    next()
+  beforeRouteLeave(to, from, next) {
+    this.scrollTop = this.$refs["body"].scrollTop;
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.$nextTick(() => {
+        vm.$refs["body"].scrollTo(0, vm.scrollTop);
+      });
+    });
   },
   methods: {
     async changeCourse(type) {
@@ -132,26 +145,19 @@ export default {
       }
     },
     goto(item) {
-      if (item.taskType === 'T03') {
+      if(item.testPaperId > 0) {
+        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+      }else if (item.taskType === 'T03'){
         if (item.resourceType === 'R03') {
           //单道试题
           this.$router.push(`/questionDetail?tchCourseId=${this.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
-        } else {
-          //试卷
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
         }
-      } else if (['T04'].includes(item.taskType)) {
-        // 学资源
-        this.getCourseTaskDetail(item)
-      } else if (['T01', 'T02'].includes(item.taskType)) {
-        //微课   由于需要自动横屏全屏播放 暂时不弄
-        this.getCourseTaskDetail(item)
-      } else if (['T06'].includes(item.taskType)) {
-        //讨论
-        this.getCourseTaskDetail(item)
       } else if (['T13'].includes(item.taskType)) {
         //口语
         this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${this.sysCourseId}`)
+      } else if (['T02','T04','T06'].includes(item.taskType)) {
+        // 学资源 微课+心得 讨论  跳任务统计
+        this.viewStat(item)
       }
     },
     getCourseTaskDetail(item) {
@@ -234,7 +240,8 @@ export default {
         return
       }
 
-      if (!this.courseList.length) {
+      // if (!this.courseList.length) {
+      if (this.firstFlag) {
         //首次加载
         await this.getClassTeachCourseInfo()
         if (this.$route.query.from === 'course') {
@@ -244,11 +251,13 @@ export default {
           this.tchCourseId = this.$route.query.tchCourseId
           this.termType = this.$route.query.termType
         } else {
-          this.courseName = this.courseList[0].tchCourseInfo.courseName
-          this.classGrade = this.courseList[0].tchCourseInfo.classGrade
-          this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
-          this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
-          this.termType = this.courseList[0].tchCourseInfo.termType
+          if(this.courseList.length) {
+            this.courseName = this.courseList[0].tchCourseInfo.courseName
+            this.classGrade = this.courseList[0].tchCourseInfo.classGrade
+            this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
+            this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
+            this.termType = this.courseList[0].tchCourseInfo.termType
+          }
         }
 
       }
@@ -311,6 +320,9 @@ export default {
           this.courseList = page === 1 ? [] : this.courseList.concat([])
           this.dropdownFinish = true
         }
+        this.firstFlag = false
+      }).catch(err => {
+        this.firstFlag = false
       })
     },
     async getCourseTaskList(name, id) {
@@ -573,6 +585,12 @@ export default {
     flex: 1;
     overflow-y: auto;
     /*padding-top: 55px;*/
+    .add-course {
+      width: 190px;
+      height: 44px;
+      border-radius: 22px;
+      font-size: 16px;
+    }
   }
 
   &__footer {

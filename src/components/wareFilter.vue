@@ -35,13 +35,15 @@
           </div>
         </div>
         <div class="ware-filter-wrap__body-right">
-          <div v-if="!isLoading&&courseList.length==0" style="text-align: center;color: #999999">
-            <img class="null-tips" src="../assets/img/empty-1.png" alt />
+          <div v-if="!isLoading&&courseList.length==0" class="empty-page">
+            <img src="../assets/img/empty-1.png" alt />
             <span style="font-size: 14px">当前没有{{currentTypeName}}，快去上传{{currentTypeName}}吧！</span>
           </div>
           <div v-for="(item,index) in courseList" :key="index" @click="handleSelect(item)"
                :class="['cell__item',{active:item.check}]">
-            {{item.coursewareName || item.testPaperName}}
+            <div>
+              {{item.coursewareName || item.testPaperName}}
+            </div>
             <van-icon v-show="item.check" class="check blue" name="success"/>
           </div>
         </div>
@@ -324,11 +326,19 @@
           align-items: center;
           color: #666;
           font-size: 14px;
-          padding: 0 5px;
           word-break: break-all;
           border-bottom: 1px solid #ebedf0;
           padding: 0 20px;
 
+          div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 可以显示的行数，超出部分用...表示*/
+            -webkit-box-orient: vertical;
+            word-break: break-all;
+            flex: 1;
+          }
           .check {
             flex: 0 0 20px;
             text-align: right;

@@ -155,7 +155,7 @@
         courseList: [],
         //sysCourseId:'',
         termTypeList: [],
-        termIndex: ((new Date().getMonth() + 1) >= 2 && (new Date().getMonth() + 1) <= 7)?0:1,
+        termIndex: ((new Date().getMonth() + 1) >= 2 && (new Date().getMonth() + 1) <= 7)?1:0,
         gradeTermList: this.$store.getters.getGradeTermInfo,
         subjectName: localStorage.getItem("currentSubjectTypeName"),
         classGradeMap: [],

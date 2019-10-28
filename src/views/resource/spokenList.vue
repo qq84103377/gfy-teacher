@@ -34,7 +34,7 @@
               </div>
               <div @click="modify(item,false)">
                 <i class="iconGFY icon-copy-orange"></i>
-                <span>复制任务</span>
+                <span>复制口语</span>
               </div>
               <div @click="sendTask(item)">
                 <i class="iconGFY icon-plane"></i>
@@ -154,7 +154,19 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        scrollTop: 0
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       modify(item, bol) {
@@ -162,11 +174,14 @@
           //编辑
           this.form.share = item.shareType
           this.form.difficult = item.spokenDegree
+          this.form.name = item.spokenTitle
+        }else {
+          //复制
+          this.form.name = item.spokenTitle + '-副本'
         }
         this.isEdit = bol;
         this.popShow = true;
         this.form.spokenId = item.spokenId;
-        this.form.name = item.spokenTitle
       },
       async submit() {
         if (!this.form.name) {

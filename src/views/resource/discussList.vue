@@ -153,6 +153,7 @@
         total: 0,
         curFile: null,
         oSSObject: null,
+        scrollTop: 0,
       }
     },
     created() {
@@ -171,6 +172,17 @@
           this.photoList = []
         }
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       goto(item) {

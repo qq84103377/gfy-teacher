@@ -70,7 +70,7 @@
              v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案
         </div>
       </div>
-      <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length">
+      <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length && !stuArr[stuIndex].answer[aswIndex].text">
         <i class="iconGFY icon-circle-logo"></i>
         <audio autoplay controls controlsList="nodownload" :src="stuArr[stuIndex].answer[aswIndex].audioArr[0]"></audio>
       </div>
@@ -271,7 +271,7 @@
       },
       examTitle() {
         if (this.info.groupExamList.length) {
-          return this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).title
+          return this.info.title + this.info.groupExamList.find(v => v.examGroupId === this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId).title
         } else {
           return this.info.title
         }

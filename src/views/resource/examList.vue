@@ -6,7 +6,7 @@
         <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
       </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试卷，快去创建吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${$route.query.subjectType}&classGrade=${$route.query.classGrade}&title=${item.testPaperName}`)" class="mgt10"
+          <list-item @clickTo="viewDetail(item)" class="mgt10"
                      style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list"
                      :key="index"
                      :itemTitle="item.testPaperName"
@@ -134,7 +134,7 @@
           show: false,
           title: '',
           name: '',
-          difficult: 'D01',
+          difficult: 'D02',
           share: 'S02',
           testPaperId: '',
           btnLoading: false,
@@ -146,6 +146,8 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        scrollTop: 0,
+        currentItem: {}
       }
     },
     computed: {
@@ -156,18 +158,35 @@
     watch: {
       show(v) {
         if (!v) {
-          this.addExam.name = ''
-          this.addExam.difficult = 'D01'
+          this.addExam.difficult = 'D02'
           this.addExam.share = 'S02'
+          this.addExam.name=`《${this.$route.query.courseName}》标准测试卷1`
         }
       }
     },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
+    },
     methods: {
+      viewDetail(item) {
+        this.$store.commit('setResourceInfo', item)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${this.$route.query.subjectType}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+      },
       copy(item) {
         this.addExam.title = '复制';
         this.addExam.show = true
         this.addExam.testPaperId = item.testPaperId
         this.addExam.name = item.testPaperName + '-副本'
+        this.currentItem = item
       },
       copyTestPaper(copyTestPaperId) {
         this.addExam.btnLoading = true
@@ -284,7 +303,7 @@
             "testPaperId": "",
             "classGrade": this.$route.query.classGrade,//归属年级
             "subjectType": this.$route.query.subjectType,//学科
-            "shareType": this.addExam.share,//共享级别
+            "shareType": this.addExam.title == '复制' ? 'S01' : this.addExam.share,//共享级别
             "belongSchoolId": this.$store.getters.schoolId,//归属学校
             "belongAccountNo": this.$store.getters.getUserInfo.accountNo,//归属账号
             "testPaperName": this.addExam.name,//试卷名称
@@ -294,9 +313,9 @@
             "belongYear": new Date().getFullYear(),//归属年份
             "testPaperMode": "M01",//试卷模式
             "testPaperDegree": this.addExam.difficult,//试卷难度
-            "score": 0,//试卷分数，默认0分
-            "subjectiveItemNum": 0,//主观题数量
-            "objectiveItemNum": 0,//客观题数量
+            "score": this.addExam.title == '复制' ? this.currentItem.score : 0,//试卷分数，默认0分
+            "subjectiveItemNum": this.addExam.title == '复制' ? this.currentItem.subjectiveItemNum : 0,//主观题数量
+            "objectiveItemNum": this.addExam.title == '复制' ? this.currentItem.objectiveItemNum : 0,//客观题数量
             "duration": 10,//试卷时长
             "statusCd": "S01"//状态
           }

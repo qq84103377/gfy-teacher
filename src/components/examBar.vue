@@ -103,6 +103,7 @@
 
 <script>
   import filterPanel from './filterPanel'
+  import {generateTimeReqestNumber} from '@/utils/filter'
   import {Dialog} from 'vant';
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
 
@@ -132,8 +133,8 @@
         filterShow: false,
         form: {
           name: '',
-          difficult: 'D01',
-          share: 'S02',
+          difficult: 'D02',
+          share: this.type === 'error' ? 'S01' : 'S02',
           btnLoading: false
         },
         tempList: [],
@@ -146,14 +147,17 @@
         if (!v) {
           this.form = {
             name: '',
-            difficult: 'D01',
-            share: 'S02',
+            difficult: 'D02',
+            share: this.type === 'error' ? 'S01' : 'S02',
             btnLoading: false
           }
         }else {
           //每次点开生成试卷弹窗请求课程列表
           if(this.type === 'error') {
+            this.form.name = `错题集试题${generateTimeReqestNumber()}`
             this.getClassTeachCourseInfo()
+          }else if(this.$route.path === '/questionList') {
+            this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
           }
         }
       }
@@ -225,17 +229,17 @@
           if (res.flag) {
             if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId || this.$route.query.sysCourseId) {
               // 有选择加入的课程
-              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
+              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }else {
               //没有选择加入的课程
-              this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName)
+              this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }
           } else {
             this.$toast(res.msg)
           }
         })
       },
-      addTeachCourseRes(resourceId, name) {
+      addTeachCourseRes(resourceId, name, paperInfo) {
         this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",
@@ -256,13 +260,13 @@
         addTeachCourseRes(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            this.addTestPaperExamInfo(resourceId, name)
+            this.addTestPaperExamInfo(resourceId, name,paperInfo)
           } else {
             this.$toast(res.msg)
           }
         })
       },
-      addTestPaperExamInfo(testPaperId, name) {
+      addTestPaperExamInfo(testPaperId, name, paperInfo) {
         this.form.btnLoading = true
         let testPaperExamInfoList = []
         let examIndex = -1
@@ -306,6 +310,8 @@
           this.form.btnLoading = false
           if (res.flag) {
             this.addExam = false
+            this.$store.commit('setResourceInfo', paperInfo)
+            this.$store.commit("setTaskClassInfo", '')
             this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}`)
           } else {
             this.$toast(res.msg)
@@ -336,7 +342,8 @@
       handleSubmit() {
         if (this.type === 'task') {
           if (this.length) {
-            this.$router.push(`/addTask?type=exam`)
+            // this.$router.push(`/addTask?type=exam`)
+            this.$router.push(`/addTask?type=exam&_t=new`)
           }
         } else {
           this.addExam = true

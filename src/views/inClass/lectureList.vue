@@ -56,7 +56,19 @@
         finished: false,
         currentPage: 0,
         total: 0,
+        scrollTop: 0
       }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        });
+      });
     },
     methods: {
       selectCourse(tchClassTeachingDataList) {
@@ -102,6 +114,9 @@
           }
           this.$router.push({path:'/boardDetail',query:{data:item}})
 
+        }else {
+          //试卷
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.resourceId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.$route.query.classGrade}&title=${item.name}`)
         }
       },
       moveItem(item, index, type) {

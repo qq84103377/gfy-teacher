@@ -10,6 +10,7 @@ const baseUrl = process.env.VUE_APP_BASE_URL
 if (process.env.NODE_ENV === 'development') {} else {}
 axios.defaults.baseURL = baseUrl
 axios.defaults.withCredentials = false
+axios.defaults.timeout = 6000
 axios.defaults.headers = {
   "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
 }

@@ -2,7 +2,10 @@
     <section class="my-class-wrap">
       <div class="my-class-wrap__body">
         <van-cell v-for="(value,key) in classList" :key="key" v-if="value.teacherInfoList.some(v => v.subjectType !== 'S20')" :title="value.className" @click="$router.push(`/classDetail?classId=${key}&className=${value.className}`)" is-link/>
-
+        <div v-if="!Object.keys(classList).length" class="empty-page">
+          <img src="../../assets/img/empty-2.png" alt />
+          <div class="grey9 fs12">当前没有班级！</div>
+        </div>
       </div>
     </section>
 </template>

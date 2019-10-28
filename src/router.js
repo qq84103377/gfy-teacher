@@ -96,7 +96,7 @@ export default new Router({
           component: () => import('./views/preview/subjectList.vue'),
           meta: {
             isShowHeader: true,
-            title: '题目分析'
+            title: '作答情况'
           }
         },
         {

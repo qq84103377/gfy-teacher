@@ -64,6 +64,10 @@
               <van-icon v-show="item.testPaperId == currentTestPaperId" class="check blue" name="success"/>
             </div>
           </div>
+          <div v-if="!testPaperList.length" class="empty-page">
+            <img style="width: 70%;" src="../assets/img/empty-2.png" alt />
+            <div>当前无数据~</div>
+          </div>
         </div>
       </div>
       <div class="exam-filter-wrap__footer">
