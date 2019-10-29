@@ -1,8 +1,11 @@
 <template>
   <section class="shop" ref="listScroll">
-    <van-nav-bar title="积分商城" left-arrow @click-left="$router.replace('/mine')">
-      <div slot="right" class="tips" @click="$router.push('/convertRule')">兑换说明</div>
-    </van-nav-bar>
+    <van-sticky>
+      <van-nav-bar title="积分商城" left-arrow @click-left="$router.replace('/mine')">
+        <div slot="right" class="tips" @click="$router.push('/convertRule')">兑换说明</div>
+      </van-nav-bar>
+    </van-sticky>
+
     <div class="shop-header">
       <div class="item" @click="$router.push('/converseRecord')">
         <div>
@@ -22,23 +25,25 @@
       </div>
     </div>
     <div class="shop-body">
-      <div class="shop-body_title">
-        <div class="txt">
-          <h4>礼品兑换区</h4>
-          <div class="line"></div>
-        </div>
-        <div class="checkbox">
-          <van-checkbox v-model="checked" shape="square" @change="handleCheck" checked-color="#39F0DD">
-            我能兑换的礼品
-          </van-checkbox>
-        </div>
-        <div class="menu">
-          <van-dropdown-menu>
-            <van-dropdown-item @change="handleDropdown" v-model="goodsType" :options="typeList"/>
-          </van-dropdown-menu>
+      <van-sticky>
+        <div class="shop-body_title">
+          <div class="txt">
+            <h4>礼品兑换区</h4>
+            <div class="line"></div>
+          </div>
+          <div class="checkbox">
+            <van-checkbox v-model="checked" shape="square" @change="handleCheck" checked-color="#39F0DD">
+              我能兑换的礼品
+            </van-checkbox>
+          </div>
+          <div class="menu">
+            <van-dropdown-menu>
+              <van-dropdown-item @change="handleDropdown" v-model="goodsType" :options="typeList"/>
+            </van-dropdown-menu>
 
+          </div>
         </div>
-      </div>
+      </van-sticky>
       <div class="shop-body_production">
         <van-list
           v-model="loading"
@@ -175,7 +180,7 @@
           goodsType: this.goodsType,
           schoolIdList: this.$store.getters.schoolIdList,
           redeemType: this.redeemType,
-          limitNumber:this.langCoin
+          limitNumber: this.langCoin
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -230,7 +235,8 @@
     beforeRouteEnter(to, from, next) {
       next(vm => {
         vm.$nextTick(() => {
-          vm.$refs["listScroll"].scrollTo(0, vm.listScroll);
+          // vm.$refs["listScroll"].scrollTo(0, vm.listScroll);
+          vm.$refs["listScroll"].scrollTop = vm.listScroll;
         });
       });
     },
@@ -291,7 +297,12 @@
 
     &-body {
       padding: 10px;
-
+      @{deep} .van-sticky--fixed{
+        background-color: #fff;
+        border-bottom: 1px solid #f5f6f5;
+        padding: 0 10px;
+        top: 44px;
+      }
       &_title {
         display: flex;
         justify-content: space-between;

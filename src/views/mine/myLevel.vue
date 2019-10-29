@@ -1,8 +1,11 @@
 <template>
   <section class="level-wrap">
-    <van-nav-bar title="我的等级" left-arrow @click-left="$router.replace('/mine')">
-      <div slot="right" class="tips" @click="showTips = true">如何获取经验？</div>
-    </van-nav-bar>
+    <van-sticky>
+      <van-nav-bar title="我的等级" left-arrow @click-left="$router.replace('/mine')">
+        <div slot="right" class="tips" @click="showTips = true">如何获取经验？</div>
+      </van-nav-bar>
+    </van-sticky>
+
     <div class="level-wrap-progress">
       <span>LV.{{currentLevel}}</span>
       <van-progress
