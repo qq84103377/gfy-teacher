@@ -208,22 +208,25 @@
           console.log('getMySchoolInfo', res)
           if (res.flag && res.data.length > 0) {
             let schoolList = res.data[0].schoolList;
-            let length = schoolList.length;
-            this.schoolList = schoolList.map(item => {
-              return item.schoolName
-            })
-            // 获取老师科目列表，去重后
-            for (let i = 0; i < length; i++) {
-              let gradeList = schoolList[i].classGradeList;
-              let gradeLen = gradeList.length;
-              for (let j = 0; j < gradeLen; j++) {
-                let subjectList = gradeList[j].subjectList;
-                let arr = subjectList.map(item => {
-                  return item.subjectName;
-                })
-                this.tagList = Array.from(new Set([...this.tagList, ...arr]));
+            if (schoolList){
+              let length = schoolList.length;
+              this.schoolList = schoolList.map(item => {
+                return item.schoolName
+              })
+              // 获取老师科目列表，去重后
+              for (let i = 0; i < length; i++) {
+                let gradeList = schoolList[i].classGradeList;
+                let gradeLen = gradeList.length;
+                for (let j = 0; j < gradeLen; j++) {
+                  let subjectList = gradeList[j].subjectList;
+                  let arr = subjectList.map(item => {
+                    return item.subjectName;
+                  })
+                  this.tagList = Array.from(new Set([...this.tagList, ...arr]));
+                }
               }
             }
+
             this.loading = false;
           }
         })
