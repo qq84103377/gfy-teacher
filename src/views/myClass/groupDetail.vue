@@ -15,6 +15,10 @@
             </div>
             <van-icon name="arrow" @click="stuInfo=item;visible=true" style="vertical-align: middle;" />
           </van-cell>
+          <div v-if="(!groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent || groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent.length === 0) && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
+            <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
+            <div class="pd10">当前没有组员!</div>
+          </div>
           <div class="disabled-mask"></div>
         </div>
         <div style="position: relative;" :class="{disabled: isDel}">
@@ -31,6 +35,10 @@
                 </van-cell>
             </div>
           </div>
+          <div v-if="groupList.filter((v,i) => i !== curIndex).length === 0 && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
+            <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
+            <div class="pd10">当前没有学生!</div>
+          </div>
           <div class="disabled-mask"></div>
         </div>
       </div>
@@ -44,10 +52,14 @@
 <script>
   import settingDialog from './components/settingDialog'
   import {getSubGroupStudent, addSubGroupStudentByBatch, delSubGroupStudentByBatch} from '@/api/index'
-    export default {
+  import { mapMutations, mapGetters, mapState } from 'vuex'
+  export default {
         name: "groupDetail",
       components: {settingDialog},
       computed: {
+        ...mapState({
+          vanLoading: state => state.setting.vanLoading
+        }),
         isAdd() {
          return this.groupList.some((g,gi) => {
             if(gi !== this.curIndex && g.tchClassSubGroupStudent.tchSubGroupStudent) {

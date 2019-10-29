@@ -12,7 +12,7 @@
           <div style="position: relative;">
             <div class="score-pop-wrap">
               <div class="score-pop-wrap__item" :class="{active: currentSubjectType== value}" v-for="(value, key) in subjectTypeList" :key="key" @click="handleClosePop(key)">{{value}}
-                <van-icon v-show="currentSubjectType== value " class="check blue" name="success" />
+<!--                <van-icon v-show="currentSubjectType== value " class="check blue" name="success" />-->
               </div>
             </div>
             <div class="parent">

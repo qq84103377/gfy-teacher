@@ -539,6 +539,20 @@ export default new Router({
           ]
         },
         {
+          path: '/familyReport',
+          name: 'familyReport',
+          component: () => import('./views/teachStat/familyReport.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '家庭报告'
+          }
+        },
+        {
+          path: '/reportDetail',
+          name: 'reportDetail',
+          component: () => import('./views/teachStat/reportDetail.vue')
+        },
+        {
           path: '/errorBook',
           name: 'errorBook',
           component: () => import('./views/errorBook/index.vue')

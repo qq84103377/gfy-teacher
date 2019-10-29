@@ -229,7 +229,7 @@
               type: 'inside',
               xAxisIndex: [0],
               start: 0,
-              end: 1
+              end: xData.length ? Math.ceil(100 / xData.length) : 100
             }
           ],
           legend: {
