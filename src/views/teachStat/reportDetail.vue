@@ -1,7 +1,7 @@
 <template>
   <section class="report-detail">
     <van-nav-bar
-      :title="stuList[stuIndex].accountNo|getStudentName(stuList[stuIndex].classId)"
+      :title="(getStudentName(stuList[stuIndex].accountNo,stuList[stuIndex].classId))+'的家庭报告'"
       @click-left="$router.back()"
       left-arrow>
       <div slot="right" class="fs14 blue" @click="">生成报告</div>
@@ -15,7 +15,7 @@
       <van-cell v-for="(item,index) in subjectList" :key="index">
         <div slot="title">
           <div @click="selectItem(item,index)" class="aic jcsb">
-            <span>{{item.name}}</span>
+            <span>{{item.subjectName}}</span>
             <van-icon :name="item.fold?'arrow-up':'arrow-down'"/>
           </div>
           <div v-show="item.fold">
@@ -84,7 +84,8 @@
 
 <script>
   import echarts from "echarts";
-
+  import {getUserKnowledgePointCounter} from '@/api/index'
+  import {getStudentName, getSubjectName} from '@/utils/filter'
   export default {
     name: "reportDetail",
     data() {
@@ -94,17 +95,49 @@
           {name: '任务完成情况', active: false},
           {name: '成绩趋势分析', active: false},
         ],
-        subjectList: [{name:'语文'},{name: '数学'},{name: '英语'}],
+        subjectList: [],
         stuList: JSON.parse(JSON.stringify(this.$route.params.stuList)),
         stuIndex: this.$route.params.stuIndex,
+        gradeList: [
+          {classGrade: 'G01',subject: ['S01','S02','S03']},
+          {classGrade: 'G02',subject: ['S01','S02','S03']},
+          {classGrade: 'G03',subject: ['S01','S02','S03']},
+          {classGrade: 'G04',subject: ['S01','S02','S03']},
+          {classGrade: 'G05',subject: ['S01','S02','S03']},
+          {classGrade: 'G06',subject: ['S01','S02','S03']},
+          {classGrade: 'G07',subject: ['S01','S02','S03','S06','S07','S08','S09']},
+          {classGrade: 'G08',subject: ['S01','S02','S03','S04','S06','S07','S08','S09']},
+          {classGrade: 'G09',subject: ['S01','S02','S03','S04','S05','S06','S07']},
+          {classGrade: 'G10',subject: ['S01','S02','S03','S04','S05','S06','S07','S08','S09']},
+          {classGrade: 'G11',subject: ['S01','S02','S03','S04','S05','S06','S07','S08','S09']},
+          {classGrade: 'G12',subject: ['S01','S02','S03','S04','S05','S06','S07','S08','S09']},
+        ]
       }
     },
     computed: {
       tabIndex() {
         return this.tabList.findIndex(v => v.active)
+      },
+      getStudentName() {
+        return getStudentName
       }
     },
     methods: {
+      getSubjectType() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "yearSection":"Y02"
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getSubjectType(params).then(res => {
+
+        })
+      },
       toggleStu(type) {
         if(type) {
           //下一个
@@ -155,6 +188,94 @@
          })
         }
       },
+      init(accountNo, index) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "schoolId": this.$store.getters.schoolId,
+          roleType: 'A03',
+          termType: '',
+          ...this.$route.params.filterParams,
+          subjectType: '',
+          accountNo
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getUserKnowledgePointCounter(params).then(res => {
+          if (res.flag) {
+            let courseList = [],
+              courseIdList = [],
+              sessionIndexList = [],
+              sessionList = [],
+              knowledgeRadar = []
+            res.data[0].sectionItemList.forEach(v => {
+              const index = courseIdList.findIndex(c => v.courseKnowledgePointItem[0].courseId === c)
+              if (index < 0) {
+                courseIdList.push(v.courseKnowledgePointItem[0].courseId)
+                v['knowledgePointItem'] = [];
+                v['courseAllCount'] = 0;
+                v['courseRightCount'] = 0;
+                courseList.push(v)
+              }
+              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].knowledgePointItem.push(v.courseKnowledgePointItem[0].knowledgePointItem[0]);
+              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseAllCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].totalCount);
+              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseRightCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].rigthCount);
+            })
+
+            let xData = [], totalCounts = [], rigthCounts = [], masterys = [], max = 0;
+            courseList.forEach(obj => {
+              if (sessionIndexList.indexOf(obj.sessionIndex) < 0) {
+                sessionIndexList.push(obj.sessionIndex);
+                sessionList.push({
+                  'sectionName': obj.sectionName,
+                  'sectionType': obj.sectionType,
+                  'sessionIndex': obj.sessionIndex,
+                  'courseList': [],
+                  'sectionAllCount': 0,
+                  'sectionRightCount': 0
+                });
+              }
+              sessionList[sessionIndexList.indexOf(obj.sessionIndex)].courseList.push(obj);
+              sessionList[sessionIndexList.indexOf(obj.sessionIndex)].sectionAllCount += parseInt(obj.courseAllCount);
+              sessionList[sessionIndexList.indexOf(obj.sessionIndex)].sectionRightCount += parseInt(obj.courseRightCount);
+              obj.knowledgePointItem.forEach(k => {
+                xData.push(k.knowledgePointName);
+                totalCounts.push(k.totalCount);
+                rigthCounts.push(k.rigthCount);
+                masterys.push(((k.rigthCount / k.totalCount) * 100).toFixed(2));
+                if (k.totalCount > max) {
+                  max = k.totalCount;
+                }
+              })
+            })
+            //柱状图
+            this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max, index);
+
+
+            sessionList.forEach(o => {
+              let sectionPercent = o.sectionAllCount == 0 ? '0%' : this.toPercent(o.sectionRightCount / o.sectionAllCount);
+              knowledgeRadar.push({
+                'sectionName': o.sectionName,
+                'sectionType': o.sectionType,
+                'sessionIndex': o.sessionIndex,
+                'sectionAllCount': o.sectionAllCount,
+                'sectionRightCount': o.sectionRightCount,
+                sectionPercent
+              });
+            })
+            //雷达图
+            this.setOption(knowledgeRadar, index);
+
+          } else {
+            this.$store.commit('setVanLoading', false)
+            this.$toast(res.msg)
+          }
+        })
+      },
       drawHistogram1(index) {
         var myChart = echarts.init(document.getElementById('knowledge' + index));
         let option1 = {
@@ -183,7 +304,7 @@
             }
           ],
           legend: {
-            data: ['总题数', '正确数', '掌握数']
+            data: ['总题数', '正确数', '掌握度']
           },
           xAxis: [
             {
@@ -396,7 +517,9 @@
       },
     },
     mounted() {
-
+      this.subjectList = this.gradeList.find(v => this.$route.params.filterParams.classGrade === v.classGrade).subject.map(v => {
+        return {subjectName: getSubjectName(v), subjectType: v}
+      })
     }
   }
 </script>

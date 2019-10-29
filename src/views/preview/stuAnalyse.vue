@@ -17,7 +17,8 @@
       </div>
       <div class="stu-analyse__body" v-if="info.questionList[curIndex]">
         <div class="stu-analyse__body-top html-img">
-          <div style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].score}}分</div>
+          <div v-if="info.questionList[curIndex].isRight" style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].score}}分</div>
+          <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
           <div v-html="info.questionList[curIndex].title"></div>
           <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].answer"></span></div>
           <div>学生答案: <span class="blue" v-html="info.questionList[curIndex].studentAnswer"></span></div>

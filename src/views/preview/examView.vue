@@ -10,10 +10,12 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table @jump="jump" :list="classList" :classView="true" v-show="classView"></score-table>
-      <score-table @jump="jump" :list="groupList" :classView="false" v-show="!classView"></score-table>
+      <score-table :examScore="info.testPaperScore" @jump="jump" :list="classList" :classView="true"
+                   v-show="classView"></score-table>
+      <score-table :examScore="info.testPaperScore" @jump="jump" :list="groupList" :classView="false"
+                   v-show="!classView"></score-table>
       <div v-if="!classList.length" class="empty-page">
-        <img src="../../assets/img/empty-1.png" alt />
+        <img src="../../assets/img/empty-1.png" alt/>
         <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
       </div>
     </div>
@@ -23,6 +25,7 @@
 <script>
   import scoreTable from '../../components/scoreTable'
   import {getStudentName} from '@/utils/filter'
+
   export default {
     name: "examView",
     data() {
@@ -36,29 +39,38 @@
     },
     computed: {
       classList() {
-       return  this.info.studentStatList.reduce((t,v) => {
-          if(v.endDate) {
-            t.push({...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分${v.duration%60}秒`})
+        let arr = this.info.studentStatList.reduce((t, v) => {
+          if (v.endDate) {
+            t.push({
+              ...v,
+              name: getStudentName(v.accountNo, this.info.classId),
+              duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
+            })
           }
           return t
-        },[])
+        }, [])
+       return this.bubbleSort(arr)
       },
       groupList() {
-        return  this.info.studentStatList.reduce((t,v) => {
-          if(v.endDate) {
+        let arr = this.info.studentStatList.reduce((t, v) => {
+          if (v.endDate) {
             const index = t.findIndex(g => g.groupId === v.groupId)
-            const item = {...v,name:getStudentName(v.accountNo,this.info.classId),duration: `${Math.floor(v.duration/60)}分${v.duration%60}秒`}
-            if(index > -1) {
+            const item = {
+              ...v,
+              name: getStudentName(v.accountNo, this.info.classId),
+              duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
+            }
+            if (index > -1) {
               // 已存在相同组
               t[index].stu.push(item)
-             const total = t[index].stu.reduce((total,s) => {
+              const total = t[index].stu.reduce((total, s) => {
                 total += s.score
                 return total
-              },0)
+              }, 0)
               t[index].average = (total / t[index].stu.length).toFixed(2)
-            }else {
+            } else {
               t.push({
-                groupId:v.groupId,
+                groupId: v.groupId,
                 groupName: v.groupName,
                 average: item.score,
                 stu: [item]
@@ -67,29 +79,59 @@
 
           }
           return t
-        },[])
+        }, [])
+        return this.bubbleSort(arr)
       }
     },
     created() {
     },
     components: {scoreTable},
     methods: {
+      //冒泡排序
+      bubbleSort(arr) {
+
+        for (let i = 0; i < arr.length - 1; i++) {
+
+          for (let j = 0; j < arr.length - 1 - i; j++) {
+
+            if (arr[j].score < arr[j + 1].score) {
+
+              let tem = arr[j];
+
+              arr[j] = arr[j + 1];
+
+              arr[j + 1] = tem;
+
+            }
+
+          }
+
+        }
+        return arr
+
+      },
       jump(item) {
-        if(this.isSpoken) {
-         let info = this.info.finishResultBySplit.reduce((t,v) => {
+        if (this.isSpoken) {
+          let info = this.info.finishResultBySplit.reduce((t, v) => {
             let answer = v.splitInfoStudentAnswers.find(value => value.accountNo === item.accountNo)
-           if(answer) t.push({...answer,sentenceContent:v.splitSentence.sentenceContent}) // 词汇存进数组
+            if (answer) t.push({...answer, sentenceContent: v.splitSentence.sentenceContent}) // 词汇存进数组
             return t
-          },[])
-          this.$router.push({name:'spokenAnalyse',params:{type:'personal',info,classId:this.info.classId,index:0}})
-        }else {
-          this.$router.push({path:'/stuAnalyse',query:{accountNo:item.accountNo,classId:this.info.classId,taskType:this.taskType}})
+          }, [])
+          this.$router.push({
+            name: 'spokenAnalyse',
+            params: {type: 'personal', info, classId: this.info.classId, index: 0}
+          })
+        } else {
+          this.$router.push({
+            path: '/stuAnalyse',
+            query: {accountNo: item.accountNo, classId: this.info.classId, taskType: this.taskType}
+          })
         }
       },
       handleToggle(bol) {
         //班级未分组时,无法切换小组查看 弹出toast
-        if(JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
-         return this.$toast('该班级未分组,无法进行小组查看')
+        if (JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
+          return this.$toast('该班级未分组,无法进行小组查看')
         }
         this.classView = bol
       },

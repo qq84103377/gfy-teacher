@@ -16,8 +16,8 @@
         <div class="row-item">
           <div>{{item.duration}}</div>
         </div>
-        <div class="row-item  score blue">
-          <div @click="$emit('jump',item)">{{item.score}} ></div>
+        <div class="row-item score">
+          <div :class="[{red:examScore>0?(item.score/examScore)<0.6:true},{blue:examScore>0?(item.score/examScore)>=0.6:false}]" @click="$emit('jump',item)">{{item.score}} ></div>
         </div>
       </div>
     </div>
@@ -31,8 +31,8 @@
         <div class="row-item">
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>
         </div>
-        <div class="row-item  score blue">
-          <div v-for="(s,index3) in item.stu" :key="index3" @click="$emit('jump',s)">{{s.score}} ></div>
+        <div class="row-item score" >
+          <div :class="[{red:examScore>0?(s.score/examScore)<0.6:true},{blue:examScore>0?(s.score/examScore)>=0.6:false}]" v-for="(s,index3) in item.stu" :key="index3" @click="$emit('jump',s)">{{s.score}} ></div>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
 <script>
   export default {
     name: "scoreTable",
-    props: ['classView', 'list'],
+    props: ['classView', 'list','examScore'], //examScore试卷总分
     data() {
       return {
 

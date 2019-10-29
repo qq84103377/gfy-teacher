@@ -17,7 +17,8 @@
     </div>
     <div>
       <van-cell title="学生列表" style="background: #f5f5f5;color: #999"/>
-      <van-cell v-for="(item,index) in classList[classIndex].studentInfo" :key="index" @click="$router.push({name:`reportDetail`,params:{stuIndex:index,stuList:classList[classIndex].studentInfo}})"
+      <van-cell v-for="(item,index) in classList[classIndex].studentInfo" :key="index"
+                @click="viewDetail(item,index)"
                 :title="item.accountNo|getStudentName(item.classId)" is-link/>
     </div>
 
@@ -133,6 +134,20 @@
       }
     },
     methods: {
+      viewDetail(item, index) {
+        this.$router.push({
+          name: `reportDetail`,
+          params: {
+            stuIndex: index,
+            stuList: this.classList[this.classIndex].studentInfo,
+            filterParams: {
+              classGrade: this.gradeSubjectList[this.gradeIndex].classGrade,
+              classId: this.classList[this.classIndex].classId,
+              time: ''
+            }
+          }
+        })
+      },
       selectItem(item, index, arr) {
         if (item.active) return
         for (let key in arr) {

@@ -23,7 +23,12 @@
         <van-cell v-if="groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
                   @click="visible=true;stuInfo=item"
                   v-for="(item,index) in groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
-                  :key="index" :title="item.studentName" is-link/>
+                  :key="index" is-link>
+          <div slot="title" class="aic jcsb fs16">
+            <div class="aic">{{item.studentName}} <span v-if="item.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="item.identityType === 'I02'" class="group-leader-badge">组</span></div>
+            <div v-if="item.studentNumber" class="fs15 grey6">学号: {{item.studentNumber}}</div>
+          </div>
+        </van-cell>
         <div v-if="(!groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent || !groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent.length) && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
           <img style="width: 70%" src="../../assets/img/empty-1.png" alt />
           <div class="pd10">当前无数据~</div>
@@ -181,6 +186,19 @@
     &__body {
       flex: 1;
       overflow-y: auto;
+      .class-leader-badge,.group-leader-badge {
+        width: 17px;
+        line-height: 17px;
+        border-radius: 50%;
+        margin-left: 6px;
+        color: #fff;
+        font-size: 10px;
+        background: #F06839;
+        text-align: center;
+      }
+      .group-leader-badge {
+        background: #F0AD39;
+      }
     }
 
     &__footer {

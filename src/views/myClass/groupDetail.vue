@@ -10,10 +10,15 @@
           <van-cell title="组员"/>
           <van-cell v-for="(item,index) in groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent" :key="index">
             <div @click="$set(item,'check',!item.check);stuInfo=item" class="aic" slot="title">
-              <div class="check-box" :class="{'is-active':item.check}"></div>
-              <div>{{item.studentName}}</div>
+              <div class="aic">
+                <div class="check-box" :class="{'is-active':item.check}"></div>
+                <div class="aic">{{item.studentName}}<span v-if="item.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="item.identityType === 'I02'" class="group-leader-badge">组</span></div>
+              </div>
             </div>
-            <van-icon name="arrow" @click="stuInfo=item;visible=true" style="vertical-align: middle;" />
+            <div class="aic" style="justify-content: flex-end">
+              <div v-if="item.studentNumber" class="fs15 grey6 mgr10">学号: {{item.studentNumber}}</div>
+              <van-icon name="arrow" @click="stuInfo=item;visible=true" style="vertical-align: middle;" />
+            </div>
           </van-cell>
           <div v-if="(!groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent || groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent.length === 0) && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
             <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
@@ -29,9 +34,13 @@
               <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
                   <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
                     <div class="check-box" :class="{'is-active':s.check}"></div>
-                    <div>{{s.studentName}}</div>
+                    <div class="aic">{{s.studentName}}<span v-if="s.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="s.identityType === 'I02'" class="group-leader-badge">组</span></div>
                   </div>
+
+                <div class="aic" style="justify-content: flex-end">
+                  <div v-if="s.studentNumber" class="fs15 grey6 mgr10">学号: {{s.studentNumber}}</div>
                   <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;" />
+                </div>
                 </van-cell>
             </div>
           </div>
@@ -189,6 +198,19 @@
           background-size: contain;
           border: 1px solid transparent;
         }
+      }
+      .class-leader-badge,.group-leader-badge {
+        width: 17px;
+        line-height: 17px;
+        border-radius: 50%;
+        margin-left: 6px;
+        color: #fff;
+        font-size: 10px;
+        background: #F06839;
+        text-align: center;
+      }
+      .group-leader-badge {
+        background: #F0AD39;
       }
       .disabled-mask {
         position: absolute;
