@@ -2,7 +2,7 @@
   <section class="briefing-wrap">
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
-        <div class="fs18" style="color: #000">{{$route.query.title}}完成情况简报</div>
+        <div class="fs18" style="color: #000">{{$route.query.subjectTypeName}}练习{{$route.query.title}}{{new Date()|generateTimeReqestNumber('MMdd')}}完成情况简报</div>
         <div class="info-wrap">
           <div>本次练习班级平均分为<span class="orange">{{info.finshCount>0?(info.totalScore / info.finshCount).toFixed(2):0}}分</span></div>
           <div>最高分为<span class="orange">{{info.maxScore}}分</span></div>

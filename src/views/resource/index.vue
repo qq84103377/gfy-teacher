@@ -23,12 +23,12 @@
         </div>
       </div>
       <div v-if="courseList.length || firstFlag">
-        <van-cell class="fs16" title="微课" is-link @click="goto('/lessonList')"/>
+        <van-cell class="fs16" :title="`微课(${resourceCount.find(v => v.resourceType === 'R01').resourceCount})`" is-link @click="goto('/lessonList')"/>
         <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')"/>
-        <van-cell class="fs16" title="试卷" is-link @click="goto('/examList')"/>
-        <van-cell class="fs16" title="试题" is-link @click="goto('/questionList')"/>
-        <van-cell class="fs16" title="讨论" is-link @click="goto('/discussList')"/>
-        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" title="口语" is-link @click="goto('/spokenList')"/>
+        <van-cell class="fs16" :title="`试卷(${resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" is-link @click="goto('/examList')"/>
+        <van-cell class="fs16" :title="`试题(${resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" is-link @click="goto('/questionList')"/>
+        <van-cell class="fs16" :title="`讨论(${resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" is-link @click="goto('/discussList')"/>
+        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" is-link @click="goto('/spokenList')"/>
       </div>
     </div>
   </section>
@@ -57,6 +57,13 @@
         tchClassCourseInfo: [],
         classGrade: '',
         tchCourseInfo:{},
+        resourceCount:[
+          {resourceType:'R01',resourceCount:0},
+          {resourceType:'R02',resourceCount:0},
+          {resourceType:'R03',resourceCount:0},
+          {resourceType:'R04',resourceCount:0},
+          {resourceType:'R08',resourceCount:0},
+        ],
         firstFlag: true
       }
     },
@@ -72,8 +79,9 @@
         this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,courseName}})
 
       },
-      selectCourse(tchCourseInfo, index) {
+      selectCourse(tchCourseInfo, index, resourceCount) {
         this.tchCourseInfo = tchCourseInfo
+        this.resourceCount = resourceCount
         this.index = index
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
@@ -125,6 +133,7 @@
             this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
             if (!this.courseName) {
               this.tchCourseInfo = this.courseList[0].tchCourseInfo
+              this.resourceCount = this.courseList[0].resourceCount
               //首次取第一条课程的信息
               this.courseName = this.courseList[0].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId

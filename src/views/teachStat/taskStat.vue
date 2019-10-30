@@ -17,7 +17,10 @@
         </div>
         <div class="mgt10">
           <div class="echart-label">学生任务完成情况</div>
-          <div class="fs10 grey9 mgt5">（需要查看更加详细的数据，请登录PC端）</div>
+          <div class="fs10 grey9 mgt5 aic jcsb">
+            <span>（需要查看更加详细的数据，请登录PC端）</span>
+            <i @click="exportExcel" class="iconGFY icon-download-blue"></i>
+          </div>
           <div v-if="stuStatInfo.statAccountList.length">
             <div class="stat-table">
               <div class="col">
@@ -231,7 +234,8 @@
   } from '@/api/index'
   import echarts from "echarts";
   import {mutualType} from '@/utils/filter'
-
+  import Blob from '@/utils/excel/Blob'
+  import {export_json_to_excel} from '@/utils/excel/Export2Excel'
   export default {
     name: "taskStat",
     data() {
@@ -245,7 +249,12 @@
         showMutual: false,
         mutualInfoList: [],
         classStatList: [],
-        personStatList: []
+        personStatList: [],
+        tableData: [
+          {'index':'0',"nickName": "沙滩搁浅我们的旧时光", "name": "小明"},
+          {'index':'1',"nickName": "女人天生高贵", "name": "小红"},
+          {'index':'2',"nickName": "海是彩色的灰尘", "name": "小兰"}
+        ]
       }
     },
     computed: {
@@ -272,6 +281,20 @@
       this.init()
     },
     methods: {
+      exportExcel() {
+        require.ensure([], () => {
+          const tHeader = ['序号', '昵称', '姓名'];
+          // 上面设置Excel的表格第一行的标题
+          const filterVal = ['index', 'nickName', 'name'];
+          // 上面的index、nickName、name是tableData里对象的属性
+          const list = this.tableData;  //把data里的tableData存到list
+          const data = this.formatJson(filterVal, list);
+          export_json_to_excel(tHeader, data, '列表excel');
+        })
+      },
+      formatJson(filterVal, jsonData) {
+        return jsonData.map(v => filterVal.map(j => v[j]))
+      },
       handleShowItem() {
         if (this.$parent.classIndex > 0 && this.filterParams.subjectType) {
           const item = JSON.parse(localStorage.classMap)[this.$parent.classIndex].teacherInfoList.find(v => v.subjectType === this.filterParams.subjectType)

@@ -7,7 +7,7 @@
           <van-pull-refresh v-model="refLoad" @refresh="onRefresh">
             <van-list v-model="listLoad" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
               <div v-for="(item,index) in list" :key="index" class="list-wrap" :class="{active:item.tchCourseInfo.tchCourseId == tchCourseId}">
-                <list-item @clickTo="selectCourse(item.tchCourseInfo,index)" :fold="item.fold" class="mgt10" style="background: #fff;"  :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" >
+                <list-item @clickTo="selectCourse(item.tchCourseInfo,index,item.resourceCount)" :fold="item.fold" class="mgt10" style="background: #fff;"  :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" >
                   <div v-if="item.tchCourseInfo.tchClassCourseInfo.length>2" @click="$set(item,'fold',!item.fold)" slot="btn" class="fs10" style="text-align: right"><i class="iconGFY icon-ellipsis"></i></div>
                 </list-item>
               </div>
@@ -56,8 +56,8 @@
         },
       },
       methods:{
-        selectCourse(tchCourseInfo,index) {
-          this.$emit('selectCourse',tchCourseInfo,index)
+        selectCourse(tchCourseInfo,index,resourceCount) {
+          this.$emit('selectCourse',tchCourseInfo,index,resourceCount)
           this.$refs['dropdown'].toggle(false)
         },
         onLoad() {
