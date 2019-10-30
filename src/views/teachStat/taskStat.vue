@@ -26,7 +26,7 @@
               <div class="col">
                 <div style="font-weight: bold;">姓名</div>
                 <div v-for="(item,index) in stuStatInfo.statAccountList" :key="index">
-                  {{item.account_no|getStudentName(60)}}
+                  {{item.account_no|getStudentName(item.class_id)}}
                 </div>
               </div>
               <div class="row-wrap">
@@ -233,7 +233,7 @@
     statByPersonal
   } from '@/api/index'
   import echarts from "echarts";
-  import {mutualType} from '@/utils/filter'
+  import {mutualType, getStudentName} from '@/utils/filter'
   import Blob from '@/utils/excel/Blob'
   import {export_json_to_excel} from '@/utils/excel/Export2Excel'
   export default {
@@ -250,11 +250,6 @@
         mutualInfoList: [],
         classStatList: [],
         personStatList: [],
-        tableData: [
-          {'index':'0',"nickName": "沙滩搁浅我们的旧时光", "name": "小明"},
-          {'index':'1',"nickName": "女人天生高贵", "name": "小红"},
-          {'index':'2',"nickName": "海是彩色的灰尘", "name": "小兰"}
-        ]
       }
     },
     computed: {
@@ -283,13 +278,19 @@
     methods: {
       exportExcel() {
         require.ensure([], () => {
-          const tHeader = ['序号', '昵称', '姓名'];
+          let tHeader = ['姓名', '总任务数', '完成总任务数','完成微课程任务数','完成素材任务数','完成试卷任务数','完成讨论任务数','做题正确率','任务完成率'];
+          let filterVal = ['stuName', 'total_count', 'total_finish', 'tv_count', 'T04_count', 'paper_count', 'discuss_count', 'accuracy', 'finish_precent'];
+          if(this.filterParams.subjectType === 'S03') {
+            tHeader.splice(-2,0,'完成口语任务数')
+            filterVal.splice(-2,0,'T13_count')
+          }
           // 上面设置Excel的表格第一行的标题
-          const filterVal = ['index', 'nickName', 'name'];
           // 上面的index、nickName、name是tableData里对象的属性
-          const list = this.tableData;  //把data里的tableData存到list
+          const list = this.stuStatInfo.statAccountList.map(v => {
+            return {...v,accuracy:v.accuracy||0,stuName:getStudentName(v.account_no, v.class_id)}
+          })
           const data = this.formatJson(filterVal, list);
-          export_json_to_excel(tHeader, data, '列表excel');
+          export_json_to_excel(tHeader, data, '学生任务完成情况');
         })
       },
       formatJson(filterVal, jsonData) {
