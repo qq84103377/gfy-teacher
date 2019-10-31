@@ -530,7 +530,7 @@
         console.log("发任务：", obj.discussName)
         this.$store.commit('setResourceInfo', obj)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/addTask?type=discuss_t=new`)
+        this.$router.push(`/addTask?type=discuss&_t=new`)
       },
     }
   }

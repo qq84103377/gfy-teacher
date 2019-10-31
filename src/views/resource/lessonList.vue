@@ -92,17 +92,17 @@ export default {
       console.log("点击");
       if (!item.url) return
 
-      this.checkUrlPermission(item.url,item.coursewareName)
+      this.checkUrlPermission(item)
 
     },
-    checkUrlPermission(url,title) {
+    checkUrlPermission(item) {
       // 课件鉴权
       let permissionParams = {
         'interUser': 'runLfb',
         'interPwd': '25d55ad283aa400af464c76d713c07ad',
         'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
         'belongSchoolId': this.$store.getters.schoolId,
-        'url': url,
+        'url': item.url,
         'sysTypeCd': 'S03'
       }
       this.$store.commit('setVanLoading', true)
@@ -110,26 +110,27 @@ export default {
         this.$store.commit('setVanLoading', false)
         if (respone.flag) {
           if (this.type == 'office' || this.type == 'pdf') {
-            if (url.indexOf('pubquanlang') > -1) {
-              url = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
+            if (item.url.indexOf('pubquanlang') > -1) {
+              item.url = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
 
             } else {
-              url = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
+              item.url = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
             }
           } else {
-            url = respone.data[0].accessUrl
+            item.url = respone.data[0].accessUrl
           }
         } else {
-          url = ''
+          item.url = ''
         }
 
-        if (!url) {
+        if (!item.url) {
           this.$toast('暂无资源')
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: url, title } })
+        this.$router.push({ name: 'videoPage', query: { src: item.url, title: item.coursewareName, isMp3: item.source == "S01" ? true : false } })
       }).catch(() => {
+        this.$store.commit('setVanLoading', false)
         this.$toast('资源错误')
       })
     },

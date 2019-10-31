@@ -1,84 +1,84 @@
 <template>
   <section class="task-detail">
     <van-nav-bar class="task-detail__header" title="任务详情" left-arrow @click-left="$router.go(-2)" />
-      <div class="task-detail__body">
-        <div class="task-detail__body__top">
-          <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
-          <div class="red fs10">您可以把练习分享诶家长，督促学生及时完成练习</div>
-        </div>
-        <div class="task-detail__body__center">
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>名称</div>
-              <div class="ellipsis">{{taskDetail.tastName}}</div>
+    <div class="task-detail__body">
+      <div class="task-detail__body__top">
+        <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
+        <div class="red fs10">您可以把练习分享诶家长，督促学生及时完成练习</div>
+      </div>
+      <div class="task-detail__body__center">
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>名称</div>
+            <div class="ellipsis">{{taskDetail.tastName}}</div>
+          </div>
+        </van-cell>
+        <van-cell v-show="showClass">
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>班级</div>
+            <div>
+              <van-dropdown-menu style="height: 5vw">
+                <van-dropdown-item v-model="currentClassId" :options="optionList" />
+              </van-dropdown-menu>
             </div>
-          </van-cell>
-          <van-cell v-show="showClass">
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>班级</div>
-              <div>
-                <van-dropdown-menu style="height: 5vw">
-                  <van-dropdown-item v-model="currentClassId" :options="optionList" />
-                </van-dropdown-menu>
-              </div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>开始时间</div>
+            <div>{{taskDetail.startDate}}</div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>结束时间</div>
+            <div>{{taskDetail.endDate}}</div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title">
+            <div>描述:</div>
+            <div class="desc" v-if="taskDetail.desc">{{taskDetail.desc}}</div>
+            <div class="desc" v-else>无</div>
+          </div>
+        </van-cell>
+      </div>
+      <div class="task-detail__body__center">
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>类型</div>
+            <div>{{taskDetail.tastType|dealType(taskTypeList)}}</div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>题量</div>
+            <div>{{examCount}}道</div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title" class="task-detail__body__center__cell">
+            <div>时长</div>
+            <div>{{taskDetail.duration}}分钟</div>
+          </div>
+        </van-cell>
+        <van-cell>
+          <div slot="title">
+            <div class="task-detail__body__center__cell">
+              <div>备注:</div>
+              <div class="fs10 red">{{200 - remark.length}}</div>
             </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>开始时间</div>
-              <div>{{taskDetail.startDate}}</div>
-            </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>结束时间</div>
-              <div>{{taskDetail.endDate}}</div>
-            </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title">
-              <div>描述:</div>
-              <div class="desc" v-if="taskDetail.desc">{{taskDetail.desc}}</div>
-              <div class="desc" v-else>无</div>
-            </div>
-          </van-cell>
-        </div>
-        <div class="task-detail__body__center">
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>类型</div>
-              <div>{{taskDetail.tastType|dealType(taskTypeList)}}</div>
-            </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>题量</div>
-              <div>{{examCount}}道</div>
-            </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title" class="task-detail__body__center__cell">
-              <div>时长</div>
-              <div>{{taskDetail.duration}}分钟</div>
-            </div>
-          </van-cell>
-          <van-cell>
-            <div slot="title">
-              <div class="task-detail__body__center__cell">
-                <div>备注:</div>
-                <div class="fs10 red">{{200 - remark.length}}</div>
-              </div>
-              <textarea rows="1" maxlength="200" v-model="remark" placeholder="请输入描述，字数在200字内"></textarea>
-            </div>
+            <textarea rows="1" maxlength="200" v-model="remark" placeholder="请输入描述，字数在200字内"></textarea>
+          </div>
 
-          </van-cell>
-        </div>
+        </van-cell>
       </div>
-      <div class="task-detail__footer">
-        <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
-        <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
-      </div>
-      <share-bar :show.sync="shareBarShow"></share-bar>
+    </div>
+    <div class="task-detail__footer">
+      <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
+      <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
+    </div>
+    <share-bar :show.sync="shareBarShow" :title="'新任务--'+taskDetail.tastName" :link="link"></share-bar>
   </section>
 </template>
 
@@ -106,6 +106,11 @@ export default {
   mounted() {
     console.log("任务类型", this.taskTypeList)
     this.initTaskDetail()
+  },
+  computed: {
+    link() {
+      return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+    }
   },
   methods: {
     initTaskDetail() {
