@@ -28,12 +28,15 @@
           <span>库存：</span>{{goodsInfo.mallGoodsStockInfo.convertNumber}}/{{goodsInfo.mallGoodsStockInfo.stockNumber}}
         </div>
       </div>
+      <div class="cuttingLine">
+        继续拖动，查看图文详情
+      </div>
       <div class="remark" v-if="goodsInfo" v-html="goodsInfo.remark"></div>
     </div>
     <div class="goodsDetail-footer" v-if="goodsInfo">
       <div class="count">
         <p>数量：</p>
-        <van-stepper v-model="goodsCount" min="1" max="5" integer :disabled="disabled" />
+        <van-stepper v-model="goodsCount" min="1" max="5" integer :disabled="disabled"/>
       </div>
       <div class="btns">
         <van-button type="primary" icon="star-o" color="#FFFCE0" v-show="!isCollect" @click="collect">收藏</van-button>
@@ -70,8 +73,8 @@
         isCollect: false,
         collectId: 0,
         langCoin: 0,
-        title:'商品详情',
-        disabled:false
+        title: '商品详情',
+        disabled: false
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -102,7 +105,7 @@
       },
       // 监听滚动事件
       scroll(e) {
-        let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        // let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         console.log('滚动距离', e.target.scrollTop)
         this.scrollTop = e.target.scrollTop;
         // 滚动超过200时显示到顶部按钮
@@ -121,9 +124,10 @@
           if (this.scrollTop === 0) {
             clearInterval(timer);
           }
-          setTimeout(()=>{
+          setTimeout(() => {
+            console.log('清除定时器')
             clearInterval(timer);
-          },2000)
+          }, 2000)
         }, 24);
       },
       // 收藏商品
@@ -222,7 +226,8 @@
     },
     created() {
       this.getGoodsDetail(this.$route.params.id);
-      this.langCoin = window.localStorage.getItem('langCoin');
+      let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
+      this.langCoin = counterSummary.langCoin;
 
     }
   }
@@ -235,7 +240,7 @@
     position: relative;
 
     &-header {
-      height: 348px;
+      height: 347px;
       background-color: #eee;
       position: relative;
 
@@ -285,13 +290,13 @@
         > div {
           font-size: 14px;
           border-bottom: 1px solid #F5F6FA;
-          padding: 10px;
+          padding:8px 10px 5px 10px;
 
           .goodsName {
             width: 100%;
-            height: 40px;
+            height: 30px;
             font-size: 14px;
-            line-height: 20px;
+            line-height: 15px;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
@@ -299,6 +304,7 @@
             line-clamp: 2;
             -webkit-box-orient: vertical;
             margin: 10px auto;
+            margin-top: 0;
           }
 
           .price {
@@ -323,6 +329,35 @@
             }
           }
 
+        }
+      }
+
+      .cuttingLine {
+        font-size: 12px;
+        color: #666666;
+        font-weight: 500;
+        text-align: center;
+        position: relative;
+        margin: 30px 10px 0 10px;
+        line-height: 20px;
+
+        &:before {
+          content: '';
+          width: 100px;
+          height: 1px;
+          background-color: #CCCCCC;
+          position: absolute;
+          top: 10px;
+          left: 0;
+        }
+        &:after {
+          content: '';
+          width: 100px;
+          height: 1px;
+          background-color: #CCCCCC;
+          position: absolute;
+          top: 10px;
+          right: 0;
         }
       }
 
@@ -404,8 +439,9 @@
               color: #FAD528;
             }
           }
-          &.van-button--disabled{
-            background-color: rgba(0,0,0,0.5)!important;
+
+          &.van-button--disabled {
+            background-color: rgba(0, 0, 0, 0.5) !important;
             border: none;
           }
         }
