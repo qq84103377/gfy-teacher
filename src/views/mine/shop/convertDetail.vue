@@ -163,7 +163,8 @@
             cancelExchangeApplyGoodsInfo(params).then(res => {
               if (res.flag) {
                 this.$toast.success('取消成功！');
-                this.recordList.splice(index, 1);
+                // this.recordList.splice(index, 1);
+                this.$router.replace('/converseRecord')
               } else {
                 this.$toast.fail(res.msg);
               }
