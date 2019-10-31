@@ -12,12 +12,7 @@
             <span v-show="!hasNew">{{tips}}</span>
           </template>
         </van-cell>
-        <van-cell title="服务条款" is-link>
-        <template slot="title">
-          <span class="custom-title">服务条款  </span>
-          <van-tag type="danger">敬请期待</van-tag>
-        </template>
-        </van-cell>
+        <van-cell title="服务条款" is-link to="/serviceSheet"></van-cell>
       </van-cell-group>
     </div>
     <div class="account-footer">

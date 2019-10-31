@@ -1,55 +1,55 @@
 <template>
   <div class="updatePassword">
-      <van-cell-group>
+    <van-cell-group>
+      <van-field
+        class="telInput"
+        v-model="mobileNo"
+        type="tel"
+        disabled="true"
+        placeholder="请输入原手机号"
+      />
+      <van-field v-model="vailcode" center clearable placeholder="请输入6位验证码">
+        <van-button
+          class="btn-vailcode"
+          v-if="!timer"
+          size="small"
+          slot="button"
+          type="info"
+          :loading="codeBtnLoading"
+          loading-text="获取验证码"
+          @click="getVailCode"
+        >获取验证码
+        </van-button>
+        <van-button
+          class="btn-vailcode"
+          v-else
+          :disabled="disabled"
+          size="small"
+          slot="button"
+          type="info"
+          @click="getVailCode"
+        >{{second}}秒后重新获取
+        </van-button>
+      </van-field>
+      <div class="form-cell">
         <van-field
-          class="telInput"
-          v-model="mobileNo"
-          type="tel"
-          disabled="true"
-          placeholder="请输入原手机号"
+          v-model="newPassword"
+          type="password"
+          @input.native="checkPwd"
+          placeholder="请输入新的登录密码"
         />
-        <van-field v-model="vailcode" center clearable  placeholder="请输入6位验证码">
-          <van-button
-            class="btn-vailcode"
-            v-if="!timer"
-            size="small"
-            slot="button"
-            type="info"
-            :loading="codeBtnLoading"
-            loading-text="获取验证码"
-            @click="getVailCode"
-          >获取验证码
-          </van-button>
-          <van-button
-            class="btn-vailcode"
-            v-else
-            :disabled="disabled"
-            size="small"
-            slot="button"
-            type="info"
-            @click="getVailCode"
-          >{{second}}秒后重新获取
-          </van-button>
-        </van-field>
-        <div class="form-cell">
-          <van-field
-            v-model="newPassword"
-            type="password"
-            @input.native="checkPwd"
-            placeholder="请输入新的登录密码"
-          />
-          <span class="error" v-show="isUnAvailable">长度在6~16位</span>
-        </div>
-        <div class="form-cell">
-          <van-field
-            v-model="comfirmPwd"
-            type="password"
-            @input.native="checkPwd2"
-            placeholder="请再次输入新的登录密码"
-          />
-          <span class="error" v-show="isDifferent">*两次密码不一致</span>
-        </div>
-      </van-cell-group>
+        <span class="error" v-show="isUnAvailable">长度在6~16位</span>
+      </div>
+      <div class="form-cell">
+        <van-field
+          v-model="comfirmPwd"
+          type="password"
+          @input.native="checkPwd2"
+          placeholder="请再次输入新的登录密码"
+        />
+        <span class="error" v-show="isDifferent">两次密码不一致</span>
+      </div>
+    </van-cell-group>
     <div class="tips">
       收不到验证码？请点击<span @click="$router.push('/service')">为您服务</span>咨询
     </div>
@@ -202,11 +202,13 @@
   @deep: ~">>>";
   .updatePassword {
     background-color: #fff;
-    .telInput{
-      @{deep} .van-field__control{
+
+    .telInput {
+      @{deep} .van-field__control {
         color: #333333;
       }
     }
+
     @{deep} .van-button {
       border-radius: 5px;
     }
@@ -214,10 +216,14 @@
     .form-cell {
       position: relative;
 
+      @{deep} .van-field__control {
+        padding-right: 90px;
+      }
+
       span {
         position: absolute;
-        top: 30px;
-        left: 100px;
+        top: 15px;
+        right: 10px;
         font-size: 12px;
 
         &.error {

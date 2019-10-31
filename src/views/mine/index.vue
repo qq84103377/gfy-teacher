@@ -205,10 +205,10 @@
           requestJson: JSON.stringify(obj)
         }
         getMySchoolInfo(params).then(res => {
-          console.log('getMySchoolInfo', res)
+          // console.log('getMySchoolInfo', res)
           if (res.flag && res.data.length > 0) {
             let schoolList = res.data[0].schoolList;
-            if (schoolList){
+            if (schoolList) {
               let length = schoolList.length;
               this.schoolList = schoolList.map(item => {
                 return item.schoolName
@@ -251,7 +251,7 @@
           requestJson: JSON.stringify(obj)
         }
         getUserCurriculum(params).then(res => {
-          console.log('getUserCurriculum', res)
+          // console.log('getUserCurriculum', res)
           if (res.flag && res.data.length > 0) {
             this.taskNum = res.data[0].counterValue;
             this.courseNum = res.data[1].counterValue;
@@ -259,7 +259,7 @@
         })
       },
 
-      // 获取郎币和等级
+      // 获取郎币和等级和积分
       getUserCounterSummary() {
         let obj = {
           interUser: "runLfb",
@@ -273,11 +273,19 @@
           requestJson: JSON.stringify(obj)
         }
         getUserCounterSummary(params).then(res => {
-          console.log('getUserCounterSummary', res)
+          // console.log('getUserCounterSummary', res)
+          var integer = 0;
           if (res.flag && res.data.length > 0) {
             let counterDataArray = res.data[0].UserCounterSummary.userCounter;
             for (var i = 0; i < counterDataArray.length; i++) {
-              if (counterDataArray[i].counterType == "U03") {
+              if (counterDataArray[i].counterType == "U01") {
+                // 积分
+                integer =
+                  counterDataArray[i].counterValue == null
+                    ? 0
+                    : counterDataArray[i].counterValue;
+                // window.localStorage.setItem('integer', integer);
+              } else if (counterDataArray[i].counterType == "U03") {
                 // 等级
                 this.level =
                   counterDataArray[i].counterValue == null
@@ -289,13 +297,18 @@
                   counterDataArray[i].counterValue == null
                     ? 0
                     : counterDataArray[i].counterValue;
-                window.localStorage.setItem('langCoin', this.langCoin);
+                // window.localStorage.setItem('langCoin', this.langCoin);
               }
             }
           } else {
             this.level = 0;
             this.langCoin = 0;
           }
+          let obj = {
+            langCoin:this.langCoin,
+            integer:integer
+          };
+          window.localStorage.setItem('counterSummary', JSON.stringify(obj));
         })
       },
 

@@ -45,8 +45,8 @@
         </van-button>
       </div>
       <div class="form-footer fs10">
-        <span>注册帮助</span>
-        <span class="van-hairline--left" @click="$router.push(`/index`)">随便看看</span>
+        <span @click="$toast.fail('敬请期待')">注册帮助</span>
+        <span class="van-hairline--left" @click="$toast.fail('敬请期待')">随便看看</span>
       </div>
     </div>
   </div>
