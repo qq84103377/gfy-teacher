@@ -5,8 +5,10 @@
       <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
 
-      <video class="video" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
+      <video v-if='!isMp3' class="video" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
       </video>
+
+      <img v-else src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="">
 
       <div class="video_control" data-way='0' v-show='isShowControl' v-if='!isFullscreen'>
         <div class="progress">
@@ -122,7 +124,8 @@ export default {
       isLandscape: false,
       showMore: false,
       isMove: false,
-      isIphone: false
+      isIphone: false,
+      isMp3: this.$route.query.isMp3
     }
   },
   computed: {

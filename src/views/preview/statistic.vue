@@ -67,7 +67,6 @@
           <!-- <video v-if="type === 'mp4'" controls="controls"
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video> -->
           <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
-
           </video>
           <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio>
           <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl" :src="wareDetail.courseware.srcUrl" />
@@ -1178,7 +1177,10 @@ export default {
       }
 
       > img,
-      > video,
+      > video {
+        width: 100%;
+        // height: 350px;
+      }
       > iframe {
         width: 100%;
         height: 350px;
