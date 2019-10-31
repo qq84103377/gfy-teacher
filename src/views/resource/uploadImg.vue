@@ -19,7 +19,7 @@
           </div>
           <draggable class="img-group" v-model="imgList" :options="{handle:'.img-group-item'}">
             <div class="img-group-item" v-for="(item,index) in imgList" :key="index">
-              <img :src="item.src" alt="">
+              <img @click="previewImg(index)" :src="item.src" alt="">
               <div class="img-group-item__name" v-if="!item.edit" @click="changeName(item)">{{item.name}}</div>
               <div class="img-group-item__input" v-if="item.edit"><input @blur="$set(item,'edit',false)" maxlength="20"
                                                                          v-model="item.name" v-focus="item.edit"
@@ -84,6 +84,7 @@
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
   import {addCourseWare, createCourseSummitInfo, createCourseSummitInfoList, addTeachCourseResList} from '@/api/index'
+  import { ImagePreview } from "vant";
 
   export default {
     name: "uploadImg",
@@ -121,6 +122,16 @@
       this.getOSSKey();
     },
     methods: {
+      previewImg(startPosition) {
+        ImagePreview({
+          images: this.imgList.map(v => v.src),
+          startPosition,
+          onClose() {
+            // do something
+            console.log("close");
+          }
+        });
+      },
       showSheet() {
         if (this.imgList.length >= 9) {
           this.$toast('最多上传9张图片!')

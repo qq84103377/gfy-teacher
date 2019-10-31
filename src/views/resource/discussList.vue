@@ -82,7 +82,7 @@
               </div>
               <draggable class="img-group" v-model="imgList" :options="{handle:'.img-group-item'}">
                 <div class="img-group-item" v-for="(item,index) in imgList" :key="index">
-                  <img :src="item.url" alt="">
+                  <img @click="previewImg(index)" :src="item.url" alt="">
                   <van-icon @click="imgList.splice(index, 1)" class="del" name="clear"/>
                 </div>
               </draggable>
@@ -126,6 +126,7 @@
   import {modifyTeachCourseRes, addDiscussInfo, addTeachCourseRes, modifyDiscussInfo} from '@/api/index'
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
+  import { ImagePreview } from "vant";
 
   export default {
     name: "discussList",
@@ -185,6 +186,16 @@
       });
     },
     methods: {
+      previewImg(startPosition) {
+        ImagePreview({
+          images: this.imgList.map(v => v.url),
+          startPosition,
+          onClose() {
+            // do something
+            console.log("close");
+          }
+        });
+      },
       goto(item) {
         this.$router.push({path:`/discussDetail`,query:{data:item}})
       },

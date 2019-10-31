@@ -36,7 +36,7 @@
           </div>
           <div class="img-group">
             <div class="img-wrap" v-for="(item,index) in imgList" :key="index">
-              <img :src="item.url" alt="">
+              <img @click="previewImg(index)" :src="item.url" alt="">
               <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" name="clear"/>
             </div>
           </div>
@@ -100,6 +100,7 @@
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
   import {addCourseWare, createCourseSummitInfo, addImportTask, addTeachCourseRes} from '@/api/index'
+  import { ImagePreview } from "vant";
 
   export default {
     name: "uploadLesson",
@@ -130,6 +131,16 @@
       this.getOSSKey();
     },
     methods: {
+      previewImg(startPosition) {
+          ImagePreview({
+            images: this.imgList.map(v => v.url),
+            startPosition,
+            onClose() {
+              // do something
+              console.log("close");
+            }
+          });
+      },
       createCourseSummitInfo(resourceId) {
         this.form.btnLoading = true
         let obj = {
