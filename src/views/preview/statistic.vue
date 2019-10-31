@@ -147,8 +147,8 @@
       </div>
     </div>
 
-    <div class="statistic-wrap__footer" v-if="$route.query.taskType !== 'T13' && showFooter">
-      <van-button v-if="isTestPaper" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
+    <div class="statistic-wrap__footer" v-if="showFooter">
+      <van-button v-if="$route.query.taskType === 'T13' || isTestPaper" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
         加分/减分
       </van-button>
       <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{subjectTypeName:subjectTypeName,info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
@@ -692,6 +692,8 @@ export default {
         if (res.flag && res.data[0]) {
           if (this.$route.query.taskType === 'T13') {
             res.data[0].studentStatList = res.data[0].examstat
+            //因为口语没有testPaperScore这个字段,只有totalScore字段,跳转到加减分页面时都是统一用到testPaperScore字段
+            res.data[0].testPaperScore = res.data[0].totalScore
           }
           this.taskFinishInfo = res.data[0]
         } else {
