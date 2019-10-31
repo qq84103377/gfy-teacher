@@ -12,7 +12,7 @@
       </div>
       <div class="briefing-wrap__body-ctn-wrap" v-for="(item,index) in scoreSpan" :key="index">
         <div class="fs16">{{item.name}} 共计{{item.stu.length}}人</div>
-        <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{s.name}}{{si < item.stu.length -1 ? '、':''}}</span></div>
+        <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{s|getStudentName($route.query.classId)}}{{si < item.stu.length -1 ? '、':''}}</span></div>
       </div>
     </div>
     <div class="briefing-wrap__footer">
@@ -24,7 +24,7 @@
 <script>
   import shareBar from '../../components/shareBar'
   import {getStudentName} from '@/utils/filter'
-  import {statTaskStat} from '@/api/index'
+  import {statTaskStat, getAppraiseV2} from '@/api/index'
   import * as calculator from '@/utils/calculate'
   export default {
     name: "briefing",
@@ -33,7 +33,8 @@
       return {
         shareBarShow: false,
         scoreSpan: [],
-        info: this.$route.query.info
+        info: this.$route.query.info,
+        appraiseList: this.$route.query.appraise.list,
       }
     },
     computed: {
@@ -45,13 +46,40 @@
       this.$store.commit('setVanLoading',true)
       if(!('cordova' in window)) {
         //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
-       await this.statTaskStat()
+        await this.statTaskStat()
+        if(this.$route.query.testPaperId<=0 && this.$route.query.taskType !== 'T13' && this.$route.query.resourceType !== 'R03') {
+          await this.getAppraise()
+        }
       }
 
       this.init()
       this.$store.commit('setVanLoading',false)
     },
     methods: {
+      async getAppraise() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          classId: this.$route.query.classId,
+          currPage: 1,
+          isAppendMode: true,
+          objectId: this.$route.query.taskId,
+          objectTypeCd: 'A01',
+          pageSize: 9999,
+          praiseType: 1,
+          replyType: 1,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getAppraiseV2(params).then(res => {
+          if (res.flag && res.data[0]) {
+            this.appraiseList = res.data[0].appraiseListInfo
+          } else {
+            this.appraiseList = []
+          }
+        })
+      },
       async statTaskStat() {
         let obj = {
           "interUser": "runLfb",
@@ -87,6 +115,26 @@
             {name: '未提交', stu: []},
             {name: '补做', stu: []},
           ]
+          this.info.studentStatList.forEach(v => {
+            let percent = 0
+            if (this.info.testPaperScore > 0) {
+              // percent = Number((v.score / this.info.testPaperScore).toFixed(2))
+              percent = calculator.div(v.score,this.info.testPaperScore,2)
+            }
+            if (v.endDate) {
+              if(percent >= 1) {
+                this.scoreSpan[0].stu.push(v.accountNo)
+              }
+              if(percent >= 0.8) {
+                this.scoreSpan[1].stu.push(v.accountNo)
+              }
+            } else {
+              this.scoreSpan[2].stu.push(v.accountNo)
+            }
+            if(v.redoTimes > 0) {
+              this.scoreSpan[3].stu.push(v.accountNo)
+            }
+          })
         }else {
           //心得或讨论
           this.scoreSpan = [
@@ -95,39 +143,26 @@
             {name: '未提交', stu: []},
             {name: '补做', stu: []},
           ]
+          this.appraiseList.forEach(v => {
+            if(v.essFlag === '1') {
+              //有加精华
+              this.scoreSpan[0].stu.push(v.appraiseAccountNo)
+            }
+            if(v.praiseList.length) {
+              //有人点赞
+              this.scoreSpan[1].stu.push(v.appraiseAccountNo)
+            }
+            this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t,v) => {
+              t.push(...v.accountNoList)
+              return t
+            },[])
+            this.info.studentStatList.forEach(v => {
+              if(v.redoTimes > 0) {
+                this.scoreSpan[3].stu.push(v.accountNo)
+              }
+            })
+          })
         }
-        this.info.studentStatList.forEach(v => {
-          let percent = 0
-          if (this.info.testPaperScore > 0) {
-            // percent = Number((v.score / this.info.testPaperScore).toFixed(2))
-            percent = calculator.div(v.score,this.info.testPaperScore,2)
-          }
-          if (v.endDate) {
-            if(percent >= 1) {
-              this.scoreSpan[0].stu.push({
-                name: getStudentName(v.accountNo, this.info.classId),
-                accountNo: v.accountNo
-              })
-            }
-            if(percent >= 0.8) {
-              this.scoreSpan[1].stu.push({
-                name: getStudentName(v.accountNo, this.info.classId),
-                accountNo: v.accountNo
-              })
-            }
-          } else {
-            this.scoreSpan[2].stu.push({
-              name: getStudentName(v.accountNo, this.info.classId),
-              accountNo: v.accountNo
-            })
-          }
-          if(v.redoTimes > 0) {
-            this.scoreSpan[3].stu.push({
-              name: getStudentName(v.accountNo, this.info.classId),
-              accountNo: v.accountNo
-            })
-          }
-        })
       },
     },
   }

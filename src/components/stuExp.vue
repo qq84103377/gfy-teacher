@@ -19,7 +19,7 @@
           </div>
           <div style="width: 100%;" v-if="item.videoArr.length">
             <video poster="../assets/img/video-poster.png" class="video-wrap" v-for="(video,index) in item.videoArr" :key="index" style="width: 100%;" controls
-                   :src="video"></video>
+                   controlsList="nodownload" :src="video"></video>
           </div>
           <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]"
                v-if="item.imgArr.length">
