@@ -3,7 +3,7 @@
       <div class="task-detail__body">
         <div class="task-detail__body__top">
           <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
-          <div class="red fs10">您可以把练习分享诶家长，督促学生及时完成练习</div>
+          <div class="red fs10">您可以把练习分享给家长，督促学生及时完成练习</div>
         </div>
         <div class="task-detail__body__center">
           <van-cell>

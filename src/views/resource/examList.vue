@@ -133,7 +133,7 @@
         addExam: {
           show: false,
           title: '',
-          name: '',
+          name: `《${this.$route.query.courseName}》标准测试卷1`,
           difficult: 'D02',
           share: 'S02',
           testPaperId: '',
