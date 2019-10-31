@@ -154,10 +154,10 @@ export default new Router({
           path: '/taskDetail',
           name: 'taskDetail',
           component: () => import('./views/resource/taskDetail.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '任务详情'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '任务详情'
+          // }
         },
         {
           path: '/materialList',
