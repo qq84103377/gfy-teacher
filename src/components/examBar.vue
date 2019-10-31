@@ -154,7 +154,7 @@
         }else {
           //每次点开生成试卷弹窗请求课程列表
           if(this.type === 'error') {
-            this.form.name = `错题集试题${generateTimeReqestNumber()}`
+            this.form.name = `错题集试卷${generateTimeReqestNumber()}`
             this.getClassTeachCourseInfo()
           }else if(this.$route.path === '/questionList') {
             this.form.name = `《${this.$route.query.courseName}》标准测试卷1`

@@ -11,7 +11,7 @@
           <div class="fs16">
             <div class="detail html-img" :class="{'fold':fold}">
               <div style="flex: 1;word-break: break-all">
-                <div v-html="info.title"></div>
+                <div ref="title" v-html="info.title"></div>
                 <div v-if="info.groupExamList.length">
                   <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
                     <div class="mgt10 html-img" v-html="item.title"></div>
@@ -308,6 +308,13 @@
             })
             this.info = res.data[0]
             this.stuArr = stuArr
+            this.$nextTick(() => {
+              //去掉题目内容的audio下载按钮
+              let dom = this.$refs['title'].querySelectorAll('audio')
+              if(dom.length) {
+                dom[0].controlsList="nodownload"
+              }
+            })
             console.log(stuArr, 'dllddldlld');
           } else {
             this.$toast(res.msg)

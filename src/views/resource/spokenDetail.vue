@@ -17,7 +17,10 @@
         <audio controls controlsList="nodownload" :src="item.referenceAnswer"></audio>
         <div class="mgt15">{{index + 1}}、{{item.sentenceContent}}</div>
         <div class="mgt15">{{item.referenceExplain}}</div>
-        <div class="grey6 fs12 mgt15 aic"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.spokenDegree==='D01'?'容易':info.spokenDegree==='D02'?'中等':'困难'}}</div>
+        <div class="grey6 fs12 mgt15 aic jcsb">
+          <div class="aic"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.spokenDegree==='D01'?'容易':info.spokenDegree==='D02'?'中等':'困难'}}</div>
+          <div class="del-btn">移除</div>
+        </div>
       </div>
     </div>
   </section>
@@ -91,6 +94,16 @@
 
       &__cell {
         padding: 10px;
+
+        .del-btn {
+          width: 63px;
+          line-height: 22px;
+          border-radius: 10px;
+          border: 1px solid @blue;
+          color: @blue;
+          font-size: 12px;
+          text-align: center;
+        }
 
         @{deep} .video-js {
           height: 30px !important;

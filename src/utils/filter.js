@@ -33,10 +33,14 @@ let formatSeconds = (s) => {
 };
 
 // 时间戳转换为yyyyMMdd
-let generateTimeReqestNumber = (data=new Date()) => {
+let generateTimeReqestNumber = (data=new Date(),type) => {
   // var date = new Date()
   let d = data
-  return d.getFullYear().toString() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+  if(type==='MMdd') {
+    return pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+  }else {
+    return d.getFullYear().toString() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+  }
 }
 let pad2 = (n) => {
   return n < 10 ? '0' + n : n

@@ -15,9 +15,13 @@
           <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
             <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
               <div class="check-box" :class="{'is-active':s.check}"></div>
-              <div>{{s.studentName}}</div>
+              <div class="aic">{{s.studentName}}<span v-if="s.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="s.identityType === 'I02'" class="group-leader-badge">组</span></div>
             </div>
-            <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;"/>
+
+            <div class="aic" style="justify-content: flex-end">
+              <div v-if="s.studentNumber" class="fs15 grey6 mgr10">学号: {{s.studentNumber}}</div>
+              <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;"/>
+            </div>
           </van-cell>
         </div>
 
@@ -196,7 +200,19 @@
 
       &__group-list {
         background: #fff;
-
+        .class-leader-badge,.group-leader-badge {
+          width: 17px;
+          line-height: 17px;
+          border-radius: 50%;
+          margin-left: 6px;
+          color: #fff;
+          font-size: 10px;
+          background: #F06839;
+          text-align: center;
+        }
+        .group-leader-badge {
+          background: #F0AD39;
+        }
         .check-box {
           flex: 0 0 16px;
           height: 16px;

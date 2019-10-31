@@ -154,10 +154,10 @@ export default new Router({
           path: '/taskDetail',
           name: 'taskDetail',
           component: () => import('./views/resource/taskDetail.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '任务详情'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '任务详情'
+          // }
         },
         {
           path: '/materialList',
@@ -555,6 +555,20 @@ export default new Router({
               },
             },
           ]
+        },
+        {
+          path: '/familyReport',
+          name: 'familyReport',
+          component: () => import('./views/teachStat/familyReport.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '家庭报告'
+          }
+        },
+        {
+          path: '/reportDetail',
+          name: 'reportDetail',
+          component: () => import('./views/teachStat/reportDetail.vue')
         },
         {
           path: '/errorBook',

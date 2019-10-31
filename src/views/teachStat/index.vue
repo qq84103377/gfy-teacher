@@ -181,11 +181,6 @@
       },
       openDatePicker() {
         this.showTime = true
-        // this.$nextTick(() => {
-        //   const dateArr = this.filterTime.start.split('-')
-        //   console.log(this.$refs.datePicker.$children[0].$children[0]);
-        //   // console.log(this.$refs.datePicker.$children[0].$children[0].setValues(dateArr),'====');
-        // })
       },
       openGradePop() {
         this.gradePop = true

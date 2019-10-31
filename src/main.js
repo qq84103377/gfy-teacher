@@ -8,7 +8,7 @@ import VueCropper from "vue-cropper"
 // import fundebugVue from 'fundebug-vue'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
-import VConsole from 'vconsole/dist/vconsole.min.js'
+// import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
@@ -77,7 +77,7 @@ Vue.use(Navigation, {
   router
 })
 Vue.use(VueCropper)
-let vConsole = new VConsole()
+// let vConsole = new VConsole()
 Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)

@@ -14,10 +14,10 @@
             <van-cell title="堂测统计" @click="goInClass('/classStatList')" is-link/>
           </van-collapse-item>
           <van-collapse-item :title="`资源(${currCourse.resourceCount.find(v => v.resourceType === 'R00').resourceCount})`" name="2">
-            <van-cell title="微课" @click="gotoResource('/lessonList')" is-link/>
-            <van-cell title="素材" @click="gotoResource('/materialList')" is-link/>
-            <van-cell title="试卷" @click="gotoResource('/examList')" is-link/>
-            <van-cell title="试题" @click="gotoResource('/questionList')" is-link/>
+            <van-cell :title="`微课(${currCourse.resourceCount.find(v => v.resourceType === 'R01').resourceCount})`" @click="gotoResource('/lessonList')" is-link/>
+            <van-cell :title="`素材(${currCourse.resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" @click="gotoResource('/materialList')" is-link/>
+            <van-cell :title="`试卷(${currCourse.resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" @click="gotoResource('/examList')" is-link/>
+            <van-cell :title="`试题(${currCourse.resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" @click="gotoResource('/questionList')" is-link/>
             <van-cell :title="`讨论(${currCourse.resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" @click="gotoResource('/discussList')" is-link/>
             <van-cell v-if="currentSubjectType === 'S03'" :title="`口语(${currCourse.resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" @click="gotoResource('/spokenList')" is-link/>
           </van-collapse-item>

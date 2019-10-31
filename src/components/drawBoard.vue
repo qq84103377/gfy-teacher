@@ -447,7 +447,8 @@
             },
             pinch(evt) {
               if(_this.isPen||_this.isRubber) return
-              _this.swordEle.scaleX = _this.swordEle.scaleY = initScale * evt.scale;
+              console.log(initScale,evt.scale,evt,'evtevt');
+              _this.swordEle.scaleX = _this.swordEle.scaleY = initScale * evt.zoom;
               _this.scale = _this.swordEle.scaleX
             },
             pressMove: function (evt) {
