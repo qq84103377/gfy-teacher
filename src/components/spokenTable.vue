@@ -6,7 +6,7 @@
       <div class="col" v-if="type == 'statistic'">平均分</div>
       <div class="col ex-width" v-if="type == 'analyse'">学生姓名</div>
       <div class="col" v-if="type == 'analyse' || type == 'personal'">得分</div>
-      <div class="col" v-if="type == 'analyse' || type == 'personal'">学生录音</div>
+<!--      <div class="col" v-if="type == 'analyse' || type == 'personal'">学生录音</div>-->
     </div>
     <div class="scroll-area">
       <div class="row" v-for="(item,index) in list" :key="index">
@@ -16,10 +16,10 @@
         <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage}} ></div>
         <div class="col ex-width" v-if="type == 'analyse'">{{getStudentName(item.accountNo,classId)}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
-        <div class="col" v-if="type == 'analyse' || type == 'personal'">
-          <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>
-          <audio :id="'audio'+ index" :src="item.studentAnswer"></audio>
-        </div>
+<!--        <div class="col" v-if="type == 'analyse' || type == 'personal'">-->
+<!--          <van-icon @click="play(index,item)" class="blue audio-icon" :name="item.play?'pause-circle':'play-circle'"></van-icon>-->
+<!--          <audio :id="'audio'+ index" :src="item.studentAnswer"></audio>-->
+<!--        </div>-->
       </div>
     </div>
   </div>

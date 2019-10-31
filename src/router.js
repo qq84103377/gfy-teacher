@@ -365,6 +365,15 @@ export default new Router({
           }
         },
         {
+          path: '/convertDetail/:id',
+          name: 'convertDetail',
+          component: () => import('./views/mine/shop/convertDetail.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '兑换情况'
+          }
+        },
+        {
           path: '/help',
           name: 'help',
           component: () => import('./views/mine/help.vue'),
@@ -386,10 +395,10 @@ export default new Router({
           path: '/myLangCoin',
           name: 'myLangCoin',
           component: () => import('./views/mine/myLangCoin.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '我的朗币'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '我的朗币'
+          // }
         },
         {
           path: '/myNotice',
@@ -425,6 +434,15 @@ export default new Router({
           meta: {
             isShowHeader: true,
             title: '修改密码'
+          }
+        },
+        {
+          path: '/serviceSheet',
+          name: 'serviceSheet',
+          component: () => import('./views/mine/setting/serviceSheet.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '服务条款'
           }
         },
         {

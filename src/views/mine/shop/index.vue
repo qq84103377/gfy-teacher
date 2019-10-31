@@ -22,6 +22,7 @@
       <div class="item" @click="$router.push('/myLangCoin')">
         <div>{{langCoin}}</div>
         <span>我的朗币</span>
+        <div class="integration">我的积分:{{integer}}</div>
       </div>
     </div>
     <div class="shop-body">
@@ -84,7 +85,7 @@
 
 <script>
   import {getSysDictList} from "@/api/index";
-  import {getGoodsList, getMyCoinInfo} from "@/api/mine";
+  import {getGoodsList, getUserCounterSummary} from "@/api/mine";
 
 
   export default {
@@ -92,6 +93,7 @@
     data() {
       return {
         langCoin: 0,
+        integer: 0,
         checked: false,
         typeList: [],
         loading: false,
@@ -197,31 +199,48 @@
           }
         })
       },
-      // 获取郎币数量
-      // getMyCoinInfo() {
-      //   let obj = {
-      //     interUser: "runLfb",
-      //     interPwd: "25d55ad283aa400af464c76d713c07ad",
-      //     accountNo: this.$store.getters.getUserInfo.accountNo,
-      //     roleType: this.$store.getters.getUserInfo.roleType,
-      //     belongSchoolId: this.$store.getters.schoolId,
-      //     operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-      //     counterTypeList: [{counterType: 'U01'}],
-      //     orginTypeList: [
-      //       {orginType: "O01"},
-      //     ]
-      //
-      //   };
-      //   let params = {
-      //     requestJson: JSON.stringify(obj)
-      //   };
-      //   getMyCoinInfo(params).then(res => {
-      //     console.log('getMyCoinInfo', res);
-      //     if (res.flag && res.data) {
-      //       this.langCoin = res.data[0].countValue;
-      //     }
-      //   })
-      // },
+      // 获取郎币和积分数量
+      getUserCounterSummary() {
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          accountNo: this.$store.getters.getUserInfo.accountNo,
+          roleType: this.$store.getters.getUserInfo.roleType,
+          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+          sysType: 'S01'
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getUserCounterSummary(params).then(res => {
+          if (res.flag && res.data.length > 0) {
+            let counterDataArray = res.data[0].UserCounterSummary.userCounter;
+            for (var i = 0; i < counterDataArray.length; i++) {
+              if (counterDataArray[i].counterType == "U01") {
+                // 积分
+                this.integer =
+                  counterDataArray[i].counterValue == null
+                    ? 0
+                    : counterDataArray[i].counterValue;
+              } else if (counterDataArray[i].counterType == "U10") {
+                //郎币
+                this.langCoin =
+                  counterDataArray[i].counterValue == null
+                    ? 0
+                    : counterDataArray[i].counterValue;
+              }
+            }
+          } else {
+            this.integer = 0;
+            this.langCoin = 0;
+          }
+          let obj = {
+            langCoin: this.langCoin,
+            integer: this.integer
+          }
+          window.localStorage.setItem('counterSummary', JSON.stringify(obj));
+        })
+      },
       goDetail(item) {
         console.log(item);
         this.$router.push(`/goodsDetail/${item.goodsId}`)
@@ -242,8 +261,14 @@
     },
     mounted() {
       this.getSysDictList();
-      // this.getMyCoinInfo();
-      this.langCoin = window.localStorage.getItem('langCoin');
+      // 没有存积分和朗币信息时重新调接口获取
+      if (window.localStorage.getItem('counterSummary')) {
+        let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
+        this.integer = counterSummary.integer;
+        this.langCoin = counterSummary.langCoin;
+      } else {
+        this.getUserCounterSummary();
+      }
 
     }
   }
@@ -267,9 +292,11 @@
 
       .item {
         text-align: center;
+        width: 33.3%;
+        border-left: 1px solid #F5F6FA;
 
         div {
-          width: 70px;
+          /*width: 70px;*/
           height: 44px;
           line-height: 44px;
           color: #39F0DD;
@@ -278,6 +305,20 @@
           border-radius: 22px;
           text-align: center;
           margin: 0 auto;
+
+          &.integration {
+            font-size: 10px;
+            color: #D9A402;
+            height: 17px;
+            line-height: 15px;
+            background-color: #FFFDC7;
+            border-radius: 8px;
+            /*width: unset;*/
+            padding: 0 10px;
+            margin: 5px;
+            border: 1px solid #FFCA28;
+            box-sizing: border-box;
+          }
 
           img {
             display: block;
@@ -297,12 +338,14 @@
 
     &-body {
       padding: 10px;
-      @{deep} .van-sticky--fixed{
+
+      @{deep} .van-sticky--fixed {
         background-color: #fff;
         border-bottom: 1px solid #f5f6f5;
         padding: 0 10px;
         top: 44px;
       }
+
       &_title {
         display: flex;
         justify-content: space-between;

@@ -32,10 +32,12 @@
           </van-collapse-item>
         </van-collapse>
       </van-collapse-item>
-      <van-collapse-item title="功能使用" name="2">
-<!--        <van-cell class="fs14" v-for="item in usageData" :title="item.title" is-link :to="item.url"/>-->
-        <div style="text-align: center;padding: 10px">敬请期待</div>
-      </van-collapse-item>
+      <div  @click="showTips">
+        <van-collapse-item title="功能使用" name="2">
+          <!--        <van-cell class="fs14" v-for="item in usageData" :title="item.title" is-link :to="item.url"/>-->
+        </van-collapse-item>
+      </div>
+
       <van-collapse-item title="朗币使用说明" name="3">
         <van-collapse v-model="activeName3" accordion>
           <van-collapse-item title="什么是朗币？" name="31">
@@ -87,6 +89,11 @@
           {title:'智能补强',url:''}
         ]
       };
+    },
+    methods:{
+      showTips(){
+        this.$toast.fail('敬请期待')
+      }
     }
   }
 </script>

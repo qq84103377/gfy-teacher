@@ -3,7 +3,7 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn" v-if="canSelect">选择其他</div>
+    <div class="select-btn"  @click="$toast.fail(`敬请期待`)" v-if="canSelect">选择其他</div>
     <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务':'生成试卷'}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
@@ -154,7 +154,7 @@
         }else {
           //每次点开生成试卷弹窗请求课程列表
           if(this.type === 'error') {
-            this.form.name = `错题集试题${generateTimeReqestNumber()}`
+            this.form.name = `错题集试卷${generateTimeReqestNumber()}`
             this.getClassTeachCourseInfo()
           }else if(this.$route.path === '/questionList') {
             this.form.name = `《${this.$route.query.courseName}》标准测试卷1`

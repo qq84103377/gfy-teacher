@@ -6,7 +6,7 @@
         left-arrow>
       </van-nav-bar>
       <div class="spoken-analyse__topic" v-if="$route.params.type == 'analyse'">{{info[index].splitSentence.sentenceContent}}</div>
-     <div class="play-all-wrap" v-if="$route.params.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>
+<!--     <div class="play-all-wrap" v-if="$route.params.type == 'personal'"> <div class="play-all" :class="{'is-play':isPlay}" @click="playAll">{{isPlay?'停止播放':'播放全部'}}</div></div>-->
       <div class="spoken-analyse__body">
         <spoken-table @play="isPlay = false" ref="spoken" :classId="$route.params.classId" :type="$route.params.type" :list="$route.params.type === 'personal'?info:info[index].splitInfoStudentAnswers"></spoken-table>
       </div>

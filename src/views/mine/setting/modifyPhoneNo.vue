@@ -149,7 +149,7 @@
             this.mobileNo = this.phoneNo.substr(0, 3) + '****' + this.phoneNo.substr(this.phoneNo.length - 4);
             this.$store.commit("setUserInfo", res.data[0].usrInfo);
             setTimeout(() => {
-              this.$router.push('/setting')
+              this.$router.replace('/setting')
             }, 1000)
           } else {
             this.$toast.fail(res.msg);

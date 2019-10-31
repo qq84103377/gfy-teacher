@@ -82,8 +82,6 @@ export const getGoodsList = (params) => {
   return axios.post('mall/getMallGoodsInfoForSchool.action', qs.stringify(params))
 }
 
-
-
 // 获取收藏记录
 export const getCollectInfo = (params) => {
   return axios.post('mall/getMallCollectInfo.action', qs.stringify(params))
@@ -107,6 +105,21 @@ export const cancelMallCollectInfo = (params) => {
 // 兑换商品
 export const addExchangeApplyGoodsInfo = (params) => {
   return axios.post('mall/addExchangeApplyGoodsInfo', qs.stringify(params))
+}
+
+// 删除兑换记录
+export const delExchangeApplyGoodsInfo = (params) => {
+  return axios.post('mall/delExchangeApplyGoodsInfo', qs.stringify(params))
+}
+
+// 查询商品兑换详情
+export const getMallConvertRecordInfoById = (params) => {
+  return axios.post('mall/getMallConvertRecordInfoById', qs.stringify(params))
+}
+
+// 取消兑换商品
+export const cancelExchangeApplyGoodsInfo = (params) => {
+  return axios.post('mall/cancelExchangeApplyGoodsInfo', qs.stringify(params))
 }
 
 

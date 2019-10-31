@@ -236,6 +236,7 @@
   import {mutualType, getStudentName} from '@/utils/filter'
   import Blob from '@/utils/excel/Blob'
   import {export_json_to_excel} from '@/utils/excel/Export2Excel'
+
   export default {
     name: "taskStat",
     data() {
@@ -276,21 +277,108 @@
       this.init()
     },
     methods: {
+      //读取文件
+      readFile(fileEntry) {
+        fileEntry.file(function (file) {
+          var reader = new FileReader();
+          reader.onloadend = function () {
+            // alert(this.result);
+          };
+          reader.readAsText(file);
+        }, () => {
+
+        });
+      },
+      //创建并写入文件
+      createAndWriteFile(dataObj) {
+        //持久化数据保存
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
+
+          console.log('打开的文件系统: ' + fs.name);
+          fs.root.getFile("学生任务完成情况.xlsx", {create: true, exclusive: false},
+            (fileEntry) => {
+
+              console.log("是否是个文件？" + fileEntry.isFile.toString());
+              //写入文件
+              this.writeFile(fileEntry, dataObj);
+
+            }, this.onErrorCreateFile);
+
+        }, this.onErrorLoadFs);
+      },
+
+      //将内容数据写入到文件中
+      writeFile(fileEntry, dataObj) {
+        let _this = this
+        //创建一个写入对象
+        fileEntry.createWriter((fileWriter) => {
+
+          //文件写入成功
+          fileWriter.onwriteend = () => {
+            this.$store.commit('setVanLoading',false)
+            console.log("Successful file read...");
+            console.log(fileEntry.toInternalURL(),'fileEntry.toInternalURL()');
+            cordova.plugins.fileOpener2.showOpenWithDialog(
+              fileEntry.toInternalURL(),
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              function onSuccess(data) {
+                console.log("成功预览:" );
+              },
+              function onError(error) {
+                // console.log(
+                //   "出错！请在" +
+                //   cordova.file.externalDataDirectory +
+                //   "目录下查看"
+                // );
+                _this.$toast(`请在${fileEntry.toInternalURL()}目录下查看`)
+              }
+            );
+          };
+
+          //文件写入失败
+          fileWriter.onerror = (e) => {
+            this.$store.commit('setVanLoading',false)
+            console.log("Failed file read: " + e.toString());
+            this.$toast("文件写入失败！")
+          };
+
+          //写入文件
+          fileWriter.write(dataObj);
+        });
+      },
+
+      //文件创建失败回调
+      onErrorCreateFile(error) {
+        this.$store.commit('setVanLoading',false)
+        console.log("文件创建失败！")
+        this.$toast("文件创建失败！")
+      },
+
+      //FileSystem加载失败回调
+      onErrorLoadFs(error) {
+        this.$store.commit('setVanLoading',false)
+        console.log("文件系统加载失败！")
+        this.$toast("文件系统加载失败！")
+      },
+
+
       exportExcel() {
+        this.$store.commit('setVanLoading',true)
         require.ensure([], () => {
-          let tHeader = ['姓名', '总任务数', '完成总任务数','完成微课程任务数','完成素材任务数','完成试卷任务数','完成讨论任务数','做题正确率','任务完成率'];
+          let tHeader = ['姓名', '总任务数', '完成总任务数', '完成微课程任务数', '完成素材任务数', '完成试卷任务数', '完成讨论任务数', '做题正确率', '任务完成率'];
           let filterVal = ['stuName', 'total_count', 'total_finish', 'tv_count', 'T04_count', 'paper_count', 'discuss_count', 'accuracy', 'finish_precent'];
-          if(this.filterParams.subjectType === 'S03') {
-            tHeader.splice(-2,0,'完成口语任务数')
-            filterVal.splice(-2,0,'T13_count')
+          if (this.filterParams.subjectType === 'S03') {
+            tHeader.splice(-2, 0, '完成口语任务数')
+            filterVal.splice(-2, 0, 'T13_count')
           }
           // 上面设置Excel的表格第一行的标题
           // 上面的index、nickName、name是tableData里对象的属性
           const list = this.stuStatInfo.statAccountList.map(v => {
-            return {...v,accuracy:v.accuracy||0,stuName:getStudentName(v.account_no, v.class_id)}
+            return {...v, accuracy: v.accuracy || 0, stuName: getStudentName(v.account_no, v.class_id)}
           })
           const data = this.formatJson(filterVal, list);
-          export_json_to_excel(tHeader, data, '学生任务完成情况');
+          const blob = export_json_to_excel(tHeader, data, '学生任务完成情况');
+          this.createAndWriteFile(blob)
         })
       },
       formatJson(filterVal, jsonData) {
@@ -584,7 +672,7 @@
               },
               data: this.stuStatInfo.taskTypeCount.length ? this.stuStatInfo.taskTypeCount.map(v => {
                 return {value: v.taskTypeCount, name: v.taskTypeName}
-              }) : [{value:0,name:'无数据'}]
+              }) : [{value: 0, name: '无数据'}]
             }
           ],
           // toolbox: {

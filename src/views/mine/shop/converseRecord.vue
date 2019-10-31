@@ -7,31 +7,36 @@
       @load="onLoad"
     >
       <div v-if="recordList.length>0">
-        <div class="item" v-for="item in recordList" @click="$router.push(`/goodsDetail/${item.goodsId}`)">
-          <div class="item-title">
-            <span>{{item.convertDate | formateDate}}</span>
-            <span class="status">{{item.status|getStatus}}</span>
-          </div>
-          <div class="goodsItem">
-            <div class="goodsPic">
-              <img :src="item.goodsPhotoUrl" alt="">
+        <van-swipe-cell v-for="(item,index) in recordList">
+          <div class="item" @click="$router.push(`/convertDetail/${item.recordId}`)">
+            <div class="item-title">
+              <span>{{item.convertDate | formateDate}}</span>
+              <span class="status">{{item.status|getStatus}}</span>
             </div>
-            <div class="goodsInfo">
-              <div class="goodsName">
-                {{item.goodsName}}
+            <div class="goodsItem">
+              <div class="goodsPic">
+                <img :src="item.goodsPhotoUrl" alt="">
               </div>
-              <div class="otherInfo">
-                <div class="price">
-                  <img src="@assets/img/myself-icon-16.png" alt="">
-                  {{item.orginIntegral}}
+              <div class="goodsInfo">
+                <div class="goodsName">
+                  {{item.goodsName}}
                 </div>
-                <div class="count">
-                  x{{item.convertGoodsCount}}
+                <div class="otherInfo">
+                  <div class="price">
+                    <img src="@assets/img/myself-icon-16.png" alt="">
+                    {{item.orginIntegral}}
+                  </div>
+                  <div class="count">
+                    x{{item.convertGoodsCount}}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+          <template slot="right">
+            <van-button square type="danger" text="删除" @click="delRecord(item.recordId,index,item.status)"/>
+          </template>
+        </van-swipe-cell>
       </div>
 
       <div v-else v-show="!loading" class="placeholderImg">
@@ -45,7 +50,7 @@
 </template>
 
 <script>
-  import {getConvertRecordInfo} from "@/api/mine";
+  import {getConvertRecordInfo, delExchangeApplyGoodsInfo} from "@/api/mine";
 
   export default {
     name: "converseRecord",
@@ -98,7 +103,7 @@
           case 'S01' :
             return '申请中';
           case 'S02' :
-            return '邀约中';
+            return '申请中';
           case 'S03' :
             return '兑换成功';
           case 'S04' :
@@ -154,6 +159,46 @@
 
           }
         })
+      },
+      // 删除兑换记录
+      delRecord(id, index, status) {
+        this.$dialog
+          .confirm({
+            title: "",
+            message: "是否删除该兑换记录？",
+            cancelButtonText: "取消",
+            confirmButtonText: "确定",
+            confirmButtonColor: '#39F0DD'
+          })
+          .then(() => {
+            // on confirm
+            if (status == 'S01' || status == 'S02') {
+              this.$toast.fail('申请中的记录无法删除');
+              return;
+            }
+
+            let obj = {
+              interUser: "runLfb",
+              interPwd: "25d55ad283aa400af464c76d713c07ad",
+              convertAccountNo: this.$store.getters.getUserInfo.accountNo,
+              recordId: id
+            };
+            let params = {
+              requestJson: JSON.stringify(obj)
+            };
+            delExchangeApplyGoodsInfo(params).then(res => {
+              if (res.flag) {
+                this.$toast.success('删除成功！');
+                this.recordList.splice(index, 1);
+              } else {
+                this.$toast.fail(res.msg)
+              }
+            })
+          })
+          .catch(() => {
+            // on cancel
+
+          });
       }
     },
     mounted() {
@@ -166,13 +211,24 @@
 
   .record {
     background-color: #F5F6FA;
-    padding: 10px;
+    padding: 10px 0;
+
+    @{deep} .van-swipe-cell {
+      .van-swipe-cell__right {
+        button {
+          height: 100%;
+          background-color: #ccc;
+          color: #fff;
+          border: none;
+        }
+      }
+    }
 
     @{deep} .item {
       background-color: #fff;
       margin-bottom: 10px;
-      border-radius: 10px;
-      overflow: hidden;
+      /*border-radius: 10px;*/
+      /*overflow: hidden;*/
       padding: 0 10px;
 
       &-title {
@@ -201,7 +257,7 @@
           height: 75px;
           border-radius: 5px;
           overflow: hidden;
-          background-color: #ff0;
+          background-color: #ccc;
 
           img {
             width: 100%;

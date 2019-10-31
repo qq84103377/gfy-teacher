@@ -1,12 +1,25 @@
 <template>
   <section class="coin-wrap">
+    <van-sticky>
+      <van-nav-bar title="我的朗币" left-arrow @click-left="$router.replace('/mine')">
+        <div slot="right" class="tips" @click="showTips = true">如何赚取朗币？</div>
+      </van-nav-bar>
+    </van-sticky>
     <div class="coin-wrap-total">
-      <h3>{{langCoin}}</h3>
-      <div @click="showTips = true">如何赚取朗币？</div>
+      <div class="info">
+        <div class="coin">
+          <div>我的朗币</div>
+          <h3>{{langCoin}}</h3>
+        </div>
+        <div class="integer">
+          <div>我的积分</div>
+          <h3>{{integer}}</h3>
+        </div>
+      </div>
     </div>
     <div class="coin-wrap-detail">
       <div class="coin-wrap-detail_title">
-        <h4>郎币明细</h4>
+        <h4>积分明细</h4>
         <div class="line"></div>
       </div>
       <div class="coin-wrap-detail_body">
@@ -43,7 +56,7 @@
     </div>
     <div class="coin-wrap-source">
       <div class="coin-wrap-source_title">
-        <h4>郎币来源</h4>
+        <h4>积分来源</h4>
         <div class="line"></div>
       </div>
       <div class="coin-wrap-source_body">
@@ -65,7 +78,7 @@
     </div>
     <van-popup v-model="showTips" :round="true">
       <div class="title">
-        <h4>如何获取郎币?</h4>
+        <h4>如何获取朗币?</h4>
         <span @click="showTips = false">×</span>
       </div>
       <div class="content">
@@ -80,7 +93,7 @@
 </template>
 
 <script>
-  import {getUserCounterDetailGroupByDay, getMyCoinInfo} from '@/api/mine';
+  import {getUserCounterDetailGroupByDay, getMyCoinInfo, getUserCounterSummary} from '@/api/mine';
 
   export default {
     name: "myLangCoin",
@@ -93,14 +106,15 @@
         pageSize: 10,
         total: 1,
         langCoin: 0,
+        integer: 0,
         showTips: false,
-        coinDetail:{
-          O01:0,    //登录
-          O08:0,    //资源共享
-          O10:0,    //资源收藏
-          O11:0,    //资源创建
-          O12:0,    //资源被使用
-          O44:0,    //上课
+        coinDetail: {
+          O01: 0,    //登录
+          O08: 0,    //资源共享
+          O10: 0,    //资源收藏
+          O11: 0,    //资源创建
+          O12: 0,    //资源被使用
+          O44: 0,    //上课
         }
       }
     },
@@ -171,22 +185,22 @@
             for (let i = 0; i < arrLen; i++) {
               switch (userDetailCount[i].originType) {
                 case 'O01':     //登录
-                  this.coinDetail.O01= userDetailCount[i].counterValue;
+                  this.coinDetail.O01 = userDetailCount[i].counterValue;
                   break;
                 case 'O08':     //资源共享
-                  this.coinDetail.O08= userDetailCount[i].counterValue;
+                  this.coinDetail.O08 = userDetailCount[i].counterValue;
                   break;
                 case 'O10':     //资源收藏
-                  this.coinDetail.O10= userDetailCount[i].counterValue;
+                  this.coinDetail.O10 = userDetailCount[i].counterValue;
                   break;
                 case 'O11':     //资源创建
-                  this.coinDetail.O11= userDetailCount[i].counterValue;
+                  this.coinDetail.O11 = userDetailCount[i].counterValue;
                   break;
                 case 'O12':     //资源被使用
-                  this.coinDetail.O12= userDetailCount[i].counterValue;
+                  this.coinDetail.O12 = userDetailCount[i].counterValue;
                   break;
                 case 'O44':     //上课
-                  this.coinDetail.O44= userDetailCount[i].counterValue;
+                  this.coinDetail.O44 = userDetailCount[i].counterValue;
                   break;
 
               }
@@ -194,10 +208,47 @@
             }
           }
         })
-      }
+      },
+      // 获取积分
+      getUserCounterSummary() {
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          accountNo: this.$store.getters.getUserInfo.accountNo,
+          roleType: this.$store.getters.getUserInfo.roleType,
+          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+          sysType: 'S01'
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getUserCounterSummary(params).then(res => {
+          if (res.flag && res.data.length > 0) {
+            let counterDataArray = res.data[0].UserCounterSummary.userCounter;
+            for (var i = 0; i < counterDataArray.length; i++) {
+              if (counterDataArray[i].counterType == "U01") {
+                // 积分
+                this.integer =
+                  counterDataArray[i].counterValue == null
+                    ? 0
+                    : counterDataArray[i].counterValue;
+              }
+            }
+          } else {
+            this.integer = 0;
+          }
+        })
+      },
     },
     created() {
       this.getMyCoinInfo();
+      // 没有存积分信息时重新调接口获取
+      if (window.localStorage.getItem('counterSummary')) {
+        let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
+        this.integer = counterSummary.integer;
+      } else {
+        this.getUserCounterSummary();
+      }
       // this.getUserCounterDetailGroupByDay()
     }
 
@@ -217,25 +268,33 @@
     &-total {
       height: 120px;
       background-color: #fff;
-      padding: 30px;
+      background: url("../../assets/img/bg-1.png") no-repeat 0 0;
+      background-size: cover;
+      overflow: hidden;
 
-      h3 {
-        font-size: 30px;
-        color: #39F0DD;
-        font-weight: 500;
-        text-align: center;
-      }
-
-      div {
-        width: 120px;
-        height: 21px;
-        text-align: center;
+      .info {
+        color: #fff;
+        margin-top: 36px;
         font-size: 12px;
-        color: #666666;
-        border: 1px solid #39F0DD;
-        border-radius: 10px;
-        margin: 10px auto;
-        line-height: 21px;
+        display: flex;
+        overflow: hidden;
+
+        h3 {
+          font-size: 16px;
+          font-weight: 500;
+        }
+
+        .coin {
+          flex: 1;
+          padding-left: 118px;
+          box-sizing: border-box;
+        }
+
+        .integer {
+          flex: 1;
+          padding-left: 5px;
+          box-sizing: border-box;
+        }
       }
     }
 

@@ -15,12 +15,12 @@
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
-      <div class="statistic-wrap__achievement" v-if="isTestPaper">
+      <div class="statistic-wrap__achievement" v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">
         <div class="statistic-wrap__achievement-label divider">全班成绩概况:</div>
         <div class="statistic-wrap__achievement-score">
           <div>
             <span>班级平均分</span>
-            <span class="red">{{taskFinishInfo.finshCount>0?(taskFinishInfo.totalScore / taskFinishInfo.finshCount).toFixed(2):0}}分</span>
+            <span class="red">{{taskFinishInfo.finshCount>0?parseFloat((taskFinishInfo.totalScore / taskFinishInfo.finshCount).toFixed(2)):0}}分</span>
           </div>
           <div>
             <span>班级最高分</span>
@@ -146,11 +146,11 @@
       </div>
     </div>
 
-    <div class="statistic-wrap__footer" v-if="$route.query.taskType !== 'T13' && showFooter">
-      <van-button v-if="isTestPaper" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
+    <div class="statistic-wrap__footer" v-if="showFooter">
+      <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{subjectTypeName:subjectTypeName,info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
         分享报告
       </van-button>
     </div>
@@ -691,6 +691,8 @@ export default {
         if (res.flag && res.data[0]) {
           if (this.$route.query.taskType === 'T13') {
             res.data[0].studentStatList = res.data[0].examstat
+            //因为口语没有testPaperScore这个字段,但是总分是按100分来算的
+            res.data[0].testPaperScore = 100
           }
           this.taskFinishInfo = res.data[0]
         } else {
@@ -882,7 +884,8 @@ export default {
         } else {
           //试卷
           this.taskFinishInfo.paperDataList.forEach((v, i) => {
-            if (v.autoScoring === '1') {
+            if (v.autoScoring === '1' && !v.groupExamList.length) {
+              //客观题并且没有小题时才添加
               objectiveList.push({ ...v, num: i + 1, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present })
             }
             let group = []

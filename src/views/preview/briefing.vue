@@ -3,8 +3,8 @@
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
         <div class="fs18" style="color: #000">{{$route.query.subjectTypeName}}练习{{$route.query.title}}{{new Date()|generateTimeReqestNumber('MMdd')}}完成情况简报</div>
-        <div class="info-wrap">
-          <div>本次练习班级平均分为<span class="orange">{{info.finshCount>0?(info.totalScore / info.finshCount).toFixed(2):0}}分</span></div>
+        <div class="info-wrap" v-if="$route.query.testPaperId>0 || $route.query.taskType === 'T13'">
+          <div>本次练习班级平均分为<span class="orange">{{info.finshCount>0?parseFloat((info.totalScore / info.finshCount).toFixed(2)):0}}分</span></div>
           <div>最高分为<span class="orange">{{info.maxScore}}分</span></div>
           <div>最低分为<span class="orange">{{info.minScore}}分</span></div>
         </div>
@@ -25,18 +25,14 @@
   import shareBar from '../../components/shareBar'
   import {getStudentName} from '@/utils/filter'
   import {statTaskStat} from '@/api/index'
+  import * as calculator from '@/utils/calculate'
   export default {
     name: "briefing",
     components: {shareBar},
     data() {
       return {
         shareBarShow: false,
-        scoreSpan: [
-          {name: '满分(100分)', min: 100, max: 101, stu: []},
-          {name: '80及80分以上', min: 80, max: 101, stu: []},
-          {name: '未提交', stu: []},
-          {name: '补做', stu: []},
-        ],
+        scoreSpan: [],
         info: this.$route.query.info
       }
     },
@@ -51,7 +47,8 @@
         //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
        await this.statTaskStat()
       }
-      this.handleList()
+
+      this.init()
       this.$store.commit('setVanLoading',false)
     },
     methods: {
@@ -69,26 +66,50 @@
         }
         await statTaskStat(params).then(res => {
           if(res.flag) {
+            if (this.$route.query.taskType === 'T13') {
+              res.data[0].studentStatList = res.data[0].examstat
+              //因为口语没有testPaperScore这个字段,但是总分是按100分来算的
+              res.data[0].testPaperScore = 100
+            }
             this.info = res.data[0]
           }else {
             this.$toast(res.msg)
           }
         })
       },
-      handleList() {
+      init() {
+        if(this.$route.query.testPaperId>0 || this.$route.query.taskType === 'T13' || this.$route.query.resourceType === 'R03') {
+          //是试卷
+          this.scoreSpan = [
+            //如果是口语类型,满分字段需要调整
+            {name: `满分(${this.info.testPaperScore}分)`, stu: []},
+            {name: `${calculator.mul(this.info.testPaperScore,0.8,0)}及${calculator.mul(this.info.testPaperScore,0.8,0)}分以上`, stu: []},
+            {name: '未提交', stu: []},
+            {name: '补做', stu: []},
+          ]
+        }else {
+          //心得或讨论
+          this.scoreSpan = [
+            {name: `精华笔记`, stu: []},
+            {name: `点赞笔记`, stu: []},
+            {name: '未提交', stu: []},
+            {name: '补做', stu: []},
+          ]
+        }
         this.info.studentStatList.forEach(v => {
           let percent = 0
           if (this.info.testPaperScore > 0) {
-            percent = Number((v.score / this.info.testPaperScore * 100).toFixed(2))
+            // percent = Number((v.score / this.info.testPaperScore).toFixed(2))
+            percent = calculator.div(v.score,this.info.testPaperScore,2)
           }
           if (v.endDate) {
-            if(percent >= 100) {
+            if(percent >= 1) {
               this.scoreSpan[0].stu.push({
                 name: getStudentName(v.accountNo, this.info.classId),
                 accountNo: v.accountNo
               })
             }
-            if(percent >= 80) {
+            if(percent >= 0.8) {
               this.scoreSpan[1].stu.push({
                 name: getStudentName(v.accountNo, this.info.classId),
                 accountNo: v.accountNo

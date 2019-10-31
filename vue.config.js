@@ -5,7 +5,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-  outputDir: '../cordova-parent/www',
+  // outputDir: 'D:\\gfy\\webapp-teacher-cordova\\platforms\\android\\app\\src\\main\\assets\\www',
   pluginOptions: {
     'style-resources-loader': {
       preProcessor: 'less',

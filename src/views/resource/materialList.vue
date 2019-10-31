@@ -143,8 +143,8 @@
         fileTransfer.onprogress = function(progressEvent) {
           if (progressEvent.lengthComputable) {
             let downloadProgress =
-              (progressEvent.loaded / progressEvent.total).toFixed(2) * 100;
-            console.log("progressEvent", progressEvent);
+              ((progressEvent.loaded / progressEvent.total).toFixed(2) * 100).toFixed(2);
+            console.log(downloadProgress, progressEvent);
             _this.$toast.loading({
               mask: true,
               duration: 0, // 持续展示 toast

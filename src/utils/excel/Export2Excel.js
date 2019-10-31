@@ -140,6 +140,7 @@ export function export_json_to_excel(th, jsonData, defaultTitle) {
   wb.Sheets[ws_name] = ws;
 
   var wbout = XLSX.write(wb, {bookType: 'xlsx', bookSST: false, type: 'binary'});
-  var title = defaultTitle || '列表'
-  saveAs(new Blob([s2ab(wbout)], {type: "application/octet-stream"}), title + ".xlsx")
+  return new Blob([s2ab(wbout)], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
+  // var title = defaultTitle || '列表'
+  // saveAs(new Blob([s2ab(wbout)], {type: "application/octet-stream"}), title + ".xlsx")
 }

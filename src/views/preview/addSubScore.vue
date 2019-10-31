@@ -44,7 +44,7 @@
 <script>
   import {getStudentName} from '@/utils/filter'
   import {saveRewardScore} from '@/api/index'
-
+  import * as calculate from '@/utils/calculate'
   export default {
     name: "addSubScore",
     data() {
@@ -52,15 +52,7 @@
         leftValue: '30%',
         scoreShow: false,
         checkbox: 0,
-        scoreSpan: [
-          {name: '满分100', min: 100, max: 101, stu: []},
-          {name: '90-99分', min: 90, max: 100, stu: []},
-          {name: '80-89分', min: 80, max: 90, stu: []},
-          {name: '70-79分', min: 70, max: 80, stu: []},
-          {name: '60-69分', min: 60, max: 70, stu: []},
-          {name: '60分以下', min: 0, max: 60, stu: []},
-          {name: '未提交', stu: []},
-        ],
+        scoreSpan: [],
       }
     },
     computed: {},
@@ -109,10 +101,33 @@
         })
       },
       handleList() {
+        //口语的总分都按100分来算
+        if(this.$route.params.info.testPaperScore>=20) {
+          //总分不小于20
+          this.scoreSpan = [
+            {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.9,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.99,2))}分`, min: 0.9, max: 1, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.8,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.89,2))}分`, min: 0.8, max: 0.9, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.7,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.79,2))}分`, min: 0.7, max: 0.8, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.69,2))}分`, min: 0.6, max: 0.7, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}分以下`, min: 0, max: 0.6, stu: []},
+            {name: '未提交', stu: []},
+          ]
+        }else {
+          //总分小于20
+          this.scoreSpan = [
+            {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.99,2))}分`, min: 0.6, max: 1, stu: []},
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}分以下`, min: 0, max: 0.6, stu: []},
+            {name: '未提交', stu: []},
+          ]
+        }
+
         this.$route.params.info.studentStatList.forEach(v => {
           let percent = 0
           if (this.$route.params.info.testPaperScore > 0) {
-            percent = Number((v.score / this.$route.params.info.testPaperScore * 100).toFixed(2))
+            // percent = Number((v.score / this.$route.params.info.testPaperScore * 100).toFixed(2))
+            percent = calculate.div(v.score,this.$route.params.info.testPaperScore,2)
           }
           if (v.endDate) {
             const index = this.scoreSpan.findIndex(s => percent >= s.min && percent < s.max)
@@ -121,7 +136,7 @@
               accountNo: v.accountNo
             })
           } else {
-            this.scoreSpan[6].stu.push({
+            this.scoreSpan[this.scoreSpan.length-1].stu.push({
               name: getStudentName(v.accountNo, this.$route.params.info.classId),
               accountNo: v.accountNo
             })
