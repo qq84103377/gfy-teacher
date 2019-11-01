@@ -413,3 +413,11 @@ export const modifySpokenResource =(params)=>{
 export const modifyShareSpokenResource =(params)=>{
   return axios.post('resource/modifyShareSpokenResource', qs.stringify(params))
 }
+//学生任务完成情况
+export const statStuTaskFinishInfo =(params)=>{
+  return axios.post('teach/statStuTaskFinishInfo', qs.stringify(params))
+}
+//成绩趋势分析
+export const getStudentScoreStatistics =(params)=>{
+  return axios.post('counter/getStudentScoreStatistics', qs.stringify(params))
+}

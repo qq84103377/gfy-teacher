@@ -67,8 +67,12 @@ function div(a, b,digit=2) {
   } catch (g) { console.log() }
   c = Number(a.toString().replace('.', ''))
   d = Number(b.toString().replace('.', ''))
-  const result = mul(c / d, Math.pow(10, f - e))
-  return parseFloat(result.toFixed(digit))
+  if(d === 0) {
+    return 0
+  }else {
+    const result = mul(c / d, Math.pow(10, f - e))
+    return parseFloat(result.toFixed(digit))
+  }
 }
 
 export {div,mul,sub,add}
