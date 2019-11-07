@@ -114,11 +114,11 @@ export default new Router({
           name: "spokenAnalyse",
           component: () => import("./views/preview/spokenAnalyse.vue")
         },
-        {
-          path: "/editTask",
-          name: "editTask",
-          component: () => import("./views/preview/editTask.vue")
-        },
+        // {
+        //   path: "/editTask",
+        //   name: "editTask",
+        //   component: () => import("./views/preview/editTask.vue")
+        // },
         {
           path: "/resource",
           name: "resource",

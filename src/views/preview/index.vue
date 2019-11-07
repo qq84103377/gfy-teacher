@@ -94,7 +94,7 @@ export default {
       currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //我的课程跳过来才有的
       scrollTop: 0,
       firstFlag: true,
-      tchCourseInfo:''
+      tchCourseInfo: ''
     }
   },
   mounted() {
@@ -214,7 +214,7 @@ export default {
       this.tchCourseInfo = tchCourseInfo
       this.courseIndex = index
       this.currentTchCourseInfo = tchCourseInfo
-      console.log(this.currentTchCourseInfo,'this.currentTchCourseInfo');
+      console.log(this.currentTchCourseInfo, 'this.currentTchCourseInfo');
       this.$store.commit('setVanLoading', true)
       this.currentPage = 1
       this.classGrade = tchCourseInfo.classGrade
@@ -316,7 +316,7 @@ export default {
           } else {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
             this.tchCourseInfo = this.courseList[0].tchCourseInfo
-            console.log(this.tchCourseInfo,'this.tchCourseInfo!!!!');
+            console.log(this.tchCourseInfo, 'this.tchCourseInfo!!!!');
           }
           this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
           if (page >= res.total) {
@@ -498,7 +498,7 @@ export default {
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
       this.$store.commit("setTaskClassInfo", '')
       this.$router.push({
-        path: '/editTask?_t=new',
+        path: '/addTask?_t=new',
         query: {
           info: item,
           testPaperId: item.testPaperId,
@@ -506,7 +506,8 @@ export default {
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
           taskType: item.taskType,
-          resourceType: item.resourceType
+          resourceType: item.resourceType,
+          isEdit: true
         }
       })
     },
