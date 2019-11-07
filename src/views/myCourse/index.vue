@@ -78,15 +78,15 @@
       methods: {
         goto(item) {
           this.$router.push({path:'/courseDetail',query:{
-              courseName: item.tchCourseInfo.courseName,
+              // courseName: item.tchCourseInfo.courseName,
               tchCourseId: item.tchCourseInfo.tchCourseId,
-              classGrade: item.tchCourseInfo.classGrade,
-              sysCourseId: item.tchCourseInfo.sysCourseId,
-              termType: item.tchCourseInfo.termType,
+              // classGrade: item.tchCourseInfo.classGrade,
+              // sysCourseId: item.tchCourseInfo.sysCourseId,
+              // termType: item.tchCourseInfo.termType,
               fltGrade: this.filterParams.classGrade,
               fltTerm: this.filterParams.termType,
               fltClassId: this.filterParams.classId,
-              currCourse: item
+              // currCourse: item
             }})
         },
         deleteTeachCourse(item, index) {

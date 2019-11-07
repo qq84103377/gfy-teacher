@@ -4,7 +4,7 @@
       :title="(getStudentName(stuList[stuIndex].accountNo,stuList[stuIndex].classId))+'的家庭报告'"
       @click-left="$router.back()"
       left-arrow>
-      <div slot="right" class="fs14 blue" @click="createReport">生成报告</div>
+<!--      <div slot="right" class="fs14 blue" @click="createReport">生成报告</div>-->
     </van-nav-bar>
     <div class="report-detail__tab" ref="tab">
       <div @click="toggleTab(item,index)" :class="['report-detail__tab-item',{'blue':item.active}]"
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="report-detail__body" ref="body">
-      <div ref="container">
+      <div id="screenshot">
         <van-cell v-for="(item,index) in subjectList" :key="index">
           <div slot="title">
             <div @click="selectItem(item,index)" class="aic jcsb">
@@ -153,7 +153,17 @@
     methods: {
       createReport() {
         console.log(this.$refs['body'].scrollTop,'wieieieieie');
-        html2canvas(this.$refs['container'],{
+        // let aa = document.getElementById('screenshot')
+        let aa = document.createElement('div')
+        aa.innerHTML = 'asjdjaksdjkakdjakjsdkasda'
+        aa.style.height = '16380px'
+        aa.style.width = '100%'
+        aa.style.color = 'red'
+        aa.style.fontSize = '80px'
+        aa.style.background = '#fff'
+        aa.id = 'diaoni'
+        document.body.appendChild(aa)
+        html2canvas(aa,{
           type: 'view',
           allowTaint :true,
           backgroundColor: null,
@@ -161,10 +171,12 @@
           x: 0,
           y: 88,
           // width: window.screen.availWidth,
-          // height:this.$refs['container'].scrollHeight,
-          windowWidth: this.$refs['container'].scrollWidth,
-          windowHeight: this.$refs['container'].scrollHeight,
+          // height:this.$refs['screenshot'].scrollHeight,
+          windowWidth: aa.scrollWidth,
+          windowHeight: aa.scrollHeight,
         }).then((canvas) => {
+          document.body.removeChild(document.getElementById('diaoni'))
+          debugger
           // let dataURL = canvas.toDataURL("image/png");
           let imgUri = canvas.toDataURL("image/png")
           this.dataURL = imgUri
