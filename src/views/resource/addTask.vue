@@ -23,7 +23,8 @@
         <div slot="title">
           <div class="add-task__body__cell-ctn mgl5" :class="{grey9:isEdit}">
             <div><span class="red">*</span>{{handleLabel()}}:</div>
-            <span class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
+            <span v-if='!isEdit' class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
+            <span v-if='isEdit' class="pdlt10">{{this.resourceInfo.taskName}}</span>
           </div>
           <van-checkbox class="allow-fast" v-model="form.allowFast" v-show="['lesson'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T02')">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
@@ -53,7 +54,7 @@
       <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)||($route.query.taskType=='T02'||($route.query.taskType=='T04'&&$route.query.testPaperId==0))">
         <div slot="title">
           <div class="add-task__body__cell-ctn" :class="{ccc:form.exam,grey9:isEdit}">
-            <div>心得:</div>
+            <div :class='{mgr10:isEdit}'>心得:</div>
             <van-checkbox v-if='!isEdit' :disabled="testPaperName?true:false" class="comment-check" v-model="form.comment">
               <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked},{'disabled':testPaperName}]"></i>
               学习心得
@@ -266,6 +267,9 @@ export default {
       this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
       this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
       this.form.desc = this.resourceInfo.description
+      this.testPaperName = this.resourceInfo.testPaperName
+      this.form.comment = '1'
+
       // this.form.object = this.resourceInfo.description
       this.resourceInfo.tchClassTastInfo.forEach(ele => {
         if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
