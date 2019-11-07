@@ -319,4 +319,46 @@ const mutualType = type => {
   }
   return value
 }
-export {ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+
+const getTaskTypeName = (tType) => {
+  var task_name = "";
+  if (tType == "T01") {
+    task_name = "微课试卷";
+  } else if (tType == "T02") {
+    task_name = "微课心得";
+  } else if (tType == "T03") {
+    task_name = "测试";
+  } else if (tType == "T04") {
+    task_name = "学资源";
+  } else if (tType == "T05") {
+    task_name = "自测";
+  } else if (tType == "T06") {
+    task_name = "讨论";
+  } else if (tType == "T07") {
+    task_name = "直播课";
+  } else if (tType == "T08") {
+    task_name = "做题";
+  } else if (tType == "T09") {
+    task_name = "白板";
+  } else if (tType == "T10") {
+    task_name = "堂测";
+  } else if (tType == "T11") {
+    task_name = "自主学习";
+  } else if (tType == 'T13') {
+    task_name = "口语评测";
+  } else if (tType == 'T14') {
+    task_name = "游戏关卡";
+  } else if (tType == 'T15') {
+    task_name = "关卡口语评测";
+  } else if (tType == 'T16') {
+    task_name = "练习测试";
+  } else if (tType == 'T17') {
+    task_name = "真题试卷";
+  } else if (tType == 'T18') {
+    task_name = "组卷测试";
+  } else {
+    task_name = "其他";
+  }
+  return task_name;
+}
+export {getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}

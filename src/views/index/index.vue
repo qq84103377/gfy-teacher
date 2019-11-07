@@ -26,7 +26,7 @@
     </div>
     <div class="index-content-wrap__body">
       <van-swipe :autoplay="3000">
-        <van-swipe-item v-for="(image, index) in publishList" :key="index">
+        <van-swipe-item v-if="index<3" v-for="(image, index) in publishList" :key="index">
           <img :src="image.photoUrl" style="width:calc(100%)" />
         </van-swipe-item>
       </van-swipe>

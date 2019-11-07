@@ -8,6 +8,7 @@ import VueCropper from "vue-cropper"
 // import fundebugVue from 'fundebug-vue'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
+import * as calculate from './utils/calculate'
 // import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
@@ -90,6 +91,9 @@ Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
 // fundebugVue(fundebug, Vue)
 Object.keys(myFilter).forEach(key => {
   Vue.filter(key, myFilter[key])
+})
+Object.keys(calculate).forEach(key => {
+  Vue.filter(key, calculate[key])
 })
 Vue.config.productionTip = false
 //

@@ -12,17 +12,23 @@
           <div class="eahcrt-legend-item">学校</div>
         </div>
         <div v-show="!sectionNotEnough" id="myChart1" ref="myChart1" class="radar-chart"></div>
-        <div v-if="sectionNotEnough">章节数据不足</div>
+        <div v-if="sectionNotEnough" class="empty-page">
+          <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+          <div class="grey9 fs12">章节数据不足~</div>
+        </div>
       </div>
       <div>
         <div class="echart-label">知识点掌握情况</div>
         <div v-show="!kwgNotEnough" id="myChart2" ref="myChart2" class="histogram-chart mgt10"></div>
-        <div v-if="kwgNotEnough">知识点数据不足</div>
+        <div v-if="kwgNotEnough" class="empty-page mgb20">
+          <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+          <div class="grey9 fs12">知识点数据不足~</div>
+        </div>
       </div>
     </div>
     <div v-show="!isClass">
       <div class="cell-label">学生列表</div>
-      <van-cell v-for="(item,index) in stuList" :key="index">
+      <van-cell style="overflow: inherit" v-for="(item,index) in stuList" :key="index">
         <div slot="title">
           <div @click="selectStu(item,index)" class="aic jcsb">
             <span :class="{blue:false}">{{item.accountNo|getStudentName(item.classId)}}</span>
@@ -32,16 +38,22 @@
             <div style="position: relative;">
               <div class="echart-label">章节掌握情况</div>
               <div class="eahcrt-legend">
+                <div class="eahcrt-legend-item">个人</div>
                 <div class="eahcrt-legend-item">班级</div>
-                <div class="eahcrt-legend-item">学校</div>
               </div>
               <div v-show="!item.sectionNotEnough" :id="'radar-stu'+index" class="radar-chart"></div>
-              <div v-if="item.sectionNotEnough">章节数据不足</div>
+              <div v-if="item.sectionNotEnough" class="empty-page">
+                <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+                <div class="grey9 fs12">章节数据不足~</div>
+              </div>
             </div>
             <div>
               <div class="echart-label">知识点掌握情况</div>
               <div v-show="!item.kwgNotEnough" :id="'his-stu'+index" class="histogram-chart mgt10"></div>
-              <div v-if="item.kwgNotEnough">知识点数据不足</div>
+              <div v-if="item.kwgNotEnough" class="empty-page">
+                <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+                <div class="grey9 fs12">知识点数据不足~</div>
+              </div>
             </div>
           </div>
         </div>
@@ -52,7 +64,8 @@
 
 <script>
   import echarts from "echarts";
-  import {getUserKnowledgePointCounter} from '@/api/index'
+  import {getUserKnowledgePointCounterV2} from '@/api/index'
+  import * as calculate from '@/utils/calculate'
 
   export default {
     name: "studySituation",
@@ -70,12 +83,7 @@
     watch: {
       filterParams: {
         handler() {
-          if (this.isClass) {
-            this.init()
-          }else {
-            this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
-            this.stuAccountNo = ''
-          }
+          this.handleLoad()
         },
         deep: true,
         immediate: true
@@ -100,11 +108,19 @@
       // this.init()
     },
     methods: {
+      handleLoad() {
+        if (this.isClass) {
+          this.init()
+        } else {
+          this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
+          this.stuAccountNo = ''
+        }
+      },
       toggleTab(bol) {
-        if(this.isClass === bol) return
+        if (this.isClass === bol) return
         this.isClass = bol
-        if(bol) {
-        this.init()
+        if (bol) {
+          this.init()
         }
       },
       selectStu(item, index) {
@@ -113,7 +129,7 @@
         if (this.stuAccountNo !== item.accountNo) {
           this.stuAccountNo = item.accountNo
           this.stuIndex = index
-          this.$nextTick(() =>{
+          this.$nextTick(() => {
             this.init(item.accountNo, index)
           })
         }
@@ -130,12 +146,14 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          beignDate: this.$parent.filterTime.start,
+          endDate: this.$parent.filterTime.end,
           accountNo
         };
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getUserKnowledgePointCounter(params).then(res => {
+        getUserKnowledgePointCounterV2(params).then(res => {
           if (res.flag) {
             let courseList = [],
               courseIdList = [],
@@ -144,16 +162,19 @@
               knowledgeRadar = []
             res.data[0].sectionItemList.forEach(v => {
               const index = courseIdList.findIndex(c => v.courseKnowledgePointItem[0].courseId === c)
+              const otherItem = res.data[0].contrastMapList.find(con => con.courseId === v.courseKnowledgePointItem[0].courseId)
               if (index < 0) {
                 courseIdList.push(v.courseKnowledgePointItem[0].courseId)
                 v['knowledgePointItem'] = [];
                 v['courseAllCount'] = 0;
                 v['courseRightCount'] = 0;
+                v['otherAllCount'] = otherItem.contrastTotalCount||0;
+                v['otherRightCount'] = otherItem.contrastRightCount||0;
                 courseList.push(v)
               }
               courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].knowledgePointItem.push(v.courseKnowledgePointItem[0].knowledgePointItem[0]);
-              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseAllCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].totalCount);
-              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseRightCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].rigthCount);
+              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseAllCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].totalCount || 0);
+              courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].courseRightCount += parseInt(v.courseKnowledgePointItem[0].knowledgePointItem[0].rigthCount || 0);
             })
 
             let xData = [], totalCounts = [], rigthCounts = [], masterys = [], max = 0;
@@ -166,7 +187,9 @@
                   'sessionIndex': obj.sessionIndex,
                   'courseList': [],
                   'sectionAllCount': 0,
-                  'sectionRightCount': 0
+                  'sectionRightCount': 0,
+                  'otherAllCount' : obj.otherAllCount,
+                'otherRightCount' : obj.otherRightCount
                 });
               }
               sessionList[sessionIndexList.indexOf(obj.sessionIndex)].courseList.push(obj);
@@ -185,8 +208,12 @@
             //柱状图
             this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max, index);
 
-
             sessionList.forEach(o => {
+             const otherObj = o.courseList.reduce((t,course) => {
+               t.otherAllCount = calculate.add(course.otherAllCount,t.otherAllCount)
+               t.otherRightCount = calculate.add(course.otherRightCount,t.otherRightCount)
+                return t
+              },{otherAllCount:0,otherRightCount:0})
               let sectionPercent = o.sectionAllCount == 0 ? '0%' : this.toPercent(o.sectionRightCount / o.sectionAllCount);
               knowledgeRadar.push({
                 'sectionName': o.sectionName,
@@ -194,7 +221,8 @@
                 'sessionIndex': o.sessionIndex,
                 'sectionAllCount': o.sectionAllCount,
                 'sectionRightCount': o.sectionRightCount,
-                sectionPercent
+                sectionPercent,
+                otherCountPercent: calculate.div(otherObj.otherRightCount,otherObj.otherAllCount)
               });
             })
             //雷达图
@@ -330,7 +358,6 @@
           tmpSeriesData_value.push(parseFloat(data[d].sectionPercent.replace("%", "")));
         }
         tmpSeriesData.push({value: tmpSeriesData_value, name: ''});
-
         let option = {
           title: {
             text: ''
@@ -339,17 +366,30 @@
           radar: {
             indicator: tmpRadarIndicator
           },
-          series: [{
-            name: '班级',
-            type: 'radar',
-            data: tmpSeriesData,
-            lineStyle: {
-              color: '#39F0DD'
+          series: [
+            {
+              name: this.isClass?'班级':'个人',
+              type: 'radar',
+              data: tmpSeriesData,
+              lineStyle: {
+                color: '#39F0DD'
+              },
+              itemStyle: {
+                borderColor: '#39F0DD'
+              }
             },
-            itemStyle: {
-              borderColor: '#39F0DD'
-            }
-          }]
+            {
+              name: this.isClass?'学校':'班级',
+              type: 'radar',
+              data: [{value:data.map(v => calculate.mul(v.otherCountPercent,100)),name:''}],
+              lineStyle: {
+                color: '#D677EA'
+              },
+              itemStyle: {
+                borderColor: '#D677EA'
+              }
+            },
+          ]
         };
         if (tmpRadarIndicator.length >= 3) {
           if (this.isClass) {
@@ -491,7 +531,7 @@
         }
 
         &.active {
-          background: linear-gradient(0deg,rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
+          background: linear-gradient(0deg, rgba(57, 240, 221, 1), rgba(140, 247, 238, 1));
           color: #fff;
         }
       }

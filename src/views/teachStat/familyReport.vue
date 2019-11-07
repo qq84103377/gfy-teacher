@@ -143,7 +143,8 @@
             filterParams: {
               classGrade: this.gradeSubjectList[this.gradeIndex].classGrade,
               classId: this.classList[this.classIndex].classId,
-              time: ''
+              startDate: this.filterTime.start,
+              endDate: this.filterTime.end,
             }
           }
         })
@@ -230,7 +231,7 @@
           return this.$toast('开始时间不能大于结束时间')
         }
         // if(this.$route.path === '/taskStat') {
-        this.$refs['routerView'].init()
+        // this.$refs['routerView'].init()
         // }
         this.showTime = false
       },
