@@ -180,6 +180,77 @@ export default {
     //   }
     // }
   },
+  watch: {
+    editCourseInfo: {
+      deep: true,
+      handler(newV, oldV) {
+        console.log(newV, "------change");
+
+        this.resetData()
+
+        if (this.isEdit) {
+          console.log("编辑课程信息", this.editCourseInfo);
+          this.form.name = this.editCourseInfo.courseName
+          this.form.desc = this.editCourseInfo.desc
+          this.form.share = this.editCourseInfo.shareType
+
+          let tchClassCourseInfo = this.editCourseInfo.tchClassCourseInfo
+          let classStart = {}
+          let classEnd = {}
+
+          //判断是分班设置还是统一设置
+          let flag = false
+          let start = tchClassCourseInfo[0].startDate
+          let end = tchClassCourseInfo[0].endDate
+          tchClassCourseInfo.forEach(item => {
+            classStart[item.classId] = item.startDate
+            classEnd[item.classId] = item.endDate
+            this.result.push(item.classId)
+            if (start != item.startDate || end != item.endDate) {
+              flag = true
+            }
+
+          });
+
+          if (flag) {
+            this.form.radio = "1"
+            //分班
+            for (let m in this.classMap) {
+              if (classStart[this.classMap[m].classId]) {
+                this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date(classStart[this.classMap[m].classId]))
+              } else {
+                this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+              }
+              if (classEnd[this.classMap[m].classId]) {
+                this.classMap[m]['endDate'] = generateTimeReqestNumber(new Date(classEnd[this.classMap[m].classId]))
+              } else {
+                let now = new Date()
+                now.setDate(now.getDate() + 3)
+                this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+              }
+            }
+
+            let date = new Date()
+            this.form.time1 = generateTimeReqestNumber(date);
+            date.setDate(date.getDate() + 3)
+            this.form.time2 = generateTimeReqestNumber(date)
+          } else {
+            //统一
+            this.form.radio = "2"
+            for (let m in this.classMap) {
+              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+              let now = new Date()
+              now.setDate(now.getDate() + 3)
+              this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+            }
+            this.form.time1 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].startDate))
+            this.form.time2 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].endDate))
+          }
+        } else {
+        }
+      },
+    },
+  },
   components: { courseFilter },
   mounted() {
     //班级信息
@@ -262,6 +333,38 @@ export default {
     //this.getClassTeacherCourseDeploy()
   },
   methods: {
+    resetData() {
+      this.loadingEdit = false
+      this.loadingSubmit = false
+      this.filterShow = false
+      this.showTime = false
+      this.showMask = false
+      this.form = {
+        share: 'S01',
+        desc: '',
+        name: '',
+        course: '',
+        radio: '2',
+        time1: '',
+        time2: '',
+      }
+      // this.sysCourseId = ''
+      // this.sysCourseList = []
+      // this.shareCourseList = []
+      // this.currentShareCourse = {}
+      // this.list = ['a', 'b', 'c']
+      this.result = []
+      // this.currentDate = new Date()
+      // this.minDate = new Date()
+      // this.className = '电话的的的123'
+      // // this.classMap = {}
+      // this.beginDate = []
+      // this.endDate = []
+      // this.timeType = {}
+      // this.currentClassId = ''
+      // this.selectCourseName = ''
+      // this.isSelect = true
+    },
     formatter(type, value) {
       console.log(type)
       if (type === 'year') {

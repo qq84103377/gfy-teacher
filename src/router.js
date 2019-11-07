@@ -110,6 +110,11 @@ export default new Router({
           component: () => import('./views/preview/imgCorrect.vue')
         },
         {
+          path: "/editTask",
+          name: "editTask",
+          component: () => import("./views/preview/editTask.vue")
+        },
+        {
           path: '/spokenAnalyse',
           name: 'spokenAnalyse',
           component: () => import('./views/preview/spokenAnalyse.vue')
@@ -576,9 +581,9 @@ export default new Router({
           component: () => import('./views/teachStat/reportAll.vue')
         },
         {
-          path: '/errorBook',
-          name: 'errorBook',
-          component: () => import('./views/errorBook/index.vue')
+          path: "/errorBook",
+          name: "errorBook",
+          component: () => import("./views/errorBook/index.vue")
         },
         {
           path: '/errorQuestionDetail',
@@ -608,9 +613,9 @@ export default new Router({
       component: () => import('./views/login/forgetPwd.vue')
     },
     {
-      path: '/resetPwd',
-      name: 'resetPwd',
-      component: () => import('./views/login/resetPwd.vue')
-    },
+      path: "/resetPwd",
+      name: "resetPwd",
+      component: () => import("./views/login/resetPwd.vue")
+    }
   ]
 })

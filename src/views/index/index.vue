@@ -12,7 +12,7 @@
           <div style="position: relative;">
             <div class="score-pop-wrap">
               <div class="score-pop-wrap__item" :class="{active: currentSubjectType== value}" v-for="(value, key) in subjectTypeList" :key="key" @click="handleClosePop(key)">{{value}}
-<!--                <van-icon v-show="currentSubjectType== value " class="check blue" name="success" />-->
+                <!--                <van-icon v-show="currentSubjectType== value " class="check blue" name="success" />-->
               </div>
             </div>
             <div class="parent">
@@ -65,7 +65,7 @@
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
                 <span>班级查看</span>
               </div>
-              <div>
+              <div @click="editTask(item)">
                 <i class="iconGFY icon-edit"></i>
                 <span>编辑</span>
               </div>
@@ -150,9 +150,9 @@ export default {
       localStorage.setItem('stat', JSON.stringify(item))
     },
     goto(item) {
-      if(item.testPaperId > 0) {
+      if (item.testPaperId > 0) {
         this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${item.tchCourseClassInfo[0].classGrade}&title=${item.tchCourseClassInfo[0].testPaperName}`)
-      }else if (item.tastType === 'T03'){
+      } else if (item.tastType === 'T03') {
         if (item.resourceType === 'R03') {
           //单道试题
           this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.tastName}`)
@@ -160,7 +160,7 @@ export default {
       } else if (['T13'].includes(item.tastType)) {
         //口语
         this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${item.tchCourseClassInfo[0].sysCourseId}`)
-      } else if (['T02','T04','T06'].includes(item.tastType)) {
+      } else if (['T02', 'T04', 'T06'].includes(item.tastType)) {
         // 学资源 微课+心得 讨论  跳任务统计
         this.viewStat(item)
       }
@@ -549,7 +549,26 @@ export default {
         this.$toast('资源错误')
       })
 
-    }
+    },
+    editTask(item) {
+      return
+      console.log(item, 'editTask  item');
+      this.$store.commit('setResourceInfo', item)
+      this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
+      this.$store.commit("setTaskClassInfo", '')
+      this.$router.push({
+        path: '/editTask?_t=new',
+        query: {
+          info: item,
+          testPaperId: item.testPaperId,
+          termType: this.termType,
+          tchCourseId: item.tchCourseId,
+          taskId: item.taskId,
+          taskType: item.taskType,
+          resourceType: item.resourceType
+        }
+      })
+    },
   }
 }
 
