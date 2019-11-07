@@ -18,7 +18,7 @@
           </div>
           <div class="price">
             <img src="@assets/img/myself-icon-16.png" alt="">
-            {{goodsInfo.discountIntegral}}
+            {{goodsInfo.mallConvertRuleInfo.langcoinNumber}}
           </div>
         </div>
         <div class="otherInfo">
@@ -36,13 +36,14 @@
     <div class="goodsDetail-footer" v-if="goodsInfo">
       <div class="count">
         <p>数量：</p>
-        <van-stepper v-model="goodsCount" min="1" max="5" integer :disabled="disabled"/>
+        <van-stepper v-model="goodsCount" min="1" :max="goodsInfo.mallConvertRuleInfo.limitConvertNumber" integer :disabled="disabled"
+                     @overlimit="overlimit(goodsInfo.mallConvertRuleInfo.limitConvertNumber)"/>
       </div>
       <div class="btns">
         <van-button type="primary" icon="star-o" color="#FFFCE0" v-show="!isCollect" @click="collect">收藏</van-button>
         <van-button type="primary" icon="star" color="#FFFCE0" v-show="isCollect" @click="cancelCollect">取消</van-button>
-        <van-button type="info" @click="convert" :disabled="langCoin<goodsInfo.discountIntegral || disabled">
-          {{langCoin < goodsInfo.discountIntegral ? '朗币不足':'立即兑换'}}
+        <van-button type="info" @click="convert" :disabled="langCoin<goodsInfo.mallConvertRuleInfo.langcoinNumber || disabled">
+          {{langCoin < goodsInfo.mallConvertRuleInfo.langcoinNumber ? '朗币不足':'立即兑换'}}
         </van-button>
       </div>
 
@@ -55,7 +56,7 @@
 </template>
 
 <script>
-  import {getGoodsList, addMallCollectInfo, cancelMallCollectInfo, addExchangeApplyGoodsInfo} from "@/api/mine";
+  import {getGoodsList, addMallCollectInfo, cancelMallCollectInfo, addExchangeApplyGoodsInfo,getUserCounterList} from "@/api/mine";
   import {ImagePreview} from 'vant';
 
   export default {
@@ -193,6 +194,7 @@
           if (res.flag) {
             this.$toast.success('兑换成功');
             this.$router.replace('/converseRecord');
+            this.getUserCounterList();
           } else {
             this.$toast.fail(res.msg)
           }
@@ -223,6 +225,38 @@
           }
         })
       },
+      // 获取积分信息
+      getUserCounterList(){
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          accountNo: this.$store.getters.getUserInfo.accountNo
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getUserCounterList(params).then(res=>{
+          console.log(res,'getUserCounterList')
+          if (res.flag && res.data.length > 0){
+            let integer = res.data[0].counterValue -  res.data[0].convertIntegral;
+            this.langCoin = Math.floor((res.data[0].counterValue -  res.data[0].convertIntegral)/10)
+            let obj = {
+              langCoin:this.langCoin,
+              integer:integer
+            };
+            window.localStorage.setItem('counterSummary', JSON.stringify(obj));
+          }
+        })
+      },
+      // 超出步进器限制
+      overlimit(max){
+        console.log(max)
+        if (max>1){
+          this.$toast.fail('本商品限制兑换1~'+max+'件');
+        } else {
+          this.$toast.fail('本商品限制兑换'+max+'件');
+        }
+      }
     },
     created() {
       this.getGoodsDetail(this.$route.params.id);

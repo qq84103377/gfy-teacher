@@ -24,7 +24,7 @@
                 <div class="otherInfo">
                   <div class="price">
                     <img src="@assets/img/myself-icon-16.png" alt="">
-                    {{item.orginIntegral}}
+                    {{item.orginIntegral/10}}
                   </div>
                   <div class="count">
                     x{{item.convertGoodsCount}}
@@ -110,6 +110,8 @@
             return '兑换失败';
           case 'S05' :
             return '取消兑换';
+          case 'S08' :
+            return '取消兑换确认中';
         }
       }
     },
@@ -144,7 +146,7 @@
           convertAccountNo: this.$store.getters.getUserInfo.accountNo,
           pageSize: this.pageSize,
           currentPage: this.currentPage,
-          statusList: "S01,S02,S03,S05",
+          statusList: "S01,S02,S03,S05,S08",
         }
         let params = {
           requestJson: JSON.stringify(obj)

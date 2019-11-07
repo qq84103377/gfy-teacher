@@ -179,7 +179,7 @@
         getMyCoinInfo(params).then(res => {
           console.log('getMyCoinInfo', res);
           if (res.flag && res.data) {
-            this.langCoin = res.data[0].countValue;
+            // this.langCoin = res.data[0].countValue;
             let userDetailCount = res.data[0].intUserDetailCountResultVo || [];
             var arrLen = userDetailCount.length;
             for (let i = 0; i < arrLen; i++) {
@@ -246,6 +246,7 @@
       if (window.localStorage.getItem('counterSummary')) {
         let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
         this.integer = counterSummary.integer;
+        this.langCoin = counterSummary.langCoin;
       } else {
         this.getUserCounterSummary();
       }
