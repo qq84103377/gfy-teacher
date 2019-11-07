@@ -21,7 +21,7 @@
               <div class="otherInfo">
                 <div class="price">
                   <img src="@assets/img/myself-icon-16.png" alt="">
-                  {{item.discountIntegral}}
+                  {{item.mallConvertRuleInfo.langcoinNumber}}
                 </div>
                 <div class="store">
                   库存：{{item.mallGoodsStockInfo.convertNumber}}/{{item.mallGoodsStockInfo.stockNumber}}
