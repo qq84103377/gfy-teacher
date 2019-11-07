@@ -1,6 +1,7 @@
 <template>
   <section class="in-class-wrap">
-    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId"
+    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName"
+                     :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
                      @selectCourse="selectCourse">
@@ -9,13 +10,19 @@
     </dropdown-header>
     <div class="in-class-wrap__body">
       <div v-if="!courseList.length && !firstFlag" class="empty-page">
-        <img src="../../assets/img/preview/task_null.png" alt />
+        <img src="../../assets/img/preview/task_null.png" alt/>
         <div class="grey9 fs12">当前没有课程,快去新建课程吧！</div>
       </div>
       <div v-if="courseList.length || firstFlag">
-        <van-cell class="fs16" title="讲义" is-link @click="goto('/lectureList')"/>
-        <van-cell class="fs16" title="白板" is-link @click="goto('/boardList')"/>
-        <van-cell class="fs16" title="堂测统计" is-link @click="goto('/classStatList')"/>
+        <van-cell class="fs16"
+                  :title="`讲义(${resourceCount.find(v => v.resourceType === 'R12_C01')?resourceCount.find(v => v.resourceType === 'R12_C01').resourceCount:0})`"
+                  is-link @click="goto('/lectureList')"/>
+        <van-cell class="fs16"
+                  :title="`白板(${resourceCount.find(v => v.resourceType === 'R12_C02')?resourceCount.find(v => v.resourceType === 'R12_C02').resourceCount:0})`"
+                  is-link @click="goto('/boardList')"/>
+        <van-cell class="fs16"
+                  :title="`堂测统计(${resourceCount.find(v => v.resourceType === 'R12_C03')?resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`"
+                  is-link @click="goto('/classStatList')"/>
       </div>
     </div>
   </section>
@@ -45,18 +52,67 @@
         index: 0, //选中的课程index
         classGrade: '',
         termType: '',
-        firstFlag: true
+        firstFlag: true,
+        resourceCount: [
+          {resourceType: 'R12_C01', resourceCount: 0},
+          {resourceType: 'R12_C02', resourceCount: 0},
+          {resourceType: 'R12_C03', resourceCount: 0},
+        ],
       }
     },
     created() {
-      this.$store.commit('setVanLoading',true)
+      this.$store.commit('setVanLoading', true)
       this.dropdownOnLoad()
 
     },
+    activated() {
+      if (this.tchCourseId) {
+        this.getCount(this.tchCourseId)
+      }
+    },
     methods: {
+      getCount(tchCourseIdSelect) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectType": localStorage.getItem("currentSubjectType"),
+          "classGrade": "",
+          "termType": "",
+          "pageSize": "20",
+          "courseType": "C01",
+          "classId": "",
+          "currentPage": 1,
+          tchCourseIdSelect
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeachCourseInfo(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+           this.resourceCount = res.data[0].resourceCount
+          }
+        })
+      },
       goto(path) {
-        const {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,termType} = this
-        this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId,tchClassCourseInfo,classGrade,termType}})
+        const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, termType} = this
+        this.$router.push({path,
+          query: {
+            tchCourseId,
+            sysCourseId,
+            relationCourseId,
+            subjectType,
+            classId,
+            tchClassCourseInfo,
+            classGrade,
+            termType
+          }
+        })
       },
       async changeCourse(type) {
         if (type) {
@@ -91,8 +147,9 @@
           }
         }
       },
-      selectCourse(tchCourseInfo, index) {
+      selectCourse(tchCourseInfo, index, resourceCount) {
         this.index = index
+        this.resourceCount = resourceCount
         this.courseName = tchCourseInfo.courseName
         this.tchCourseId = tchCourseInfo.tchCourseId
         this.sysCourseId = tchCourseInfo.sysCourseId
@@ -115,7 +172,7 @@
         await this.getClassTeachCourseInfo()
         this.$toast('刷新成功')
       },
-      async getClassTeachCourseInfo() {
+      async getClassTeachCourseInfo(tchCourseIdSelect) {
 
         let obj = {
           "interUser": "runLfb",
@@ -130,13 +187,15 @@
           "pageSize": "20",
           "courseType": "C01",
           "classId": "",
-          "currentPage": this.dropdownPage
+          "currentPage": this.dropdownPage,
+          tchCourseIdSelect
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
         await getClassTeachCourseInfo(params).then(res => {
-          this.$store.commit('setVanLoading',false)
+          console.log(res, '课程类表');
+          this.$store.commit('setVanLoading', false)
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
           this.total = res.total
@@ -144,6 +203,7 @@
             this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
             if (!this.courseName) {
               //首次取第一条课程的信息
+              this.resourceCount = this.courseList[0].resourceCount
               this.courseName = this.courseList[0].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
               this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
@@ -180,6 +240,7 @@
       margin-top: 10px;
       flex: 1;
       overflow-y: auto;
+
       .null-tips {
         margin-top: 50px;
         margin-left: 50%;
