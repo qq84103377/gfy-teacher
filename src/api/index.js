@@ -421,3 +421,7 @@ export const statStuTaskFinishInfo =(params)=>{
 export const getStudentScoreStatistics =(params)=>{
   return axios.post('counter/getStudentScoreStatistics', qs.stringify(params))
 }
+//更新已发布任务
+export const modifyCourseTask =(params)=>{
+  return axios.post('teach/modifyCourseTask', qs.stringify(params))
+}
