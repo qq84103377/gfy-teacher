@@ -76,7 +76,7 @@
 </template>
 
 <script>
-  import {getMySchoolInfo, getUserCurriculum, getUserCounterSummary} from '@/api/mine';
+  import {getMySchoolInfo, getUserCurriculum, getUserCounterSummary,getUserCounterList} from '@/api/mine';
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import cropper from "../../components/cropper";
 
@@ -280,10 +280,10 @@
             for (var i = 0; i < counterDataArray.length; i++) {
               if (counterDataArray[i].counterType == "U01") {
                 // 积分
-                integer =
-                  counterDataArray[i].counterValue == null
-                    ? 0
-                    : counterDataArray[i].counterValue;
+                // integer =
+                //   counterDataArray[i].counterValue == null
+                //     ? 0
+                //     : counterDataArray[i].counterValue;
                 // window.localStorage.setItem('integer', integer);
               } else if (counterDataArray[i].counterType == "U03") {
                 // 等级
@@ -293,25 +293,48 @@
                     : counterDataArray[i].counterValue;
               } else if (counterDataArray[i].counterType == "U10") {
                 //郎币
-                this.langCoin =
-                  counterDataArray[i].counterValue == null
-                    ? 0
-                    : counterDataArray[i].counterValue;
+                // this.langCoin =
+                //   counterDataArray[i].counterValue == null
+                //     ? 0
+                //     : counterDataArray[i].counterValue;
                 // window.localStorage.setItem('langCoin', this.langCoin);
               }
             }
           } else {
             this.level = 0;
-            this.langCoin = 0;
+            // this.langCoin = 0;
           }
-          let obj = {
-            langCoin:this.langCoin,
-            integer:integer
-          };
-          window.localStorage.setItem('counterSummary', JSON.stringify(obj));
+          // let obj = {
+          //   langCoin:this.langCoin,
+          //   integer:integer
+          // };
+          // window.localStorage.setItem('counterSummary', JSON.stringify(obj));
         })
       },
 
+      // 获取积分信息
+      getUserCounterList(){
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          accountNo: this.$store.getters.getUserInfo.accountNo
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getUserCounterList(params).then(res=>{
+          console.log(res,'getUserCounterList')
+          if (res.flag && res.data.length > 0){
+            let integer = res.data[0].counterValue -  res.data[0].convertIntegral;
+            this.langCoin = Math.floor((res.data[0].counterValue -  res.data[0].convertIntegral)/10)
+            let obj = {
+              langCoin:this.langCoin,
+              integer:integer
+            };
+            window.localStorage.setItem('counterSummary', JSON.stringify(obj));
+          }
+        })
+      },
       // 点击头像上传图片
       fileSelect() {
         // if ("cordova" in window) {
@@ -419,6 +442,7 @@
       this.getMySchoolInfo();
       this.getUserCurriculum();
       this.getUserCounterSummary();
+      this.getUserCounterList();
     }
   }
 </script>

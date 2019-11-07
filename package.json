@@ -54,6 +54,7 @@
     "chai": "^4.1.2",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "html2canvas": "^1.0.0-rc.5",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
     "script-loader": "^0.7.2",

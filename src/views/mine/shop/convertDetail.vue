@@ -27,7 +27,7 @@
         </span>
           <div class="price">
             <img src="@assets/img/myself-icon-16.png" alt="">
-            {{recordDetail.consumeIntegral}}
+            {{recordDetail.consumeIntegral /10}}
           </div>
         </div>
       </div>

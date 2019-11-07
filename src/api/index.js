@@ -373,7 +373,7 @@ export const statByClass =(params)=>{
 export const statByPersonal =(params)=>{
   return axios.post('teach/statByPersonal', qs.stringify(params))
 }
-//学情-班级
+//学情数据
 export const getUserKnowledgePointCounter =(params)=>{
   return axios.post('counter/getUserKnowledgePointCounter', qs.stringify(params))
 }
@@ -424,4 +424,8 @@ export const getStudentScoreStatistics =(params)=>{
 //更新已发布任务
 export const modifyCourseTask =(params)=>{
   return axios.post('teach/modifyCourseTask', qs.stringify(params))
+}
+//学情数据
+export const getUserKnowledgePointCounterV2 =(params)=>{
+  return axios.post('counter/getUserKnowledgePointCounterV2', qs.stringify(params))
 }

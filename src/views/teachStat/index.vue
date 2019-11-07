@@ -153,9 +153,11 @@
           if (time1.getTime() > time2.getTime()) {
             return this.$toast('开始时间不能大于结束时间')
           }
-          // if(this.$route.path === '/taskStat') {
+          if(this.$route.path === '/taskStat') {
             this.$refs['routerView'].init()
-          // }
+          }else if (this.$route.path === '/studySituation') {
+            this.$refs['routerView'].handleLoad()
+          }
         this.showTime = false
       },
       formatter(type,value){

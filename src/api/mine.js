@@ -16,6 +16,11 @@ export const getUserCounterSummary = (params) => {
   return axios.post('counter/getUserCounterSummary', qs.stringify(params))
 }
 
+// 获取用户的积分信息
+export const getUserCounterList = (params) => {
+  return axios.post('counter/getUserCounterList', qs.stringify(params))
+}
+
 // 获取我的等级/朗币来源明细
 export const getUserCounterDetailGroupByDay = (params) => {
   return axios.post('counter/getUserCounterDetailGroupByDay', qs.stringify(params))

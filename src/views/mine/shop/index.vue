@@ -63,7 +63,6 @@
               <div class="goodsInfo">
                 <div class="price">
                   <img src="@assets/img/myself-icon-16.png" alt="">
-                  <!-- {{item.discountIntegral}} -->
                   {{item.mallConvertRuleInfo.langcoinNumber}}
                 </div>
                 <div class="store">
@@ -183,7 +182,7 @@
           goodsType: this.goodsType,
           schoolIdList: this.$store.getters.schoolIdList,
           redeemType: this.redeemType,
-          limitNumber: this.langCoin
+          limitNumber: this.integer
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -201,47 +200,47 @@
         })
       },
       // 获取郎币和积分数量
-      getUserCounterSummary() {
-        let obj = {
-          interUser: "runLfb",
-          interPwd: "25d55ad283aa400af464c76d713c07ad",
-          accountNo: this.$store.getters.getUserInfo.accountNo,
-          roleType: this.$store.getters.getUserInfo.roleType,
-          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-          sysType: 'S01'
-        }
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        getUserCounterSummary(params).then(res => {
-          if (res.flag && res.data.length > 0) {
-            let counterDataArray = res.data[0].UserCounterSummary.userCounter;
-            for (var i = 0; i < counterDataArray.length; i++) {
-              if (counterDataArray[i].counterType == "U01") {
-                // 积分
-                this.integer =
-                  counterDataArray[i].counterValue == null
-                    ? 0
-                    : counterDataArray[i].counterValue;
-              } else if (counterDataArray[i].counterType == "U10") {
-                //郎币
-                this.langCoin =
-                  counterDataArray[i].counterValue == null
-                    ? 0
-                    : counterDataArray[i].counterValue;
-              }
-            }
-          } else {
-            this.integer = 0;
-            this.langCoin = 0;
-          }
-          let obj = {
-            langCoin: this.langCoin,
-            integer: this.integer
-          }
-          window.localStorage.setItem('counterSummary', JSON.stringify(obj));
-        })
-      },
+      // getUserCounterSummary() {
+      //   let obj = {
+      //     interUser: "runLfb",
+      //     interPwd: "25d55ad283aa400af464c76d713c07ad",
+      //     accountNo: this.$store.getters.getUserInfo.accountNo,
+      //     roleType: this.$store.getters.getUserInfo.roleType,
+      //     operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+      //     sysType: 'S01'
+      //   }
+      //   let params = {
+      //     requestJson: JSON.stringify(obj)
+      //   }
+      //   getUserCounterSummary(params).then(res => {
+      //     if (res.flag && res.data.length > 0) {
+      //       let counterDataArray = res.data[0].UserCounterSummary.userCounter;
+      //       for (var i = 0; i < counterDataArray.length; i++) {
+      //         if (counterDataArray[i].counterType == "U01") {
+      //           // 积分
+      //           this.integer =
+      //             counterDataArray[i].counterValue == null
+      //               ? 0
+      //               : counterDataArray[i].counterValue;
+      //         } else if (counterDataArray[i].counterType == "U10") {
+      //           //郎币
+      //           this.langCoin =
+      //             counterDataArray[i].counterValue == null
+      //               ? 0
+      //               : counterDataArray[i].counterValue;
+      //         }
+      //       }
+      //     } else {
+      //       this.integer = 0;
+      //       this.langCoin = 0;
+      //     }
+      //     let obj = {
+      //       langCoin: this.langCoin,
+      //       integer: this.integer
+      //     }
+      //     window.localStorage.setItem('counterSummary', JSON.stringify(obj));
+      //   })
+      // },
       goDetail(item) {
         console.log(item);
         this.$router.push(`/goodsDetail/${item.goodsId}`)
@@ -260,16 +259,18 @@
         });
       });
     },
-    mounted() {
+    mounted(){
       this.getSysDictList();
+    },
+    activated() {
       // 没有存积分和朗币信息时重新调接口获取
-      if (window.localStorage.getItem('counterSummary')) {
+      // if (window.localStorage.getItem('counterSummary')) {
         let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
         this.integer = counterSummary.integer;
         this.langCoin = counterSummary.langCoin;
-      } else {
-        this.getUserCounterSummary();
-      }
+      // } else {
+      //   this.getUserCounterSummary();
+      // }
 
     }
   }
