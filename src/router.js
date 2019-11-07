@@ -571,6 +571,11 @@ export default new Router({
           component: () => import('./views/teachStat/reportDetail.vue')
         },
         {
+          path: '/reportAll',
+          name: 'reportAll',
+          component: () => import('./views/teachStat/reportAll.vue')
+        },
+        {
           path: '/errorBook',
           name: 'errorBook',
           component: () => import('./views/errorBook/index.vue')

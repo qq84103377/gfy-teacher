@@ -230,6 +230,9 @@
         if (time1.getTime() > time2.getTime()) {
           return this.$toast('开始时间不能大于结束时间')
         }
+        if (time2.getTime() - time1.getTime() > 15552000000) {
+          return this.$toast('时间范围不能超过6个月')
+        }
         // if(this.$route.path === '/taskStat') {
         // this.$refs['routerView'].init()
         // }

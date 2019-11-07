@@ -4,7 +4,7 @@
       :title="(getStudentName(stuList[stuIndex].accountNo,stuList[stuIndex].classId))+'的家庭报告'"
       @click-left="$router.back()"
       left-arrow>
-<!--      <div slot="right" class="fs14 blue" @click="createReport">生成报告</div>-->
+      <div slot="right" class="fs14 blue" @click="viewAll">生成报告</div>
     </van-nav-bar>
     <div class="report-detail__tab" ref="tab">
       <div @click="toggleTab(item,index)" :class="['report-detail__tab-item',{'blue':item.active}]"
@@ -151,6 +151,9 @@
       },
     },
     methods: {
+      viewAll() {
+        this.$router.push(`/reportAll?accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.$route.params.filterParams.classGrade}`)
+      },
       createReport() {
         console.log(this.$refs['body'].scrollTop,'wieieieieie');
         // let aa = document.getElementById('screenshot')
