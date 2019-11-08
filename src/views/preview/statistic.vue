@@ -73,7 +73,7 @@
           <!--      <PDF v-else-if=" type === 'pdf' && info.srcUrl" :url="info.srcUrl"-->
           <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
           <!--      <iframe v-else-if=" type === 'pdf' && info.srcUrl && !vanLoading" :src="info.srcUrl"></iframe>-->
-          <iframe v-else-if=" (type === 'office'||type === 'pdf') && wareDetail.courseware.srcUrl && !vanLoading" :src="wareDetail.courseware.srcUrl"></iframe>
+          <iframe v-else-if=" (type === 'office'||type === 'pdf') && wareDetail.courseware.srcUrl && !loadWareFlag" :src="wareDetail.courseware.srcUrl"></iframe>
 
           <list-item class="mgt10" :itemTitle="wareDetail.courseware.coursewareName">
             <!--            <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img-->
@@ -221,6 +221,7 @@ export default {
       info: JSON.parse(localStorage.getItem('stat')),
       taskFinishInfo: { examstat: [], studentStatList: [], paperDataList: [] },
       remind: false,
+      loadWareFlag: true,
     }
   },
   computed: {
@@ -567,6 +568,7 @@ export default {
           } else {
             this.wareDetail.courseware.srcUrl = respone.data[0].accessUrl
           }
+          this.loadWareFlag = false
         } else {
           this.wareDetail.courseware.srcUrl = ''
         }

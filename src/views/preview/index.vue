@@ -26,7 +26,7 @@
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
                 <span>班级查看</span>
               </div>
-              <div>
+              <div @click="editTask(item)">
                 <i class="iconGFY icon-edit"></i>
                 <span>编辑</span>
               </div>
@@ -93,7 +93,8 @@ export default {
       courseIndex: 0, //选中的课程index
       currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //我的课程跳过来才有的
       scrollTop: 0,
-      firstFlag: true
+      firstFlag: true,
+      tchCourseInfo: ''
     }
   },
   mounted() {
@@ -145,9 +146,9 @@ export default {
       }
     },
     goto(item) {
-      if(item.testPaperId > 0) {
+      if (item.testPaperId > 0) {
         this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
-      }else if (item.taskType === 'T03'){
+      } else if (item.taskType === 'T03') {
         if (item.resourceType === 'R03') {
           //单道试题
           this.$router.push(`/questionDetail?tchCourseId=${this.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
@@ -155,7 +156,7 @@ export default {
       } else if (['T13'].includes(item.taskType)) {
         //口语
         this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${this.sysCourseId}`)
-      } else if (['T02','T04','T06'].includes(item.taskType)) {
+      } else if (['T02', 'T04', 'T06'].includes(item.taskType)) {
         // 学资源 微课+心得 讨论  跳任务统计
         this.viewStat(item)
       }
@@ -210,8 +211,10 @@ export default {
       localStorage.setItem('stat', JSON.stringify(item))
     },
     async selectCourse(tchCourseInfo, index) {
+      this.tchCourseInfo = tchCourseInfo
       this.courseIndex = index
       this.currentTchCourseInfo = tchCourseInfo
+      console.log(this.currentTchCourseInfo, 'this.currentTchCourseInfo');
       this.$store.commit('setVanLoading', true)
       this.currentPage = 1
       this.classGrade = tchCourseInfo.classGrade
@@ -251,7 +254,7 @@ export default {
           this.tchCourseId = this.$route.query.tchCourseId
           this.termType = this.$route.query.termType
         } else {
-          if(this.courseList.length) {
+          if (this.courseList.length) {
             this.courseName = this.courseList[0].tchCourseInfo.courseName
             this.classGrade = this.courseList[0].tchCourseInfo.classGrade
             this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
@@ -272,6 +275,7 @@ export default {
       this.$toast('刷新成功')
     },
     async getClassTeachCourseInfo() {
+      console.log('getClassTeachCourseInfo....');
       const page = this.dropdownPage
       let obj = {
         "interUser": "runLfb",
@@ -311,6 +315,8 @@ export default {
 
           } else {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+            this.tchCourseInfo = this.courseList[0].tchCourseInfo
+            console.log(this.tchCourseInfo, 'this.tchCourseInfo!!!!');
           }
           this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
           if (page >= res.total) {
@@ -485,7 +491,26 @@ export default {
         this.$toast('资源错误')
       })
 
-    }
+    },
+    editTask(item) {
+      console.log(item, 'editTask  item');
+      this.$store.commit('setResourceInfo', item)
+      this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
+      this.$store.commit("setTaskClassInfo", '')
+      this.$router.push({
+        path: '/addTask?_t=new',
+        query: {
+          info: item,
+          testPaperId: item.testPaperId,
+          termType: this.termType,
+          tchCourseId: item.tchCourseId,
+          taskId: item.taskId,
+          taskType: item.taskType,
+          resourceType: item.resourceType,
+          isEdit: true
+        }
+      })
+    },
 
   }
 

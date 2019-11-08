@@ -26,7 +26,7 @@
             style="margin-left: 0;"
             v-model="g.check"
             @click="handleSelectParent(g)"
-            :disabled:="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
+            :disabled="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0"
           >
             <i
               slot="icon"

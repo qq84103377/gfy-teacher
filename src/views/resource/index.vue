@@ -155,10 +155,43 @@
           this.firstFlag = false
         })
       },
+      getCount(tchCourseIdSelect) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectType": localStorage.getItem("currentSubjectType"),
+          "classGrade": "",
+          "termType": "",
+          "pageSize": "20",
+          "courseType": "C01",
+          "classId": "",
+          "currentPage": 1,
+          tchCourseIdSelect
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeachCourseInfo(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.resourceCount = res.data[0].resourceCount
+          }
+        })
+      },
     },
     created() {
       this.$store.commit('setVanLoading',true)
       this.dropdownOnLoad()
+    },
+    activated() {
+      if (this.tchCourseId) {
+        this.getCount(this.tchCourseId)
+      }
     },
   }
 </script>

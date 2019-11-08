@@ -1,7 +1,7 @@
 <template>
   <section class="add-task">
 
-    <van-nav-bar :title="isEdit?'编辑':handleTitle()" @click-left="$router.back()" left-arrow>
+    <van-nav-bar title="编辑" @click-left="$router.back()" left-arrow>
     </van-nav-bar>
     <div class="add-task__body">
       <van-cell class="add-task__body__cell">
@@ -19,30 +19,27 @@
           <span class="grey9">分钟</span>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T02'||$route.query.taskType=='T04')">
+      <!-- <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)"> -->
+      <van-cell class="add-task__body__cell" v-if="$route.query.taskType=='T01'||$route.query.taskType=='T02'||$route.query.taskType=='T04'">
         <div slot="title">
-          <div class="add-task__body__cell-ctn mgl5" :class="{grey9:isEdit}">
+          <div class="add-task__body__cell-ctn mgl5 grey9">
             <div><span class="red">*</span>{{handleLabel()}}:</div>
-            <span v-if='!isEdit' class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
-            <span v-if='isEdit' class="pdlt10">{{this.resourceInfo.taskName}}</span>
+            <span class="pdlt10">{{this.resourceInfo.taskName}}</span>
           </div>
-          <van-checkbox class="allow-fast" v-model="form.allowFast" v-show="['lesson'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T02')">
+          <van-checkbox class="allow-fast" v-model="form.allowFast" v-show="$route.query.taskType=='T01'||$route.query.taskType=='T02'">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许快进
           </van-checkbox>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T03'||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
+      <!-- <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)"> -->
+      <van-cell class="add-task__body__cell" v-if="$route.query.taskType=='T01'||$route.query.taskType=='T03'||($route.query.taskType=='T04'&&$route.query.testPaperId!=0)">
         <div slot="title">
-          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
-            <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
-            </div>
-            <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
-            </div>
-            <div v-if='isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span> </div>
-
-            <van-icon v-if="testPaperName&&$route.query.type != 'exam'&&!isEdit" @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}" name="clear" />
-            <van-icon v-if="$route.query.type != 'exam'&&!isEdit" @click="selectTestPaper" class="add" :class="{ccc:form.comment}" name="add" />
+          <div class="add-task__body__cell-ctn grey9" :class="{mgl5:$route.query.taskType=='T03'}">
+            <div><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span> </div>
+            <!-- <div class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}</div>
+            <van-icon v-if="testPaperName&&$route.query.type != 'exam'" @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}" name="clear" />
+            <van-icon v-if="$route.query.type != 'exam'" @click="selectTestPaper" class="add" :class="{ccc:form.comment}" name="add" /> -->
           </div>
           <van-checkbox class="allow-fast" v-model="form.allowEdit" v-if="form.exam" :name="form.allowEdit">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
@@ -51,19 +48,20 @@
         </div>
 
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)||($route.query.taskType=='T02'||($route.query.taskType=='T04'&&$route.query.testPaperId==0))">
+      <!-- <van-cell class="add-task__body__cell" v-if="['lesson','material'].includes($route.query.type)"> -->
+      <van-cell class="add-task__body__cell" v-if="$route.query.taskType=='T02'||($route.query.taskType=='T04'&&$route.query.testPaperId==0)">
         <div slot="title">
-          <div class="add-task__body__cell-ctn" :class="{ccc:form.exam,grey9:isEdit}">
-            <div :class='{mgr10:isEdit}'>心得:</div>
-            <van-checkbox v-if='!isEdit' :disabled="testPaperName?true:false" class="comment-check" v-model="form.comment">
-              <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked},{'disabled':testPaperName}]"></i>
-              学习心得
-            </van-checkbox>
-            <van-radio-group v-if='isEdit' style="display: flex;" class="mgl10" v-model="form.comment">
+          <div class="add-task__body__cell-ctn grey9" :class="{ccc:form.exam}">
+            <div class="mgr10">心得:</div>
+            <van-radio-group style="display: flex;" class="mgl10" v-model="form.comment">
               <van-radio name="1"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 <span class="grey9">学习心得</span>
               </van-radio>
             </van-radio-group>
+            <!-- <van-checkbox :disabled="testPaperName?true:false" class="comment-check" v-model="form.comment">
+              <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked},{'disabled':testPaperName}]"></i>
+              学习心得
+            </van-checkbox> -->
           </div>
         </div>
       </van-cell>
@@ -149,10 +147,8 @@
       </van-cell>
     </div>
     <div class="add-task__footer">
-      <van-button v-if='!isEdit' type="info" class="submit" @click="submitSendTask" :loading="showLoading" loading-text="发布中...">发布</van-button>
-       <van-button v-else type="info" class="submit" @click="modifyTask" :loading="showLoading" loading-text="提交中...">提交</van-button>
+      <van-button type="info" class="submit" @click="submitSendTask" :loading="showLoading" loading-text="提交中...">提交</van-button>
     </div>
-
 
     <van-popup
       v-model="showTime"
@@ -168,35 +164,35 @@
       />
     </van-popup>
 
-    <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName" :tchCourseInfo.sync="tchCourseInfo"  ref="examFilter"></exam-filter>
+    <!-- <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName" :tchCourseInfo.sync="tchCourseInfo"  ref="examFilter"></exam-filter> -->
   </section>
 </template>
 
 <script>
 import { formatTime, generateTimeReqestNumber } from '@/utils/filter'
-import examFilter from '../../components/examFilter'
+// import examFilter from '../../components/examFilter'
 import {
   createCourseTask, modifyCourseTask
 } from '@/api/index'
 
 export default {
-  name: "addTask",
-  components: { examFilter },
+  name: "editTask",
+  // components: { examFilter },
   data() {
     return {
-      isEdit: this.$route.query.isEdit,
       filterShow: false,
       currentDate: new Date(),
       tchCourseInfo: {},
       resourceInfo: '',
       form: {
         name: '',
-        duration: this.isEdit ? "" : '10',
+        duration: '',
         allowFast: false,
         allowEdit: false,
-        comment: this.isEdit ? "1" : false,
+        comment: "1",
         exam: '',
-        object: this.isEdit ? "" : '1',
+        object: '',
+        // xinde:'1',
         time: '1',
         time1: formatTime(new Date()),
         time2: '',
@@ -219,57 +215,18 @@ export default {
       examCount: 0,
       result: [],
       firstFlag: true
-
     }
   },
   mounted() {
     this.resourceInfo = this.$store.getters.getResourceInfo
-    console.log('课件', this.resourceInfo)
-    if (this.resourceInfo && !this.isEdit) {
-      console.log(this.$route.query.type, '/////////////////');
-      if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
-        if (this.resourceInfo.coursewareName.length > 64) {
-          this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.coursewareName
-        }
-        this.form.resourceId = this.resourceInfo.coursewareId
-      } else if (this.$route.query.type === 'exam') {
-        if (this.resourceInfo.testPaperName.length > 64) {
-          this.form.name = this.resourceInfo.testPaperName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.testPaperName
-        }
-        this.testPaperId = this.resourceInfo.testPaperId
-        this.testPaperName = this.resourceInfo.testPaperName
-        this.form.exam = this.resourceInfo.testPaperName
-        this.form.resourceId = this.resourceInfo.testPaperId
-        this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
-      } else if (this.$route.query.type === 'discuss') {
-        console.log('this.$route.query.type discuss//////////////');
-        if (this.resourceInfo.discussName.length > 64) {
-          this.form.name = this.resourceInfo.discussName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.discussName
-        }
-        this.form.resourceId = this.resourceInfo.discussId
+    if (this.resourceInfo) {
 
-      } else if (this.$route.query.type === 'spoken') {
-        if (this.resourceInfo.spokenTitle.length > 64) {
-          this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.spokenTitle
-        }
-        this.form.resourceId = this.resourceInfo.spokenId
-      }
-    } else if (this.resourceInfo && this.isEdit) {
       this.form.duration = this.resourceInfo.duration
       this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
       this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
       this.form.desc = this.resourceInfo.description
       this.testPaperName = this.resourceInfo.testPaperName
-      this.form.comment = '1'
-
+      
       // this.form.object = this.resourceInfo.description
       this.resourceInfo.tchClassTastInfo.forEach(ele => {
         if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
@@ -311,7 +268,6 @@ export default {
         }
         this.form.resourceId = this.resourceInfo.spokenId
       }
-
     }
     this.initClass()
 
@@ -335,8 +291,10 @@ export default {
         } else {
           this.form.time2 = formatTime(endDate);
         }
+
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
+          console.log("有getTaskClassInfo");
           this.classList = JSON.parse(taskClass)
           this.classList.forEach(item => {
             this.$set(item, 'type', "all")
@@ -404,6 +362,7 @@ export default {
           console.log("发任务的班级分组学生信息；", this.sendTaskClassSubGroup)
           classKey += item.classId
           let classStudent = JSON.parse(localStorage.getItem(classKey))
+          // console.log(classStudent, 'classStudent');
 
           if (classStudent) {
             let student = {}
@@ -445,112 +404,114 @@ export default {
         })
         this.$store.commit('setTeamList', this.form.class)
 
-        if (this.isEdit) {
-          let tchClassCourseInfo = this.resourceInfo.tchClassTastInfo
-          let classStart = {}
-          let classEnd = {}
-          // console.log(tchClassCourseInfo, 'tchClassCourseInfo///');
 
-          //判断是分班设置还是统一设置
-          let flag = false
-          let start = tchClassCourseInfo[0].startDate
-          let end = tchClassCourseInfo[0].endDate
-          tchClassCourseInfo.forEach(item => {
-            classStart[item.classId] = item.startDate
-            classEnd[item.classId] = item.endDate
-            this.result.push(item.classId)
-            if (start != item.startDate || end != item.endDate) {
-              flag = true
-            }
-          })
 
-          console.log(this.classList, 'this.classList///');
 
-          if (flag) {
-            console.log("分班设置时间");
-            this.form.time = "2"
-            //分班
-            for (let m in this.classList) {
-              tchClassCourseInfo.forEach(ele => {
-                if (ele.classId == this.classList[m].classId) {
-                  this.$set(this.classList[m], 'startDate', formatTime(new Date(ele.startDate)))
-                  this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
+        let tchClassCourseInfo = this.resourceInfo.tchClassTastInfo
+        let classStart = {}
+        let classEnd = {}
+        // console.log(tchClassCourseInfo, 'tchClassCourseInfo///');
 
-                  this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
-                  this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
-                }
-              })
-            }
-          } else {
-            console.log("统一设置时间");
-            //统一
-            this.form.time = "1"
-
-            this.form.time1 = formatTime(new Date(tchClassCourseInfo[0].startDate))
-            this.form.time2 = formatTime(new Date(tchClassCourseInfo[0].endDate))
+        //判断是分班设置还是统一设置
+        let flag = false
+        let start = tchClassCourseInfo[0].startDate
+        let end = tchClassCourseInfo[0].endDate
+        tchClassCourseInfo.forEach(item => {
+          classStart[item.classId] = item.startDate
+          classEnd[item.classId] = item.endDate
+          this.result.push(item.classId)
+          if (start != item.startDate || end != item.endDate) {
+            flag = true
           }
+        })
 
-          this.classList.forEach(item => {
-            item.check = false
-            item.type = 'none'
-            this.$set(item, 'type', "none")
-            this.resourceInfo.tchClassTastInfo.forEach(element => {
-              if (item.classId == element.classId) {
-                console.log(item.classId == element.classId, 'item.classId == element.classId');
-                item.check = true
-                item.type = 'all'
-                this.$set(item, 'type', "all")
-                if (element.accountNo.length && Object.keys(item.classStudent).length != element.accountNo.length) {
-                  this.$set(item, 'type', "part")
-                }
+        console.log(this.classList, 'this.classList///');
 
-                for (const key in item.classStudent) {
-                  this.$set(item.classStudent[key], 'active', false)
-                  item.classStudent[key].active = false
-                  element.accountNo.forEach(i => {
-                    if (key == i) {
-                      this.$set(item.classStudent[key], 'active', true)
-                      item.classStudent[key].active = true
-                    }
-                  })
-                }
+        if (flag) {
+          console.log("分班设置时间");
+          this.form.time = "2"
+          //分班
+          for (let m in this.classList) {
+            tchClassCourseInfo.forEach(ele => {
+              if (ele.classId == this.classList[m].classId) {
+                this.$set(this.classList[m], 'startDate', formatTime(new Date(ele.startDate)))
+                this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
 
-                item.tchSubGroup.forEach((ele, index) => {
-                  this.$set(ele, 'check', false)
-                  if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
-                    ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                      s.active = false
-                      this.$set(s, 'active', false)
-                      element.tchClassSubGroup.forEach(i => {
-                        if (s.subgroupId == i) {
-                          s.active = true
-                        }
-                      })
-                    })
-                  }
-                  element.tchClassSubGroup.forEach(i => {
-                    if (ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
-                      console.log("相等==");
-                      this.$set(ele, 'check', true)
-                      ele.check = true
-                    }
-                  })
-                })
-              } else {
-                item.tchSubGroup.forEach(obj => {
-                  obj.check = item.check
-                  if (obj.tchClassSubGroupStudent.tchSubGroupStudent && obj.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
-                    obj.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                      s.active = item.check
-                    })
+                this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
+                this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+              }
+            })
+          }
+        } else {
+          console.log("统一设置时间");
+          //统一
+          this.form.time = "1"
+
+          this.form.time1 = formatTime(new Date(tchClassCourseInfo[0].startDate))
+          this.form.time2 = formatTime(new Date(tchClassCourseInfo[0].endDate))
+        }
+
+        this.classList.forEach(item => {
+          item.check = false
+          item.type = 'none'
+          this.$set(item, 'type', "none")
+          this.resourceInfo.tchClassTastInfo.forEach(element => {
+            if (item.classId == element.classId) {
+              console.log(item.classId == element.classId, 'item.classId == element.classId');
+              item.check = true
+              item.type = 'all'
+              this.$set(item, 'type', "all")
+              if (element.accountNo.length && Object.keys(item.classStudent).length != element.accountNo.length) {
+                this.$set(item, 'type', "part")
+              }
+
+              for (const key in item.classStudent) {
+                this.$set(item.classStudent[key], 'active', false)
+                item.classStudent[key].active = false
+                element.accountNo.forEach(i => {
+                  if (key == i) {
+                    this.$set(item.classStudent[key], 'active', true)
+                    item.classStudent[key].active = true
                   }
                 })
               }
-            })
 
+              item.tchSubGroup.forEach((ele, index) => {
+                this.$set(ele, 'check', false)
+                if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
+                  ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                    s.active = false
+                    this.$set(s, 'active', false)
+                    element.tchClassSubGroup.forEach(i => {
+                      if (s.subgroupId == i) {
+                        s.active = true
+                      }
+                    })
+                  })
+                }
+                element.tchClassSubGroup.forEach(i => {
+                  if (ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
+                    console.log("相等==");
+                    this.$set(ele, 'check', true)
+                    ele.check = true
+                  }
+                })
+              })
+            } else {
+              item.tchSubGroup.forEach(obj => {
+                obj.check = item.check
+                if (obj.tchClassSubGroupStudent.tchSubGroupStudent && obj.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
+                  obj.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                    s.active = item.check
+                  })
+                }
+              })
+            }
           })
-          console.log(this.classList, 'this.classList////////');
-        }
+
+        })
+        console.log(this.classList, 'this.classList////////');
+
       } else {
         this.$toast("课程信息错误,请重新选择课程")
         return
@@ -572,25 +533,13 @@ export default {
     },
 
     handleLabel() {
-      if (this.$route.query.type === 'lesson' || (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02')) {
+      if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02') {
         return '微课'
-      } else if (this.$route.query.type === 'material' || (this.$route.query.taskType === 'T04')) {
+      } else if (this.$route.query.taskType === 'T04') {
         return '素材'
       }
     },
-    handleTitle() {
-      if (this.$route.query.type === 'lesson') {
-        return '微课任务'
-      } else if (this.$route.query.type === 'material') {
-        return '学资源任务'
-      } else if (this.$route.query.type === 'exam') {
-        return '试卷任务'
-      } else if (this.$route.query.type === 'discuss') {
-        return '讨论'
-      } else if (this.$route.query.type === 'spoken') {
-        return '口语'
-      }
-    },
+
     handleCheckGroup(group, classItem) {
       if (!group.tchClassSubGroupStudent.tchSubGroupStudent || group.tchClassSubGroupStudent.tchSubGroupStudent.length == 0) {
         return
@@ -614,12 +563,10 @@ export default {
           classItem.check = false
         }
       }
-
-
       console.log(group.check)
     },
     handleCheckClass(item, index) {
-      console.log('handleCheckClass');
+
       if (item.disabled) {
         return
       }
@@ -633,11 +580,10 @@ export default {
           item.type = 'all'
         } else {
           item.type = 'none'
-
+          this.$set(item, 'type', 'none')
         }
       } else {
         item.tchSubGroup.forEach(obj => {
-
           if (obj.tchClassSubGroupStudent.tchSubGroupStudent) {
             obj.check = item.check
             obj.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
@@ -649,12 +595,12 @@ export default {
       }
     },
     changeObject() {
-      if (this.isEdit && this.firstFlag) {
+      if (this.firstFlag) {
         this.firstFlag = false
         return
       }
-      console.log(this.form.object)
       if (this.form.object === "1") {
+
         console.log("按班级发任务")
         this.classList.forEach(item => {
           if (!item.classStudent || Object.keys(item.classStudent).length > 0) {
@@ -669,6 +615,7 @@ export default {
           // this.$set(item, "type", 'none')
         });
       } else if (this.form.object === "2") {
+
         console.log("按组发任务")
         this.classList.forEach(item => {
           if (item.tchSubGroup && item.tchSubGroup.length > 0) {
@@ -761,242 +708,6 @@ export default {
       this.$refs.examFilter.getTeachCourseResDetail()
     },
     submitSendTask() {
-      if (!this.currentTchCourseId) {
-        this.$toast("课程信息错误,请重新选择课程")
-        return
-      }
-      if (!this.form.name) {
-        this.$toast("请输入任务名称")
-        return
-      }
-
-      if (!this.form.duration) {
-        this.$toast("请输入任务时长")
-        return
-      }
-
-      if (this.form.duration > 9999) {
-        this.$toast("任务时长最大只可以设置为9999")
-        return
-      }
-
-      if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
-        //微课、学资源任务判断
-        if (!this.resourceInfo.coursewareId) {
-          this.$toast("请选择课件")
-          return
-        }
-
-        //判断是否不含试卷和未选择心得
-        if (!this.form.comment && !this.testPaperId) {
-          this.$toast("请选择心得或者试卷")
-          return
-        }
-      }
-      if (!this.form.resourceId) {
-        this.$toast("未获取到资源编号，请返回重新选择")
-        return
-      }
-
-      //时间判断
-      if (this.form.time === "1") {
-        //统一设置
-        if (!this.form.time1) {
-          this.$toast("请设置任务开始时间")
-          return
-        }
-        if (!this.form.time2) {
-          this.$toast("请设置任务结束时间")
-          return
-        }
-      } else if (this.form.time === "2") {
-        //分班设置
-      } else {
-        this.$toast("时间设置信息有误")
-        return
-      }
-
-      //任务类型
-      let taskType = ""
-      let resourceType = ""
-      let isDrag = ""
-      if (this.$route.query.type === 'lesson') {
-        if (this.testPaperId) {
-          //微课+试卷
-          taskType = "T01"
-        } else {
-          //微课+心得
-          taskType = "T02"
-        }
-        resourceType = "R01"
-        if (this.form.allowFast) {
-          isDrag = "I01"
-        } else {
-          isDrag = "I02"
-        }
-      } else if (this.$route.query.type === 'material') {
-        //学资源
-        taskType = "T04";
-        resourceType = "R01"
-
-      } else if (this.$route.query.type === 'exam') {
-        //试卷
-        taskType = "T03";
-        resourceType = "R02"
-      } else if (this.$route.query.type === 'discuss') {
-        //讨论
-        taskType = "T06";
-        resourceType = "R04"
-      } else if (this.$route.query.type === 'spoken') {
-        //口语
-        taskType = "T13";
-        resourceType = "R08"
-      }
-
-      //是否允许修改答案
-      let modifyAfterSubmit = ""
-      if (this.testPaperId) {
-        if (this.form.allowEdit) {
-          modifyAfterSubmit = "M02"
-        } else {
-          modifyAfterSubmit = "M01"
-        }
-      }
-
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": 24,
-        "tchCourseId": this.currentTchCourseId,
-        "tastOrigin": "T03",
-        "taskName": this.form.name,
-        "tastType": taskType,
-        "resourceType": resourceType,
-        "resourceId": this.form.resourceId,
-        "statusCd": "S01",
-        "isRedo": "I01",
-        "duration": this.form.duration,
-        "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "desc": this.form.desc,
-        "courseType": "C01",
-        "isDrag": isDrag,
-        "testPaperId": this.testPaperId,
-        "modifyAfterSubmit": modifyAfterSubmit,
-        "sysTypeCd": "S02"
-      };
-      //发布任务的学生
-      let classListSelect = []
-      if (this.form.object == "2") {
-        //按照分组
-        let index = 1
-        this.classList.forEach((item) => {
-          if (item.check) {
-            let subgroupIdList = []
-            let accountNoList = []
-            classListSelect.push(item.classId)
-            item.tchSubGroup.forEach(group => {
-              if (group.check) {
-                subgroupIdList.push(group.tchClassSubGroupStudent.tchClassSubGroup.subgroupId)
-                group.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                  if (s.active) {
-                    accountNoList.push(s.accountNo)
-                  }
-                })
-              }
-            })
-            obj['subgroupIdList' + index] = subgroupIdList.join("|")
-            obj['accountNoList' + index] = accountNoList.join("|")
-            index++
-          }
-        });
-
-        obj['classCount'] = classListSelect.length
-
-      } else if (this.form.object === "1") {
-        //按照班级
-        let index = 1
-        this.classList.forEach((item) => {
-          if (item.check) {
-            let accountNoList = []
-            classListSelect.push(item.classId)
-            for (let k in item.classStudent) {
-              if (item.classStudent[k].active) {
-                accountNoList.push(item.classStudent[k].accountNo)
-              }
-            }
-            obj['accountNoList' + index] = accountNoList.join("|")
-            index++
-          }
-        });
-
-        obj['classCount'] = classListSelect.length
-
-      } else {
-        this.$toast("发任务对象错误")
-        return
-      }
-      if (classListSelect.length === 0) {
-        this.$toast('未选择班级学生')
-        return
-      }
-      //时间设置
-      if (this.form.time === "1") {
-        //统一设置
-        let start = this.form.time1
-        let end = this.form.time2
-        let index = 1
-        this.classList.forEach((item) => {
-          if (item.check) {
-            obj['classTaskInfo' + index] = item.classId + '|' + start + '|' + end
-            index++
-          }
-        })
-      } else if (this.form.time === "2") {
-        //分班设置
-        let index = 1
-        this.classList.forEach((item) => {
-          if (item.check) {
-            obj['classTaskInfo' + index] = item.classId + '|' + item.startDate + '|' + item.endDate
-            index++
-          }
-        })
-      } else {
-        this.$toast("时间设置参数错误")
-        return
-      }
-
-      console.log(obj)
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      this.showLoading = true
-      createCourseTask(params).then(res => {
-        if (res) {
-          this.showLoading = false
-          if (res.flag) {
-            this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId)
-            let taskInfo = {
-              taskName: this.form.name,
-              desc: this.form.desc,
-              examCount: this.examCount,
-              duration: this.form.duration,
-              taskType: taskType
-            };
-            this.$store.commit('setSendTaskInfo', taskInfo)
-          } else {
-            this.$toast(res.msg)
-          }
-        } else {
-          this.showLoading = false
-          this.$toast("请求错误")
-          return
-        }
-      }, error => {
-        this.showLoading = false
-      })
-    },
-    modifyTask() {
       if (!this.currentTchCourseId) {
         this.$toast("课程信息错误,请重新选择课程")
         return
@@ -1211,6 +922,7 @@ export default {
         this.showLoading = false
       })
     }
+
   },
   computed: {
     teamList() {
