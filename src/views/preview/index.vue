@@ -64,6 +64,7 @@ import {
   deleteCourseTask,
   getCourseTaskDetail
 } from '@/api/index'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "index",
@@ -99,7 +100,13 @@ export default {
   },
   mounted() {
     // this.getClassTeachCourseInfo()
+    eventBus.$off("previewEditTask")
+    eventBus.$on("previewEditTask", (data) => {
+      console.log("previewEditTask eventbus");
+      this.onRefresh()
+    })
   },
+ 
   beforeRouteLeave(to, from, next) {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
@@ -496,6 +503,7 @@ export default {
     editTask(item) {
       console.log(item, 'editTask  item');
       this.$store.commit('setResourceInfo', item)
+      console.log(this.tchCourseInfo, 'this.tchCourseInfo');
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
       this.$store.commit("setTaskClassInfo", '')
       this.$router.push({
@@ -508,7 +516,8 @@ export default {
           taskId: item.taskId,
           taskType: item.taskType,
           resourceType: item.resourceType,
-          isEdit: true
+          isEdit: true,
+          from: 'preview',
         }
       })
     },
