@@ -174,8 +174,8 @@
           })
           .then(() => {
             // on confirm
-            if (status == 'S01' || status == 'S02') {
-              this.$toast.fail('申请中的记录无法删除');
+            if (status == 'S01' || status == 'S02'|| status == 'S08') {
+              this.$toast.fail('申请中和确认中的记录无法删除');
               return;
             }
 
