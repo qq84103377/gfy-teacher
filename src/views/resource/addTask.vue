@@ -351,7 +351,7 @@ export default {
           this.form.time2 = formatTime(endDate);
         }
         // }
-        console.log(this.form.time2,'this.form.time2');
+        console.log(this.form.time2,"this.form.time2");
 
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
@@ -375,8 +375,7 @@ export default {
 
         this.classList = this.tchCourseInfo.tchClassCourseInfo
         let subjectType = this.tchCourseInfo.subjectType
-
-
+        
 
         this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
         //获取分组信息
@@ -463,10 +462,11 @@ export default {
           }
           item.startDate = this.form.time1
           item.endDate = this.form.time2
+          console.log("classlist//////////////",this.classList);
         })
+        // return
         this.$store.commit('setTeamList', this.form.class)
-        console.log(this.classList, "classlist是什么");
-        return
+
         if (this.isEdit) {
           let tchClassCourseInfo = this.resourceInfo.tchClassTastInfo
           let classStart = {}
