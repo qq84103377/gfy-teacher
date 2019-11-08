@@ -226,7 +226,7 @@ export default {
       this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
       this.form.desc = this.resourceInfo.description
       this.testPaperName = this.resourceInfo.testPaperName
-      
+
       // this.form.object = this.resourceInfo.description
       this.resourceInfo.tchClassTastInfo.forEach(ele => {
         if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {

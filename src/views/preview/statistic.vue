@@ -3,14 +3,16 @@
     <van-nav-bar :title="info.taskName" @click-left="$router.back()" left-arrow>
       <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper">试卷分析</div>
     </van-nav-bar>
-    <div class="statistic-wrap__tab-scroll" v-if="$route.query.type != 'inClass'">
+    <div class="statistic-wrap__tab-scroll">
       <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
       </div>
     </div>
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button class="notice-btn" :class="{remind: remind}" v-if="$route.query.type != 'inClass'" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">重发任务
+          </van-button>
+          <van-button class="notice-btn" v-else :class="{remind: remind}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
@@ -233,9 +235,34 @@ export default {
     }),
     subjectTypeName() {
       return localStorage.currentSubjectTypeName
-    }
+    },
+    isTaskEnd() {
+      return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate).getTime()
+    },
   },
   methods: {
+    sendTask() {
+      let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
+      tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)
+      this.$store.commit('setResourceInfo', this.info)
+      this.$store.commit("setTchCourseInfo", tchCourseInfo)
+      this.$store.commit("setTaskClassInfo", '')
+      this.$router.push({
+        path: '/addTask?_t=new',
+        query: {
+          info: this.info,
+          testPaperId: this.info.testPaperId,
+          termType: this.termType,
+          tchCourseId: this.info.tchCourseId,
+          taskId: this.info.taskId,
+          taskType: this.info.taskType,
+          resourceType: this.info.resourceType,
+          isEdit: true,
+          isResend: 1,
+          taskFinishInfo: this.taskFinishInfo
+        }
+      })
+    },
     goVideoPage(url) {
       if (!url) return
       this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
@@ -984,7 +1011,6 @@ export default {
         this.checkUrlPermission()
       }
     }
-
     this.$store.commit('setVanLoading', false)
     // if (!this.isWk && !this.isSpoken) {
     // }

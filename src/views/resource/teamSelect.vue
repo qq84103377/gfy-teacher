@@ -92,7 +92,6 @@
       if (classInfo) {
         this.list = JSON.parse(classInfo);
       }
-
       //获取选中班级学生
       this.sendStudent = this.$store.getters.getSendTaskClassStudent
       //获取选中班级分组

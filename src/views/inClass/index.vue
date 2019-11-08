@@ -100,6 +100,9 @@
         })
       },
       goto(path) {
+        if(path === '/classStatList') {
+          localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.courseList[this.index].tchCourseInfo))
+        }
         const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, termType} = this
         this.$router.push({path,
           query: {
@@ -125,6 +128,7 @@
               this.index++
               this.courseName = this.courseList[this.index].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+              this.resourceCount = this.courseList[this.index].resourceCount
             } else {
               //最后一页
               this.$toast('没有下一课了')
@@ -133,6 +137,7 @@
             this.index++
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.resourceCount = this.courseList[this.index].resourceCount
           }
 
         } else {
@@ -144,6 +149,7 @@
             this.index--
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.resourceCount = this.courseList[this.index].resourceCount
           }
         }
       },
