@@ -499,7 +499,14 @@ export default {
                   this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
 
                   this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
-                  this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                  if(this.$route.query.isResend) {
+                    let now = new Date()
+                    now.setDate(now.getDate() + 3)
+                    this.classList[m]['endDate'] = formatTime(new Date(now))
+                  }else {
+                     this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                  }
+
                 }
               })
             }
@@ -530,12 +537,28 @@ export default {
                 for (const key in item.classStudent) {
                   this.$set(item.classStudent[key], 'active', false)
                   item.classStudent[key].active = false
-                  element.accountNo.forEach(i => {
-                    if (key == i) {
+                  if(this.$route.query.isResend) {
+                    //重发任务
+                    const unfinishList = JSON.parse(JSON.stringify(this.$route.query.taskFinishInfo)).studentUnfinishList
+                    const accountNoList = unfinishList.reduce((t,unfinish) => {
+                      t.push(...unfinish.accountNoList)
+                      return t
+                    },[])
+                    if(accountNoList.some(account => account == key)) {
                       this.$set(item.classStudent[key], 'active', true)
                       item.classStudent[key].active = true
+                    }else {
+                      //只要有一个学生不在未完成列表里面 就证明不是全选
+                      this.$set(item, 'type', "part")
                     }
-                  })
+                  }else {
+                    element.accountNo.forEach(i => {
+                      if (key == i) {
+                        this.$set(item.classStudent[key], 'active', true)
+                        item.classStudent[key].active = true
+                      }
+                    })
+                  }
                 }
 
                 item.tchSubGroup.forEach((ele, index) => {

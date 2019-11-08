@@ -215,6 +215,7 @@ export default {
           resourceType: item.resourceType
         }
       })
+      localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.tchCourseInfo))
       localStorage.setItem('stat', JSON.stringify(item))
     },
     async selectCourse(tchCourseInfo, index) {
