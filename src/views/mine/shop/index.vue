@@ -311,7 +311,7 @@
           &.integration {
             font-size: 10px;
             color: #D9A402;
-            height: 17px;
+            height: auto;
             line-height: 15px;
             background-color: #FFFDC7;
             border-radius: 8px;

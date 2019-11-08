@@ -115,6 +115,7 @@
         subjectList: [],
         stuList: JSON.parse(JSON.stringify(this.$route.params.stuList)),
         stuIndex: this.$route.params.stuIndex,
+        filterParams: JSON.parse(JSON.stringify(this.$route.params.filterParams)),
         gradeList: [
           {classGrade: 'G01', subject: ['S01', 'S02', 'S03']},
           {classGrade: 'G02', subject: ['S01', 'S02', 'S03']},
@@ -152,7 +153,7 @@
     },
     methods: {
       viewAll() {
-        this.$router.push(`/reportAll?accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.$route.params.filterParams.classGrade}`)
+        this.$router.push(`/reportAll?accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
       },
       createReport() {
         console.log(this.$refs['body'].scrollTop,'wieieieieie');
@@ -195,7 +196,7 @@
           "belongSchoolId": this.$store.getters.schoolId,
           eChartsType: 'T01',
           termType: '',
-          ...this.$route.params.filterParams,
+          ...this.filterParams,
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo,
         };
@@ -222,7 +223,7 @@
           "belongSchoolId": this.$store.getters.schoolId,
           roleType: 'A03',
           termType: '',
-          ...this.$route.params.filterParams,
+          ...this.filterParams,
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -352,7 +353,7 @@
           "schoolId": this.$store.getters.schoolId,
           roleType: 'A03',
           termType: '',
-          ...this.$route.params.filterParams,
+          ...this.filterParams,
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -760,7 +761,7 @@
       init() {
         this.subjectList = []
         this.$nextTick(() => {
-          this.subjectList = this.gradeList.find(v => this.$route.params.filterParams.classGrade === v.classGrade).subject.map(v => {
+          this.subjectList = this.gradeList.find(v => this.filterParams.classGrade === v.classGrade).subject.map(v => {
             return {
               subjectName: getSubjectName(v),
               subjectType: v,

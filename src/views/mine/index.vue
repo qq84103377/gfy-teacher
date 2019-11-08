@@ -434,15 +434,22 @@
     },
 
     created() {
+      // if (!this.$store.getters.getUserInfo) {
+      //   return;
+      // }
+      // this.userName = this.$store.getters.getUserInfo.userName;
+      // this.iconUrl = this.$store.getters.getUserInfo.iconUrl;
+      this.getMySchoolInfo();
+      this.getUserCurriculum();
+      this.getUserCounterSummary();
+      this.getUserCounterList();
+    },
+    activated() {
       if (!this.$store.getters.getUserInfo) {
         return;
       }
       this.userName = this.$store.getters.getUserInfo.userName;
       this.iconUrl = this.$store.getters.getUserInfo.iconUrl;
-      this.getMySchoolInfo();
-      this.getUserCurriculum();
-      this.getUserCounterSummary();
-      this.getUserCounterList();
     }
   }
 </script>
