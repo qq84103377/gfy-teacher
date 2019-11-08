@@ -34,7 +34,7 @@
       </van-cell>
       <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T03'||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
         <div slot="title">
-          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
+          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
             <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
             </div>
             <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
@@ -178,6 +178,7 @@ import examFilter from '../../components/examFilter'
 import {
   createCourseTask, modifyCourseTask
 } from '@/api/index'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "addTask",
@@ -191,12 +192,12 @@ export default {
       resourceInfo: '',
       form: {
         name: '',
-        duration: this.isEdit ? "" : '10',
+        duration: this.$route.query.isEdit ? "" : '10',
         allowFast: false,
         allowEdit: false,
-        comment: this.isEdit ? "1" : false,
+        comment: this.$route.query.isEdit ? "1" : false,
         exam: '',
-        object: this.isEdit ? "" : '1',
+        object: this.$route.query.isEdit ? "" : '1',
         time: '1',
         time1: formatTime(new Date()),
         time2: '',
@@ -223,16 +224,21 @@ export default {
     }
   },
   mounted() {
+    // return
     this.resourceInfo = this.$store.getters.getResourceInfo
     console.log('课件', this.resourceInfo)
+
     if (this.resourceInfo && !this.isEdit) {
       console.log(this.$route.query.type, '/////////////////');
       if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
-        if (this.resourceInfo.coursewareName.length > 64) {
-          this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.coursewareName
+        if (this.resourceInfo.coursewareName) {
+          if (this.resourceInfo.coursewareName.length > 64) {
+            this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.coursewareName
+          }
         }
+
         this.form.resourceId = this.resourceInfo.coursewareId
       } else if (this.$route.query.type === 'exam') {
         if (this.resourceInfo.testPaperName.length > 64) {
@@ -263,12 +269,19 @@ export default {
         this.form.resourceId = this.resourceInfo.spokenId
       }
     } else if (this.resourceInfo && this.isEdit) {
+
       this.form.duration = this.resourceInfo.duration
       this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
       this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
-      this.form.desc = this.resourceInfo.description
+      if (this.resourceInfo.description) {
+        this.form.desc = this.resourceInfo.description
+      } else if (this.resourceInfo.desc) {
+        this.form.desc = this.resourceInfo.desc
+      }
+
       this.testPaperName = this.resourceInfo.testPaperName
       this.form.comment = '1'
+
 
       // this.form.object = this.resourceInfo.description
       this.resourceInfo.tchClassTastInfo.forEach(ele => {
@@ -319,12 +332,14 @@ export default {
 
   methods: {
     initClass() {
+
       //课程信息
       this.tchCourseInfo = this.$store.getters.getTchCourseInfo
       console.log("课程", this.tchCourseInfo)
 
       if (this.tchCourseInfo) {
         this.currentTchCourseId = this.tchCourseInfo.tchCourseId
+        // if (!this.isEdit) {
         let endDate = new Date(this.tchCourseInfo.tchClassCourseInfo[0].endDate)
         endDate.setHours(23)
         endDate.setMinutes(59)
@@ -335,6 +350,9 @@ export default {
         } else {
           this.form.time2 = formatTime(endDate);
         }
+        // }
+        console.log(this.form.time2,'this.form.time2');
+
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
           this.classList = JSON.parse(taskClass)
@@ -357,6 +375,8 @@ export default {
 
         this.classList = this.tchCourseInfo.tchClassCourseInfo
         let subjectType = this.tchCourseInfo.subjectType
+
+
 
         this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
         //获取分组信息
@@ -439,12 +459,14 @@ export default {
               this.$set(item, 'type', "none")
             }
           }
-
+          if (!this.isEdit) {
+          }
           item.startDate = this.form.time1
           item.endDate = this.form.time2
         })
         this.$store.commit('setTeamList', this.form.class)
-
+        console.log(this.classList, "classlist是什么");
+        return
         if (this.isEdit) {
           let tchClassCourseInfo = this.resourceInfo.tchClassTastInfo
           let classStart = {}
@@ -490,6 +512,7 @@ export default {
             this.form.time2 = formatTime(new Date(tchClassCourseInfo[0].endDate))
           }
 
+
           this.classList.forEach(item => {
             item.check = false
             item.type = 'none'
@@ -521,20 +544,23 @@ export default {
                     ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
                       s.active = false
                       this.$set(s, 'active', false)
-                      element.tchClassSubGroup.forEach(i => {
+                      element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
                         if (s.subgroupId == i) {
                           s.active = true
                         }
                       })
                     })
                   }
-                  element.tchClassSubGroup.forEach(i => {
-                    if (ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
-                      console.log("相等==");
-                      this.$set(ele, 'check', true)
-                      ele.check = true
-                    }
-                  })
+                  if (element.tchClassSubGroup) {
+                    element.tchClassSubGroup.forEach(i => {
+                      if (ele.tchClassSubGroupStudent && ele.tchClassSubGroupStudent.tchClassSubGroup && ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
+                        console.log("相等==");
+                        this.$set(ele, 'check', true)
+                        ele.check = true
+                      }
+                    })
+                  }
+
                 })
               } else {
                 item.tchSubGroup.forEach(obj => {
@@ -657,7 +683,7 @@ export default {
       if (this.form.object === "1") {
         console.log("按班级发任务")
         this.classList.forEach(item => {
-          if (!item.classStudent || Object.keys(item.classStudent).length > 0) {
+          if (item.classStudent || Object.keys(item.classStudent).length > 0) {
             this.$set(item, "disabled", false)
           } else {
             this.$set(item, "disabled", true)
@@ -1189,16 +1215,9 @@ export default {
           this.showLoading = false
           if (res.flag) {
             this.$toast.success("提交成功")
-            this.$router.replace('/preview')
-            // this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId)
-            // let taskInfo = {
-            //   taskName: this.form.name,
-            //   desc: this.form.desc,
-            //   examCount: this.examCount,
-            //   duration: this.form.duration,
-            //   taskType: taskType
-            // };
-            // this.$store.commit('setSendTaskInfo', taskInfo)
+            eventBus.$emit(this.$route.query.from + "EditTask", true);
+            this.$router.back()
+
           } else {
             this.$toast(res.msg)
           }

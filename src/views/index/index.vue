@@ -105,6 +105,7 @@ import listItem from '../../components/list-item'
 import {  getUnFinishCourseTask, getMySchoolInfo, getClassStudent, getSubGroupStudent, getGradeTermInfo, getPublishByRole,
   getClassTeacherCourseDeploy, getCourseTaskDetail} from '@/api/index'
 import { pubApi } from '@/api/parent-GFY'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "index",
@@ -121,6 +122,7 @@ export default {
     }
   },
   activated() {
+    console.log("index activated");
     //在别的地方修改科目以后返回到首页要重新获取对应的科目
     this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
   },
@@ -129,6 +131,12 @@ export default {
     this.getGradeTermInfo()
     this.getPublishByRole()
     this.getClassTeacherCourseDeploy()
+
+    eventBus.$off("indexEditTask")
+    eventBus.$on("indexEditTask", (data) => {
+      console.log("index eventbus");
+      this.getUnFinishCourseTask()
+    })
   },
   methods: {
     viewStat(item) {
@@ -551,21 +559,38 @@ export default {
 
     },
     editTask(item) {
-      return
       console.log(item, 'editTask  item');
+      let classList = []
+      let classMap = JSON.parse(localStorage.getItem("classMap"));
+      for (const key in classMap) {
+        for (var i = 0; i < item.courseClassList.length; i++) {
+          if (classMap[key].classId == item.courseClassList[i]) {
+            classList.push({ classId: item.courseClassList[i], className: classMap[key].className })
+          }
+        }
+      }
+      console.log(classList, 'classList///////');
+      let tchCourseInfo = {
+        tchCourseId: item.tchCourseId,
+        tchClassCourseInfo: classList,
+        subjectType: item.subjectType,
+      }
       this.$store.commit('setResourceInfo', item)
-      this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
+      this.$store.commit("setTchCourseInfo", tchCourseInfo)
+      console.log(tchCourseInfo, 'tchCourseInfo');
       this.$store.commit("setTaskClassInfo", '')
       this.$router.push({
-        path: '/editTask?_t=new',
+        path: '/addTask?_t=new',
         query: {
           info: item,
           testPaperId: item.testPaperId,
-          termType: this.termType,
+          // termType: this.termType,
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
-          taskType: item.taskType,
-          resourceType: item.resourceType
+          taskType: item.taskType ? item.taskType : item.tastType,
+          resourceType: item.resourceType,
+          isEdit: true,
+          from: 'index',
         }
       })
     },
