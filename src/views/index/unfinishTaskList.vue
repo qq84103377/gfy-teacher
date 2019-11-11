@@ -257,22 +257,22 @@ export default {
     },
     editTask(item) {
       console.log(item, 'editTask  item');
-      let classList = []
+      // let classList = []
       let classMap = JSON.parse(localStorage.getItem("classMap"));
       for (const key in classMap) {
         for (var i = 0; i < item.courseClassList.length; i++) {
-          if (classMap[key].classId == item.courseClassList[i]) {
-            classList.push({ classId: item.courseClassList[i], className: classMap[key].className })
+          if (classMap[key].classId == item.courseClassList[i].classId) {
+            item.courseClassList[i].className = classMap[key].className
+            // classList.push({ classId: item.courseClassList[i].classId, className: classMap[key].className, })
           }
         }
       }
-      console.log(classList, 'classList///////');
+      console.log(item.courseClassList, 'item.courseClassList');
       let tchCourseInfo = {
         tchCourseId: item.tchCourseId,
-        tchClassCourseInfo: classList,
+        tchClassCourseInfo: item.courseClassList,
         subjectType: item.subjectType,
       }
-
       this.$store.commit('setResourceInfo', item)
       this.$store.commit("setTchCourseInfo", tchCourseInfo)
       console.log(tchCourseInfo, 'tchCourseInfo');
