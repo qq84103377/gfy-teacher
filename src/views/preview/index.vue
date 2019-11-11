@@ -106,7 +106,7 @@ export default {
       this.onRefresh()
     })
   },
- 
+
   beforeRouteLeave(to, from, next) {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
@@ -212,7 +212,8 @@ export default {
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
           taskType: item.taskType,
-          resourceType: item.resourceType
+          resourceType: item.resourceType,
+          courseName: this.courseName,    // 重发任务需要用到
         }
       })
       localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.tchCourseInfo))

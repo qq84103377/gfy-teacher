@@ -259,7 +259,8 @@ export default {
           resourceType: this.info.resourceType,
           isEdit: true,
           isResend: 1,
-          taskFinishInfo: this.taskFinishInfo
+          taskFinishInfo: this.taskFinishInfo,
+          courseName: this.$route.query.courseName
         }
       })
     },

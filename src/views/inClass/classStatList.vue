@@ -79,7 +79,8 @@
             tchCourseId: item.tchCourseId,
             taskId: item.taskId,
             taskType: item.taskType,
-            resourceType: item.resourceType
+            resourceType: item.resourceType,
+            courseName: this.$route.query.courseName,    // 重发任务需要用到
           }
         })
         localStorage.setItem('stat', JSON.stringify(item))
