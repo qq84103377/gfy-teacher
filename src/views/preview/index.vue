@@ -72,7 +72,6 @@ export default {
   data() {
     return {
       show: false,
-      list: [{ name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 },],
       courseList: [],
       courseTaskList: [],
       courseName: '',
@@ -214,6 +213,7 @@ export default {
           taskType: item.taskType,
           resourceType: item.resourceType,
           courseName: this.courseName,    // 重发任务需要用到
+          from: 'preview',
         }
       })
       localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.tchCourseInfo))

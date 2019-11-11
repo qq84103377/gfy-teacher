@@ -260,7 +260,8 @@ export default {
           isEdit: true,
           isResend: 1,
           taskFinishInfo: this.taskFinishInfo,
-          courseName: this.$route.query.courseName
+          courseName: this.$route.query.courseName,
+          from: this.$route.query.from,
         }
       })
     },
@@ -1023,7 +1024,13 @@ export default {
         await vm.statTaskStat()
         vm.getAppraise()
       })
-    } else {
+    }else if (from.path === '/addTask') {
+      next(vm => {
+       const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
+        vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
+      })
+    }
+    else {
       next()
     }
   },

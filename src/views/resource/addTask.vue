@@ -1282,7 +1282,6 @@
           this.$toast("时间设置参数错误")
           return
         }
-        debugger
         console.log(obj)
         let params = {
           requestJson: JSON.stringify(obj)
