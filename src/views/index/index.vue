@@ -95,6 +95,10 @@
           <i class="iconGFY icon-res-plus"></i>
           <span @click="$toast.fail('敬请期待')">智能补强</span>
         </div>
+        <div>
+          <i class="iconGFY icon-res-plus"></i>
+          <span @click="$router.push(`/specialExer`)">专项练习</span>
+        </div>
       </div>
     </div>
   </section>
