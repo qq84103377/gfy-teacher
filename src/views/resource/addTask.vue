@@ -32,7 +32,7 @@
           </van-checkbox>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T03'||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
+      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||($route.query.taskType=='T03'&& $route.query.resourceType==='R02')||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
         <div slot="title">
           <div class="add-task__body__cell-ctn" :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
             <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
@@ -304,10 +304,11 @@ export default {
         console.log(this.resourceInfo.taskName, 'this.resourceInfo.taskName');
       }
       this.form.resourceId = this.resourceInfo.resourceId
+      console.log(this.resourceInfo.resourceId, 'this.resourceInfo.resourceId');
 
       if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
 
-      } else if (this.$route.query.taskType === 'T03') {//试卷exam
+      } else if (this.$route.query.taskType === 'T03' && this.$route.query.resourceType === 'R02') {//试卷exam
 
         this.testPaperId = this.resourceInfo.testPaperId
         this.testPaperName = this.resourceInfo.testPaperName
@@ -351,7 +352,7 @@ export default {
           this.form.time2 = formatTime(endDate);
         }
         // }
-        console.log(this.form.time2,"this.form.time2");
+        console.log(this.form.time2, "this.form.time2");
 
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
@@ -375,7 +376,7 @@ export default {
 
         this.classList = this.tchCourseInfo.tchClassCourseInfo
         let subjectType = this.tchCourseInfo.subjectType
-        
+
 
         this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
         //获取分组信息
@@ -462,7 +463,7 @@ export default {
           }
           item.startDate = this.form.time1
           item.endDate = this.form.time2
-          console.log("classlist//////////////",this.classList);
+          console.log("classlist//////////////", this.classList);
         })
         // return
         this.$store.commit('setTeamList', this.form.class)
@@ -499,12 +500,12 @@ export default {
                   this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
 
                   this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
-                  if(this.$route.query.isResend) {
+                  if (this.$route.query.isResend) {
                     let now = new Date()
                     now.setDate(now.getDate() + 3)
                     this.classList[m]['endDate'] = formatTime(new Date(now))
-                  }else {
-                     this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                  } else {
+                    this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
                   }
 
                 }
@@ -524,6 +525,13 @@ export default {
             item.check = false
             item.type = 'none'
             this.$set(item, 'type', "none")
+
+            if (this.form.object == '1') {
+              for (let k in item.classStudent) {
+                item.classStudent[k].active = false
+              }
+            }
+
             this.resourceInfo.tchClassTastInfo.forEach(element => {
               if (item.classId == element.classId) {
                 console.log(item.classId == element.classId, 'item.classId == element.classId');
@@ -537,21 +545,21 @@ export default {
                 for (const key in item.classStudent) {
                   this.$set(item.classStudent[key], 'active', false)
                   item.classStudent[key].active = false
-                  if(this.$route.query.isResend) {
+                  if (this.$route.query.isResend) {
                     //重发任务
                     const unfinishList = JSON.parse(JSON.stringify(this.$route.query.taskFinishInfo)).studentUnfinishList
-                    const accountNoList = unfinishList.reduce((t,unfinish) => {
+                    const accountNoList = unfinishList.reduce((t, unfinish) => {
                       t.push(...unfinish.accountNoList)
                       return t
-                    },[])
-                    if(accountNoList.some(account => account == key)) {
+                    }, [])
+                    if (accountNoList.some(account => account == key)) {
                       this.$set(item.classStudent[key], 'active', true)
                       item.classStudent[key].active = true
-                    }else {
+                    } else {
                       //只要有一个学生不在未完成列表里面 就证明不是全选
                       this.$set(item, 'type', "part")
                     }
-                  }else {
+                  } else {
                     element.accountNo.forEach(i => {
                       if (key == i) {
                         this.$set(item.classStudent[key], 'active', true)

@@ -8,7 +8,7 @@
       <div v-else slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass"></edit-course>
+            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -106,7 +106,7 @@ export default {
       this.onRefresh()
     })
   },
- 
+
   beforeRouteLeave(to, from, next) {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
@@ -119,6 +119,9 @@ export default {
     });
   },
   methods: {
+    toggle() {
+      this.$refs.dropdown.toggle();
+    },
     async changeCourse(type) {
       if (type) {
         //下一题
