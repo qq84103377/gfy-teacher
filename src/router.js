@@ -120,7 +120,7 @@ export default new Router({
         },
         {
           path: '/spokenAnalyse',
-          name: 'spokenAnalyse'
+          name: 'spokenAnalyse',
           component: () => import('./views/preview/spokenAnalyse.vue')
         },
         {
