@@ -302,7 +302,7 @@ export default {
       // }else {
       this.$router.push({
         name: `examView`,
-        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType }
+        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType }
       })
       // }
     },
@@ -1019,12 +1019,16 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     if (from.path === '/imgCorrect') {
-      // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
       next(async vm => {
         await vm.statTaskStat()
         vm.getAppraise()
       })
-    }else if (from.path === '/addTask') {
+    }else if (from.path === '/examView') {
+      next(async vm => {
+        await vm.statTaskStat()
+      })
+    }
+    else if (from.path === '/addTask') {
       next(vm => {
        const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
         vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
