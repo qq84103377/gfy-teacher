@@ -1035,6 +1035,7 @@ export default {
         if (res) {
           this.showLoading = false
           if (res.flag) {
+            eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
             this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId)
             let taskInfo = {
               taskName: this.form.name,

@@ -53,6 +53,7 @@
     delTestPaperExamInfo
   } from '@/api/index'
   import {numToWord} from '@/utils/filter'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "examDetail",
@@ -61,9 +62,9 @@
       numToWord() {
         return numToWord
       },
-      isSend() {
-        return this.$route.query.type == 1   // 0 未发 1 已发
-      },
+      // isSend() {
+      //   return this.$route.query.type == 1   // 0 未发 1 已发
+      // },
       total() {
         return this.list.reduce((t, v) => {
           t += v.sectionExamList.length
@@ -79,6 +80,7 @@
     },
     data() {
       return {
+        isSend: this.$route.query.type == 1, // 0 未发 1 已发
         selectList: [],
         correctShow: false,
         setPointShow: false,
@@ -422,7 +424,14 @@
     },
     created() {
       this.getDetail()
-    }
+    },
+    mounted() {
+      eventBus.$off("examDetailRefresh")
+      eventBus.$on("examDetailRefresh", (data) => {
+        this.isSend = true
+        eventBus.$emit("examListRefresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
+      })
+    },
   }
 </script>
 

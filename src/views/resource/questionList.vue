@@ -334,7 +334,7 @@
           border-width: 0 6px 6px;
           transform: rotateZ(180deg) translateY(50%);
           &.up {
-            transform: rotateZ(0deg) translateY(50%);
+            transform: rotateZ(0deg) translateY(-35%);
           }
         }
       }
