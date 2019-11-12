@@ -429,3 +429,7 @@ export const modifyCourseTask =(params)=>{
 export const getUserKnowledgePointCounterV2 =(params)=>{
   return axios.post('counter/getUserKnowledgePointCounterV2', qs.stringify(params))
 }
+//重发任务
+export const redoCourseTask =(params)=>{
+  return axios.post('teachNew/redoCourseTask', qs.stringify(params))
+}
