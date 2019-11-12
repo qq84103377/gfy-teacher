@@ -82,6 +82,15 @@ export default new Router({
           }
         },
         {
+          path: '/addSubGroupScore',
+          name: 'addSubGroupScore',
+          component: () => import('./views/preview/addSubGroupScore.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '加分/减分'
+          }
+        },
+        {
           path: '/briefing',
           name: 'briefing',
           component: () => import('./views/preview/briefing.vue'),

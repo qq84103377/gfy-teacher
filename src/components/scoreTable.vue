@@ -11,7 +11,9 @@
     <div v-if="classView">
       <div class="row" v-for="(item,index) in list" :key="index">
         <div class="row-item">
-          <div :class="{stuName:item.redoTimes>0}">{{item.name}}</div>
+          <div :class="{stuName:item.redoTimes>0}">{{item.name}}
+            <span style="white-space: nowrap" class="blue">({{item.studentRewardScore||0}})</span>
+          </div>
         </div>
         <div class="row-item">
           <div>{{item.duration}}</div>
@@ -23,7 +25,10 @@
     </div>
     <div v-else>
       <div class="row" v-for="(item,index) in list" :key="index">
-        <div class="row-item team-col">{{item.groupName || '未分组'}}</div>
+        <div class="row-item team-col">
+          <span class="vertical">{{item.groupName || '未分组'}}</span>
+          <span style="white-space: nowrap" class="blue">({{item.groupScore||0}})</span>
+        </div>
         <div class="row-item average">{{item.average}}</div>
         <div class="row-item">
           <div :class="{stuName:s.redoTimes>0}" v-for="(s,index1) in item.stu" :key="index1">{{s.name}}</div>
@@ -159,8 +164,11 @@
         border-bottom: 1px solid #F5F6FA;
         &.team-col {
           flex: 0 0 10%;
-          padding: 0 10px;
-          word-break: break-all;
+
+          .vertical {
+            padding: 0 10px;
+            word-break: break-all;
+          }
         }
 
         &.average {
@@ -180,6 +188,7 @@
           justify-content: center;
           height: 44px;
           border-bottom: 1px solid #F5F6FA;
+          flex-direction: column;
           &:last-child {
             border-bottom: none;
           }
