@@ -118,11 +118,6 @@ export default new Router({
           name: 'imgCorrect',
           component: () => import('./views/preview/imgCorrect.vue')
         },
-        // {
-        //   path: "/editTask",
-        //   name: "editTask",
-        //   component: () => import("./views/preview/editTask.vue")
-        // },
         {
           path: '/spokenAnalyse',
           name: 'spokenAnalyse',
