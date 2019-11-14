@@ -24,7 +24,7 @@
                 <div class="otherInfo">
                   <div class="price">
                     <img src="@assets/img/myself-icon-16.png" alt="">
-                    {{item.orginIntegral/10}}
+                    {{Math.ceil(item.consumeIntegral/10)}}
                   </div>
                   <div class="count">
                     x{{item.convertGoodsCount}}
@@ -109,7 +109,7 @@
           case 'S04' :
             return '兑换失败';
           case 'S05' :
-            return '取消兑换';
+            return '取消兑换成功';
           case 'S08' :
             return '取消兑换确认中';
         }

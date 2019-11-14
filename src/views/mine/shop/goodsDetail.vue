@@ -192,7 +192,7 @@
         };
         addExchangeApplyGoodsInfo(params).then(res => {
           if (res.flag) {
-            this.$toast.success('兑换成功');
+            this.$toast.success('申请兑换中');
             this.$router.replace('/converseRecord');
             this.getUserCounterList();
           } else {

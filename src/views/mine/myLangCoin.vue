@@ -1,7 +1,7 @@
 <template>
   <section class="coin-wrap">
     <van-sticky>
-      <van-nav-bar title="我的朗币" left-arrow @click-left="$router.replace('/mine')">
+      <van-nav-bar title="我的朗币" left-arrow @click-left="$router.back()">
         <div slot="right" class="tips" @click="showTips = true">如何赚取朗币？</div>
       </van-nav-bar>
     </van-sticky>
