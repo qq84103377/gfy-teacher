@@ -51,7 +51,7 @@
           </div>
           <div v-if="recordDetail.status == 'S08' || recordDetail.status == 'S05'">
             <span>取消日期：</span>
-            <span>{{recordDetail.converCancletDate | formatDate}}</span>
+            <span>{{recordDetail.convertCancletDate | formatDate}}</span>
           </div>
           <div v-else>
             <span>发放日期：</span>
