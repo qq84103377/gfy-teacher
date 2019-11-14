@@ -575,6 +575,14 @@ export default new Router({
           }
         },
         {
+          path: "/specialExer",
+          component: () => import("./views/specialExer/index.vue"),
+          meta: {
+            isShowHeader: true,
+            title: "专项练习"
+          }
+        },
+        {
           path: '/reportDetail',
           name: 'reportDetail',
           component: () => import('./views/teachStat/reportDetail.vue')

@@ -27,7 +27,7 @@
         </span>
           <div class="price">
             <img src="@assets/img/myself-icon-16.png" alt="">
-            {{recordDetail.consumeIntegral /10}}
+            {{Math.ceil(recordDetail.consumeIntegral/10)}}
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@
           case 'S04' :
             return '兑换失败';
           case 'S05' :
-            return '取消兑换';
+            return '取消兑换成功';
           case 'S08' :
             return '取消兑换确认中';
         }

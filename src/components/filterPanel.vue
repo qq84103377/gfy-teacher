@@ -77,7 +77,9 @@
 
           Dialog.confirm({
             title: '提示',
-            message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换'
+            message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
+            confirmButtonColor: '#39F0DD',
+            className: 'change-subject'
           }).then(() => {
             this.show = false
             let item = this.childList.find(v => v.check)
