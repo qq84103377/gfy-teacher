@@ -433,3 +433,11 @@ export const getUserKnowledgePointCounterV2 =(params)=>{
 export const redoCourseTask =(params)=>{
   return axios.post('teachNew/redoCourseTask', qs.stringify(params))
 }
+//获取地区列表
+export const getAreaInfo =(params)=>{
+  return axios.post('resource/getAreaInfo', qs.stringify(params))
+}
+//获取资源中心微课&素材列表
+export const getResCourseWareInfo =(params)=>{
+  return axios.post('resource/getResCourseWareInfo', qs.stringify(params))
+}
