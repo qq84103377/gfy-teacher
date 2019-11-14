@@ -5,17 +5,17 @@
     </van-nav-bar>
     <div class="add-task__body">
       <van-cell class="add-task__body__cell">
-        <div slot="title" class="add-task__body__cell-ctn mgl5">
+        <div slot="title" class="add-task__body__cell-ctn mgl5" :class="{ccc:$route.query.isResend}">
           <div><span class="red">*</span>名称:</div>
-          <input v-model="form.name" type="text" maxlength="64" placeholder="请输入名称,字数在64字内">
+          <input :disabled="$route.query.isResend" v-model="form.name" type="text" maxlength="64" placeholder="请输入名称,字数在64字内">
           <span class="red">{{64 - form.name.length}}</span>
-          <van-icon v-show="form.name.length" @click="form.name = ''" class="close" name="clear" />
+          <van-icon v-show="form.name.length && !$route.query.isResend" @click="form.name = ''" class="close" name="clear" />
         </div>
       </van-cell>
       <van-cell class="add-task__body__cell">
-        <div slot="title" class="add-task__body__cell-ctn mgl5">
+        <div slot="title" class="add-task__body__cell-ctn mgl5" :class="{ccc:$route.query.isResend}">
           <div><span class="red">*</span>时长:</div>
-          <input v-model="form.duration" type="number" placeholder="请输入时长">
+          <input :disabled="$route.query.isResend" v-model="form.duration" type="number" placeholder="请输入时长">
           <span class="grey9">分钟</span>
         </div>
       </van-cell>
@@ -32,14 +32,15 @@
           </van-checkbox>
         </div>
       </van-cell>
-      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T03'||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
+      <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||($route.query.taskType=='T03'&& $route.query.resourceType==='R02')||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
         <div slot="title">
-          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
+          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
             <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
             </div>
             <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
             </div>
-            <div v-if='isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span> </div>
+            <div v-if='isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span>
+            </div>
 
             <van-icon v-if="testPaperName&&$route.query.type != 'exam'&&!isEdit" @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}" name="clear" />
             <van-icon v-if="$route.query.type != 'exam'&&!isEdit" @click="selectTestPaper" class="add" :class="{ccc:form.comment}" name="add" />
@@ -75,7 +76,7 @@
               <van-radio name="1" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 班
               </van-radio>
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+              <van-radio v-if="!$route.query.isResend" name="2" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 组
               </van-radio>
             </van-radio-group>
@@ -149,8 +150,12 @@
       </van-cell>
     </div>
     <div class="add-task__footer">
-      <van-button v-if='!isEdit' type="info" class="submit" @click="submitSendTask" :loading="showLoading" loading-text="发布中...">发布</van-button>
-       <van-button v-else type="info" class="submit" @click="modifyTask" :loading="showLoading" loading-text="提交中...">提交</van-button>
+      <van-button v-if='!isEdit' type="info" class="submit" @click="submitSendTask" :loading="showLoading"
+                  loading-text="发布中...">发布
+      </van-button>
+      <van-button v-else type="info" class="submit" @click="modifyTask" :loading="showLoading" loading-text="提交中...">
+        提交
+      </van-button>
     </div>
 
 
@@ -168,7 +173,8 @@
       />
     </van-popup>
 
-    <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName" :tchCourseInfo.sync="tchCourseInfo"  ref="examFilter"></exam-filter>
+    <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName"
+                 :tchCourseInfo.sync="tchCourseInfo" ref="examFilter"></exam-filter>
   </section>
 </template>
 
@@ -176,8 +182,9 @@
 import { formatTime, generateTimeReqestNumber } from '@/utils/filter'
 import examFilter from '../../components/examFilter'
 import {
-  createCourseTask, modifyCourseTask
+  createCourseTask, modifyCourseTask, redoCourseTask
 } from '@/api/index'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "addTask",
@@ -191,12 +198,12 @@ export default {
       resourceInfo: '',
       form: {
         name: '',
-        duration: this.isEdit ? "" : '10',
+        duration: this.$route.query.isEdit ? "" : '10',
         allowFast: false,
         allowEdit: false,
-        comment: this.isEdit ? "1" : false,
+        comment: this.$route.query.isEdit ? "1" : false,
         exam: '',
-        object: this.isEdit ? "" : '1',
+        object: this.$route.query.isEdit ? "" : '1',
         time: '1',
         time1: formatTime(new Date()),
         time2: '',
@@ -212,10 +219,8 @@ export default {
       currentClassIdIndex: '',
       minDate: new Date(),
       currentTchCourseId: '',
-      sendTaskClassStudent: {
-      },
-      sendTaskClassSubGroup: {
-      },
+      sendTaskClassStudent: {},
+      sendTaskClassSubGroup: {},
       examCount: 0,
       result: [],
       firstFlag: true
@@ -223,16 +228,21 @@ export default {
     }
   },
   mounted() {
+    // return
     this.resourceInfo = this.$store.getters.getResourceInfo
     console.log('课件', this.resourceInfo)
+
     if (this.resourceInfo && !this.isEdit) {
       console.log(this.$route.query.type, '/////////////////');
       if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
-        if (this.resourceInfo.coursewareName.length > 64) {
-          this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.coursewareName
+        if (this.resourceInfo.coursewareName) {
+          if (this.resourceInfo.coursewareName.length > 64) {
+            this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.coursewareName
+          }
         }
+
         this.form.resourceId = this.resourceInfo.coursewareId
       } else if (this.$route.query.type === 'exam') {
         if (this.resourceInfo.testPaperName.length > 64) {
@@ -263,12 +273,19 @@ export default {
         this.form.resourceId = this.resourceInfo.spokenId
       }
     } else if (this.resourceInfo && this.isEdit) {
+
       this.form.duration = this.resourceInfo.duration
       this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
       this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
-      this.form.desc = this.resourceInfo.description
+      if (this.resourceInfo.description) {
+        this.form.desc = this.resourceInfo.description
+      } else if (this.resourceInfo.desc) {
+        this.form.desc = this.resourceInfo.desc
+      }
+
       this.testPaperName = this.resourceInfo.testPaperName
       this.form.comment = '1'
+
 
       // this.form.object = this.resourceInfo.description
       this.resourceInfo.tchClassTastInfo.forEach(ele => {
@@ -294,7 +311,7 @@ export default {
 
       if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
 
-      } else if (this.$route.query.taskType === 'T03') {//试卷exam
+      } else if (this.$route.query.taskType === 'T03' && this.$route.query.resourceType === 'R02') {//试卷exam
 
         this.testPaperId = this.resourceInfo.testPaperId
         this.testPaperName = this.resourceInfo.testPaperName
@@ -325,6 +342,7 @@ export default {
 
       if (this.tchCourseInfo) {
         this.currentTchCourseId = this.tchCourseInfo.tchCourseId
+        // if (!this.isEdit) {
         let endDate = new Date(this.tchCourseInfo.tchClassCourseInfo[0].endDate)
         endDate.setHours(23)
         endDate.setMinutes(59)
@@ -335,6 +353,9 @@ export default {
         } else {
           this.form.time2 = formatTime(endDate);
         }
+        // }
+        console.log(this.form.time2, 'this.form.time2');
+
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
           this.classList = JSON.parse(taskClass)
@@ -357,6 +378,7 @@ export default {
 
         this.classList = this.tchCourseInfo.tchClassCourseInfo
         let subjectType = this.tchCourseInfo.subjectType
+
 
         this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
         //获取分组信息
@@ -439,12 +461,17 @@ export default {
               this.$set(item, 'type', "none")
             }
           }
-
+          if (!this.isEdit) {
+          }
           item.startDate = this.form.time1
           item.endDate = this.form.time2
+          console.log("classlist//////////////", this.classList);
         })
+        // return
         this.$store.commit('setTeamList', this.form.class)
 
+
+        console.log(this.classList, "classlist是什么");
         if (this.isEdit) {
           let tchClassCourseInfo = this.resourceInfo.tchClassTastInfo
           let classStart = {}
@@ -477,7 +504,14 @@ export default {
                   this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
 
                   this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
-                  this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                  if (this.$route.query.isResend) {
+                    let now = new Date()
+                    now.setDate(now.getDate() + 3)
+                    this.classList[m]['endDate'] = formatTime(new Date(now))
+                  } else {
+                    this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                  }
+
                 }
               })
             }
@@ -490,10 +524,17 @@ export default {
             this.form.time2 = formatTime(new Date(tchClassCourseInfo[0].endDate))
           }
 
+
           this.classList.forEach(item => {
             item.check = false
             item.type = 'none'
             this.$set(item, 'type', "none")
+
+            if (this.form.object == '1') {
+              for (let k in item.classStudent) {
+                item.classStudent[k].active = false
+              }
+            }
             this.resourceInfo.tchClassTastInfo.forEach(element => {
               if (item.classId == element.classId) {
                 console.log(item.classId == element.classId, 'item.classId == element.classId');
@@ -507,12 +548,28 @@ export default {
                 for (const key in item.classStudent) {
                   this.$set(item.classStudent[key], 'active', false)
                   item.classStudent[key].active = false
-                  element.accountNo.forEach(i => {
-                    if (key == i) {
+                  if (this.$route.query.isResend) {
+                    //重发任务
+                    const unfinishList = JSON.parse(JSON.stringify(this.$route.query.taskFinishInfo)).studentUnfinishList
+                    const accountNoList = unfinishList.reduce((t, unfinish) => {
+                      t.push(...unfinish.accountNoList)
+                      return t
+                    }, [])
+                    if (accountNoList.some(account => account == key)) {
                       this.$set(item.classStudent[key], 'active', true)
                       item.classStudent[key].active = true
+                    } else {
+                      //只要有一个学生不在未完成列表里面 就证明不是全选
+                      this.$set(item, 'type', "part")
                     }
-                  })
+                  } else {
+                    element.accountNo.forEach(i => {
+                      if (key == i) {
+                        this.$set(item.classStudent[key], 'active', true)
+                        item.classStudent[key].active = true
+                      }
+                    })
+                  }
                 }
 
                 item.tchSubGroup.forEach((ele, index) => {
@@ -521,20 +578,23 @@ export default {
                     ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
                       s.active = false
                       this.$set(s, 'active', false)
-                      element.tchClassSubGroup.forEach(i => {
+                      element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
                         if (s.subgroupId == i) {
                           s.active = true
                         }
                       })
                     })
                   }
-                  element.tchClassSubGroup.forEach(i => {
-                    if (ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
-                      console.log("相等==");
-                      this.$set(ele, 'check', true)
-                      ele.check = true
-                    }
-                  })
+                  if (element.tchClassSubGroup) {
+                    element.tchClassSubGroup.forEach(i => {
+                      if (ele.tchClassSubGroupStudent && ele.tchClassSubGroupStudent.tchClassSubGroup && ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
+                        console.log("相等==");
+                        this.$set(ele, 'check', true)
+                        ele.check = true
+                      }
+                    })
+                  }
+
                 })
               } else {
                 item.tchSubGroup.forEach(obj => {
@@ -657,7 +717,7 @@ export default {
       if (this.form.object === "1") {
         console.log("按班级发任务")
         this.classList.forEach(item => {
-          if (!item.classStudent || Object.keys(item.classStudent).length > 0) {
+          if (item.classStudent || Object.keys(item.classStudent).length > 0) {
             this.$set(item, "disabled", false)
           } else {
             this.$set(item, "disabled", true)
@@ -975,6 +1035,7 @@ export default {
         if (res) {
           this.showLoading = false
           if (res.flag) {
+            eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
             this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId)
             let taskInfo = {
               taskName: this.form.name,
@@ -1189,16 +1250,9 @@ export default {
           this.showLoading = false
           if (res.flag) {
             this.$toast.success("提交成功")
-            this.$router.replace('/preview')
-            // this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId)
-            // let taskInfo = {
-            //   taskName: this.form.name,
-            //   desc: this.form.desc,
-            //   examCount: this.examCount,
-            //   duration: this.form.duration,
-            //   taskType: taskType
-            // };
-            // this.$store.commit('setSendTaskInfo', taskInfo)
+            eventBus.$emit(this.$route.query.from + "EditTask", true);
+            this.$router.back()
+
           } else {
             this.$toast(res.msg)
           }

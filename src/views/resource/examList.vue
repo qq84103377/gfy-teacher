@@ -55,7 +55,7 @@
 
     </div>
     <div class="exam-list__footer">
-      <van-button type="info" class="btn" @click="addExam.title = '新建试卷';addExam.show = true">新建试卷</van-button>
+      <van-button type="info" class="btn" @click="createTestPaper">新建试卷</van-button>
     </div>
 
     <van-popup
@@ -124,6 +124,7 @@
   import listItem from '../../components/list-item'
   import {teachApi} from "../../api/parent-GFY";
   import {modifyTeachCourseRes, addTestPaper, addTeachCourseRes, modifyTestPaper, copyTestPaper} from '@/api/index'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "examList",
@@ -147,7 +148,10 @@
         currentPage: 0,
         total: 0,
         scrollTop: 0,
-        currentItem: {}
+        currentItem: {},
+        "tchCourseId": this.$route.query.tchCourseId,
+        "sysCourseId": this.$route.query.sysCourseId,
+        "relationSeqId": this.$route.query.relationCourseId,
       }
     },
     computed: {
@@ -175,7 +179,23 @@
         });
       });
     },
+    mounted() {
+      // this.getClassTeachCourseInfo()
+      eventBus.$off("examListRefresh")
+      eventBus.$on("examListRefresh", (data) => {
+        this.onRefresh()
+      })
+    },
     methods: {
+      createTestPaper() {
+        this.$router.push({path:`/questionList`,query:{
+            "tchCourseId": this.$route.query.tchCourseId,
+            "sysCourseId": this.$route.query.sysCourseId,
+            "relationSeqId": this.$route.query.relationCourseId,
+            "courseName": this.$route.query.courseName,
+            from: 'examList'
+          }})
+      },
       viewDetail(item) {
         this.$store.commit('setResourceInfo', item)
         this.$store.commit("setTaskClassInfo", '')
@@ -346,7 +366,11 @@
                   this.$toast('添加成功')
                   this.$refs['body'].scrollTo(0, 0)
                   this.onRefresh()
-                  this.$router.push(`/questionList`)
+                  this.$router.push({path:`/questionList`,query:{
+                      "tchCourseId": this.$route.query.tchCourseId,
+                      "sysCourseId": this.$route.query.sysCourseId,
+                      "relationSeqId": this.$route.query.relationCourseId,
+                    }})
                 } else {
                   this.$toast(ret[0].msg)
                 }
@@ -388,11 +412,11 @@
         })
       },
       handleSubmit() {
-        if (this.addExam.title == '编辑') {
+        // if (this.addExam.title == '编辑') {
           this.modifyTestPaper()
-        } else {
-          this.addTestPaper()
-        }
+        // } else {
+        //   this.addTestPaper()
+        // }
       },
       async onLoad() {
         this.currentPage++
@@ -417,9 +441,9 @@
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
-          "tchCourseId": this.$route.query.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId,
+          "tchCourseId": this.tchCourseId,
+          "sysCourseId": this.sysCourseId,
+          "relationSeqId": this.relationCourseId,
           "resourceType": 'R02',
           "shareType": '',
           "sourceName": "",
@@ -446,13 +470,15 @@
       },
       senTask(obj){
         if (!obj.objectiveItemNum && !obj.subjectiveItemNum){
-          this.$toast('该试卷不含试题')
-          return
+          return this.$toast('该试卷不含试题')
+        }
+        if(obj.stateName) {
+          return this.$toast('该试卷已发任务,不能重复发任务')
         }
         console.log("发任务：", obj.testPaperName)
         this.$store.commit('setResourceInfo', obj)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/addTask?type=exam&_t=new`)
+        this.$router.push(`/addTask?type=exam&_t=new&from=examList`)
       },
     }
   }

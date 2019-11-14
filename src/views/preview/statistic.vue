@@ -3,14 +3,16 @@
     <van-nav-bar :title="info.taskName" @click-left="$router.back()" left-arrow>
       <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper">试卷分析</div>
     </van-nav-bar>
-    <div class="statistic-wrap__tab-scroll" v-if="$route.query.type != 'inClass'">
+    <div class="statistic-wrap__tab-scroll">
       <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
       </div>
     </div>
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
-          <van-button class="notice-btn" :class="{remind: remind}" v-if="$route.query.type != 'inClass'" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">重发任务
+          </van-button>
+          <van-button class="notice-btn" v-else :class="{remind: remind}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
@@ -233,9 +235,36 @@ export default {
     }),
     subjectTypeName() {
       return localStorage.currentSubjectTypeName
-    }
+    },
+    isTaskEnd() {
+      return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate).getTime()
+    },
   },
   methods: {
+    sendTask() {
+      let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
+      tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)
+      this.$store.commit('setResourceInfo', this.info)
+      this.$store.commit("setTchCourseInfo", tchCourseInfo)
+      this.$store.commit("setTaskClassInfo", '')
+      this.$router.push({
+        path: '/addTask?_t=new',
+        query: {
+          info: this.info,
+          testPaperId: this.info.testPaperId,
+          termType: this.termType,
+          tchCourseId: this.info.tchCourseId,
+          taskId: this.info.taskId,
+          taskType: this.info.taskType,
+          resourceType: this.info.resourceType,
+          isEdit: true,
+          isResend: 1,
+          taskFinishInfo: this.taskFinishInfo,
+          courseName: this.$route.query.courseName,
+          from: this.$route.query.from,
+        }
+      })
+    },
     goVideoPage(url) {
       if (!url) return
       this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
@@ -273,7 +302,7 @@ export default {
       // }else {
       this.$router.push({
         name: `examView`,
-        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType }
+        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType }
       })
       // }
     },
@@ -984,19 +1013,28 @@ export default {
         this.checkUrlPermission()
       }
     }
-
     this.$store.commit('setVanLoading', false)
     // if (!this.isWk && !this.isSpoken) {
     // }
   },
   beforeRouteEnter(to, from, next) {
     if (from.path === '/imgCorrect') {
-      // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
       next(async vm => {
         await vm.statTaskStat()
         vm.getAppraise()
       })
-    } else {
+    }else if (from.path === '/examView') {
+      next(async vm => {
+        await vm.statTaskStat()
+      })
+    }
+    else if (from.path === '/addTask') {
+      next(vm => {
+       const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
+        vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
+      })
+    }
+    else {
       next()
     }
   },

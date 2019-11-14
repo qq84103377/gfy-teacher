@@ -106,6 +106,7 @@
   import {generateTimeReqestNumber} from '@/utils/filter'
   import {Dialog} from 'vant';
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务
@@ -313,6 +314,7 @@
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
             this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}`)
+            if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
           } else {
             this.$toast(res.msg)
           }
@@ -343,7 +345,7 @@
         if (this.type === 'task') {
           if (this.length) {
             // this.$router.push(`/addTask?type=exam`)
-            this.$router.push(`/addTask?type=exam&_t=new`)
+            this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
           }
         } else {
           this.addExam = true

@@ -82,6 +82,15 @@ export default new Router({
           }
         },
         {
+          path: '/addSubGroupScore',
+          name: 'addSubGroupScore',
+          component: () => import('./views/preview/addSubGroupScore.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '加分/减分'
+          }
+        },
+        {
           path: '/briefing',
           name: 'briefing',
           component: () => import('./views/preview/briefing.vue'),
@@ -109,11 +118,6 @@ export default new Router({
           name: 'imgCorrect',
           component: () => import('./views/preview/imgCorrect.vue')
         },
-        // {
-        //   path: "/editTask",
-        //   name: "editTask",
-        //   component: () => import("./views/preview/editTask.vue")
-        // },
         {
           path: '/spokenAnalyse',
           name: 'spokenAnalyse',
@@ -568,6 +572,14 @@ export default new Router({
           meta: {
             isShowHeader: true,
             title: '家庭报告'
+          }
+        },
+        {
+          path: "/specialExer",
+          component: () => import("./views/specialExer/index.vue"),
+          meta: {
+            isShowHeader: true,
+            title: "专项练习"
           }
         },
         {

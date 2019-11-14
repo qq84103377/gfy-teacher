@@ -113,7 +113,7 @@
     </div>
 
     <div class="add-course-wrap__footer" v-if="isEdit">
-      <van-button class="edit-btn" type="info">取消</van-button>
+      <van-button class="edit-btn" type="info" @click="$emit('onFinish')">取消</van-button>
       <van-button class="edit-btn" type="info" :loading="loadingEdit" @click="submitEdit" loading-text="修改中...">提交</van-button>
     </div>
     <div class="add-course-wrap__footer" v-else>
@@ -765,6 +765,7 @@ export default {
         if (res) {
           if (res.flag) {
             this.$toast('修改成功')
+            this.$emit('onFinish')
           } else {
             this.$toast(res.flag)
           }

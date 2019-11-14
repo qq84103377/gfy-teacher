@@ -81,7 +81,7 @@
           "type": this.leftValue === '30%' ? "T01" : 'T02',
           score,
           "subjectType": localStorage.currentSubjectType,
-          "teacherName": localStorage.userInfo.userName,
+          "teacherName": JSON.parse(localStorage.getItem('userInfo')).userName,
           "taskName": JSON.parse(localStorage.getItem('stat')).taskName,
           "termType": this.$route.params.termType,
           "classId": this.$route.params.info.classId,

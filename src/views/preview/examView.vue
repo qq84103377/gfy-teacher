@@ -19,12 +19,16 @@
         <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
       </div>
     </div>
+    <div class="exam-view-wrap__footer">
+      <van-button type="info" class="btn" @click="addSubScore">加分/减分</van-button>
+    </div>
   </section>
 </template>
 
 <script>
   import scoreTable from '../../components/scoreTable'
   import {getStudentName} from '@/utils/filter'
+  import {statTaskStatV2, statTaskStat} from '@/api/index'
 
   export default {
     name: "examView",
@@ -35,6 +39,7 @@
         title: this.$route.params.title,
         isSpoken: this.$route.params.isSpoken,
         taskType: this.$route.params.taskType,
+        termType: this.$route.params.termType,
       }
     },
     computed: {
@@ -72,6 +77,7 @@
               t.push({
                 groupId: v.groupId,
                 groupName: v.groupName,
+                groupScore: v.groupScore,
                 average: item.score,
                 stu: [item]
               })
@@ -85,8 +91,59 @@
     },
     created() {
     },
+    beforeRouteEnter(to, from, next) {
+      if (from.path === '/addSubScore' || from.path === '/addSubGroupScore') {
+        next( vm => {
+           vm.statTaskStat()
+        })
+      }
+      else {
+        next()
+      }
+    },
     components: {scoreTable},
     methods: {
+      statTaskStat() {
+        this.$store.commit('setVanLoading',true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.info.taskId,
+          classId: this.info.classId,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        let api
+        if (['T10'].includes(this.$route.query.taskType)) {
+          //从堂测统计进入
+          api = statTaskStatV2
+        } else {
+          api = statTaskStat
+        }
+        api(params).then(res => {
+          this.$store.commit('setVanLoading',false)
+          if (res.flag && res.data[0]) {
+            if (this.$route.query.taskType === 'T13') {
+              res.data[0].studentStatList = res.data[0].examstat
+              //因为口语没有testPaperScore这个字段,但是总分是按100分来算的
+              res.data[0].testPaperScore = 100
+            }
+            this.info = res.data[0]
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      addSubScore() {
+        if(this.classView) {
+        this.$router.push({name:`addSubScore`,params:{info:this.info,termType:this.termType}})
+        }else {
+          this.$router.push({name:`addSubGroupScore`,params:{info:this.info,termType:this.termType}})
+        }
+      },
       //冒泡排序
       bubbleSort(arr) {
 
@@ -176,6 +233,19 @@
       overflow-y: auto;
       padding: 0 10px 10px;
 
+    }
+    &__footer {
+      flex: 0 0 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      .btn {
+        height: 44px;
+        line-height: 44px;
+        flex: 1;
+        border-radius: 20px;
+        font-size: 18px;
+      }
     }
   }
 </style>

@@ -36,6 +36,7 @@
 <script>
   import listItem from '../../components/list-item'
   import {getClassTeachCourseInfo, getCourseTaskList, deleteCourseTask} from '@/api/index'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "classStatList",
@@ -52,6 +53,14 @@
         tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo)),
         scrollTop: 0,
       }
+    },
+    mounted() {
+      // this.getClassTeachCourseInfo()
+      eventBus.$off("classStatListEditTask")
+      eventBus.$on("classStatListEditTask", (data) => {
+        console.log("classStatListEditTask eventbus");
+        this.onRefresh()
+      })
     },
     beforeRouteLeave(to, from, next) {
       this.scrollTop = this.$refs["body"].scrollTop;
@@ -79,7 +88,9 @@
             tchCourseId: item.tchCourseId,
             taskId: item.taskId,
             taskType: item.taskType,
-            resourceType: item.resourceType
+            resourceType: item.resourceType,
+            courseName: this.$route.query.courseName,    // 重发任务需要用到
+            from: 'classStatList'
           }
         })
         localStorage.setItem('stat', JSON.stringify(item))

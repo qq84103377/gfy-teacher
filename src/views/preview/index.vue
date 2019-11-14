@@ -8,7 +8,7 @@
       <div v-else slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
           <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass"></edit-course>
+            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -64,6 +64,7 @@ import {
   deleteCourseTask,
   getCourseTaskDetail
 } from '@/api/index'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "index",
@@ -71,7 +72,6 @@ export default {
   data() {
     return {
       show: false,
-      list: [{ name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 }, { name: 1 },],
       courseList: [],
       courseTaskList: [],
       courseName: '',
@@ -99,7 +99,13 @@ export default {
   },
   mounted() {
     // this.getClassTeachCourseInfo()
+    eventBus.$off("previewEditTask")
+    eventBus.$on("previewEditTask", (data) => {
+      console.log("previewEditTask eventbus");
+      this.onRefresh()
+    })
   },
+
   beforeRouteLeave(to, from, next) {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
@@ -112,6 +118,9 @@ export default {
     });
   },
   methods: {
+    toggle() {
+      this.$refs.dropdown.toggle();
+    },
     async changeCourse(type) {
       if (type) {
         //下一题
@@ -205,9 +214,12 @@ export default {
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
           taskType: item.taskType,
-          resourceType: item.resourceType
+          resourceType: item.resourceType,
+          courseName: this.courseName,    // 重发任务需要用到
+          from: 'preview',
         }
       })
+      localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.tchCourseInfo))
       localStorage.setItem('stat', JSON.stringify(item))
     },
     async selectCourse(tchCourseInfo, index) {
@@ -495,6 +507,7 @@ export default {
     editTask(item) {
       console.log(item, 'editTask  item');
       this.$store.commit('setResourceInfo', item)
+      console.log(this.tchCourseInfo, 'this.tchCourseInfo');
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
       this.$store.commit("setTaskClassInfo", '')
       this.$router.push({
@@ -507,7 +520,8 @@ export default {
           taskId: item.taskId,
           taskType: item.taskType,
           resourceType: item.resourceType,
-          isEdit: true
+          isEdit: true,
+          from: 'preview',
         }
       })
     },

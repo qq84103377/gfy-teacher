@@ -12,7 +12,7 @@
                 <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
                 <span>班级查看</span>
               </div>
-              <div>
+              <div @click="editTask(item)">
                 <i class="iconGFY icon-edit"></i>
                 <span>编辑</span>
               </div>
@@ -32,6 +32,8 @@
 import listItem from '../../components/list-item'
 import { getUnFinishCourseTask, getCourseTaskDetail, deleteCourseTask } from '@/api/index'
 import { pubApi } from '@/api/parent-GFY'
+import eventBus from "@/utils/eventBus";
+
 export default {
   name: "unfinishTaskList",
   components: { listItem },
@@ -57,6 +59,13 @@ export default {
         vm.$refs["body"].scrollTo(0, vm.scrollTop);
       });
     });
+  },
+  mounted() {
+    eventBus.$off("unfinishEditTask")
+    eventBus.$on("unfinishEditTask", (data) => {
+      console.log("unfinishEditTask eventbus");
+      this.onRefresh()
+    })
   },
   methods: {
     viewStat(item) {
@@ -99,17 +108,17 @@ export default {
       });
     },
     goto(item) {
-      if(item.testPaperId > 0) {
+      if (item.testPaperId > 0) {
         this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${item.tchCourseClassInfo[0].classGrade}&title=${item.tchCourseClassInfo[0].testPaperName}`)
-      }else if (item.tastType === 'T03'){
+      } else if (item.tastType === 'T03') {
         if (item.resourceType === 'R03') {
           //单道试题
           this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.tastName}`)
         }
       } else if (['T13'].includes(item.tastType)) {
         //口语
-          this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${item.tchCourseClassInfo[0].sysCourseId}`)
-      } else if (['T02','T04','T06'].includes(item.tastType)) {
+        this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${item.tchCourseClassInfo[0].sysCourseId}`)
+      } else if (['T02', 'T04', 'T06'].includes(item.tastType)) {
         // 学资源 微课+心得 讨论  跳任务统计
         this.viewStat(item)
       }
@@ -245,7 +254,44 @@ export default {
         this.$toast('资源错误')
       })
 
-    }
+    },
+    editTask(item) {
+      console.log(item, 'editTask  item');
+      // let classList = []
+      let classMap = JSON.parse(localStorage.getItem("classMap"));
+      for (const key in classMap) {
+        for (var i = 0; i < item.courseClassList.length; i++) {
+          if (classMap[key].classId == item.courseClassList[i].classId) {
+            item.courseClassList[i].className = classMap[key].className
+            // classList.push({ classId: item.courseClassList[i].classId, className: classMap[key].className, })
+          }
+        }
+      }
+      console.log(item.courseClassList, 'item.courseClassList');
+      let tchCourseInfo = {
+        tchCourseId: item.tchCourseId,
+        tchClassCourseInfo: item.courseClassList,
+        subjectType: item.subjectType,
+      }
+      this.$store.commit('setResourceInfo', item)
+      this.$store.commit("setTchCourseInfo", tchCourseInfo)
+      console.log(tchCourseInfo, 'tchCourseInfo');
+      this.$store.commit("setTaskClassInfo", '')
+      this.$router.push({
+        path: '/addTask?_t=new',
+        query: {
+          info: item,
+          testPaperId: item.testPaperId,
+          // termType: this.termType,
+          tchCourseId: item.tchCourseId,
+          taskId: item.taskId,
+          taskType: item.taskType ? item.taskType : item.tastType,
+          resourceType: item.resourceType,
+          isEdit: true,
+          from: 'unfinish'
+        }
+      })
+    },
   }
 }
 </script>
