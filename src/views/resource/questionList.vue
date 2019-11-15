@@ -117,8 +117,10 @@
       }
     },
     created() {
-      this.getExamSectionTypeRelation()
-      this.getSysDictList()
+      this.$store.commit('setVanLoading',true)
+      Promise.all([this.getExamSectionTypeRelation(),this.getSysDictList()]).then(res => {
+        this.$store.commit('setVanLoading',false)
+      })
     },
     beforeRouteLeave(to, from, next) {
       this.scrollTop = this.$refs["body"].scrollTop;
@@ -198,7 +200,7 @@
         this.$refs['body'].scrollTo(0, 0)
         this.onRefresh()
       },
-      getSysDictList() {
+     async getSysDictList() {
         let obj = {
           "interUser": "123",
           "interPwd": "123",
@@ -207,13 +209,13 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getSysDictList(params).then(res => {
+       await getSysDictList(params).then(res => {
           if (res.flag) {
             this.tab.typeList.push(...res.data[0].sysDictInfoList)
           }
         })
       },
-      getExamSectionTypeRelation() {
+      async getExamSectionTypeRelation() {
         let obj = {
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
@@ -231,7 +233,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getExamSectionTypeRelation(params).then(res => {
+       await getExamSectionTypeRelation(params).then(res => {
           if (res.flag) {
             this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
           }
@@ -272,7 +274,7 @@
           requestJson: JSON.stringify(obj)
         }
         teachApi.getTeachCourseResDetail(params).then(res => {
-          this.$store.commit('setVanLoading',false)
+          if(this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading',false)
           this.listLoading = false
           this.refLoading = false
           this.total = res.total
