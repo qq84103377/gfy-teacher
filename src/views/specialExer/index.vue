@@ -1,79 +1,72 @@
 <template>
   <section class="question-type-wrap">
     <van-row class="question-type-wrap__tit">
-      <van-col span="8" :class="{active:active==0}" @click="active=0">题型专项</van-col>
-      <van-col span="8" :class="{active:active==1}" @click="active=1">知识点专项</van-col>
-      <van-col span="8" :class="{active:active==2}" @click="active=2">复习套卷</van-col>
+      <van-col span="8" :class="{ active: active == 0 }" @click="active = 0">题型专项</van-col>
+      <van-col span="8" :class="{ active: active == 1 }" @click="active = 1">知识点专项</van-col>
+      <van-col span="8" :class="{ active: active == 2 }" @click="active = 2">复习套卷</van-col>
     </van-row>
 
-    <!-- <div @click="toggleTab(item,index)" :class="['report-detail__tab-item',{'blue':item.active}]" v-for="(item,index) in tabList" :key="index">{{item.name}}
-      </div> -->
-
-    <div class='question-type-wrap__body'>
+    <div class="question-type-wrap__body">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999" />
 
-      <van-cell @click="openAreaPop" title="地区" is-link>
-        <div class="blue">{{gradeSubjectList[gradeIndex].name}}</div>
+      <van-cell @click="changeList(area,'地区');filterShow=true" title="地区" is-link>
+        <div class="blue">{{filter.area}}</div>
       </van-cell>
 
-      <van-cell v-if="active!=2" @click="openSubjectPop" title="科目" is-link>
-        <div class="blue">{{classList[classIndex].schoolYear + classList[classIndex].gradeName + classList[classIndex].className}}</div>
+      <van-cell v-if="active != 2" @click="changeList(subject,'科目');filterShow=true" title="科目" is-link>
+        <div class="blue">
+          {{filter.subject}}
+        </div>
       </van-cell>
 
       <van-cell v-else @click="openGradePop" title="年级学科" is-link>
-        <div class="blue">{{classList[classIndex].schoolYear + classList[classIndex].gradeName + classList[classIndex].className}}</div>
+        <div class="blue">
+          {{filter.grade}}
+        </div>
       </van-cell>
 
-      <van-cell v-if="active!=2" @click="openTextbookPop" title="教材" is-link>
-        <div class="blue">{{classList[classIndex].schoolYear + classList[classIndex].gradeName + classList[classIndex].className}}</div>
+      <van-cell v-if="active != 2" @click="changeList(testbook,'教材');filterShow=true" title="教材" is-link>
+        <div class="blue">
+          {{filter.testbook}}
+        </div>
       </van-cell>
 
       <van-cell v-else @click="openMorePop" title="更多" is-link>
-        <div class="blue">什么更多</div>
+        <div class="blue">{{filter.more}}</div>
       </van-cell>
 
       <!-- <router-view ref="routerView"></router-view> -->
-      <question-type v-if='active==0'></question-type>
-      <knowledge-point v-if='active==1'></knowledge-point>
-      <review-test v-if='active==2'></review-test>
+      <question-type v-if="active == 0"></question-type>
+      <knowledge-point v-if="active == 1"></knowledge-point>
+      <review-test v-if="active == 2"></review-test>
 
     </div>
-    <!-- 地区-->
-    <van-popup v-model="areaPop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '90%' }">
+    <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter" :double='double'></filter-panel>
+
+
+    <!--    复习套卷-年级学科-->
+    <van-popup v-model="gradePop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
       <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(gradeSubjectList)" class="close" name="close" />
-        <div class="grade-pop-wrap__title van-hairline--bottom">地区</div>
-        <div class="grade-pop-wrap__body">
-          <div class="province">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" class="province_border" :class="{active:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-              </div>
-            </van-cell>
-          </div>
-          <div class="city">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{cityActive:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-                <van-icon v-if="item.active" class="blue" name="success" />
-              </div>
-            </van-cell>
-          </div>
+        <van-icon @click="handleClose(0,gradeSubjectList)" class="close" name="close" />
+        <div class="grade-pop-wrap__subject van-hairline--bottom">
+          <span v-for="(item, index) in subject" :key="index" :class="[{ blue: item.active }]" @click="handleSelectSubject(item)">{{ item.name }}</span>
         </div>
-        <div class="grade-pop-wrap__footer">
-          <van-button class="btn" type="info" @click="confirm()">确定</van-button>
-        </div>
-      </div>
-    </van-popup>
-    <!--   科目-->
-    <van-popup v-model="subjectPop" round position="bottom" :style="{ height: '90%' }">
-      <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(classList)" class="close" name="close" />
-        <div class="grade-pop-wrap__title van-hairline--bottom">科目</div>
         <div class="grade-pop-wrap__body">
-          <van-cell @click="selectItem(value,key,classList)" v-for="(value,key) in classList" :key="key">
-            <div slot="title" class="aic jcsb"><span>{{value.schoolYear + value.gradeName + value.className}}</span>
-              <van-icon v-if="value.active" class="blue" name="success" />
+
+          <div class="grade-pop-wrap__body-left">
+            <div @click="selectGradeParent(item,index)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
             </div>
-          </van-cell>
+          </div>
+
+          <div class="grade-pop-wrap__body-right">
+            <div class="" v-for="(item,index) in gradeSubjectList[gradeIndex].child" :key="index">
+              <div @click="handleSelectGrade(item)" class="van-hairline--bottom">
+                <div :class="['cell__item',{active:item.check}]">{{item.name}}
+                  <van-icon v-show="item.check" class="check blue" name="success" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="grade-pop-wrap__footer">
           <van-button class="btn" type="info" @click="confirm(1)">确定</van-button>
@@ -81,78 +74,32 @@
       </div>
     </van-popup>
 
-    <!--    复习套卷-年级学科-->
-    <van-popup v-model="gradePop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '90%' }">
-      <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(gradeSubjectList)" class="close" name="close" />
-        <div class="grade-pop-wrap__subject van-hairline--bottom">
-          <span v-for="(item,index) in rangeList" :key="index" :class="[{blue:item.active}]" @click="">{{item.name}}</span>
-        </div>
-        <div class="grade-pop-wrap__body">
-          <div class="province">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" class="province_border" :class="{active:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-              </div>
-            </van-cell>
-          </div>
-          <div class="city">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{cityActive:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-                <van-icon v-if="item.active" class="blue" name="success" />
-              </div>
-            </van-cell>
-          </div>
-        </div>
-        <div class="grade-pop-wrap__footer">
-          <van-button class="btn" type="info" @click="confirm()">确定</van-button>
-        </div>
-      </div>
-    </van-popup>
-
-    <!--    教材-->
-    <van-popup v-model="textbookPop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '90%' }">
-      <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(gradeSubjectList)" class="close" name="close" />
-        <div class="grade-pop-wrap__title van-hairline--bottom">教材</div>
-        <div class="grade-pop-wrap__body">
-          <div class="province">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" class="province_border" :class="{active:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-              </div>
-            </van-cell>
-          </div>
-          <div class="city">
-            <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{cityActive:item.active}">
-              <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-                <van-icon v-if="item.active" class="blue" name="success" />
-              </div>
-            </van-cell>
-          </div>
-        </div>
-        <div class="grade-pop-wrap__footer">
-          <van-button class="btn" type="info" @click="confirm()">确定</van-button>
-        </div>
-      </div>
-    </van-popup>
-
     <!--  更多-->
-    <van-popup v-model="morePop" round position="bottom" :style="{ height: '90%' }">
+    <van-popup v-model="morePop" round position="bottom" :style="{ height: '93%' }">
       <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(classList)" class="close" name="close" />
+        <van-icon @click="handleClose(1,moreList)" class="close" name="close" />
         <div class="grade-pop-wrap__title van-hairline--bottom">更多</div>
-        <div class="grade-pop-wrap__body">
+        <div class="grade-pop-wrap__body-more">
           <van-cell>
             类型
           </van-cell>
           <div class="grade-pop-wrap__body__group-wrap">
-            <div @click="handleSelectChild(s,c)" v-for="(s,si) in list" :key="si" :class="['grade-pop-wrap__body__group-wrap-item',{active:s.active}]">{{s}}
+            <div @click="handleSelectChild(s, moreList[0])" v-for="(s, si) in moreList[0]" :key="si" :class="[
+                'grade-pop-wrap__body__group-wrap-item',
+                { active: s.active }
+              ]">
+              {{ s.name }}
             </div>
           </div>
           <van-cell>
             年份
           </van-cell>
           <div class="grade-pop-wrap__body__group-wrap">
-            <div @click="handleSelectChild(s,c)" v-for="(s,si) in list" :key="si" :class="['grade-pop-wrap__body__group-wrap-item',{active:s.active}]">{{s}}
+            <div @click="handleSelectChild(s, moreList[1])" v-for="(s, si) in moreList[1]" :key="si" :class="[
+                'grade-pop-wrap__body__group-wrap-item',
+                { active: s.active }
+              ]">
+              {{ s.name }}
             </div>
           </div>
         </div>
@@ -165,212 +112,375 @@
 </template>
 
 <script>
-import { generateTimeReqestNumber } from '@/utils/filter'
-import reviewTest from './component/reviewTest'
-import questionType from './component/questionType'
-import knowledgePoint from './component/knowledgePoint'
+import { generateTimeReqestNumber } from "@/utils/filter";
+import reviewTest from "./component/reviewTest";
+import questionType from "./component/questionType";
+import knowledgePoint from "./component/knowledgePoint";
+import filterPanel from './component/filterPanel'
+import { gettestbookVersionInfo, getSubjectType } from '@/api/index'
 
 export default {
   name: "index",
   components: {
     reviewTest,
     questionType,
-    knowledgePoint
+    knowledgePoint,
+    filterPanel
   },
   data() {
     return {
-      rangeList: [
-        { name: '近一周', mtd1: 'getDate', mtd2: 'setDate', num: 7, active: true },
-        { name: '近一个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 1, active: false },
-        { name: '近三个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 3, active: false },
-      ],
-      areaPop: false,
-      subjectPop: false,
-      textbookPop: false,
+      active: 0,
+
       morePop: false,
       gradePop: false,
-      showTime: false,
-      currentDate: '',
-      maxDate: new Date(),
-      gradeSubjectList: [],
-      gradeIndex: 0,
-      classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
-      // classList: {0:{gradeName:'全部',schoolYear:'',className:'',classId:'',active:true},...JSON.parse(localStorage.getItem("classMap"))},
-      classList: JSON.parse(localStorage.getItem("classMap")),
-      filterTime: {
-        start: '',
-        end: generateTimeReqestNumber(new Date()),
-        type: true,   //true为开始
+
+      filterShow: false,
+      title: '',
+      filter: {
+        area: '',
+        subject: '',
+        testbook: '',
+        grade: '',
+        more: ''
       },
-      activeKey: 0,
-      list: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-      active: 0
-    }
+      double: true,
+
+      area: [
+        { name: '广东', active: true, child: [{ name: '广州市' }, { name: '清远市' }, { name: '韶关市' }] },
+        { name: '广西', child: [{ name: '玉林市' }, { name: '贵港市' }, { name: '南陵市' }] },
+      ],
+      subject: [
+        { name: '语文', value: 'Y01', active: true, child: [] },
+        { name: '数学', value: 'Y02', active: false, child: [] },
+        { name: '英语', value: 'Y03', active: false, child: [] },
+        { name: '物理', value: 'Y03', active: false, child: [] },
+        { name: '化学', value: 'Y03', active: false, child: [] },
+        { name: '高中', value: 'Y03', active: false, child: [] },
+      ],
+      subjectIndex:0,
+      testbook: [
+        { name: '粤教沪科版(沪粤版)', active: true, child: [{ name: '亲年级上册' }, { name: '八年级下册' }, { name: '老头教学' }] },
+        { name: '外研版', child: [{ name: 'asdasd' }, { name: '八年级fdfgd下册' }, { name: '老头sdfs教学' }] },
+      ],
+      course: [
+        { name: '一单元', child: [{ name: '说和做砂进口的' }, { name: '的境况是假的' }, { name: '健康的时刻纯净水' }] },
+        { name: '五座', child: [{ name: '四渡赤水都吃' }, { name: 'as' }, { name: '的深V是' }] },
+      ],
+      list: [
+        { name: '小学', value: 'Y01', active: true, child: [] },
+        { name: '初中', value: 'Y02', active: false, child: [] },
+        { name: '高中', value: 'Y03', active: false, child: [] },
+      ],
+      moreList: [
+        [
+          { name: '小学', value: 'Y01', active: true, child: [] },
+          { name: '初中', value: 'Y02', active: false, child: [] },
+          { name: '高中', value: 'Y03', active: false, child: [] },
+        ],
+        [
+          { name: '小学', value: 'Y01', active: true, child: [] },
+          { name: '初中', value: 'Y02', active: false, child: [] },
+          { name: '高中', value: 'Y03', active: false, child: [] },
+        ]
+      ],
+      moreIndex: '',
+
+      label: 'subjectName',
+
+      // areaPop: false,
+      // subjectPop: false,
+      // testbookPop: false,
+
+      gradeSubjectList: [
+        { name: '粤教沪科版(沪粤版)', active: true, child: [{ name: '亲年级上册' }, { name: '八年级下册' }, { name: '老头教学' }] },
+        { name: '外研版', child: [{ name: 'asdasd' }, { name: '八年级fdfgd下册' }, { name: '老头sdfs教学' }] }
+      ],
+      gradeIndex: 0,
+      gradeOldIndex: 0,
+      gradeIndex2: -1,
+
+      classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
+
+      classList: JSON.parse(localStorage.getItem("classMap")),
+    };
   },
   methods: {
-    dateRange(methodName1, methodName2, num, index) {
-      let time1 = new Date()
-      time1[methodName2](time1[methodName1]() - num)
-      this.filterTime.start = generateTimeReqestNumber(time1)
-      this.filterTime.end = generateTimeReqestNumber(new Date())
-      this.rangeList.forEach(v => {
-        v.active = false
+    selectParent(index) {
+      // return
+      if (this.title === '科目') {
+        this.getSubjectType(index)
+      } else if (this.title === '地区' || this.title === '教材') {
+        // this.list.forEach(v => {
+        //   this.$set(v, 'active', false)
+        //   v.child.forEach(_v => {
+        //     this.$set(_v, 'check', false)
+        //   });
+        // })
+        // this.$set(this.list[index], 'active', true)
+        // this.$set(this.list[index].child[0], 'check', true)
+        // this.list = JSON.parse(JSON.stringify(this.area))
+      }
+    },
+    getSubjectType(index = 0) {
+      if (this.subject[index].done) return
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        yearSection: this.subject[index].value,
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      getSubjectType(params).then(res => {
+        this.$set(this.subject[index], 'done', true) // 是否已加载了数据
+        if (res.flag) {
+          this.subject[index].child = res.resSubjectTypeInfoList
+          this.list[index].child = res.resSubjectTypeInfoList
+        }
       })
-      this.rangeList[index].active = true
-      if (this.filterTime.type) {
-        this.currentDate = new Date(this.filterTime.start)
+    },
+    gettestbookVersionInfo() {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "yearSection": "Y02",
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      gettestbookVersionInfo(params).then(res => {
+        if (res.flag) {
+          res.testbookVersionList
+        }
+      })
+    },
+    changeList(arr, title) {
+      this.title = title
+      this.double = true
+      // this.$set(arr[0], 'active', true)
+
+      if (title === '科目') {
+        this.label = 'subjectName'
+        this.double = false
+        // this.$set(arr[0], 'check', true)
       } else {
-        this.currentDate = new Date(this.filterTime.end)
+        // this.$set(arr[0], 'active', true)
+        // this.$set(arr[0].child[0], 'check', true)
+      }
+      this.list = JSON.parse(JSON.stringify(arr))
+    },
+    handleFilter(item) {
+      if (this.title === '地区') {
+        let area = item.child.find(v => v.check)
+        this.filter.area = item.name + "-" + area.name
+        this.checkItem(this.area, item)
+      } else if (this.title === '教材') {
+        let testbook = item.child.find(v => v.check)
+        this.filter.testbook = item.name + "-" + testbook.name
+        this.checkItem(this.testbook, item)
+      } else if (this.title === '科目') {
+        this.filter.subject = item.name
+        this.checkItem(this.subject, item)
+      } else if (this.title === '课程') {
+        // this.filter.course = item.name
+        // this.checkItem(this.course, item)
       }
     },
-    changeDate(picker) {
-      console.log(picker.getValues(), '=======');
-      if (this.filterTime.type) {
-        //开始时间
-        this.filterTime.start = picker.getValues().join('-')
+    checkItem(arr, item) {
+      if (this.double) {
+        arr.forEach(v => {
+          this.$set(v, 'active', v.name === item.name)
+          if (v.name === item.name) {
+            v.child.forEach((_v, index) => {
+              this.$set(_v, 'check', item.child[index].check)
+            })
+          }
+        })
       } else {
-        this.filterTime.end = picker.getValues().join('-')
+        arr.forEach(v => {
+          this.$set(v, 'active', v.name === item.name)
+        })
+      }
+
+    },
+    handleClose(index, arr) {
+      this.gradePop = false;
+      this.morePop = false;
+      console.log(arr);
+      if (index) {
+        arr.forEach(element => {
+          for (let key in element) {
+            this.$set(element[key], "active", false);
+          }
+          // if (element.child.length) {
+          //   element.child.forEach(ele => {
+          //     this.$set(ele, "check", false);
+          //   });
+          // }
+        });
+      } else {
+        arr.forEach(element => {
+          this.$set(element, "active", false)
+          if (element.child.length) {
+            element.child.forEach(ele => {
+              this.$set(ele, "check", false);
+            });
+          }
+        })
       }
     },
-    confirmDate() {
-      //判断结束时间时候小于结束时间
-      let time1 = new Date(this.filterTime.start)
-      let time2 = new Date(this.filterTime.end)
-      if (time1.getTime() > time2.getTime()) {
-        return this.$toast('开始时间不能大于结束时间')
-      }
-      if (this.$route.path === '/taskStat') {
-        this.$refs['routerView'].init()
-      } else if (this.$route.path === '/studySituation') {
-        this.$refs['routerView'].handleLoad()
-      }
-      this.showTime = false
+    handleSelectChild(s, arr) {
+      let check = !s.active
+      arr.forEach(item => {
+        this.$set(item, 'active', false)
+        if (item.name == s.name) {
+          this.$set(item, 'active', check)
+        }
+      });
     },
-    formatter(type, value) {
-      if (type === 'year') {
-        return `${value}年`;
-      } else if (type === 'month') {
-        return `${value}月`
-      } else if (type === "day") {
-        return `${value}日`
-      } else if (type === "hour") {
-        return `${value}时`
-      } else if (type === "minute") {
-        return `${value}分`
-      }
-      return value;
+    handleSelectSubject(item) {
+      // if (item.active) return
+      // this.subject.forEach(v => {
+      //   this.$set(v, 'active', false)
+      // })
+      // this.$set(item, 'active', true)
     },
-    handleClose(arr) {
-      this.areaPop = false
-      this.subjectPop = false
-      this.textbookPop = false
-      this.gradePop = false
-      this.morePop = false
-      for (let key in arr) {
-        this.$set(arr[key], 'active', false)
-      }
-    },
-    openDatePicker() {
-      this.showTime = true
-    },
-    openAreaPop() {
-      this.areaPop = true
-      this.$set(this.gradeSubjectList[this.gradeIndex], 'active', true)
-    },
+
     openGradePop() {
-      this.gradePop = true
-      this.$set(this.gradeSubjectList[this.gradeIndex], 'active', true)
+      this.gradePop = true;
+      this.gradeIndex = this.gradeOldIndex
+      this.$set(this.gradeSubjectList[this.gradeIndex], "active", true);
+      if (this.gradeIndex2 >= 0) {
+        this.$set(this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2], "active", true);
+      }
     },
-    openTextbookPop() {
-      this.textbookPop = true
-      this.$set(this.classList[this.classIndex], 'active', true)
-    },
-    openSubjectPop() {
-      this.subjectPop = true
-      this.$set(this.classList[this.classIndex], 'active', true)
-    },
+
     openMorePop() {
-      this.morePop = true
-      this.$set(this.classList[this.classIndex], 'active', true)
+      this.morePop = true;
+      this.moreList.forEach(element => {
+        element.forEach(ele => {
+          this.$set(ele, "active", false)
+        });
+      });
+      if (this.moreIndex) {
+
+        this.moreList[0][this.moreIndex[0]] && this.$set(this.moreList[0][this.moreIndex[0]], "active", true)
+        this.moreList[1][this.moreIndex[1]] && this.$set(this.moreList[1][this.moreIndex[1]], "active", true)
+      }
+
+    },
+    selectGradeParent(item, index) {
+      this.gradeIndex = index
+      if (item.active) return
+      this.gradeSubjectList.forEach(v => {
+        this.$set(v, 'active', false)
+        v.child.forEach(_v => {
+          this.$set(_v, 'check', false)
+        });
+      })
+      this.$set(item, 'active', true)
+      // 默认选中第一个
+      // this.$set(item.child[0], 'check', true)
+    },
+    handleSelectGrade(item) {
+      if (item.check) return
+      this.gradeSubjectList.forEach(v => {
+        v.child.forEach(_v => {
+          this.$set(_v, 'check', false)
+        });
+      })
+      this.$set(item, 'check', true)
+
     },
     selectItem(item, index, arr) {
-      if (item.active) return
+      if (item.active) return;
       for (let key in arr) {
-        this.$set(arr[key], 'active', false)
+        this.$set(arr[key], "active", false);
       }
-      item.active = true
+      item.active = true;
     },
     confirm(flag) {
       if (flag) {
-        this.$dialog
-          .confirm({
-            title: "提示",
-            message: "是否进行科目的切换？科目切换后，首页的科目也将进行切换",
-            confirmButtonColor: '#39F0DD',
-            className: 'change-subject'
-          })
-          .then(() => {
-            // on confirm
-            for (let key in this.classList) {
-              if (this.classList[key].active) {
-                this.classIndex = key * 1
-                break
-              }
-            }
-            this.subjectPop = false
 
-            // let obj = {
-            //   interUser: "runLfb",
-            //   interPwd: "25d55ad283aa400af464c76d713c07ad",
-            //   convertAccountNo: this.$store.getters.getUserInfo.accountNo,
-            //   recordId: id
-            // };
-            // let params = {
-            //   requestJson: JSON.stringify(obj)
-            // };
-            // delExchangeApplyGoodsInfo(params).then(res => {
-            //   if (res.flag) {
-            //     this.$toast.success('删除成功！');
-            //     this.recordList.splice(index, 1);
-            //   } else {
-            //     this.$toast.fail(res.msg)
-            //   }
-            // })
-          })
-          .catch(() => {
-            // on cancel
+        // this.$dialog
+        //   .confirm({
+        //     title: "提示",
+        //     message: "是否进行科目的切换？科目切换后，首页的科目也将进行切换",
+        //     confirmButtonColor: "#39F0DD",
+        //     className: "change-subject"
+        //   })
+        //   .then(() => {
+        //     // on confirm
+        //     for (let key in this.classList) {
+        //       if (this.classList[key].active) {
+        //         this.classIndex = key * 1;
+        //         break;
+        //       }
+        //     }
+        //     this.subjectPop = false;
 
-          });
-        return
+        //   })
+        //   .catch(() => {
+        //     // on cancel
+        //   });
+
+        let gradeIndex2 = this.gradeSubjectList[this.gradeIndex].child.findIndex(ele => ele.check)
+
+        if (gradeIndex2 < 0) {
+          this.$toast('请选择')
+          return
+        }
+
+        this.gradePop = false
+        this.gradeIndex2 = gradeIndex2
+        this.gradeOldIndex = this.gradeIndex
+
+        this.filter.grade = this.gradeSubjectList[this.gradeIndex].name + "-" + this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2].name
+
       } else {
-        const index = this.gradeSubjectList.findIndex(v => v.active)
-        // this.filterText.grade = index > -1 ? this.gradeSubjectList[index].name : ''
-        this.gradeIndex = index > -1 ? index : 0
-        this.areaPop = false
+        let arr = []
+        let index = ''
+        this.moreList.forEach(ele => {
+          index = ele.findIndex(v => v.active)
+          arr.push(index)
+          // if (index >= 0) {
+          //   arr.push(index)
+          // }
+        })
+        console.log(arr, 'arr');
+        if (arr.length) {
+          this.moreIndex = arr
+          if (this.moreList[0][this.moreIndex[0]]) {
+            this.filter.more = this.moreList[0][this.moreIndex[0]].name
+          }
+          if (this.moreList[1][this.moreIndex[1]]) {
+            this.filter.more = this.moreList[1][this.moreIndex[1]].name
+          }
+          if (this.moreList[0][this.moreIndex[0]] && this.moreList[1][this.moreIndex[1]]) {
+            this.filter.more = this.moreList[0][this.moreIndex[0]].name + '，' + this.moreList[1][this.moreIndex[1]].name
+          }
+          if (!this.moreList[0][this.moreIndex[0]] && !this.moreList[1][this.moreIndex[1]]) {
+            this.filter.more = ''
+          }
+
+        } else {
+          this.moreIndex = ''
+        }
+
+        this.morePop = false;
+
       }
     }
   },
-  created() {
-    let arr = []
-    let flag = true
-    JSON.parse(localStorage.gradeList).forEach(v => {
-      v.teacherInfoList.forEach(t => {
-        if (t.subjectType !== 'S20') {
-          arr.push({ name: v.gradeName + t.subjectName, classGrade: v.classGrade, subjectType: t.subjectType, active: localStorage.currentSubjectType === t.subjectType && flag })
-          if (localStorage.currentSubjectType === t.subjectType && flag) {
-            flag = false
-          }
-        }
-      })
-    })
-    this.gradeSubjectList.push(...arr)
-    let time = new Date()
-    time.setDate(time.getDate() - 7)
-    this.filterTime.start = generateTimeReqestNumber(time)
-    this.currentDate = new Date(this.filterTime.start)
-
-  },
-}
+  // created() {
+  //   this.gettestbookVersionInfo()
+  //   this.getSubjectType()
+  // }
+};
 </script>
 
 <style lang="less" scoped>
@@ -399,6 +509,9 @@ export default {
   @{deep} .van-picker__toolbar {
     display: none;
   }
+  @{deep} .van-cell__value {
+    flex: 2;
+  }
   .time-piker-header {
     height: 42px;
     padding: 0 10px;
@@ -426,11 +539,6 @@ export default {
         border: 1px solid @blue;
       }
     }
-  }
-
-  &__body {
-    flex: 1;
-    overflow-y: auto;
   }
 
   .grade-pop-wrap {
@@ -509,44 +617,61 @@ export default {
     }
 
     &__body {
+      display: flex;
       flex: 1;
-      overflow-y: auto;
+      // overflow-y: auto;
 
-      .province {
-        // position: absolute;
-        height: auto;
-        padding-bottom: 50px;
-        top: 50px;
-        left: 0;
-        bottom: 50px;
-        width: 30%;
-        font-size: 12px;
+      &-left {
+        flex: 0 0 95px;
+        overflow-y: auto;
 
-        &_border {
-          border-left: 3px solid transparent;
+        > div {
+          height: 44px;
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          align-items: center;
+          font-size: 15px;
+          border-left: 2.5px solid transparent;
+
+          &.active {
+            color: @blue;
+            border-left: 2.5px solid #16aab7;
+          }
         }
       }
 
-      .active {
-        background: #fff;
-        color: @blue;
-        border-left: 3px solid @blue;
-      }
+      &-right {
+        flex: 1;
+        overflow-y: auto;
 
-      .cityActive {
-        color: @blue;
-      }
+        .tip {
+          padding: 0 20px 10px;
+        }
+        .cell__item {
+          justify-content: space-between;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          color: #666;
+          font-size: 14px;
+          word-break: break-all;
+          padding: 0 20px;
 
-      .city {
-        position: absolute;
-        height: auto;
-        top: 50px;
-        left: 30%;
-        bottom: 50px;
-        width: 70%;
-        font-size: 12px;
-        overflow-y: scroll;
+          .check {
+            flex: 0 0 20px;
+            text-align: right;
+          }
+
+          &.active {
+            color: @blue;
+          }
+        }
       }
+    }
+    &__body-more {
+      flex: 1;
+      overflow-y: auto;
     }
 
     &__footer {
