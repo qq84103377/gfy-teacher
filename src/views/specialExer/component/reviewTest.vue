@@ -5,7 +5,7 @@
       <img class="null-tips" src="../../../assets/img/preview/board_empty.png" alt />
     </div>
     <div v-else>
-      <van-cell v-for='item in list' :key='item'>
+      <van-cell v-for='item in list' :key='item' @click='go(item)'>
         <template slot="title">
           <div class="fs18">我是邓稼先的题我是邓稼先的微课邓稼微...</div>
           <div class="fs14 grey6 mgt5">
@@ -27,7 +27,7 @@
       <img class="null-tips" src="../../../assets/img/preview/board_empty.png" alt />
     </div>
     <div v-else>
-      <van-cell v-for='item in list' :key='item'>
+      <van-cell v-for='item in list' :key='item' @click='go(item)'>
         <template slot="title">
           <div class="fs18">我是邓稼先的题我是邓稼先的微课邓稼微...</div>
           <div class="fs14 grey6 mgt5">
@@ -46,6 +46,11 @@ export default {
   data() {
     return {
       list: [1, 2, 3, 4, 5, 6, 7]
+    }
+  },
+  methods: {
+    go(item) {
+      this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
     }
   },
 
