@@ -177,10 +177,31 @@
                   item.courseList = tmp
                 }
               })
-              this.courseList = this.unitList[this.unitIndex]?this.unitList[this.unitIndex].courseList:[]
+              this.courseList = (this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?this.unitList[this.unitIndex].courseList:[]
+              //选默认值
+              if(this.courseList.length) {
+                const item = this.courseList[0]
+                if(item.childNodeList && item.childNodeList.length>0) {
+                    this.$set(item,'fold',true)
+                    this.selectSysCourse(item.childNodeList[0].courseId,item.childNodeList[0].nodeName)
+                }else {
+                    this.$set(item,'fold',true)
+                    this.selectSysCourse(item.courseId,item.nodeName)
+                }
+              }
+              this.$emit('filter',this.currentSysCourseId)
+              this.$emit('update:label',(this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+
             }
           } else {
             // this.$toast(res.msg)
+            this.courseList = []
+            this.unitList = []
+            this.unitIndex = 0
+            this.selectSysCourse('','')
+            this.$emit('filter',this.currentSysCourseId)
+            this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+
           }
 
         })
@@ -193,12 +214,6 @@
         this.show = false
         this.$emit('filter',this.currentSysCourseId)
         this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
-        // this.$emit('update:sysCourseId', this.currentSysCourseId)
-        // if (this.type === 'myCourse') {
-        //   this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
-        // } else {
-        //   this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade)
-        // }
       },
 
 

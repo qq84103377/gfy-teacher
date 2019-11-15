@@ -44,7 +44,7 @@
 
   export default {
     name: "versionFilter",
-    props: ['visible','label'],
+    props: ['visible','label','gradeTerm'],
     data() {
       return {
         index: 0,
@@ -86,9 +86,13 @@
       eventBus.$on("changeYear", (yearIndex,subjectType) => {
         this.yearIndex = yearIndex
         this.$set(this.versionList[this.yearIndex].gradeList[0],'check',true)
+        const gradeItem = this.versionList[this.yearIndex].gradeList.find(v => v.check)
+        const textItem = this.versionList[this.yearIndex].arr.find(v => v.active)
+        this.$emit('update:label',textItem.textBookName + gradeItem.gradeTermName)
+        this.$emit('update:gradeTerm',gradeItem.grade + '|' + gradeItem.term)
         eventBus.$emit('changeVersion',{
-          textBookId: this.versionList[this.yearIndex].arr.find(v => v.active).textBookId,
-          gradeTermId: this.versionList[this.yearIndex].gradeList.find(v => v.check).gradeTermId},{subjectType})
+          textBookId: textItem.textBookId,
+          gradeTermId: gradeItem.gradeTermId},{subjectType})
       })
     },
     methods: {
@@ -137,6 +141,7 @@
               if(!index && !i) {
                 this.$set(v.gradeList[0],'check',true)
                 this.$emit('update:label',ver.textBookName + v.gradeList[0].gradeTermName)
+                this.$emit('update:gradeTerm',v.gradeList[0].grade + '|' + v.gradeList[0].term)
                 eventBus.$emit('changeVersion',{textBookId:ver.textBookId,gradeTermId:v.gradeList[0].gradeTermId})
               }
             })
@@ -150,6 +155,7 @@
           textBookId: textItem.textBookId,
           gradeTermId: gradeTermItem.gradeTermId})
         this.$emit('update:label',textItem.textBookName + gradeTermItem.gradeTermName)
+        this.$emit('update:gradeTerm',gradeTermItem.grade + '|' + gradeTermItem.term)
         this.show = false
       },
       closePop() {

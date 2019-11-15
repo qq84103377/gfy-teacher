@@ -441,3 +441,11 @@ export const getAreaInfo =(params)=>{
 export const getResCourseWareInfo =(params)=>{
   return axios.post('resource/getResCourseWareInfo', qs.stringify(params))
 }
+//获取资源中心试卷列表
+export const getSysCourseTestPaperList =(params)=>{
+  return axios.post('resource/getSysCourseTestPaperList', qs.stringify(params))
+}
+//获取资源中心试题列表
+export const getResExamInfo =(params)=>{
+  return axios.post('resource/getResExamInfo', qs.stringify(params))
+}
