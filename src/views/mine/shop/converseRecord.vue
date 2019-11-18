@@ -109,9 +109,9 @@
           case 'S04' :
             return '兑换失败';
           case 'S05' :
-            return '取消兑换成功';
+            return '取消成功';
           case 'S08' :
-            return '取消兑换确认中';
+            return '申请取消';
         }
       }
     },

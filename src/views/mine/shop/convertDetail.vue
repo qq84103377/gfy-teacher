@@ -42,19 +42,19 @@
         </div>
         <div class="convertInfo-body">
           <div>
-            <span>兑换数量：</span>
+            <span>商品兑换数量：</span>
             <span>{{recordDetail.convertGoodsCount}}</span>
           </div>
           <div>
-            <span>申请日期：</span>
+            <span>商品申请日期：</span>
             <span>{{recordDetail.convertDate | formatDate}}</span>
           </div>
-          <div v-if="recordDetail.status == 'S08' || recordDetail.status == 'S05'">
-            <span>取消日期：</span>
-            <span>{{recordDetail.convertCancletDate | formatDate}}</span>
+          <div v-show="recordDetail.status == 'S08' || recordDetail.status == 'S05'">
+            <span>申请取消日期：</span>
+            <span>{{recordDetail.convertCancleDate | formatDate}}</span>
           </div>
-          <div v-else>
-            <span>发放日期：</span>
+          <div v-show="recordDetail.status == 'S03'">
+            <span>商品发放日期：</span>
             <span>{{recordDetail.convertCompleteDate | formatDate}}</span>
           </div>
           <div>
@@ -112,9 +112,9 @@
           case 'S04' :
             return '兑换失败';
           case 'S05' :
-            return '取消兑换成功';
+            return '取消成功';
           case 'S08' :
-            return '取消兑换确认中';
+            return '申请取消';
         }
       }
     },
