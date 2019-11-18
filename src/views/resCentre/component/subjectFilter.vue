@@ -65,9 +65,6 @@
           this.$emit('update:visible', false)
         }
       },
-      // childList() {
-      //   return this.list[this.index] ? this.list[this.index].child : []
-      // },
     },
     watch: {
       visible(v) {
@@ -100,9 +97,10 @@
           if(res.flag) {
             this.subjectList[index].child = res.resSubjectTypeInfoList
             if(!index) {
-              this.$emit('update:label',this.subjectList[index].name + this.subjectList[index].child[0].subjectName)
-              this.$set(this.subjectList[index].child[0],'check',true)
-              eventBus.$emit('changeSubject',this.subjectList[index].child[0].subjectType)
+              const subjectIndex = this.subjectList[index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
+              this.$emit('update:label',this.subjectList[index].name + this.subjectList[index].child[subjectIndex].subjectName)
+              this.$set(this.subjectList[index].child[subjectIndex],'check',true)
+              eventBus.$emit('changeSubject',this.subjectList[index].child[subjectIndex].subjectType)
             }
           }
         })
@@ -112,12 +110,15 @@
         const item = this.subjectList[this.index].child.find(v => v.check)
         if(this.index !== this.tempIndex) {
          //切换过学年
-         eventBus.$emit('changeYear',this.index, item?item.subjectType:'')
+          if(item) {
+            eventBus.$emit('changeYear',this.index, item?item.subjectType:'')
+            this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
+          }
        }else {
          //没有切换学年,只切换学科
          eventBus.$emit('changeSubject',item?item.subjectType:'')
-       }
-        this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
+          this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
+        }
         this.show = false
       },
       closePop() {

@@ -1136,29 +1136,49 @@ export default {
         }
       }
 
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": 24,
-        "tchCourseId": this.currentTchCourseId,
-        "taskName": this.form.name,
-        "tastType": taskType,
-        "resourceType": resourceType,
-        "resourceId": this.form.resourceId,
-        "statusCd": "S01",
-        "isRedo": "I01",
-        "duration": this.form.duration,
-        "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "desc": this.form.desc,
-        "courseType": "C01",
-        "isDrag": isDrag,
-        "testPaperId": this.testPaperId,
-        "modifyAfterSubmit": modifyAfterSubmit,
-        "taskId": this.$route.query.taskId,
-        // "layerStatus": '',
+      let obj
+      if (this.$route.query.isResend) {
+        obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.query.taskId,
+          "classId": this.classList[0].classId,
+          "tchCourseId": this.currentTchCourseId,
+          "subjectType": this.tchCourseInfo.subjectType,
+          "courseName": this.$route.query.courseName,
+          "tastType": taskType,
+          "taskType": "cs",
+          "taskName": this.form.name,
+          accountNoList: '',
+          "endTime": ""
+        }
+      } else {
+        obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "tchCourseId": this.currentTchCourseId,
+          "taskName": this.form.name,
+          "tastType": taskType,
+          "resourceType": resourceType,
+          "resourceId": this.form.resourceId,
+          "statusCd": "S01",
+          "isRedo": "I01",
+          "duration": this.form.duration,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "desc": this.form.desc,
+          "courseType": "C01",
+          "isDrag": isDrag,
+          "testPaperId": this.testPaperId,
+          "modifyAfterSubmit": modifyAfterSubmit,
+          "taskId": this.$route.query.taskId,
+          // "layerStatus": '',
 
-      };
+        };
+      }
       //发布任务的学生
       let classListSelect = []
       if (this.form.object == "2") {
@@ -1199,8 +1219,12 @@ export default {
                 accountNoList.push(item.classStudent[k].accountNo)
               }
             }
-            obj['accountNoList' + index] = accountNoList.join("|")
-            index++
+            if(this.$route.query.isResend) {
+              obj.accountNoList = accountNoList.join("|")
+            }else {
+              obj['accountNoList' + index] = accountNoList.join("|")
+              index++
+            }
           }
         });
 
@@ -1220,19 +1244,40 @@ export default {
         let start = this.form.time1
         let end = this.form.time2
         let index = 1
-        this.classList.forEach((item) => {
-          if (item.check) {
-            obj['classTaskInfo' + index] = item.classId + '|' + start + '|' + end
-            index++
+        if(this.$route.query.isResend) {
+          if (new Date(start).getTime() > new Date(end).getTime()) {
+            return this.$toast('开始时间不能大于结束时间')
           }
-        })
+          if(new Date(end).getTime() < new Date().getTime()) {
+            return this.$toast('结束时间不能小于当前时间')
+          }
+          obj.endTime = end
+        }else {
+          this.classList.forEach((item) => {
+            if (item.check) {
+              obj['classTaskInfo' + index] = item.classId + '|' + start + '|' + end
+              index++
+            }
+          })
+        }
       } else if (this.form.time === "2") {
         //分班设置
         let index = 1
         this.classList.forEach((item) => {
           if (item.check) {
-            obj['classTaskInfo' + index] = item.classId + '|' + item.startDate + '|' + item.endDate
-            index++
+            if(this.$route.query.isResend) {
+              if (new Date(item.startDate).getTime() > new Date(item.endDate).getTime()) {
+                return this.$toast('开始时间不能大于结束时间')
+              }
+              if(new Date(item.endDate).getTime() < new Date().getTime()) {
+                return this.$toast('结束时间不能小于当前时间')
+              }
+              obj.endTime = item.endDate
+
+            }else {
+              obj['classTaskInfo' + index] = item.classId + '|' + item.startDate + '|' + item.endDate
+              index++
+            }
           }
         })
       } else {
@@ -1245,12 +1290,23 @@ export default {
         requestJson: JSON.stringify(obj)
       }
       this.showLoading = true
-      modifyCourseTask(params).then(res => {
+      let api = this.$route.query.isResend ? redoCourseTask : modifyCourseTask
+      api(params).then(res => {
         if (res) {
           this.showLoading = false
           if (res.flag) {
             this.$toast.success("提交成功")
             eventBus.$emit(this.$route.query.from + "EditTask", true);
+            if (this.$route.query.isResend) {
+              //重发任务
+              let statInfo = JSON.parse(localStorage.stat)
+              statInfo.tchClassTastInfo.forEach(v => {
+                if (v.classId ==  obj.classId) {
+                  v.endDate =  obj.endTime
+                }
+              })
+              localStorage.setItem('stat', JSON.stringify(statInfo))
+            }
             this.$router.back()
 
           } else {

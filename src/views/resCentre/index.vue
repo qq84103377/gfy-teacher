@@ -46,7 +46,7 @@
                     v-model="activeNames">
         <van-collapse-item title="微课" name="1">
           <div>
-            <list-item class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)"
+            <list-item class="mgt10" style="background: #fff;"
                        v-for="(item,index) in lessonList" :key="index"
                        :itemTitle="item.resCourseWareInfo.coursewareName"
                        @clickTo="goVideoPage(item)">
@@ -69,33 +69,117 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div @click="collect(item)">
+                <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
                   <span>收藏</span>
                 </div>
-                <div @click="">
+                <div
+                  @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','lessonList')">
                   <i class="iconGFY icon-circle-plus-yellow"></i>
                   <span>添加</span>
                 </div>
-                <div @click="sendTask(item)">
+                <div @click="sendTask(item,'lesson')">
                   <i class="iconGFY icon-plane"></i>
                   <span>发任务</span>
                 </div>
               </div>
-              <div slot="remark" class="remark">
+              <div slot="remark" class="remark" v-if="item.record">
                 <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
                 <div>
-                  <div>初一数学《雅鲁藏布大峡谷》课文朗读</div>
-                  <div>初一数学《雅鲁藏布大峡谷》课文朗读</div>
-                  <div>初一数学《雅鲁藏布大峡谷》课文朗读</div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
                 </div>
               </div>
             </list-item>
           </div>
         </van-collapse-item>
         <van-collapse-item title="素材" name="2">
+          <div>
+            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                       v-for="(item,index) in materialList" :key="index"
+                       :itemTitle="item.resCourseWareInfo.coursewareName">
+              <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.resCourseWareInfo)"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                </div>
+              </div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                  <span>收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','materialList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'material')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
+              </div>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
         </van-collapse-item>
         <van-collapse-item title="试卷" name="3">
+          <div>
+            <list-item @clickTo="viewDetail(item)" class="mgt10"
+                       style="background: #fff;" v-for="(item,index) in examList" :key="index" :itemTitle="item.testPaperName">
+              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.testPaperDegree==='D01'?'容易':item.testPaperDegree==='D02'?'中等':'困难'}}
+                  </div>
+                  <div><i class="iconGFY icon-zhu"></i>{{item.subjectiveItemNum || 0}}</div>
+                  <div><i class="iconGFY icon-ke"></i>{{item.objectiveItemNum || 0}}</div>
+                  <div><i class="iconGFY icon-download"></i>{{item.downCount || 0}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                </div>
+              </div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div @click="collect(item,item.testPaperId,item.statusCd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                  <span>收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.testPaperName,item.testPaperId,'R02','examList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'exam')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
+              </div>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
         </van-collapse-item>
       </van-collapse>
       <!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
@@ -109,7 +193,7 @@
 
         </van-collapse-item>
       </van-collapse>
-      <van-cell is-link to="/questionList">
+      <van-cell is-link @click="viewQuestion">
         <div slot="title" class="fs16">试题</div>
       </van-cell>
     </div>
@@ -143,10 +227,13 @@
     </van-popup>
 
     <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow"></subject-filter>
-    <version-filter :label.sync="versionLabel" :visible.sync="versionFilterShow"></version-filter>
+    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel"
+                    :visible.sync="versionFilterShow"></version-filter>
     <area-filter :label.sync="areaLabel" :visible.sync="areaFilterShow" @filter="v => areaCode = v"></area-filter>
     <res-course-filter :label.sync="courseLabel" :visible.sync="resCourseFilterShow"
                        @filter="handleFilter"></res-course-filter>
+    <add-course-pop @success="saveRecord" :isSendTask="isSendTask" :resourceType="resourceType" :resourceId="resourceId" :resName="resName"
+                   :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm" :visible.sync="addCourseShow"></add-course-pop>
   </section>
 </template>
 
@@ -156,11 +243,20 @@
   import versionFilter from './component/versionFilter'
   import areaFilter from './component/areaFilter'
   import resCourseFilter from './component/resCourseFilter'
-  import {getResCourseWareInfo, delCollectInfo, createCollectInfo} from '@/api/index'
+  import addCoursePop from './component/addCoursePop'
+  import {
+    getResCourseWareInfo,
+    delCollectInfo,
+    createCollectInfo,
+    getClassTeachCourseInfo,
+    getSysCourseTestPaperList,
+  } from '@/api/index'
+  import {getGradeName, getSubjectName} from "../../utils/filter";
+  import { teachApi, pubApi } from '@/api/parent-GFY'
 
   export default {
     name: "index",
-    components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter},
+    components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter, addCoursePop},
     data() {
       return {
         arr: [{}, {}],
@@ -179,6 +275,7 @@
         versionFilterShow: false,
         areaFilterShow: false,
         resCourseFilterShow: false,
+        addCourseShow: false,
         subjectLabel: '',
         versionLabel: '',
         areaLabel: '',
@@ -191,35 +288,241 @@
         },
         courseId: '',
         areaCode: '',
-        lessonList: []
+        gradeTerm: '', //年级学期
+        lessonList: [],
+        materialList: [],
+        courseList: [],
+        examList: [],
+        resName: '',
+        resourceId: '',
+        resourceType: '',
+        listKey: '', // 点击添加时属于哪个列表
+        isSendTask: false,
+      }
+    },
+    watch: {
+      courseId() {
+        this.activeNames = []
+        this.lessonList = []
+        this.materialList = []
+        this.courseList = []
+        this.examList = []
       }
     },
     created() {
     },
     methods: {
-      collect(item) {
+      viewQuestion() {
+        this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}`)
+      },
+      viewDetail(item) {
+        this.$store.commit('setResourceInfo', item)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}`)
+      },
+      goto(item) {
+        this.$router.push({path:'/materialDetail',query:{data:item}})
+      },
+      sendTask(obj,key) {
+        if(key === 'exam') {
+          if (!obj.objectiveItemNum && !obj.subjectiveItemNum){
+            return this.$toast('该试卷不含试题')
+          }
+          this.$store.commit('setResourceInfo', obj)
+          this.showAddPop(obj.testPaperName,'','R02',key)
+        }else {
+          this.$store.commit('setResourceInfo', obj.resCourseWareInfo)
+          this.showAddPop(obj.resCourseWareInfo.coursewareName,'','R01',key)
+        }
+      },
+      goVideoPage(item) {
+        if (!item.resCourseWareInfo.srcUrl) return
+        this.checkUrlPermission(item)
+      },
+      checkUrlPermission(item) {
+        // 课件鉴权
+        let permissionParams = {
+          'interUser': 'runLfb',
+          'interPwd': '25d55ad283aa400af464c76d713c07ad',
+          'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+          'belongSchoolId': this.$store.getters.schoolId,
+          'url': item.resCourseWareInfo.srcUrl,
+          'sysTypeCd': 'S03'
+        }
+        this.$store.commit('setVanLoading', true)
+        pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
+          this.$store.commit('setVanLoading', false)
+          if (respone.flag) {
+            item.resCourseWareInfo.srcUrl = respone.data[0].accessUrl
+          } else {
+            item.resCourseWareInfo.srcUrl = ''
+          }
+
+          if (!item.resCourseWareInfo.srcUrl) {
+            this.$toast('暂无资源')
+            return
+          }
+
+          this.$router.push({ name: 'videoPage', query: { src: item.resCourseWareInfo.srcUrl, title: item.resCourseWareInfo.coursewareName, isMp3: item.resCourseWareInfo.source == "S01" ? true : false } })
+        }).catch(() => {
+          this.$store.commit('setVanLoading', false)
+          this.$toast('资源错误')
+        })
+      },
+      getSysCourseTestPaperList() {
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          "resCollectInfo": {
-            "objectTypeCd": "C03",
-            "objectId": 3090,
-            "collectType": "C01",
-            "accountNo": 12134,
-            "statusCd": "S01",
-            "subjectType": "S01"
-          }, "sysTypeCd": "S02"
+          "operateRoleType": "A02",
+          sysCourseIdList: [this.courseId],
+          "pageSize": "9999",
+          "currentPage": 1,
+          "orderByType": "T05"
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        createCollectInfo(params).then(res => {
-          if (res.flag) {
-
+        getSysCourseTestPaperList(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            this.examList = res.data || []
+          }else {
+            this.$toast(res.msg)
           }
         })
+      },
+      saveRecord(courseName) {
+        const item = this[this.listKey].find(v => this.resourceId === v.resCourseWareInfo.coursewareId)
+        if (item.record) {
+          //有添加记录
+          item.record.push(`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`)
+        } else {
+          this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
+        }
+      },
+      showAddPop(name, id, resourceType, key) {
+        if(!id) {
+          this.isSendTask = true
+        }else {
+          this.isSendTask = false
+        }
+        this.addCourseShow = true
+        this.resName = name
+        this.resourceId = id
+        this.resourceType = resourceType
+        this.listKey = key
+        if (!this.courseList.length) {
+          this.getClassTeachCourseInfo()
+        }
+      },
+      getClassTeachCourseInfo() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "subjectType": localStorage.getItem("currentSubjectType"),
+          classGrade: this.gradeTerm.split('|')[0],
+          termType: this.gradeTerm.split('|')[1],
+          "pageSize": "999",
+          "courseType": "C01",
+          "currentPage": 1,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getClassTeachCourseInfo(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag) {
+            this.courseList = res.data || []
+          }
+        })
+      },
+      handleIcon(item) {
+        var t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
+        if (t == 'ppt' || t == 'pptx') {
+          t = 'icon-ppt'
+        } else if (t == 'doc' || t == 'docx') {
+          t = 'icon-doc'
+        } else if (t == 'xls' || t == 'xlsx') {
+          t = 'icon-xls'
+        } else if (t == 'zip' || t == 'rar' || t == '7z') {
+          // t = 'icon'
+        } else if (t == 'pdf') {
+          t = 'icon-pdf'
+        } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
+          t = 'icon-img'
+        } else if (t == 'mp4' || t == 'mp3') {
+          t = 'icon-video'
+        } else {
+          // t = 'unkown'
+        }
+        return t
+      },
+      collect(item,objectId,statusCd) {
+        this.$store.commit('setVanLoading', true)
+        if (item.collectId) {
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "resCollectInfo": {
+              "collectId": item.collectId,
+              "objectTypeCd": "C03",
+              objectId,
+              "collectType": "C01",
+              "accountNo": this.$store.getters.getUserInfo.accountNo,
+              statusCd,
+            },
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          delCollectInfo(params).then(res => {
+            this.$store.commit('setVanLoading', false)
+            if (res.flag) {
+              this.$toast('取消收藏')
+              item.collectId = 0
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        } else {
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "resCollectInfo": {
+              "objectTypeCd": "C03",
+              objectId,
+              "collectType": "C01",
+              "accountNo": this.$store.getters.getUserInfo.accountNo,
+              statusCd,
+              "subjectType": localStorage.currentSubjectType
+            },
+            "sysTypeCd": "S02"
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          createCollectInfo(params).then(res => {
+            this.$store.commit('setVanLoading', false)
+            if (res.flag) {
+              this.$toast('收藏成功')
+              item.collectId = res.resCollectInfo.collectId
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        }
       },
       handleChange(activeArr) {
         if (activeArr.length > this.activeNames.length) {
@@ -232,11 +535,22 @@
           })
           if (value == '1') {
             // 微课
-            this.getResCourseWareInfo('C01')
+            if (!this.lessonList.length) {
+              this.getResCourseWareInfo('C01')
+            }
+          } else if (value == '2') {
+            //素材
+            if (!this.materialList.length) {
+              this.getResCourseWareInfo('C02')
+            }
+          }else if (value == '3') {
+            //试卷
+            this.getSysCourseTestPaperList()
           }
         }
       },
       getResCourseWareInfo(queryType) {
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -254,8 +568,15 @@
           requestJson: JSON.stringify(obj)
         }
         getResCourseWareInfo(params).then(res => {
+          this.$store.commit('setVanLoading', false)
           if (res.flag) {
-            this.lessonList = res.resCourseWareOrderInfoList || []
+            if (queryType === 'C01') {
+              this.lessonList = res.resCourseWareOrderInfoList || []
+            } else {
+              this.materialList = res.resCourseWareOrderInfoList || []
+            }
+          } else {
+            this.$toast(res.msg)
           }
         })
       },

@@ -7,8 +7,10 @@
     <div class="question-list__tab">
       <div>
         <div class="dropdown__title" @click="tab.questionType=!tab.questionType">
-          <div class="ellipsis">{{tab.questionTypeList.find(v => v.active)?tab.questionTypeList.find(v => v.active).examTypeName:'题型'}}</div>
-<!--          <van-icon :name="tab.questionType?'arrow-up':'arrow-down'"/>-->
+          <div class="ellipsis">{{tab.questionTypeList.find(v => v.active)?tab.questionTypeList.find(v =>
+            v.active).examTypeName:'题型'}}
+          </div>
+          <!--          <van-icon :name="tab.questionType?'arrow-up':'arrow-down'"/>-->
           <span :class="['triangle',{up:tab.questionType}]"></span>
         </div>
         <div v-show="tab.questionType" class="dropdown-menu">
@@ -19,45 +21,56 @@
       </div>
       <div>
         <div class="dropdown__title" @click="tab.difficult=!tab.difficult">
-          <div class="ellipsis">{{tab.difficultList.find(v => v.active)?tab.difficultList.find(v => v.active).name:'难度'}}</div>
-<!--          <van-icon :name="tab.difficult?'arrow-up':'arrow-down'"/>-->
+          <div class="ellipsis">{{tab.difficultList.find(v => v.active)?tab.difficultList.find(v =>
+            v.active).name:'难度'}}
+          </div>
+          <!--          <van-icon :name="tab.difficult?'arrow-up':'arrow-down'"/>-->
           <span :class="['triangle',{up:tab.difficult}]"></span>
         </div>
         <div v-show="tab.difficult" class="dropdown-menu">
-          <div class="dropdown-menu-item" @click="selectMenu(item,'difficultList')" :class="{active:item.active}" v-for="(item,index) in tab.difficultList" :key="index">{{item.name}}</div>
+          <div class="dropdown-menu-item" @click="selectMenu(item,'difficultList')" :class="{active:item.active}"
+               v-for="(item,index) in tab.difficultList" :key="index">{{item.name}}
+          </div>
         </div>
       </div>
       <div>
         <div class="dropdown__title" @click="tab.type=!tab.type">
-          <div class="ellipsis">{{tab.typeList.find(v => v.active)?tab.typeList.find(v => v.active).dictValue:'类型'}}</div>
-<!--          <van-icon :name="tab.type?'arrow-up':'arrow-down'"/>-->
+          <div class="ellipsis">{{tab.typeList.find(v => v.active)?tab.typeList.find(v => v.active).dictValue:'类型'}}
+          </div>
+          <!--          <van-icon :name="tab.type?'arrow-up':'arrow-down'"/>-->
           <span :class="['triangle',{up:tab.type}]"></span>
         </div>
         <div v-show="tab.type" class="dropdown-menu">
-          <div class="dropdown-menu-item" @click="selectMenu(item,'typeList')" :class="{active:item.active}" v-for="(item,index) in tab.typeList" :key="index">{{item.dictValue}}</div>
+          <div class="dropdown-menu-item" @click="selectMenu(item,'typeList')" :class="{active:item.active}"
+               v-for="(item,index) in tab.typeList" :key="index">{{item.dictValue}}
+          </div>
 
         </div>
       </div>
       <div>
         <div class="dropdown__title" @click="tab.sort=!tab.sort">
           <div class="ellipsis">{{tab.sortList.find(v => v.active)?tab.sortList.find(v => v.active).name:'排序'}}</div>
-<!--          <van-icon :name="tab.sort?'arrow-up':'arrow-down'"/>-->
+          <!--          <van-icon :name="tab.sort?'arrow-up':'arrow-down'"/>-->
           <span :class="['triangle',{up:tab.sort}]"></span>
         </div>
         <div v-show="tab.sort" class="dropdown-menu">
-          <div class="dropdown-menu-item" @click="selectMenu(item,'sortList')" :class="{active:item.active}" v-for="(item,index) in tab.sortList" :key="index">{{item.name}}</div>
+          <div class="dropdown-menu-item" @click="selectMenu(item,'sortList')" :class="{active:item.active}"
+               v-for="(item,index) in tab.sortList" :key="index">{{item.name}}
+          </div>
         </div>
       </div>
     </div>
     <div class="question-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
-          <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
+          <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt/>
         </div>
-        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'" @load="onLoad" :offset='80'>
-<!--          <div class="question-num">1.选择题</div>-->
-          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index"
-                     :item="item" :index="index"></question-item>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'"
+                  @load="onLoad" :offset='80'>
+          <!--          <div class="question-num">1.选择题</div>-->
+          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true"
+                         :is-send="false" v-for="(item,index) in list" :key="index"
+                         :item="item" :index="index"></question-item>
         </van-list>
       </van-pull-refresh>
 
@@ -73,7 +86,7 @@
   import questionItem from '../../components/questionItem'
   import examBar from '../../components/examBar'
   import {teachApi} from "../../api/parent-GFY";
-  import {getExamSectionTypeRelation, getSysDictList} from '@/api/index'
+  import {getExamSectionTypeRelation, getSysDictList, getResExamInfo} from '@/api/index'
   import correctPop from '../../components/correctPop'
 
   export default {
@@ -90,7 +103,7 @@
           difficult: false,
           type: false,
           sort: false,
-          sortList: [{name: '全部', value: ''},{name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
+          sortList: [{name: '全部', value: ''}, {name: '综合排序', value: 'T05'}, {name: '时间', value: 'T01'}, {
             name: '使用量',
             value: 'T02'
           }, {name: '收藏量', value: 'T03'}],
@@ -117,9 +130,9 @@
       }
     },
     created() {
-      this.$store.commit('setVanLoading',true)
-      Promise.all([this.getExamSectionTypeRelation(),this.getSysDictList()]).then(res => {
-        this.$store.commit('setVanLoading',false)
+      this.$store.commit('setVanLoading', true)
+      Promise.all([this.getExamSectionTypeRelation(), this.getSysDictList()]).then(res => {
+        this.$store.commit('setVanLoading', false)
       })
     },
     beforeRouteLeave(to, from, next) {
@@ -137,34 +150,34 @@
       clear() {
         //清空所有试题时需要移除试题的添加状态样式
         this.list.forEach(v => {
-          this.$set(v,'isRemove',false)
+          this.$set(v, 'isRemove', false)
         })
       },
-      handleAdd(isRemove,item) {
-        if(isRemove) {
+      handleAdd(isRemove, item) {
+        if (isRemove) {
           // 移除
           const index = this.selectList.findIndex(v => v.examType === item.titleType)
-          if(this.selectList[index].child.length === 1) {
+          if (this.selectList[index].child.length === 1) {
             //整个this.selectList[index]删除
-            this.selectList.splice(index,1)
-          }else {
+            this.selectList.splice(index, 1)
+          } else {
             // 只删除this.selectList[index].child[childIndex]
             const childIndex = this.selectList[index].child.findIndex(v => v.examId === item.examId)
-            this.selectList[index].child.splice(childIndex,1)
+            this.selectList[index].child.splice(childIndex, 1)
           }
-        }else {
+        } else {
           //添加
           const index = this.selectList.findIndex(v => v.examType === item.titleType)
-          if(index > -1) {
+          if (index > -1) {
             // 添加的试题已存在相同题型
             this.selectList[index].child.push(item)
-          }else {
+          } else {
             //添加的试题不存在相同题型
             // const typeItem = this.tab.questionTypeList.find(v => v.examType === item.titleType)
             const sectionIndex = this.tab.questionTypeList.findIndex(v => v.examType === item.titleType)
             const typeItem = this.tab.questionTypeList[sectionIndex]
             this.selectList.push({
-              sectionName:typeItem.sectionName,
+              sectionName: typeItem.sectionName,
               examType: typeItem.examType,
               sectionType: typeItem.sectionType,
               sectionIndex: sectionIndex - 1, //因为默认添加了一个全部的选项
@@ -173,7 +186,7 @@
           }
         }
 
-        console.log(this.selectList,'=3=');
+        console.log(this.selectList, '=3=');
 
       },
       selectMenu(item, key) {
@@ -182,7 +195,7 @@
         this.tab.type = false;
         this.tab.sort = false;
         if (item.active) return
-        this.$store.commit('setVanLoading',true)
+        this.$store.commit('setVanLoading', true)
         this.tab[key].forEach(v => {
           this.$set(v, 'active', false)
         })
@@ -190,17 +203,17 @@
 
         if (key === 'questionTypeList') {
           this.filterParam.titleType = item.examType
-        }else if (key === 'difficultList') {
+        } else if (key === 'difficultList') {
           this.filterParam.titleDegree = item.value
-        }else if (key === 'typeList') {
+        } else if (key === 'typeList') {
           this.filterParam.belongType = item.dictKey
-        }else if (key === 'sortList') {
+        } else if (key === 'sortList') {
           this.filterParam.orderByType = item.value
         }
         this.$refs['body'].scrollTo(0, 0)
         this.onRefresh()
       },
-     async getSysDictList() {
+      async getSysDictList() {
         let obj = {
           "interUser": "123",
           "interPwd": "123",
@@ -209,7 +222,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       await getSysDictList(params).then(res => {
+        await getSysDictList(params).then(res => {
           if (res.flag) {
             this.tab.typeList.push(...res.data[0].sysDictInfoList)
           }
@@ -233,7 +246,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       await getExamSectionTypeRelation(params).then(res => {
+        await getExamSectionTypeRelation(params).then(res => {
           if (res.flag) {
             this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
           }
@@ -253,52 +266,105 @@
       },
       getList() {
         const page = this.currentPage
-        let obj = {
-          "interUser": "runLfb",
-          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          "operateRoleType": "A02",
-          "accountNo": this.$store.getters.getUserInfo.accountNo,
-          "tchCourseId": this.$route.query.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId,
-          "resourceType": 'R03',
-          "shareType": '',
-          "sourceName": "",
-          "pageSize": "10",
-          "currentPage": page,
-          "filterParam": this.filterParam
-        }
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        teachApi.getTeachCourseResDetail(params).then(res => {
-          if(this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading',false)
-          this.listLoading = false
-          this.refLoading = false
-          this.total = res.total
-          if (res.flag && res.data && res.data[0] && res.data[0].examQuestion && res.data[0].examQuestion.length) {
-            this.list = page === 1 ? res.data[0].examQuestion : this.list.concat(res.data[0].examQuestion)
-            if (page >= res.total) {
+        if (this.$route.query.isRes) {
+          //从资源中心过来
+         let obj = {
+            "interUser": "runLfb",
+            "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "queryType": "C01",
+            "sysCourseIdList": [this.$route.query.courseId],
+            "areaCode": this.$route.query.areaCode,
+            "orderByType": this.filterParam.orderByType,
+            "pageSize": "10",
+            "currentPage": page,
+            "filterParam": {
+              "titleDegree": this.filterParam.titleDegree,
+              "belongType": this.filterParam.belongType,
+              "titleType": this.filterParam.titleType
+            }
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          getResExamInfo(params).then(res => {
+            if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
+            this.listLoading = false
+            this.refLoading = false
+            this.total = res.total
+            if (res.flag && res.examQuestionList) {
+              this.list = page === 1 ? res.examQuestionList : this.list.concat(res.examQuestionList)
+              if (page >= res.total) {
+                this.finished = true
+              }
+            } else {
+              this.list = page === 1 ? [] : this.list.concat([])
               this.finished = true
             }
-          } else {
-            this.list = page === 1 ? [] : this.list.concat([])
-            this.finished = true
-          }
-          // 加载列表时需要对已添加的试题修改状态
-          this.selectList.forEach(s => {
-            s.child.forEach(c => {
-              this.list.forEach(v => {
-                if(c.examId === v.examId) {
-                  this.$set(v,'isRemove',true)
-                }
+            this.list.forEach(v => {
+              v.groupExamList = v.groupExamList || []
+            })
+            // 加载列表时需要对已添加的试题修改状态
+            this.selectList.forEach(s => {
+              s.child.forEach(c => {
+                this.list.forEach(v => {
+                  if (c.examId === v.examId) {
+                    this.$set(v, 'isRemove', true)
+                  }
+                })
               })
             })
           })
+        } else {
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "operateRoleType": "A02",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "tchCourseId": this.$route.query.tchCourseId,
+            "sysCourseId": this.$route.query.sysCourseId,
+            "relationSeqId": this.$route.query.relationCourseId,
+            "resourceType": 'R03',
+            "shareType": '',
+            "sourceName": "",
+            "pageSize": "10",
+            "currentPage": page,
+            "filterParam": this.filterParam
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          teachApi.getTeachCourseResDetail(params).then(res => {
+            if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
+            this.listLoading = false
+            this.refLoading = false
+            this.total = res.total
+            if (res.flag && res.data && res.data[0] && res.data[0].examQuestion && res.data[0].examQuestion.length) {
+              this.list = page === 1 ? res.data[0].examQuestion : this.list.concat(res.data[0].examQuestion)
+              if (page >= res.total) {
+                this.finished = true
+              }
+            } else {
+              this.list = page === 1 ? [] : this.list.concat([])
+              this.finished = true
+            }
+            // 加载列表时需要对已添加的试题修改状态
+            this.selectList.forEach(s => {
+              s.child.forEach(c => {
+                this.list.forEach(v => {
+                  if (c.examId === v.examId) {
+                    this.$set(v, 'isRemove', true)
+                  }
+                })
+              })
+            })
 
-        })
+          })
+        }
+
       },
     }
   }
@@ -309,9 +375,11 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     .mask {
       background: transparent;
     }
+
     &__tab {
       flex: 0 0 44px;
       display: flex;
@@ -335,6 +403,7 @@
           top: 50%;
           border-width: 0 6px 6px;
           transform: rotateZ(180deg) translateY(50%);
+
           &.up {
             transform: rotateZ(0deg) translateY(-35%);
           }
@@ -390,6 +459,7 @@
       }
     }
   }
+
   .null-tips {
     margin-top: 50px;
     margin-left: 50%;
