@@ -1245,6 +1245,12 @@ export default {
         let end = this.form.time2
         let index = 1
         if(this.$route.query.isResend) {
+          if (new Date(start).getTime() > new Date(end).getTime()) {
+            return this.$toast('开始时间不能大于结束时间')
+          }
+          if(new Date(end).getTime() < new Date().getTime()) {
+            return this.$toast('结束时间不能小于当前时间')
+          }
           obj.endTime = end
         }else {
           this.classList.forEach((item) => {
@@ -1260,7 +1266,14 @@ export default {
         this.classList.forEach((item) => {
           if (item.check) {
             if(this.$route.query.isResend) {
+              if (new Date(item.startDate).getTime() > new Date(item.endDate).getTime()) {
+                return this.$toast('开始时间不能大于结束时间')
+              }
+              if(new Date(item.endDate).getTime() < new Date().getTime()) {
+                return this.$toast('结束时间不能小于当前时间')
+              }
               obj.endTime = item.endDate
+
             }else {
               obj['classTaskInfo' + index] = item.classId + '|' + item.startDate + '|' + item.endDate
               index++
