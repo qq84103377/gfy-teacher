@@ -158,7 +158,12 @@
             this.form.name = `错题集试卷${generateTimeReqestNumber()}`
             this.getClassTeachCourseInfo()
           }else if(this.$route.path === '/questionList') {
-            this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
+            if(this.$route.query.isRes) {
+              this.getClassTeachCourseInfo()
+            }
+            if(!this.$route.query.isPri) {
+              this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
+            }
           }
         }
       }
@@ -180,6 +185,10 @@
           "pageSize": "999",
           "courseType": "C01",
           "currentPage": 1,
+        }
+        if(this.$route.query.isRes) {
+          obj.termType = this.$route.query.termType
+          obj.classGrade = this.$route.query.classGrade
         }
         let params = {
           requestJson: JSON.stringify(obj)

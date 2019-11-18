@@ -78,7 +78,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar v-model="selectList" @clear="clear" :can-select="true"></exam-bar>
+    <exam-bar :can-add-course="$route.query.isRes" v-model="selectList" @clear="clear" :can-select="true"></exam-bar>
   </section>
 </template>
 
@@ -86,7 +86,7 @@
   import questionItem from '../../components/questionItem'
   import examBar from '../../components/examBar'
   import {teachApi} from "../../api/parent-GFY";
-  import {getExamSectionTypeRelation, getSysDictList, getResExamInfo} from '@/api/index'
+  import {getExamSectionTypeRelation, getSysDictList, getResExamInfo, getCollectInfoDetailV2} from '@/api/index'
   import correctPop from '../../components/correctPop'
 
   export default {
@@ -264,37 +264,48 @@
         this.currentPage = 0
         this.onLoad()
       },
-      getList() {
+      getCollectInfoDetailV2() {
+        this.$store.commit('setVanLoading', true)
         const page = this.currentPage
-        if (this.$route.query.isRes) {
-          //从资源中心过来
-         let obj = {
-            "interUser": "runLfb",
-            "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "queryType": "C01",
-            "sysCourseIdList": [this.$route.query.courseId],
-            "areaCode": this.$route.query.areaCode,
-            "orderByType": this.filterParam.orderByType,
-            "pageSize": "10",
-            "currentPage": page,
-            "filterParam": {
-              "titleDegree": this.filterParam.titleDegree,
-              "belongType": this.filterParam.belongType,
-              "titleType": this.filterParam.titleType
-            }
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          subjectType: localStorage.currentSubjectType,
+          yearSection: this.$route.query.year,
+          "pageSize": "9999",
+          "currentPage": 1,
+          "orderByType": this.filterParam.orderByType,
+          "resCollectInfo": {
+            objectTypeCd: 'C01',
+            "objectId": null,
+            "collectType": "",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "statusCd": "S01"
+          },
+          "filterParam": {
+            "titleDegree": this.filterParam.titleDegree, //难度
+            "titleType": this.filterParam.titleType, //题型
+            "belongType": this.filterParam.belongType, //类型
+            "belongAreaCode": this.$route.query.areaCode,
+            "keyWord": "",
+            "createYear": "",
+            "courseWareType": ""
           }
-          let params = {
-            requestJson: JSON.stringify(obj)
-          }
-          getResExamInfo(params).then(res => {
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getCollectInfoDetailV2(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
             if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
             this.listLoading = false
             this.refLoading = false
             this.total = res.total
-            if (res.flag && res.examQuestionList) {
-              this.list = page === 1 ? res.examQuestionList : this.list.concat(res.examQuestionList)
+            if (res.flag) {
+              this.list = page === 1 ? res.data : this.list.concat(res.data)
               if (page >= res.total) {
                 this.finished = true
               }
@@ -315,7 +326,69 @@
                 })
               })
             })
-          })
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      getList() {
+        const page = this.currentPage
+        if (this.$route.query.isRes) {
+          //从资源中心过来
+          if(this.$route.query.isPri) {
+            //私人资源
+            this.getCollectInfoDetailV2()
+          }else {
+            //平台资源
+            let obj = {
+              "interUser": "runLfb",
+              "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+              "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+              "belongSchoolId": this.$store.getters.schoolId,
+              "queryType": "C01",
+              "sysCourseIdList": [this.$route.query.courseId],
+              "areaCode": this.$route.query.areaCode,
+              "orderByType": this.filterParam.orderByType,
+              "pageSize": "10",
+              "currentPage": page,
+              "filterParam": {
+                "titleDegree": this.filterParam.titleDegree,
+                "belongType": this.filterParam.belongType,
+                "titleType": this.filterParam.titleType
+              }
+            }
+            let params = {
+              requestJson: JSON.stringify(obj)
+            }
+            getResExamInfo(params).then(res => {
+              if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
+              this.listLoading = false
+              this.refLoading = false
+              this.total = res.total
+              if (res.flag && res.examQuestionList) {
+                this.list = page === 1 ? res.examQuestionList : this.list.concat(res.examQuestionList)
+                if (page >= res.total) {
+                  this.finished = true
+                }
+              } else {
+                this.list = page === 1 ? [] : this.list.concat([])
+                this.finished = true
+              }
+              this.list.forEach(v => {
+                v.groupExamList = v.groupExamList || []
+              })
+              // 加载列表时需要对已添加的试题修改状态
+              this.selectList.forEach(s => {
+                s.child.forEach(c => {
+                  this.list.forEach(v => {
+                    if (c.examId === v.examId) {
+                      this.$set(v, 'isRemove', true)
+                    }
+                  })
+                })
+              })
+            })
+          }
         } else {
           let obj = {
             "interUser": "runLfb",

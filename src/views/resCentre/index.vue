@@ -4,12 +4,12 @@
       title="资源中心">
     </van-nav-bar>
     <div class="res-centre-wrap__tab">
-      <div class="van-hairline--right" @click="tabIndex=0" :class="{active:!tabIndex}">平台资源</div>
-      <div :class="{active:tabIndex}" @click="tabIndex=1">私人资源</div>
+      <div class="van-hairline--right" @click="toggleTab(0)" :class="{active:!tabIndex}">平台资源</div>
+      <div :class="{active:tabIndex}" @click="toggleTab(1)">私人资源</div>
     </div>
     <div class="res-centre-wrap__body">
       <div class="res-centre-wrap__body__title">筛选</div>
-      <van-cell class="res-centre-wrap__body__cell" v-if="!tabIndex">
+      <van-cell class="res-centre-wrap__body__cell" v-show="!tabIndex">
         <div slot="title" @click="areaFilterShow=true" class="aic jcsb">
           <div class="fs16">地区</div>
           <div class="fs15"><span class="blue mgr10">{{areaLabel}}</span>
@@ -25,7 +25,7 @@
           </div>
         </div>
       </van-cell>
-      <van-cell class="res-centre-wrap__body__cell" v-if="!tabIndex">
+      <van-cell class="res-centre-wrap__body__cell" v-show="!tabIndex">
         <div slot="title" @click="versionFilterShow=true" class="aic jcsb">
           <div class="fs16">教材</div>
           <div class="fs15"><span class="blue mgr10">{{versionLabel}}</span>
@@ -33,7 +33,7 @@
           </div>
         </div>
       </van-cell>
-      <van-cell class="res-centre-wrap__body__cell" v-if="!tabIndex">
+      <van-cell class="res-centre-wrap__body__cell" v-show="!tabIndex">
         <div slot="title" @click="resCourseFilterShow=true" class="aic jcsb">
           <div class="fs16">课程</div>
           <div class="fs15"><span class="blue mgr10">{{courseLabel}}</span>
@@ -71,7 +71,7 @@
               <div slot="btn" class="btn-group van-hairline--top">
                 <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                  <span>收藏</span>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
                 </div>
                 <div
                   @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','lessonList')">
@@ -138,7 +138,8 @@
         <van-collapse-item title="试卷" name="3">
           <div>
             <list-item @clickTo="viewDetail(item)" class="mgt10"
-                       style="background: #fff;" v-for="(item,index) in examList" :key="index" :itemTitle="item.testPaperName">
+                       style="background: #fff;" v-for="(item,index) in examList" :key="index"
+                       :itemTitle="item.testPaperName">
               <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
               <div slot="desc">
                 <div class="desc-top">
@@ -183,14 +184,143 @@
         </van-collapse-item>
       </van-collapse>
       <!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
-      <van-collapse v-if="0" class="res-centre-wrap__body__collapse" v-show="tabIndex" v-model="activeNames1">
+      <van-collapse class="res-centre-wrap__body__collapse" v-show="tabIndex" @change="handlePrivateChange"
+                    v-model="activeNames1">
         <van-collapse-item title="微课" name="1">
+          <div>
+            <list-item class="mgt10" style="background: #fff;"
+                       v-for="(item,index) in priLessonList" :key="index"
+                       :itemTitle="item.courseware_name"
+                       @clickTo="goVideoPage(item)">
+              <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
+                <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else class="iconGFY icon-video"></i>
+              </div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                </div>
+              </div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div v-if="item.collect_type === 'C01'" @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                  <span>取消收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priLessonList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'lesson')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
+              </div>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
         </van-collapse-item>
         <van-collapse-item title="素材" name="2">
-
+          <div>
+            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                       v-for="(item,index) in priMaterialList" :key="index"
+                       :itemTitle="item.courseware_name">
+              <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                </div>
+              </div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div v-if="item.collect_type === 'C01'" @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                  <span>取消收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priMaterialList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'material')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
+              </div>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
         </van-collapse-item>
         <van-collapse-item title="试卷" name="3">
-
+          <div>
+            <list-item @clickTo="viewDetail(item)" class="mgt10"
+                       style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
+                       :itemTitle="item.test_paper_name">
+              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.test_paper_degree==='D01'?'容易':item.test_paper_degree==='D02'?'中等':'困难'}}
+                  </div>
+                  <div><i class="iconGFY icon-zhu"></i>{{item.subjective_item_num || 0}}</div>
+                  <div><i class="iconGFY icon-ke"></i>{{item.objective_item_num || 0}}</div>
+                  <div><i class="iconGFY icon-download"></i>{{item.down_count || 0}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                </div>
+              </div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div v-if="item.collect_type === 'C01'" @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                  <span>取消收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.test_paper_name,item.test_paper_id,'R02','priExamList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'exam')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
+              </div>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
         </van-collapse-item>
       </van-collapse>
       <van-cell is-link @click="viewQuestion">
@@ -232,8 +362,10 @@
     <area-filter :label.sync="areaLabel" :visible.sync="areaFilterShow" @filter="v => areaCode = v"></area-filter>
     <res-course-filter :label.sync="courseLabel" :visible.sync="resCourseFilterShow"
                        @filter="handleFilter"></res-course-filter>
-    <add-course-pop @success="saveRecord" :isSendTask="isSendTask" :resourceType="resourceType" :resourceId="resourceId" :resName="resName"
-                   :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm" :visible.sync="addCourseShow"></add-course-pop>
+    <add-course-pop @success="saveRecord" :isSendTask="isSendTask" :resourceType="resourceType" :resourceId="resourceId"
+                    :resName="resName"
+                    :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm"
+                    :visible.sync="addCourseShow"></add-course-pop>
   </section>
 </template>
 
@@ -250,9 +382,10 @@
     createCollectInfo,
     getClassTeachCourseInfo,
     getSysCourseTestPaperList,
+    getCollectInfoDetailV2,
   } from '@/api/index'
-  import {getGradeName, getSubjectName} from "../../utils/filter";
-  import { teachApi, pubApi } from '@/api/parent-GFY'
+  import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
+  import {teachApi, pubApi} from '@/api/parent-GFY'
 
   export default {
     name: "index",
@@ -291,52 +424,197 @@
         gradeTerm: '', //年级学期
         lessonList: [],
         materialList: [],
-        courseList: [],
         examList: [],
+        priLessonList: [],
+        priMaterialList: [],
+        priExamList: [],
+        courseList: [],
         resName: '',
         resourceId: '',
         resourceType: '',
-        listKey: '', // 点击添加时属于哪个列表
+        listKey: '', // 平台资源点击添加时属于哪个列表
+        priListKey: '', // 私人资源点击添加时属于哪个列表
         isSendTask: false,
       }
     },
     watch: {
+      subjectLabel() {
+        if(this.tabIndex) {
+          //私人资源
+          this.activeNames1.forEach(v => {
+            if (v == 1) {
+              // 微课
+              this.getCollectInfoDetailV2('C03')
+            } else if (v == '2') {
+              //素材
+              this.getCollectInfoDetailV2('C04')
+            } else if (v == '3') {
+              //试卷
+              this.getCollectInfoDetailV2('C02')
+            }
+          })
+        }
+      },
       courseId() {
-        this.activeNames = []
-        this.lessonList = []
-        this.materialList = []
+        if(this.courseId) {
+          this.activeNames.forEach(v => {
+            if (v == 1) {
+              // 微课
+              this.getResCourseWareInfo('C01')
+            } else if (v == '2') {
+              //素材
+              this.getResCourseWareInfo('C02')
+            } else if (v == '3') {
+              //试卷
+              this.getSysCourseTestPaperList()
+            }
+          })
+        }else {
+          this.lessonList = []
+          this.materialList = []
+          this.examList = []
+        }
         this.courseList = []
-        this.examList = []
-      }
+      },
     },
     created() {
     },
     methods: {
+      handleYearSecion() {
+        const year = this.subjectLabel.substr(0, 2)
+        if (year === '小学') {
+          return 'Y01'
+        } else if (year === '初中') {
+          return 'Y02'
+        } else {
+          return 'Y03'
+        }
+      },
+      getCollectInfoDetailV2(objectTypeCd) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          subjectType: localStorage.currentSubjectType,
+          yearSection: this.handleYearSecion(),
+          "pageSize": "9999",
+          "currentPage": 1,
+          "orderByType": "T05",
+          "resCollectInfo": {
+            objectTypeCd,
+            "objectId": null,
+            "collectType": "",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "statusCd": "S01"
+          },
+          "filterParam": {
+            "titleDegree": "",
+            "belongType": "",
+            "belongAreaCode": "",
+            "keyWord": "",
+            "createYear": "",
+            "courseWareType": ""
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getCollectInfoDetailV2(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            if(objectTypeCd === 'C02') {
+              //试题
+              this.priExamList = res.data || []
+            }else if (objectTypeCd === 'C03') {
+              //微课
+              this.priLessonList = res.data || []
+            }else if (objectTypeCd === 'C04') {
+              //素材
+              this.priMaterialList = res.data || []
+            }
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      toggleTab(value) {
+        this.tabIndex = value
+      },
       viewQuestion() {
-        this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}`)
+        if(this.tabIndex) {
+          this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+        }else {
+          this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+        }
       },
       viewDetail(item) {
-        this.$store.commit('setResourceInfo', item)
-        this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}`)
+        if(this.tabIndex) {
+          let humpObj = {}
+          for(let k in item) {
+            const humpKey = toHump(k)
+            humpObj[humpKey] = item[k]
+            this.$store.commit('setResourceInfo', humpObj)
+            this.$store.commit("setTaskClassInfo", '')
+            this.$router.push(`/examDetail?type=1&testPaperId=${humpObj.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${humpObj.testPaperName}`)
+          }
+        }else {
+          this.$store.commit('setResourceInfo', item)
+          this.$store.commit("setTaskClassInfo", '')
+          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}`)
+        }
       },
       goto(item) {
-        this.$router.push({path:'/materialDetail',query:{data:item}})
-      },
-      sendTask(obj,key) {
-        if(key === 'exam') {
-          if (!obj.objectiveItemNum && !obj.subjectiveItemNum){
-            return this.$toast('该试卷不含试题')
+        if(this.tabIndex) {
+          let humpObj = {}
+          for(let k in item) {
+            const humpKey = toHump(k)
+            humpObj[humpKey] = item[k]
           }
-          this.$store.commit('setResourceInfo', obj)
-          this.showAddPop(obj.testPaperName,'','R02',key)
+          this.$router.push({path: '/materialDetail', query: {data: humpObj}})
         }else {
-          this.$store.commit('setResourceInfo', obj.resCourseWareInfo)
-          this.showAddPop(obj.resCourseWareInfo.coursewareName,'','R01',key)
+          this.$router.push({path: '/materialDetail', query: {data: item}})
+        }
+      },
+      sendTask(obj, key) {
+        if(this.tabIndex) {
+          if (key === 'exam') {
+            if (!obj.objective_item_num && !obj.subjective_item_num) {
+              return this.$toast('该试卷不含试题')
+            }
+            let humpObj = {}
+            for(let k in obj) {
+              const humpKey = toHump(k)
+              humpObj[humpKey] = obj[k]
+            }
+            this.$store.commit('setResourceInfo', humpObj)
+            this.showAddPop(obj.test_paper_name, '', 'R02', key)
+          }else {
+            let humpObj = {}
+            for(let k in obj) {
+              const humpKey = toHump(k)
+              humpObj[humpKey] = obj[k]
+            }
+            this.$store.commit('setResourceInfo', humpObj)
+            this.showAddPop(obj.courseware_name, '', 'R01', key)
+          }
+
+        }else {
+          if (key === 'exam') {
+            if (!obj.objectiveItemNum && !obj.subjectiveItemNum) {
+              return this.$toast('该试卷不含试题')
+            }
+            this.$store.commit('setResourceInfo', obj)
+            this.showAddPop(obj.testPaperName, '', 'R02', key)
+          } else {
+            this.$store.commit('setResourceInfo', obj.resCourseWareInfo)
+            this.showAddPop(obj.resCourseWareInfo.coursewareName, '', 'R01', key)
+          }
         }
       },
       goVideoPage(item) {
-        if (!item.resCourseWareInfo.srcUrl) return
+        if (this.tabIndex ? !item.src_url : !item.resCourseWareInfo.srcUrl) return
         this.checkUrlPermission(item)
       },
       checkUrlPermission(item) {
@@ -346,30 +624,40 @@
           'interPwd': '25d55ad283aa400af464c76d713c07ad',
           'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
           'belongSchoolId': this.$store.getters.schoolId,
-          'url': item.resCourseWareInfo.srcUrl,
+          'url': this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
           'sysTypeCd': 'S03'
         }
         this.$store.commit('setVanLoading', true)
-        pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
+        pubApi.checkUrlPermission({requestJson: JSON.stringify(permissionParams)}).then((respone) => {
           this.$store.commit('setVanLoading', false)
           if (respone.flag) {
-            item.resCourseWareInfo.srcUrl = respone.data[0].accessUrl
+            this.tabIndex ? item.src_url = respone.data[0].accessUrl
+              : item.resCourseWareInfo.srcUrl = respone.data[0].accessUrl
           } else {
-            item.resCourseWareInfo.srcUrl = ''
+            this.tabIndex ? item.src_url = ''
+              : item.resCourseWareInfo.srcUrl = ''
           }
 
-          if (!item.resCourseWareInfo.srcUrl) {
+          if (this.tabIndex ? !item.src_url : !item.resCourseWareInfo.srcUrl) {
             this.$toast('暂无资源')
             return
           }
 
-          this.$router.push({ name: 'videoPage', query: { src: item.resCourseWareInfo.srcUrl, title: item.resCourseWareInfo.coursewareName, isMp3: item.resCourseWareInfo.source == "S01" ? true : false } })
+          this.$router.push({
+            name: 'videoPage',
+            query: {
+              src:this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
+              title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
+              isMp3: (this.tabIndex ? item.source : item.resCourseWareInfo.source) == "S01" ? true : false
+            }
+          })
         }).catch(() => {
           this.$store.commit('setVanLoading', false)
           this.$toast('资源错误')
         })
       },
       getSysCourseTestPaperList() {
+        if(!this.courseId) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -387,32 +675,55 @@
         }
         getSysCourseTestPaperList(params).then(res => {
           this.$store.commit('setVanLoading', false)
-          if(res.flag) {
+          if (res.flag) {
             this.examList = res.data || []
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
       },
       saveRecord(courseName) {
-        const item = this[this.listKey].find(v => this.resourceId === v.resCourseWareInfo.coursewareId)
-        if (item.record) {
-          //有添加记录
-          item.record.push(`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`)
-        } else {
-          this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
+        if(this.tabIndex) {
+          let item = {}
+          if(this.priListKey === 'priExamList') {
+            item = this[this.priListKey].find(v => this.resourceId === v.test_paper_id)
+          }else {
+            item = this[this.priListKey].find(v => this.resourceId === v.courseware_id)
+          }
+          if (item.record) {
+            //有添加记录
+            item.record.push(`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`)
+          } else {
+            this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
+          }
+        }else {
+          let item = {}
+          if(this.listKey === 'examList') {
+            item = this[this.listKey].find(v => this.resourceId === v.testPaperId)
+          }else {
+            item = this[this.listKey].find(v => this.resourceId === v.resCourseWareInfo.coursewareId)
+          }
+          if (item.record) {
+            //有添加记录
+            item.record.push(`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`)
+          } else {
+            this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
+          }
         }
       },
       showAddPop(name, id, resourceType, key) {
-        if(!id) {
+        if (!id) {
           this.isSendTask = true
-        }else {
+        } else {
           this.isSendTask = false
         }
         this.addCourseShow = true
         this.resName = name
         this.resourceId = id
         this.resourceType = resourceType
+        if(this.tabIndex) {
+          this.priListKey = key
+        }
         this.listKey = key
         if (!this.courseList.length) {
           this.getClassTeachCourseInfo()
@@ -445,7 +756,8 @@
         })
       },
       handleIcon(item) {
-        var t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
+        const type = this.tabIndex ? item.src_url : item.srcUrl
+        let t = type.substring(type.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {
           t = 'icon-ppt'
         } else if (t == 'doc' || t == 'docx') {
@@ -465,16 +777,16 @@
         }
         return t
       },
-      collect(item,objectId,statusCd) {
+      collect(item, objectId, statusCd, index) {
         this.$store.commit('setVanLoading', true)
-        if (item.collectId) {
+        if (this.tabIndex?item.collect_id:item.collectId) {
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",
             "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
-              "collectId": item.collectId,
+              "collectId": this.tabIndex?item.collect_id:item.collectId,
               "objectTypeCd": "C03",
               objectId,
               "collectType": "C01",
@@ -489,12 +801,15 @@
             this.$store.commit('setVanLoading', false)
             if (res.flag) {
               this.$toast('取消收藏')
-              item.collectId = 0
+              this.tabIndex?
+                this[this.priListKey].splice(index,1)
+                :item.collectId = 0
             } else {
               this.$toast(res.msg)
             }
           })
         } else {
+          //私人资源不能收藏
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -524,6 +839,33 @@
           })
         }
       },
+      handlePrivateChange(activeArr) {
+        if (activeArr.length > this.activeNames1.length) {
+          //有展开
+          let value = '' //展开的index
+          activeArr.forEach(v => {
+            if (this.activeNames1.indexOf(v) === -1) {
+              value = v
+            }
+          })
+          if (value == '1') {
+            // 微课
+            if (!this.priLessonList.length) {
+              this.getCollectInfoDetailV2('C03')
+            }
+          } else if (value == '2') {
+            //素材
+            if (!this.priMaterialList.length) {
+              this.getCollectInfoDetailV2('C04')
+            }
+          } else if (value == '3') {
+            //试卷
+            if (!this.priExamList.length) {
+              this.getCollectInfoDetailV2('C02')
+            }
+          }
+        }
+      },
       handleChange(activeArr) {
         if (activeArr.length > this.activeNames.length) {
           //有展开
@@ -543,13 +885,16 @@
             if (!this.materialList.length) {
               this.getResCourseWareInfo('C02')
             }
-          }else if (value == '3') {
+          } else if (value == '3') {
             //试卷
-            this.getSysCourseTestPaperList()
+            if (!this.examList.length) {
+              this.getSysCourseTestPaperList()
+            }
           }
         }
       },
       getResCourseWareInfo(queryType) {
+        if(!this.courseId) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
