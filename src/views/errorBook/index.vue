@@ -38,7 +38,7 @@
 <script>
   import courseFilter from '../../components/courseFilter'
   import examBar from '../../components/examBar'
-  import {getTeacherErrorExamList} from '@/api/index'
+  import {getTeacherErrorExamList, getTeacherErrorExamDetail, getExamSectionTypeRelation} from '@/api/index'
   import { mapMutations, mapGetters, mapState } from 'vuex'
   export default {
     components: {courseFilter, examBar},
@@ -67,7 +67,8 @@
           classId:''
         },
         selectList: this.$store.getters.getErrorBookSelected,
-        selectCourseList: []
+        selectCourseList: [],
+        questionTypeList: []
       }
     },
     watch: {
@@ -104,6 +105,9 @@
     mounted() {
       this.$refs['courseFilter'].handleSubmit()
     },
+    created() {
+      this.getExamSectionTypeRelation()
+    },
     activated() {
       //试题详情返回的时候要对选中的试题重新赋值
       this.selectList = this.$store.getters.getErrorBookSelected
@@ -114,6 +118,92 @@
       })
     },
     methods: {
+      getExamSectionTypeRelation() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "currPage": 1,
+          "pageSize": 999,
+          "examSectionTypeRlation": {
+            "seqId": null,//编号可空
+            "subjectType": localStorage.currentSubjectType, //学科（课程时由课程信息获取，资源中心时有所选学科获取）
+            "examType": null,//题型，可空
+            "sectionType": null //章节类型，可空
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getExamSectionTypeRelation(params).then(res => {
+          if (res.flag) {
+            this.questionTypeList = res.examSectionTypeRlationList
+          }
+        })
+      },
+      getTeacherErrorExamDetail(courseId,type) {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          subjectType: localStorage.currentSubjectType,
+          errorPersent:this.errorValue,
+          ...this.filterParams,
+          sysCourseIdList: [courseId],
+        };
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getTeacherErrorExamDetail(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag && res.data[0]) {
+            if(type) {
+              //添加
+              res.data[0].examQuestionInfo.forEach(item => {
+                //点击添加时判断已选入的试题是否有包含该课程里的试题
+                if(this.selectList.some(s => s.child.some(c => c.examId === item.examId))) return
+
+                const index = this.selectList.findIndex(v => v.examType === item.titleType)
+                if (index > -1) {
+                  // 添加的试题已存在相同题型
+                  this.selectList[index].child.push(item)
+                } else {
+                  //添加的试题不存在相同题型
+                  const sectionIndex = this.questionTypeList.findIndex(v => v.examType === item.titleType)
+                  console.log(sectionIndex);
+                  const typeItem = this.questionTypeList[sectionIndex]
+                  this.selectList.push({
+                    sectionName: typeItem.sectionName,
+                    examType: typeItem.examType,
+                    sectionType: typeItem.sectionType,
+                    sectionIndex: sectionIndex,
+                    child: [item]
+                  })
+                }
+              })
+            }else {
+              // 移除
+              res.data[0].examQuestionInfo.forEach(item => {
+                const index = this.selectList.findIndex(v => v.examType === item.titleType)
+                if (this.selectList[index].child.length === 1) {
+                  //整个this.selectList[index]删除
+                  this.selectList.splice(index, 1)
+                } else {
+                  // 只删除this.selectList[index].child[childIndex]
+                  const childIndex = this.selectList[index].child.findIndex(v => v.examId === item.examId)
+                  this.selectList[index].child.splice(childIndex, 1)
+                }
+              })
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       clear() {
         //清空所有试题时需要移除课程试题的添加状态样式
         this.courseList.forEach(v => {
@@ -138,12 +228,14 @@
         this.getList()
       },
       selectCourse(item) {
+
         this.$set(item,'active',!item.active)
         if(item.active) {
           this.selectCourseList.push(item.sysCourseId)
         }else {
           this.selectCourseList.splice(this.selectCourseList.indexOf(item.sysCourseId),1)
         }
+        this.getTeacherErrorExamDetail(item.sysCourseId,item.active)
       },
       confirmCb(classGrade='',termType='',classId='',gradeName='',termName='',className='') {
         this.filterName = localStorage.currentSubjectTypeName + gradeName + className + termName
