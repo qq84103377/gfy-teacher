@@ -189,6 +189,7 @@
         <van-collapse-item title="微课" name="1">
           <div>
             <list-item class="mgt10" style="background: #fff;"
+                       :can-slide="true" @del="delCourseWare(item,index,'priLessonList')"
                        v-for="(item,index) in priLessonList" :key="index"
                        :itemTitle="item.courseware_name"
                        @clickTo="goVideoPage(item)">
@@ -209,7 +210,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div v-if="item.collect_type === 'C01'" @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
+                <div v-if="item.collect_type === 'C01'"
+                     @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                   <span>取消收藏</span>
                 </div>
@@ -235,6 +237,7 @@
         <van-collapse-item title="素材" name="2">
           <div>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                       :can-slide="true" @del="delCourseWare(item,index,'priMaterialList')"
                        v-for="(item,index) in priMaterialList" :key="index"
                        :itemTitle="item.courseware_name">
               <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
@@ -252,7 +255,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div v-if="item.collect_type === 'C01'" @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd)">
+                <div v-if="item.collect_type === 'C01'"
+                     @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                   <span>取消收藏</span>
                 </div>
@@ -278,6 +282,7 @@
         <van-collapse-item title="试卷" name="3">
           <div>
             <list-item @clickTo="viewDetail(item)" class="mgt10"
+                       :can-slide="true" @del="delTestPaper(item,index)"
                        style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
                        :itemTitle="item.test_paper_name">
               <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
@@ -299,7 +304,8 @@
                 </div>
               </div>
               <div slot="btn" class="btn-group van-hairline--top">
-                <div v-if="item.collect_type === 'C01'" @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd)">
+                <div v-if="item.collect_type === 'C01'"
+                     @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                   <span>取消收藏</span>
                 </div>
@@ -383,6 +389,8 @@
     getClassTeachCourseInfo,
     getSysCourseTestPaperList,
     getCollectInfoDetailV2,
+    delCourseWare,
+    delTestPaper,
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
@@ -439,7 +447,7 @@
     },
     watch: {
       subjectLabel() {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           //私人资源
           this.activeNames1.forEach(v => {
             if (v == 1) {
@@ -456,7 +464,7 @@
         }
       },
       courseId() {
-        if(this.courseId) {
+        if (this.courseId) {
           this.activeNames.forEach(v => {
             if (v == 1) {
               // 微课
@@ -469,7 +477,7 @@
               this.getSysCourseTestPaperList()
             }
           })
-        }else {
+        } else {
           this.lessonList = []
           this.materialList = []
           this.examList = []
@@ -480,6 +488,40 @@
     created() {
     },
     methods: {
+      delTestPaper(item, index) {
+        let obj = {
+          'interUser': 'runLfb',
+          'interPwd': '25d55ad283aa400af464c76d713c07ad',
+          'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+          'belongSchoolId': this.$store.getters.schoolId,
+          "testPaperInfo": {"testPaperId": item.test_paper_id}
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        delTestPaper(params).then(res => {
+          if (res.flag) {
+            this.priExamList.splice(index, 1)
+            this.$toast('删除成功')
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      delCourseWare(item, index, key) {
+        let obj = {"courseWareList": [{"coursewareId": item.courseware_id}]}
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        delCourseWare(params).then(res => {
+          if (res.flag) {
+            this[key].splice(index, 1)
+            this.$toast('删除成功')
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       handleYearSecion() {
         const year = this.subjectLabel.substr(0, 2)
         if (year === '小学') {
@@ -523,18 +565,18 @@
         }
         getCollectInfoDetailV2(params).then(res => {
           this.$store.commit('setVanLoading', false)
-          if(res.flag) {
-            if(objectTypeCd === 'C02') {
+          if (res.flag) {
+            if (objectTypeCd === 'C02') {
               //试题
               this.priExamList = res.data || []
-            }else if (objectTypeCd === 'C03') {
+            } else if (objectTypeCd === 'C03') {
               //微课
               this.priLessonList = res.data || []
-            }else if (objectTypeCd === 'C04') {
+            } else if (objectTypeCd === 'C04') {
               //素材
               this.priMaterialList = res.data || []
             }
-          }else {
+          } else {
             this.$toast(res.msg)
           }
         })
@@ -543,56 +585,56 @@
         this.tabIndex = value
       },
       viewQuestion() {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
-        }else {
+        } else {
           this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
         }
       },
       viewDetail(item) {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           let humpObj = {}
-          for(let k in item) {
+          for (let k in item) {
             const humpKey = toHump(k)
             humpObj[humpKey] = item[k]
             this.$store.commit('setResourceInfo', humpObj)
             this.$store.commit("setTaskClassInfo", '')
             this.$router.push(`/examDetail?type=1&testPaperId=${humpObj.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${humpObj.testPaperName}`)
           }
-        }else {
+        } else {
           this.$store.commit('setResourceInfo', item)
           this.$store.commit("setTaskClassInfo", '')
           this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}`)
         }
       },
       goto(item) {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           let humpObj = {}
-          for(let k in item) {
+          for (let k in item) {
             const humpKey = toHump(k)
             humpObj[humpKey] = item[k]
           }
           this.$router.push({path: '/materialDetail', query: {data: humpObj}})
-        }else {
+        } else {
           this.$router.push({path: '/materialDetail', query: {data: item}})
         }
       },
       sendTask(obj, key) {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           if (key === 'exam') {
             if (!obj.objective_item_num && !obj.subjective_item_num) {
               return this.$toast('该试卷不含试题')
             }
             let humpObj = {}
-            for(let k in obj) {
+            for (let k in obj) {
               const humpKey = toHump(k)
               humpObj[humpKey] = obj[k]
             }
             this.$store.commit('setResourceInfo', humpObj)
             this.showAddPop(obj.test_paper_name, '', 'R02', key)
-          }else {
+          } else {
             let humpObj = {}
-            for(let k in obj) {
+            for (let k in obj) {
               const humpKey = toHump(k)
               humpObj[humpKey] = obj[k]
             }
@@ -600,7 +642,7 @@
             this.showAddPop(obj.courseware_name, '', 'R01', key)
           }
 
-        }else {
+        } else {
           if (key === 'exam') {
             if (!obj.objectiveItemNum && !obj.subjectiveItemNum) {
               return this.$toast('该试卷不含试题')
@@ -646,7 +688,7 @@
           this.$router.push({
             name: 'videoPage',
             query: {
-              src:this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
+              src: this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
               title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
               isMp3: (this.tabIndex ? item.source : item.resCourseWareInfo.source) == "S01" ? true : false
             }
@@ -657,7 +699,7 @@
         })
       },
       getSysCourseTestPaperList() {
-        if(!this.courseId) return
+        if (!this.courseId) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -683,11 +725,11 @@
         })
       },
       saveRecord(courseName) {
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           let item = {}
-          if(this.priListKey === 'priExamList') {
+          if (this.priListKey === 'priExamList') {
             item = this[this.priListKey].find(v => this.resourceId === v.test_paper_id)
-          }else {
+          } else {
             item = this[this.priListKey].find(v => this.resourceId === v.courseware_id)
           }
           if (item.record) {
@@ -696,11 +738,11 @@
           } else {
             this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
           }
-        }else {
+        } else {
           let item = {}
-          if(this.listKey === 'examList') {
+          if (this.listKey === 'examList') {
             item = this[this.listKey].find(v => this.resourceId === v.testPaperId)
-          }else {
+          } else {
             item = this[this.listKey].find(v => this.resourceId === v.resCourseWareInfo.coursewareId)
           }
           if (item.record) {
@@ -721,7 +763,7 @@
         this.resName = name
         this.resourceId = id
         this.resourceType = resourceType
-        if(this.tabIndex) {
+        if (this.tabIndex) {
           this.priListKey = key
         }
         this.listKey = key
@@ -779,14 +821,14 @@
       },
       collect(item, objectId, statusCd, index) {
         this.$store.commit('setVanLoading', true)
-        if (this.tabIndex?item.collect_id:item.collectId) {
+        if (this.tabIndex ? item.collect_id : item.collectId) {
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",
             "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
-              "collectId": this.tabIndex?item.collect_id:item.collectId,
+              "collectId": this.tabIndex ? item.collect_id : item.collectId,
               "objectTypeCd": "C03",
               objectId,
               "collectType": "C01",
@@ -801,9 +843,9 @@
             this.$store.commit('setVanLoading', false)
             if (res.flag) {
               this.$toast('取消收藏')
-              this.tabIndex?
-                this[this.priListKey].splice(index,1)
-                :item.collectId = 0
+              this.tabIndex ?
+                this[this.priListKey].splice(index, 1)
+                : item.collectId = 0
             } else {
               this.$toast(res.msg)
             }
@@ -894,7 +936,7 @@
         }
       },
       getResCourseWareInfo(queryType) {
-        if(!this.courseId) return
+        if (!this.courseId) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",

@@ -453,3 +453,11 @@ export const getResExamInfo =(params)=>{
 export const getCollectInfoDetailV2 =(params)=>{
   return axios.post('resource/getCollectInfoDetailV2', qs.stringify(params))
 }
+//删除资源中心微课/素材
+export const delCourseWare =(params)=>{
+  return axios.post('resource/delCourseWare', qs.stringify(params))
+}
+//删除资源中心试卷
+export const delTestPaper =(params)=>{
+  return axios.post('resource/delTestPaper', qs.stringify(params))
+}
