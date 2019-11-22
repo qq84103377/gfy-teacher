@@ -164,6 +164,9 @@
             if(!this.$route.query.isPri) {
               this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
             }
+          }else if (this.$route.path === '/examDetail') {
+            this.form.name = `${this.$route.query.title}-副本`
+            this.getClassTeachCourseInfo()
           }
         }
       }
@@ -280,31 +283,59 @@
         this.form.btnLoading = true
         let testPaperExamInfoList = []
         let examIndex = -1
-        this.selectList.forEach(v => {
-          v.child.forEach(c => {
-            examIndex++
-            testPaperExamInfoList.push({
-              "examId": c.examId,
-              "sectionType": v.sectionType,
-              "subjectType": c.subjectType,
-              "sectionName": v.sectionName,
-              "sectionIndex": v.sectionIndex,
-              examIndex,
-              "examScore": 5,
-              "groupId": c.groupId,
-              "groupExamReList": c.groupExamList.map((g, gi) => {
-                return {
-                  "examGroupId": g.examGroupId,
-                  "groupId": g.groupId,
-                  "autoScoring": g.autoScoring,
-                  "groupIndex": gi + 1,
-                  "examScore": 5
-                }
+
+        if (this.$route.path === '/examDetail') {
+          this.$parent.list.forEach(v => {
+            v.sectionExamList.forEach(c => {
+              examIndex++
+              testPaperExamInfoList.push({
+                "examId": c.examQuestion.examId,
+                "sectionType": v.testPaperSectionInfo.sectionType,
+                "subjectType": c.examQuestion.subjectType,
+                "sectionName": v.testPaperSectionInfo.sectionName,
+                "sectionIndex": v.testPaperSectionInfo.sectionIndex,
+                examIndex,
+                "examScore": c.sectionExamInfo.examScore,
+                "groupId": c.examQuestion.groupId,
+                "groupExamReList": c.examQuestion.groupExamList.map((g, gi) => {
+                  return {
+                    "examGroupId": g.examGroupId,
+                    "groupId": g.groupId,
+                    "autoScoring": g.autoScoring,
+                    "groupIndex": gi + 1,
+                    "examScore": g.examScore
+                  }
+                })
               })
             })
           })
+        }else {
+          this.selectList.forEach(v => {
+            v.child.forEach(c => {
+              examIndex++
+              testPaperExamInfoList.push({
+                "examId": c.examId,
+                "sectionType": v.sectionType,
+                "subjectType": c.subjectType,
+                "sectionName": v.sectionName,
+                "sectionIndex": v.sectionIndex,
+                examIndex,
+                "examScore": 5,
+                "groupId": c.groupId,
+                "groupExamReList": c.groupExamList.map((g, gi) => {
+                  return {
+                    "examGroupId": g.examGroupId,
+                    "groupId": g.groupId,
+                    "autoScoring": g.autoScoring,
+                    "groupIndex": gi + 1,
+                    "examScore": 5
+                  }
+                })
+              })
+            })
 
-        })
+          })
+        }
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -322,7 +353,7 @@
             this.addExam = false
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
-            this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}`)
+            this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}&classGrade=${this.$route.query.classGrade || this.$store.getters.getErrorFilterParams.classGrade}`)
             if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
           } else {
             this.$toast(res.msg)

@@ -412,11 +412,11 @@
         })
       },
       handleSubmit() {
-        // if (this.addExam.title == '编辑') {
+        if (this.addExam.title == '编辑') {
           this.modifyTestPaper()
-        // } else {
-        //   this.addTestPaper()
-        // }
+        } else {
+          this.addTestPaper()
+        }
       },
       async onLoad() {
         this.currentPage++
