@@ -121,6 +121,10 @@
                   <i class="iconGFY icon-circle-plus-yellow"></i>
                   <span>添加</span>
                 </div>
+                <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName)">
+                  <i class="iconGFY icon-download-orange"></i>
+                  <span>下载</span>
+                </div>
                 <div @click="sendTask(item,'material')">
                   <i class="iconGFY icon-plane"></i>
                   <span>发任务</span>
@@ -264,6 +268,10 @@
                   @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priMaterialList')">
                   <i class="iconGFY icon-circle-plus-yellow"></i>
                   <span>添加</span>
+                </div>
+                <div @click="download(item.src_url,item,courseware_name)">
+                  <i class="iconGFY icon-download-orange"></i>
+                  <span>下载</span>
                 </div>
                 <div @click="sendTask(item,'material')">
                   <i class="iconGFY icon-plane"></i>
@@ -443,6 +451,7 @@
         listKey: '', // 平台资源点击添加时属于哪个列表
         priListKey: '', // 私人资源点击添加时属于哪个列表
         isSendTask: false,
+        accessUrl: '',
       }
     },
     watch: {
@@ -488,6 +497,96 @@
     created() {
     },
     methods: {
+      async download(srcUrl,name) {
+        let url = srcUrl;
+        if (url.indexOf("pubquanlang") > -1) {
+          this.accessUrl = url;
+        } else {
+          let json = {
+            requestJson: JSON.stringify({
+              interUser: "runLfb",
+              interPwd: "25d55ad283aa400af464c76d713c07ad",
+              "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+              "belongSchoolId": this.$store.getters.schoolId,
+              url: url,
+              sysTypeCd: "S03"
+            })
+          };
+          await pubApi.checkUrlPermission(json).then(data => {
+            console.log(data, "checkUrlPermission");
+            if (data.flag) {
+              this.accessUrl = data.data[0].accessUrl;
+            }
+          });
+        }
+        this.downLoadToOpen(srcUrl,name);
+      },
+      downLoadToOpen(srcUrl,name) {
+
+        var _this = this;
+        // 文件后缀
+        var type = srcUrl
+          .substring(srcUrl.lastIndexOf(".") + 1)
+          .toLowerCase();
+        var fileName = name + "." + type;
+        var url = _this.accessUrl; //课件路径
+        var targetPath = cordova.file.externalCacheDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
+        var trustHosts = true;
+        // 初始化FileTransfer对象
+        var fileTransfer = new FileTransfer();
+        // 下载进度
+        fileTransfer.onprogress = function(progressEvent) {
+          if (progressEvent.lengthComputable) {
+            let downloadProgress =
+              ((progressEvent.loaded / progressEvent.total).toFixed(2) * 100).toFixed(2);
+            console.log(downloadProgress, progressEvent);
+            _this.$toast.loading({
+              mask: true,
+              duration: 0, // 持续展示 toast
+              forbidClick: true, // 禁用背景点击
+              message: "文件下载中..." + downloadProgress + "%"
+            });
+          } else {
+            _this.$toast.clear();
+            _this.$toast('下载完成');
+          }
+        };
+        // 调用download方法
+        fileTransfer.download(
+          url, //url网络下载路径
+          targetPath, //url本地存储路径
+          function(entry) {
+            console.log("download complete: " + entry.toURL());
+            entry.file(data => {
+              _this.$toast.clear();
+              _this.$toast('下载完成');
+              console.log("showOpenWithDialog data", data);
+              // showOpenWithDialog使用手机上安装的程序打开下载的文件
+              cordova.plugins.fileOpener2.showOpenWithDialog(
+                targetPath,
+                data.type,
+                function onSuccess(data) {
+                  console.log("成功预览:" + targetPath);
+                },
+                function onError(error) {
+                  console.log(
+                    "出错！请在" +
+                    cordova.file.externalDataDirectory +
+                    "目录下查看"
+                  );
+                }
+              );
+            });
+          },
+          function(error) {
+            _this.$toast.clear();
+            _this.$toast.fail("下载失败");
+            console.log("download error source " + error.source);
+            console.log("download error target " + error.target);
+            console.log("upload error code" + error.code);
+          }
+        );
+      },
       delTestPaper(item, index) {
         let obj = {
           'interUser': 'runLfb',
@@ -798,7 +897,7 @@
         })
       },
       handleIcon(item) {
-        const type = this.tabIndex ? item.src_url : item.srcUrl
+        const type = item.src_url || item.srcUrl
         let t = type.substring(type.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {
           t = 'icon-ppt'
