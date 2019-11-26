@@ -41,7 +41,7 @@
             title: "资源中心",
             normal: require("../../assets/img/icon-res1.png"),
             active: require("../../assets/img/icon-res1-active.png"),
-            // path: "/resCentre"
+            path: "/resCentre"
           },
           {
             title: "教学统计",

@@ -199,7 +199,7 @@
       viewDetail(item) {
         this.$store.commit('setResourceInfo', item)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${this.$route.query.subjectType}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+        this.$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${this.$route.query.subjectType}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}&courseId=${this.$route.query.sysCourseId}`)
       },
       copy(item) {
         this.addExam.title = '复制';
@@ -412,11 +412,11 @@
         })
       },
       handleSubmit() {
-        // if (this.addExam.title == '编辑') {
+        if (this.addExam.title == '编辑') {
           this.modifyTestPaper()
-        // } else {
-        //   this.addTestPaper()
-        // }
+        } else {
+          this.addTestPaper()
+        }
       },
       async onLoad() {
         this.currentPage++

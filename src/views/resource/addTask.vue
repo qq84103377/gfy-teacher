@@ -927,7 +927,7 @@ export default {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": 24,
+        "belongSchoolId": this.$store.getters.schoolId,
         "tchCourseId": this.currentTchCourseId,
         "tastOrigin": "T03",
         "taskName": this.form.name,

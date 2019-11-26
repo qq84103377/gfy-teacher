@@ -361,4 +361,11 @@ const getTaskTypeName = (tType) => {
   }
   return task_name;
 }
-export {getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+
+// 下划线转换驼峰
+const toHump = (name) => {
+  return name.replace(/\_(\w)/g, (all, letter) => {
+    return letter.toUpperCase();
+  });
+}
+export {toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
