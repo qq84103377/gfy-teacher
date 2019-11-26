@@ -106,6 +106,7 @@
       this.$refs['courseFilter'].handleSubmit()
     },
     created() {
+      this.$store.commit('setErrorBookQuestionCourse',[])
       this.getExamSectionTypeRelation()
     },
     activated() {
@@ -232,6 +233,8 @@
         this.$set(item,'active',!item.active)
         if(item.active) {
           this.selectCourseList.push(item.sysCourseId)
+          //添加课程ID,用于生成试卷后跳转资源中心试题列表
+          this.$store.commit('setErrorBookQuestionCourse',item.sysCourseId)
         }else {
           this.selectCourseList.splice(this.selectCourseList.indexOf(item.sysCourseId),1)
         }

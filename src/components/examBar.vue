@@ -373,7 +373,14 @@
             this.addExam = false
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
-            this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}&classGrade=${this.$route.query.classGrade || this.$store.getters.getErrorFilterParams.classGrade}`)
+            let courseId = this.$route.query.sysCourseId || this.courseList.find(v => v.check).tchCourseInfo.sysCourseId
+            if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+             courseId = this.$store.getters.getErrorBookQuestionCourse.join('|')
+            }
+            /**
+             * 某些场景下courseId为空,需要处理(待处理)
+             */
+            this.$router.push(`/examDetail?courseId=${courseId}&testPaperId=${testPaperId}&title=${name}&classGrade=${this.$route.query.classGrade || this.$store.getters.getErrorFilterParams.classGrade}`)
             if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
           } else {
             this.$toast(res.msg)

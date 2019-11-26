@@ -12,6 +12,7 @@ const state = {
   fullscreen: false,
   errorBookSelected: [],  //错题本选择的试题
   errorBookCourse: [], //错题本选择的课程
+  errorBookQuestionCourse: [], //错题本选择试题时对应的课程ID
   errorFilterParams: {}, //错题本筛选条件
   resQuestionSelect: [], //资源中心选择的试题
   removeQuestionList: [], //资源中心试题列表移除的试题ID
@@ -59,6 +60,15 @@ const mutations = {
   setErrorBookCourse(state,data) {
     state.errorBookCourse = data
   },
+  setErrorBookQuestionCourse(state,data) {
+    if(Array.isArray(data)) {
+      state.errorBookQuestionCourse = data
+    }else {
+      if(state.errorBookQuestionCourse.indexOf(data) === -1) {
+        state.errorBookQuestionCourse.push(data)
+      }
+    }
+  },
   setErrorFilterParams(state,data) {
     state.errorFilterParams = data
   },
@@ -93,6 +103,7 @@ const getters = {
   },
   getErrorBookSelected: state => state.errorBookSelected,
   getErrorBookCourse: state => state.errorBookCourse,
+  getErrorBookQuestionCourse: state => state.errorBookQuestionCourse,
   getErrorFilterParams: state => state.errorFilterParams,
   getResQuestionSelect: state => state.resQuestionSelect,
   getRemoveQuestionList: state => state.removeQuestionList,

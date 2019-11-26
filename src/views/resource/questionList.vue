@@ -365,13 +365,17 @@
             this.getCollectInfoDetailV2()
           }else {
             //平台资源
+            let sysCourseIdList = [this.$route.query.courseId||this.$route.query.sysCourseId]
+            if(this.$store.getters.getErrorBookQuestionCourse.length) {
+              sysCourseIdList = this.$store.getters.getErrorBookQuestionCourse
+            }
             let obj = {
               "interUser": "runLfb",
               "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
               "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
               "belongSchoolId": this.$store.getters.schoolId,
               "queryType": "C01",
-              "sysCourseIdList": [this.$route.query.courseId||this.$route.query.sysCourseId], // courseId资源中心才有 sysCourseId课程下试题才有
+              sysCourseIdList, // courseId资源中心才有 sysCourseId课程下试题才有
               "areaCode": this.$route.query.areaCode,
               "orderByType": this.filterParam.orderByType,
               "pageSize": "10",
