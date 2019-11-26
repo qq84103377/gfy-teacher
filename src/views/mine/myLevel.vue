@@ -5,60 +5,61 @@
         <div slot="right" class="tips" @click="showTips = true">如何获取经验？</div>
       </van-nav-bar>
     </van-sticky>
-
-    <div class="level-wrap-progress">
-      <span>LV.{{currentLevel}}</span>
-      <van-progress
-        :pivot-text="progress"
-        color="#4EF1DF"
-        :percentage="percentage"
-      />
-      <span>LV.{{currentLevel+1}}</span>
-
-    </div>
-    <div class="level-wrap-detail">
-      <div class="level-wrap-detail_title">
-        <h4>获取明细</h4>
-        <div class="line"></div>
-      </div>
-      <div class="level-wrap-detail_body">
-        <div class="item">
-          <div>{{loginCount}}</div>
-          <span>登录</span>
-        </div>
-        <div class="item">
-          <div>{{createResource}}</div>
-          <span>创建资源</span>
-        </div>
-        <div class="item">
-          <div>{{pubInfo}}</div>
-          <span>发布信息</span>
-        </div>
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <div class="level-wrap-progress">
+        <span>LV.{{currentLevel}}</span>
+        <van-progress
+          :pivot-text="progress"
+          color="#4EF1DF"
+          :percentage="percentage"
+        />
+        <span>LV.{{currentLevel+1}}</span>
 
       </div>
-    </div>
-    <div class="level-wrap-source">
-      <div class="level-wrap-source_title">
-        <h4>经验来源</h4>
-        <div class="line"></div>
-      </div>
-      <div class="level-wrap-source_body">
-        <van-list
-          v-model="loading"
-          :finished="finished"
-          finished-text="没有更多了"
-          @load="onLoad"
-        >
-          <div class="item" v-for="(value, name) in sourceList">
-            <div class="item-title">{{name }}{{ value.weekDay}}</div>
-            <van-cell-group>
-              <van-cell v-for="item in value.detailList" :title="item.originName" :value="'+'+item.counterValue"/>
-            </van-cell-group>
+      <div class="level-wrap-detail">
+        <div class="level-wrap-detail_title">
+          <h4>获取明细</h4>
+          <div class="line"></div>
+        </div>
+        <div class="level-wrap-detail_body">
+          <div class="item">
+            <div>{{loginCount}}</div>
+            <span>登录</span>
           </div>
-        </van-list>
+          <div class="item">
+            <div>{{createResource}}</div>
+            <span>创建资源</span>
+          </div>
+          <div class="item">
+            <div>{{pubInfo}}</div>
+            <span>发布信息</span>
+          </div>
 
+        </div>
       </div>
-    </div>
+      <div class="level-wrap-source">
+        <div class="level-wrap-source_title">
+          <h4>经验来源</h4>
+          <div class="line"></div>
+        </div>
+        <div class="level-wrap-source_body">
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <div class="item" v-for="(value, name) in sourceList">
+              <div class="item-title">{{name }}{{ value.weekDay}}</div>
+              <van-cell-group>
+                <van-cell v-for="item in value.detailList" :title="item.originName" :value="'+'+item.counterValue"/>
+              </van-cell-group>
+            </div>
+          </van-list>
+
+        </div>
+      </div>
+    </van-pull-refresh>
     <van-popup v-model="showTips" :round="true">
       <div class="title">
         <h4>如何获取经验?</h4>
@@ -93,6 +94,7 @@
         loginCount: 0,
         createResource: 0,
         pubInfo: 0,
+        isLoading: false
       }
     },
     methods: {
@@ -123,7 +125,8 @@
           requestJson: JSON.stringify(obj)
         }
         getUserCounterDetailGroupByDay(params).then(res => {
-          console.log('getUserCounterDetailGroupByDay', res)
+          this.isLoading = false;
+          // console.log('getUserCounterDetailGroupByDay', res)
           this.loading = false;
           if (res.flag && res.data) {
             this.total = res.total
@@ -146,7 +149,8 @@
           requestJson: JSON.stringify(obj)
         }
         getMylevelInfo(params).then(res => {
-          console.log('getMylevelInfo', res);
+          this.isLoading = false;
+          // console.log('getMylevelInfo', res);
           if (res.flag && res.data) {
             this.currentLevel = res.data[0].level;
             // this.progress = res.data[0].levelPoint +'/'+res.data[0].nextlevelPoint;
@@ -165,6 +169,13 @@
             }
           }
         })
+      },
+      onRefresh() {
+        console.log('onRefresh')
+        this.sourceList = {};
+        this.getMylevelInfo();
+        this.currentPage = 1;
+        this.getUserCounterDetailGroupByDay()
       }
     },
     created() {
