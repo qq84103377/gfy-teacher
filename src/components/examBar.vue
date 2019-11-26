@@ -3,8 +3,8 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn"  @click="$toast.fail(`敬请期待`)" v-if="canSelect">选择其他</div>
-    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务':'生成试卷'}}</div>
+    <div class="select-btn"  @click="viewResCenter" v-if="canSelect && $route.query.from !== 'examDetail'">{{isRevert?'返回':'选择其他'}}</div>
+    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务': ($route.query.from === 'examDetail'?'完成添加':'生成试卷')}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
       :show="selectPop"
@@ -80,7 +80,7 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell v-if="canAddCourse" class="add-exam-wrap__cell">
+        <van-cell v-if="canAddCourse && !isRevert" class="add-exam-wrap__cell">
           <div slot="title">
             <div style="display: flex;">
               <div class="fs15 mgr10"><span class="red">*</span>添加到课程: </div>
@@ -141,6 +141,7 @@
         tempList: [],
         selectCourse: '',
         courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
+        isRevert: false, //是否显示返回按钮
       }
     },
     watch: {
@@ -175,6 +176,20 @@
 
     },
     methods: {
+      viewResCenter() {
+        if(this.isRevert) {
+          this.$emit('viewRes',0)
+          this.isRevert = false
+        }else {
+          if(this.$route.path === '/examDetail') {
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.courseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
+            this.$store.commit('setResQuestionSelect',this.selectList)
+          }else if (this.$route.path === '/questionList') {
+            this.$emit('viewRes',1)
+            this.isRevert = true
+          }
+        }
+      },
       getClassTeachCourseInfo() {
         let obj = {
           "interUser": "runLfb",
@@ -206,6 +221,11 @@
       addTestPaper() {
         if (!this.form.name) {
           return this.$toast('请输入试卷名称')
+        }
+        if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+          if(!this.selectList.length) {
+            return this.$toast('请添加试题')
+          }
         }
         this.form.btnLoading = true
         let obj = {
@@ -387,6 +407,11 @@
             // this.$router.push(`/addTask?type=exam`)
             this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
           }
+        } else if(this.$route.query.from === 'examDetail') {
+          //从试卷详情点击选择其他,进入到资源中心试题列表
+          this.$store.commit('setResQuestionSelect',this.selectList)
+          this.$store.commit('setRemoveQuestionList',this.$parent.removeQuestionList)
+          this.$router.back()
         } else {
           this.addExam = true
           //examDetail

@@ -203,10 +203,11 @@
           //如果移除的大题是这个题型的最后一题,则把整个题型删除
           this.list.splice(sectionIndex,1)
           this.selectList.splice(sectionIndex,1)
+        }else {
+          //修改章节分数
+          this.list[sectionIndex].testPaperSectionInfo.sectionScore = calculate.sub(this.list[sectionIndex].testPaperSectionInfo.sectionScore,exam.sectionExamInfo.examScore)
+          this.selectList[sectionIndex].child.splice(examIndex,1)
         }
-        //修改章节分数
-        this.list[sectionIndex].testPaperSectionInfo.sectionScore = calculate.sub(this.list[sectionIndex].testPaperSectionInfo.sectionScore,exam.sectionExamInfo.examScore)
-        this.selectList[sectionIndex].child.splice(examIndex,1)
         return
         /**
          * //由于需求变更,所有的改分/上下移/添加移除试题都不再修改原试卷,所以以下内容作废
@@ -555,6 +556,78 @@
         this.isSend = true
         eventBus.$emit("examListRefresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
       })
+    },
+    beforeRouteEnter(to, from, next) {
+      if(from.path === '/questionList') {
+        next(vm => {
+          //将移除的试题在页面上清理掉
+          vm.$store.getters.getRemoveQuestionList.forEach(id => {
+            for(let k in vm.list) {
+               const index = vm.list[k].sectionExamList.findIndex(q => q.examQuestion.examId === id)
+                if(index > -1) {
+                  //找到该试题
+                  // vm.list[k].sectionExamList.splice(index,1)
+                  vm.handleAdd(k,index,vm.list[k].sectionExamList[index])
+                  break
+                }
+            }
+          })
+
+          vm.selectList = vm.$store.getters.getResQuestionSelect
+          //找出在资源中心添加的试题
+          vm.selectList.forEach(v => {
+            v.child.forEach(c => {
+
+              //找出对应的题型
+             const index = vm.list.findIndex(item => item.testPaperSectionInfo.sectionName === v.sectionName)
+              if(index > -1) {
+                //有该题型
+
+                //没有对应的试题
+                if(!vm.list[index].sectionExamList.some(item => item.examQuestion.examId === c.examId)) {
+                  vm.isModify = true
+                  vm.list[index].sectionExamList.push({
+                    examQuestion : c,
+                    sectionExamInfo: {
+                      examId: c.examId,
+                      examScore: 5
+                    },
+                    sectionIndex: vm.list[index].sectionExamList.length + 1,
+                    sectionName: v.sectionName,
+                    testPaperExamGroupList: c.groupExamList || []
+                  })
+                  vm.list[index].testPaperSectionInfo.sectionScore = vm.list[index].testPaperSectionInfo.sectionScore * 1 + 5
+                  vm.list[index].testPaperSectionInfo.sectionExamNum++
+                }
+              }else {
+                //没有题型
+                vm.isModify = true
+                vm.list.push({
+                  sectionExamList: [{
+                    examQuestion : c,
+                    sectionExamInfo: {
+                      examId: c.examId,
+                      examScore: 5
+                    },
+                    sectionIndex: vm.list.length + 1,
+                    sectionName: v.sectionName,
+                    testPaperExamGroupList: c.groupExamList || []
+                  }],
+                  testPaperSectionInfo: {
+                    sectionExamNum: 1,
+                    sectionIndex: vm.list.length + 1,
+                    sectionName: v.sectionName,
+                    sectionScore: 5,
+                    sectionType: v.sectionType
+                  }
+                })
+              }
+            })
+          })
+        })
+      }else {
+        next();
+      }
     },
   }
 </script>

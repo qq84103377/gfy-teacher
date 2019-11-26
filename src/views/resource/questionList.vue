@@ -78,7 +78,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar :can-add-course="$route.query.isRes" v-model="selectList" @clear="clear" :can-select="true"></exam-bar>
+    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true"></exam-bar>
   </section>
 </template>
 
@@ -94,6 +94,7 @@
     components: {questionItem, examBar, correctPop},
     data() {
       return {
+        isRes: this.$route.query.isRes,
         selectList: [], //添加的试题列表
         addInfo: {},
         correctInfo: {},
@@ -126,7 +127,8 @@
           "belongType": "", //类型
           "orderByType": "T05"//排序类型 T05综合排序，T01:时间排序，T02：使用量，T03：收藏量
         },
-        scrollTop: 0
+        scrollTop: 0,
+        removeQuestionList: [], //试卷详情跳转到资源中心试题列表时,移除的试题需要记录起来,返回到试卷详情时要把移除的题目清理掉
       }
     },
     created() {
@@ -141,12 +143,21 @@
     },
     beforeRouteEnter(to, from, next) {
       next(vm => {
+        if(from.path === '/examDetail') {
+          vm.selectList = JSON.parse(JSON.stringify(vm.$store.getters.getResQuestionSelect))
+        }
         vm.$nextTick(() => {
           vm.$refs["body"].scrollTo(0, vm.scrollTop);
         });
       });
     },
     methods: {
+      viewRes(type) {
+        //试题列表查看资源中心试题或返回试题列表
+        this.isRes = type
+        this.$store.commit('setVanLoading', true)
+        this.onRefresh()
+      },
       clear() {
         //清空所有试题时需要移除试题的添加状态样式
         this.list.forEach(v => {
@@ -165,8 +176,16 @@
             const childIndex = this.selectList[index].child.findIndex(v => v.examId === item.examId)
             this.selectList[index].child.splice(childIndex, 1)
           }
+          //移除时添加移除试题ID
+          this.removeQuestionList.push(item.examId)
         } else {
           //添加
+          const removeIndex = this.removeQuestionList.indexOf(item.examId)
+            if(removeIndex > -1) {
+              //添加时若移除列表已有该试题ID,则删除该ID
+              this.removeQuestionList.splice(removeIndex,1)
+            }
+
           const index = this.selectList.findIndex(v => v.examType === item.titleType)
           if (index > -1) {
             // 添加的试题已存在相同题型
@@ -238,7 +257,7 @@
           "pageSize": 999,
           "examSectionTypeRlation": {
             "seqId": null,//编号可空
-            "subjectType": this.$route.query.subjectType, //学科（课程时由课程信息获取，资源中心时有所选学科获取）
+            "subjectType": localStorage.currentSubjectType,
             "examType": null,//题型，可空
             "sectionType": null //章节类型，可空
           }
@@ -249,6 +268,12 @@
         await getExamSectionTypeRelation(params).then(res => {
           if (res.flag) {
             this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
+            if(this.$route.query.from === 'examDetail') {
+              //先找出sectionName对应的examType
+              this.selectList.forEach(v => {
+               this.$set(v,'examType',this.tab.questionTypeList.find(q => q.sectionName === v.sectionName).examType)
+              })
+            }
           }
         })
       },
@@ -333,7 +358,7 @@
       },
       getList() {
         const page = this.currentPage
-        if (this.$route.query.isRes) {
+        if (this.isRes) {
           //从资源中心过来
           if(this.$route.query.isPri) {
             //私人资源
@@ -346,7 +371,7 @@
               "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
               "belongSchoolId": this.$store.getters.schoolId,
               "queryType": "C01",
-              "sysCourseIdList": [this.$route.query.courseId],
+              "sysCourseIdList": [this.$route.query.courseId||this.$route.query.sysCourseId], // courseId资源中心才有 sysCourseId课程下试题才有
               "areaCode": this.$route.query.areaCode,
               "orderByType": this.filterParam.orderByType,
               "pageSize": "10",

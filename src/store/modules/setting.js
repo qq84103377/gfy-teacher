@@ -13,6 +13,8 @@ const state = {
   errorBookSelected: [],  //错题本选择的试题
   errorBookCourse: [], //错题本选择的课程
   errorFilterParams: {}, //错题本筛选条件
+  resQuestionSelect: [], //资源中心选择的试题
+  removeQuestionList: [], //资源中心试题列表移除的试题ID
 }
 
 const mutations = {
@@ -59,6 +61,12 @@ const mutations = {
   },
   setErrorFilterParams(state,data) {
     state.errorFilterParams = data
+  },
+  setResQuestionSelect(state,data) {
+    state.resQuestionSelect = data
+  },
+  setRemoveQuestionList(state,data) {
+    state.removeQuestionList = data
   }
 }
 
@@ -86,6 +94,8 @@ const getters = {
   getErrorBookSelected: state => state.errorBookSelected,
   getErrorBookCourse: state => state.errorBookCourse,
   getErrorFilterParams: state => state.errorFilterParams,
+  getResQuestionSelect: state => state.resQuestionSelect,
+  getRemoveQuestionList: state => state.removeQuestionList,
 };
 
 export default {
