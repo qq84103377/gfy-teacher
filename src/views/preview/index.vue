@@ -76,6 +76,7 @@ export default {
       courseTaskList: [],
       courseName: '',
       tchCourseId: '',
+      relationCourseId: '',
       termType: '',
       refLoading: false,
       listLoading: false,
@@ -156,7 +157,18 @@ export default {
     },
     goto(item) {
       if (item.testPaperId > 0) {
-        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+        this.$router.push({
+          path: `/examDetail`, query: {
+            "tchCourseId": this.tchCourseId,
+            "sysCourseId": this.sysCourseId,
+            "relationCourseId": this.relationCourseId,
+            type: 1,
+            testPaperId: item.testPaperId,
+            subjectType: localStorage.currentSubjectType,
+            classGrade: this.classGrade,
+            title: item.testPaperName,
+          }
+        })
       } else if (item.taskType === 'T03') {
         if (item.resourceType === 'R03') {
           //单道试题
@@ -232,6 +244,7 @@ export default {
       this.classGrade = tchCourseInfo.classGrade
       this.courseName = tchCourseInfo.courseName
       this.tchCourseId = tchCourseInfo.tchCourseId
+      this.relationCourseId = tchCourseInfo.relationCourseId
       this.termType = tchCourseInfo.termType
       this.sysCourseId = tchCourseInfo.sysCourseId
       await this.getCourseTaskList(this.courseName, this.tchCourseId)
@@ -264,6 +277,7 @@ export default {
           this.classGrade = this.$route.query.classGrade
           this.sysCourseId = this.$route.query.sysCourseId
           this.tchCourseId = this.$route.query.tchCourseId
+          this.relationCourseId = this.$route.query.relationCourseId
           this.termType = this.$route.query.termType
         } else {
           if (this.courseList.length) {
@@ -271,6 +285,7 @@ export default {
             this.classGrade = this.courseList[0].tchCourseInfo.classGrade
             this.sysCourseId = this.courseList[0].tchCourseInfo.sysCourseId
             this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
+            this.relationCourseId = this.courseList[0].tchCourseInfo.relationCourseId
             this.termType = this.courseList[0].tchCourseInfo.termType
           }
         }

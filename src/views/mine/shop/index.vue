@@ -45,39 +45,42 @@
           </div>
         </div>
       </van-sticky>
-      <div class="shop-body_production">
-        <van-list
-          v-model="loading"
-          :finished="finished"
-          finished-text=""
-          @load="onLoad"
-        >
-          <ul v-if="goodsLists.length>0" class="goodsList">
-            <li class="goodsItem" v-for="item in goodsLists" @click="goDetail(item)">
-              <div class="goodsPic">
-                <img :src="item.goodsPhotoUrl" alt="">
-              </div>
-              <div class="goodsName">
-                {{item.goodsName}}
-              </div>
-              <div class="goodsInfo">
-                <div class="price">
-                  <img src="@assets/img/myself-icon-16.png" alt="">
-                  {{item.mallConvertRuleInfo.langcoinNumber}}
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+        <div class="shop-body_production">
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text=""
+            @load="onLoad"
+          >
+            <ul v-if="goodsLists.length>0" class="goodsList">
+              <li class="goodsItem" v-for="item in goodsLists" @click="goDetail(item)">
+                <div class="goodsPic">
+                  <img :src="item.goodsPhotoUrl" alt="">
                 </div>
-                <div class="store">
-                  库存：{{item.mallGoodsStockInfo.convertNumber}}/{{item.mallGoodsStockInfo.stockNumber}}
+                <div class="goodsName">
+                  {{item.goodsName}}
                 </div>
-              </div>
-            </li>
+                <div class="goodsInfo">
+                  <div class="price">
+                    <img src="@assets/img/myself-icon-16.png" alt="">
+                    {{item.mallConvertRuleInfo.langcoinNumber}}
+                  </div>
+                  <div class="store">
+                    库存：{{item.mallGoodsStockInfo.convertNumber}}/{{item.mallGoodsStockInfo.stockNumber}}
+                  </div>
+                </div>
+              </li>
 
-          </ul>
-          <div v-else v-show="!$store.getters.getVanLoading&&!loading" class="placeholderImg">
-            <img src="@assets/img/blank.png"/>
-            <p>暂无商品~</p>
-          </div>
-        </van-list>
-      </div>
+            </ul>
+            <div v-else v-show="!$store.getters.getVanLoading&&!loading" class="placeholderImg">
+              <img src="@assets/img/blank.png"/>
+              <p>暂无商品~</p>
+            </div>
+          </van-list>
+        </div>
+      </van-pull-refresh>
+
     </div>
 
   </section>
@@ -105,6 +108,7 @@
         goodsType: '',//商品类型
         listScroll: 0,//滚动位置，记录上一次浏览位置
         redeemType: 'T02',//T01表示我能兑换的商品，T02表示不过滤
+        isLoading: false,
       }
     },
     methods: {
@@ -160,6 +164,11 @@
           }
         });
       },
+      onRefresh() {
+        this.goodsLists = [];
+        this.currentPage = 1;
+        this.getGoodsList();
+      },
       onLoad() {
         console.log('onload');
         // this.loading = true;
@@ -193,6 +202,7 @@
           this.$store.commit('setVanLoading', false);
 
           this.loading = false;
+          this.isLoading = false;
           if (res.flag && res.data && res.data.length > 0) {
             this.total = res.total;
             this.goodsLists = [...this.goodsLists, ...res.data];
@@ -259,15 +269,15 @@
         });
       });
     },
-    mounted(){
+    mounted() {
       this.getSysDictList();
     },
     activated() {
       // 没有存积分和朗币信息时重新调接口获取
       // if (window.localStorage.getItem('counterSummary')) {
-        let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
-        this.integer = counterSummary.integer;
-        this.langCoin = counterSummary.langCoin;
+      let counterSummary = JSON.parse(window.localStorage.getItem('counterSummary'));
+      this.integer = counterSummary.integer;
+      this.langCoin = counterSummary.langCoin;
       // } else {
       //   this.getUserCounterSummary();
       // }

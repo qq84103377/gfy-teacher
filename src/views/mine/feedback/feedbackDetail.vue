@@ -227,7 +227,7 @@
             background-color: #F5F6FA;
           }
         }
-        
+
 
         .askbox {
           display: flex;
@@ -660,7 +660,7 @@
             interUser: "runLfb",
             interPwd: "25d55ad283aa400af464c76d713c07ad",
             operateAccountNo: this.accountNo,
-            belongSchoolId: 24,
+            belongSchoolId: this.$store.getters.schoolId,
             docTypeCd: "T16",
             sysTypeCd: "T01"
           })

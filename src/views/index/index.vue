@@ -164,7 +164,19 @@ export default {
     },
     goto(item) {
       if (item.testPaperId > 0) {
-        this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${item.tchCourseClassInfo[0].classGrade}&title=${item.tchCourseClassInfo[0].testPaperName}`)
+        this.$router.push({
+          path: `/examDetail`, query: {
+            flag: 1,
+            // "tchCourseId": this.$route.query.tchCourseId,
+            "sysCourseId": item.tchCourseClassInfo[0].sysCourseId,
+            // "relationCourseId": this.$route.query.relationCourseId,
+            type: 1,
+            testPaperId: item.testPaperId,
+            subjectType: localStorage.currentSubjectType,
+            classGrade: item.tchCourseClassInfo[0].classGrade,
+            title: item.tchCourseClassInfo[0].testPaperName,
+          }
+        })
       } else if (item.tastType === 'T03') {
         if (item.resourceType === 'R03') {
           //单道试题

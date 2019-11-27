@@ -114,7 +114,7 @@
               <div slot="btn" class="btn-group van-hairline--top">
                 <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                  <span>收藏</span>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
                 </div>
                 <div
                   @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','materialList')">
@@ -165,7 +165,7 @@
               <div slot="btn" class="btn-group van-hairline--top">
                 <div @click="collect(item,item.testPaperId,item.statusCd)">
                   <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                  <span>收藏</span>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
                 </div>
                 <div
                   @click="showAddPop(item.testPaperName,item.testPaperId,'R02','examList')">
@@ -187,13 +187,12 @@
           </div>
         </van-collapse-item>
       </van-collapse>
-      <!--      因为私人资源可以左滑删除 所以只能渲染两个collapse 左滑删除没办法动态更新-->
+
       <van-collapse class="res-centre-wrap__body__collapse" v-show="tabIndex" @change="handlePrivateChange"
                     v-model="activeNames1">
         <van-collapse-item title="微课" name="1">
           <div>
             <list-item class="mgt10" style="background: #fff;"
-                       :can-slide="true" @del="delCourseWare(item,index,'priLessonList')"
                        v-for="(item,index) in priLessonList" :key="index"
                        :itemTitle="item.courseware_name"
                        @clickTo="goVideoPage(item)">
@@ -241,7 +240,6 @@
         <van-collapse-item title="素材" name="2">
           <div>
             <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
-                       :can-slide="true" @del="delCourseWare(item,index,'priMaterialList')"
                        v-for="(item,index) in priMaterialList" :key="index"
                        :itemTitle="item.courseware_name">
               <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
@@ -290,7 +288,7 @@
         <van-collapse-item title="试卷" name="3">
           <div>
             <list-item @clickTo="viewDetail(item)" class="mgt10"
-                       :can-slide="true" @del="delTestPaper(item,index)"
+                       :can-slide="item.belong_account_no == $store.getters.getUserInfo.accountNo" @del="delTestPaper(item,index)"
                        style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
                        :itemTitle="item.test_paper_name">
               <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
@@ -397,7 +395,6 @@
     getClassTeachCourseInfo,
     getSysCourseTestPaperList,
     getCollectInfoDetailV2,
-    delCourseWare,
     delTestPaper,
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
@@ -607,20 +604,6 @@
           }
         })
       },
-      delCourseWare(item, index, key) {
-        let obj = {"courseWareList": [{"coursewareId": item.courseware_id}]}
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        delCourseWare(params).then(res => {
-          if (res.flag) {
-            this[key].splice(index, 1)
-            this.$toast('删除成功')
-          } else {
-            this.$toast(res.msg)
-          }
-        })
-      },
       handleYearSecion() {
         const year = this.subjectLabel.substr(0, 2)
         if (year === '小学') {
@@ -692,18 +675,40 @@
       },
       viewDetail(item) {
         if (this.tabIndex) {
+          //私人资源
           let humpObj = {}
           for (let k in item) {
             const humpKey = toHump(k)
             humpObj[humpKey] = item[k]
-            this.$store.commit('setResourceInfo', humpObj)
-            this.$store.commit("setTaskClassInfo", '')
-            this.$router.push(`/examDetail?type=1&testPaperId=${humpObj.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${humpObj.testPaperName}`)
           }
+          this.$store.commit('setResourceInfo', humpObj)
+          this.$store.commit("setTaskClassInfo", '')
+          this.$router.push({
+            path: `/examDetail`, query: {
+              flag: 1,
+              "sysCourseId": this.courseId,
+              type: 0,
+              testPaperId:humpObj.testPaperId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.gradeTerm.split('|')[0],
+              title: humpObj.testPaperName,
+            }
+          })
         } else {
+          //平台资源
           this.$store.commit('setResourceInfo', item)
           this.$store.commit("setTaskClassInfo", '')
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}`)
+          this.$router.push({
+            path: `/examDetail`, query: {
+              flag: 1,
+              "sysCourseId": this.courseId,
+              type: 0,
+              testPaperId:item.testPaperId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.gradeTerm.split('|')[0],
+              title: item.testPaperName,
+            }
+          })
         }
       },
       goto(item) {

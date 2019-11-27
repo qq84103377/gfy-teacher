@@ -80,6 +80,8 @@
               child: [item]
             })
           }
+          //添加课程ID,用于生成试卷后跳转资源中心试题列表
+          this.$store.commit('setErrorBookQuestionCourse',this.$route.query.courseId)
         }
         //添加试题时判断该课程内的试题是否全部已添加,如果是,则把该课程的添加状态激活,否则取消激活状态
         const arr = this.$store.getters.getErrorBookCourse

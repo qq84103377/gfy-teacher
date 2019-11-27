@@ -116,7 +116,18 @@
 
         }else {
           //试卷
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.resourceId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.$route.query.classGrade}&title=${item.name}`)
+          this.$router.push({
+            path: `/examDetail`, query: {
+              "tchCourseId": this.$route.query.tchCourseId,
+              "sysCourseId": this.$route.query.sysCourseId,
+              "relationCourseId": this.$route.query.relationCourseId,
+              type: 1,
+              testPaperId: item.resourceId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.$route.query.classGrade,
+              title: item.name,
+            }
+          })
         }
       },
       moveItem(item, index, type) {

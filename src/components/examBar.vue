@@ -3,8 +3,8 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn"  @click="$toast.fail(`敬请期待`)" v-if="canSelect">选择其他</div>
-    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务':'生成试卷'}}</div>
+    <div class="select-btn"  @click="viewResCenter" v-if="canSelect && $route.query.from !== 'examDetail'">{{isRevert?'返回':'选择其他'}}</div>
+    <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务': ($route.query.from === 'examDetail'?'完成添加':'生成试卷')}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
       :show="selectPop"
@@ -80,7 +80,7 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell v-if="canAddCourse" class="add-exam-wrap__cell">
+        <van-cell v-if="canAddCourse && !isRevert" class="add-exam-wrap__cell">
           <div slot="title">
             <div style="display: flex;">
               <div class="fs15 mgr10"><span class="red">*</span>添加到课程: </div>
@@ -141,6 +141,7 @@
         tempList: [],
         selectCourse: '',
         courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
+        isRevert: false, //是否显示返回按钮
       }
     },
     watch: {
@@ -164,6 +165,9 @@
             if(!this.$route.query.isPri) {
               this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
             }
+          }else if (this.$route.path === '/examDetail') {
+            this.form.name = `${this.$route.query.title}-副本`
+            this.getClassTeachCourseInfo()
           }
         }
       }
@@ -172,7 +176,22 @@
 
     },
     methods: {
+      viewResCenter() {
+        if(this.isRevert) {
+          this.$emit('viewRes',0)
+          this.isRevert = false
+        }else {
+          if(this.$route.path === '/examDetail') {
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.sysCourseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
+            this.$store.commit('setResQuestionSelect',this.selectList)
+          }else if (this.$route.path === '/questionList') {
+            this.$emit('viewRes',1)
+            this.isRevert = true
+          }
+        }
+      },
       getClassTeachCourseInfo() {
+        if(!this.canAddCourse) return
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -203,6 +222,11 @@
       addTestPaper() {
         if (!this.form.name) {
           return this.$toast('请输入试卷名称')
+        }
+        if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+          if(!this.selectList.length) {
+            return this.$toast('请添加试题')
+          }
         }
         this.form.btnLoading = true
         let obj = {
@@ -237,12 +261,18 @@
         addTestPaper(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId || this.$route.query.sysCourseId) {
-              // 有选择加入的课程
-              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+            //先判断canAddCourse能否选择加入课
+            if(this.canAddCourse){
+              if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId) {
+                // 有选择加入的课程
+                this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              }else {
+                //没有选择加入的课程
+                this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              }
             }else {
-              //没有选择加入的课程
-              this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              //不能选择课程,即有默认课程
+              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }
           } else {
             this.$toast(res.msg)
@@ -257,9 +287,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": this.$route.query.tchCourseId || this.courseList.find(v => v.check).tchCourseInfo.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId || this.courseList.find(v => v.check).tchCourseInfo.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId || this.courseList.find(v => v.check).tchCourseInfo.relationCourseId,
+          "tchCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
+          "sysCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
+          "relationSeqId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -280,31 +310,59 @@
         this.form.btnLoading = true
         let testPaperExamInfoList = []
         let examIndex = -1
-        this.selectList.forEach(v => {
-          v.child.forEach(c => {
-            examIndex++
-            testPaperExamInfoList.push({
-              "examId": c.examId,
-              "sectionType": v.sectionType,
-              "subjectType": c.subjectType,
-              "sectionName": v.sectionName,
-              "sectionIndex": v.sectionIndex,
-              examIndex,
-              "examScore": 5,
-              "groupId": c.groupId,
-              "groupExamReList": c.groupExamList.map((g, gi) => {
-                return {
-                  "examGroupId": g.examGroupId,
-                  "groupId": g.groupId,
-                  "autoScoring": g.autoScoring,
-                  "groupIndex": gi + 1,
-                  "examScore": 5
-                }
+
+        if (this.$route.path === '/examDetail') {
+          this.$parent.list.forEach(v => {
+            v.sectionExamList.forEach(c => {
+              examIndex++
+              testPaperExamInfoList.push({
+                "examId": c.examQuestion.examId,
+                "sectionType": v.testPaperSectionInfo.sectionType,
+                "subjectType": c.examQuestion.subjectType,
+                "sectionName": v.testPaperSectionInfo.sectionName,
+                "sectionIndex": v.testPaperSectionInfo.sectionIndex,
+                examIndex,
+                "examScore": c.sectionExamInfo.examScore,
+                "groupId": c.examQuestion.groupId,
+                "groupExamReList": c.examQuestion.groupExamList.map((g, gi) => {
+                  return {
+                    "examGroupId": g.examGroupId,
+                    "groupId": g.groupId,
+                    "autoScoring": g.autoScoring,
+                    "groupIndex": gi + 1,
+                    "examScore": g.examScore
+                  }
+                })
               })
             })
           })
+        }else {
+          this.selectList.forEach(v => {
+            v.child.forEach(c => {
+              examIndex++
+              testPaperExamInfoList.push({
+                "examId": c.examId,
+                "sectionType": v.sectionType,
+                "subjectType": c.subjectType,
+                "sectionName": v.sectionName,
+                "sectionIndex": v.sectionIndex,
+                examIndex,
+                "examScore": 5,
+                "groupId": c.groupId,
+                "groupExamReList": c.groupExamList.map((g, gi) => {
+                  return {
+                    "examGroupId": g.examGroupId,
+                    "groupId": g.groupId,
+                    "autoScoring": g.autoScoring,
+                    "groupIndex": gi + 1,
+                    "examScore": 5
+                  }
+                })
+              })
+            })
 
-        })
+          })
+        }
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -322,7 +380,58 @@
             this.addExam = false
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
-            this.$router.push(`/examDetail?testPaperId=${testPaperId}&title=${name}`)
+            if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+             let courseId = this.$store.getters.getErrorBookQuestionCourse.join('|')
+              this.$router.push({
+                path: `/examDetail`, query: {
+                  flag: 1,
+                  "sysCourseId": courseId,
+                  type: 1,
+                  testPaperId,
+                  subjectType: localStorage.currentSubjectType,
+                  classGrade: this.$store.getters.getErrorFilterParams.classGrade,
+                  title: name,
+                }
+              })
+            }else {
+              if(this.canAddCourse) {
+                if(this.$route.path === '/examDetail') {
+                  this.$emit('addDone',name)
+                }else {
+                  this.$router.push({
+                    path: `/examDetail`, query: {
+                      flag: 1,
+                      "sysCourseId": this.$route.query.sysCourseId,
+                      type: 1,
+                      testPaperId,
+                      subjectType: localStorage.currentSubjectType,
+                      classGrade: this.$route.query.classGrade,
+                      title: name,
+                    }
+                  })
+                }
+              }else {
+                if(this.$route.path === '/examDetail') {
+                  this.$emit('addDone',name)
+                }else {
+                  this.$router.push({
+                    path: `/examDetail`, query: {
+                      "tchCourseId": this.$route.query.tchCourseId,
+                      "sysCourseId": this.$route.query.sysCourseId,
+                      "relationCourseId": this.$route.query.relationCourseId,
+                      type: 1,
+                      testPaperId,
+                      subjectType: localStorage.currentSubjectType,
+                      classGrade: this.$route.query.classGrade,
+                      title: name,
+                    },
+                  })
+                }
+              }
+            }
+            /**
+             * 某些场景下courseId为空,需要处理(待处理)
+             */
             if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
           } else {
             this.$toast(res.msg)
@@ -356,6 +465,11 @@
             // this.$router.push(`/addTask?type=exam`)
             this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
           }
+        } else if(this.$route.query.from === 'examDetail') {
+          //从试卷详情点击选择其他,进入到资源中心试题列表
+          this.$store.commit('setResQuestionSelect',this.selectList)
+          this.$store.commit('setRemoveQuestionList',this.$parent.removeQuestionList)
+          this.$router.back()
         } else {
           this.addExam = true
           //examDetail

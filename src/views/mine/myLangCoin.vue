@@ -17,65 +17,67 @@
         </div>
       </div>
     </div>
-    <div class="coin-wrap-detail">
-      <div class="coin-wrap-detail_title">
-        <h4>积分明细</h4>
-        <div class="line"></div>
-      </div>
-      <div class="coin-wrap-detail_body">
-        <div>
-          <div class="item">
-            <div>{{coinDetail.O01}}</div>
-            <span>登录</span>
-          </div>
-          <div class="item">
-            <div>{{coinDetail.O11}}</div>
-            <span>创建资源</span>
-          </div>
-          <div class="item">
-            <div>{{coinDetail.O12}}</div>
-            <span>资源被使用</span>
-          </div>
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <div class="coin-wrap-detail">
+        <div class="coin-wrap-detail_title">
+          <h4>积分明细</h4>
+          <div class="line"></div>
         </div>
-        <div>
-          <div class="item">
-            <div>{{coinDetail.O08}}</div>
-            <span>共享资源</span>
+        <div class="coin-wrap-detail_body">
+          <div>
+            <div class="item">
+              <div>{{coinDetail.O01}}</div>
+              <span>登录</span>
+            </div>
+            <div class="item">
+              <div>{{coinDetail.O11}}</div>
+              <span>创建资源</span>
+            </div>
+            <div class="item">
+              <div>{{coinDetail.O12}}</div>
+              <span>资源被使用</span>
+            </div>
           </div>
-          <div class="item">
-            <div>{{coinDetail.O10}}</div>
-            <span>资源收藏</span>
+          <div>
+            <div class="item">
+              <div>{{coinDetail.O08}}</div>
+              <span>共享资源</span>
+            </div>
+            <div class="item">
+              <div>{{coinDetail.O10}}</div>
+              <span>资源收藏</span>
+            </div>
+            <div class="item">
+              <div>{{coinDetail.O44}}</div>
+              <span>上课</span>
+            </div>
           </div>
-          <div class="item">
-            <div>{{coinDetail.O44}}</div>
-            <span>上课</span>
-          </div>
+
         </div>
+      </div>
+      <div class="coin-wrap-source">
+        <div class="coin-wrap-source_title">
+          <h4>积分来源</h4>
+          <div class="line"></div>
+        </div>
+        <div class="coin-wrap-source_body">
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <div class="item" v-for="(value, name) in sourceList">
+              <div class="item-title">{{name }}{{ value.weekDay}}</div>
+              <van-cell-group>
+                <van-cell v-for="item in value.detailList" :title="item.originName" :value="'+'+item.counterValue"/>
+              </van-cell-group>
+            </div>
+          </van-list>
 
+        </div>
       </div>
-    </div>
-    <div class="coin-wrap-source">
-      <div class="coin-wrap-source_title">
-        <h4>积分来源</h4>
-        <div class="line"></div>
-      </div>
-      <div class="coin-wrap-source_body">
-        <van-list
-          v-model="loading"
-          :finished="finished"
-          finished-text="没有更多了"
-          @load="onLoad"
-        >
-          <div class="item" v-for="(value, name) in sourceList">
-            <div class="item-title">{{name }}{{ value.weekDay}}</div>
-            <van-cell-group>
-              <van-cell v-for="item in value.detailList" :title="item.originName" :value="'+'+item.counterValue"/>
-            </van-cell-group>
-          </div>
-        </van-list>
-
-      </div>
-    </div>
+    </van-pull-refresh>
     <van-popup v-model="showTips" :round="true">
       <div class="title">
         <h4>如何获取朗币?</h4>
@@ -115,7 +117,8 @@
           O11: 0,    //资源创建
           O12: 0,    //资源被使用
           O44: 0,    //上课
-        }
+        },
+        isLoading: false
       }
     },
     methods: {
@@ -130,6 +133,13 @@
           this.finished = true;
         }
 
+      },
+      onRefresh() {
+        console.log('onRefresh');
+        this.sourceList = {};
+        this.getMyCoinInfo();
+        this.currentPage = 1;
+        this.getUserCounterDetailGroupByDay()
       },
       getUserCounterDetailGroupByDay() {
         let obj = {
@@ -146,7 +156,8 @@
           requestJson: JSON.stringify(obj)
         }
         getUserCounterDetailGroupByDay(params).then(res => {
-          console.log('getUserCounterDetailGroupByDay', res)
+          this.isLoading = false;
+          // console.log('getUserCounterDetailGroupByDay', res)
           this.loading = false;
           if (res.flag && res.data) {
             this.total = res.total
@@ -166,10 +177,23 @@
           counterTypeList: [{counterType: 'U01'}],
           orginTypeList: [
             {orginType: "O01"},
-            {orginType: "O11"},
-            {orginType: "O12"},
-            {orginType: "O08"},
-            {orginType: "O10"}
+            {orginType: "O05"},
+            {orginType: "O06"},
+            {orginType: "O19"},
+            {orginType: "O20"},
+            {orginType: "O21"},
+            {orginType: "O22"},
+            {orginType: "O23"},
+            {orginType: "O24"},
+            {orginType: "O25"},
+            {orginType: "O26"},
+            {orginType: "O27"},
+            {orginType: "O28"},
+            {orginType: "O29"},
+            {orginType: "O35"},
+            {orginType: "O36"},
+            {orginType: "O37"},
+            {orginType: "O44"}
           ]
 
         }
@@ -177,7 +201,8 @@
           requestJson: JSON.stringify(obj)
         }
         getMyCoinInfo(params).then(res => {
-          console.log('getMyCoinInfo', res);
+          this.isLoading = false;
+          // console.log('getMyCoinInfo', res);
           if (res.flag && res.data) {
             // this.langCoin = res.data[0].countValue;
             let userDetailCount = res.data[0].intUserDetailCountResultVo || [];

@@ -3,9 +3,10 @@
     <div class="exam-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
-        <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
-      </div>
-        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试卷，快去创建吧！'" @load="onLoad" :offset='80'>
+          <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt/>
+        </div>
+        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试卷，快去创建吧！'"
+                  @load="onLoad" :offset='80'>
           <list-item @clickTo="viewDetail(item)" class="mgt10"
                      style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list"
                      :key="index"
@@ -164,7 +165,7 @@
         if (!v) {
           this.addExam.difficult = 'D02'
           this.addExam.share = 'S02'
-          this.addExam.name=`《${this.$route.query.courseName}》标准测试卷1`
+          this.addExam.name = `《${this.$route.query.courseName}》标准测试卷1`
         }
       }
     },
@@ -186,20 +187,36 @@
         this.onRefresh()
       })
     },
+    destroyed() {
+      eventBus.$off("examListRefresh")
+    },
     methods: {
       createTestPaper() {
-        this.$router.push({path:`/questionList`,query:{
+        this.$router.push({
+          path: `/questionList`, query: {
             "tchCourseId": this.$route.query.tchCourseId,
             "sysCourseId": this.$route.query.sysCourseId,
             "relationSeqId": this.$route.query.relationCourseId,
             "courseName": this.$route.query.courseName,
             from: 'examList'
-          }})
+          }
+        })
       },
       viewDetail(item) {
         this.$store.commit('setResourceInfo', item)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/examDetail?type=${item.stateName?1:0}&testPaperId=${item.testPaperId}&subjectType=${this.$route.query.subjectType}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+        this.$router.push({
+          path: `/examDetail`, query: {
+            "tchCourseId": this.$route.query.tchCourseId,
+            "sysCourseId": this.$route.query.sysCourseId,
+            "relationCourseId": this.$route.query.relationCourseId,
+            type: item.stateName ? 1 : 0,
+            testPaperId: item.testPaperId,
+            subjectType: localStorage.currentSubjectType,
+            classGrade: this.$route.query.classGrade,
+            title: item.testPaperName,
+          }
+        })
       },
       copy(item) {
         this.addExam.title = '复制';
@@ -354,7 +371,7 @@
                   this.$refs['body'].scrollTo(0, 0)
                   this.onRefresh()
                   this.$toast('复制成功')
-                }else {
+                } else {
                   this.$toast(ret[0].msg)
                 }
               })
@@ -366,11 +383,13 @@
                   this.$toast('添加成功')
                   this.$refs['body'].scrollTo(0, 0)
                   this.onRefresh()
-                  this.$router.push({path:`/questionList`,query:{
+                  this.$router.push({
+                    path: `/questionList`, query: {
                       "tchCourseId": this.$route.query.tchCourseId,
                       "sysCourseId": this.$route.query.sysCourseId,
                       "relationSeqId": this.$route.query.relationCourseId,
-                    }})
+                    }
+                  })
                 } else {
                   this.$toast(ret[0].msg)
                 }
@@ -412,11 +431,11 @@
         })
       },
       handleSubmit() {
-        // if (this.addExam.title == '编辑') {
+        if (this.addExam.title == '编辑') {
           this.modifyTestPaper()
-        // } else {
-        //   this.addTestPaper()
-        // }
+        } else {
+          this.addTestPaper()
+        }
       },
       async onLoad() {
         this.currentPage++
@@ -468,11 +487,11 @@
           }
         })
       },
-      senTask(obj){
-        if (!obj.objectiveItemNum && !obj.subjectiveItemNum){
+      senTask(obj) {
+        if (!obj.objectiveItemNum && !obj.subjectiveItemNum) {
           return this.$toast('该试卷不含试题')
         }
-        if(obj.stateName) {
+        if (obj.stateName) {
           return this.$toast('该试卷已发任务,不能重复发任务')
         }
         console.log("发任务：", obj.testPaperName)
@@ -576,6 +595,7 @@
       }
     }
   }
+
   .null-tips {
     margin-top: 50px;
     margin-left: 50%;
