@@ -353,6 +353,7 @@ export default {
         img.src = v
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
+      //
       Promise.all([this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[0]),this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[1])]).then(async res => {
         let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
         await this.getOSSKey()
