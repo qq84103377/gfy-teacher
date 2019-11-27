@@ -120,7 +120,9 @@ export default {
       isPinch: false,
       timer: null,
       canvasHistory: [],
-      rotateIndex: 0
+      rotateIndex: 0,
+      lastLeft: 0,
+      lastTop: 0
     }
   },
   props: ['imgUrl', 'isPen', 'isRubber', 'text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -130,6 +132,7 @@ export default {
       this.clearScreen()
       this.canvasHistory = []
       this.rotateIndex = 0
+      this.rotate = 0
 
       //对于文字+图片和纯图片之间的切换 需要重新计算canvas高度,
       this.$nextTick(() => {
@@ -157,6 +160,9 @@ export default {
       // this.ctx.fillStyle = 'red'
       // this.ctx.textAlign = "center"
       // this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
+    },
+    rotate(v) {
+      console.log('现在是' + v);
     }
   },
   methods: {
@@ -245,20 +251,28 @@ export default {
 
       if (!this.rotate || this.rotate == 0 || this.rotate == 180 || this.rotate == -180 || this.rotate == 360 || this.rotate == -360) {
         console.log("非旋转////");
-        console.log(bbox,'/////bbox');
-        console.log(x, y,'/////x y');
-        console.log(bbox.left, bbox.top,'/////bboxx bboxy');
-        console.log(x-bbox.left, x-bbox.top,'/////x-bboxx x-bboxy');
+        console.log(bbox, '/////bbox');
+        console.log(x, y, '/////x y');
+        console.log(bbox.left, bbox.top, '/////bboxx bboxy');
+        console.log(x - bbox.left, y - bbox.top, '/////x-bboxx x-bboxy');
         return { x: x - bbox.left, y: y - bbox.top };
       } else {
         console.log("旋转////");
-        console.log(bbox,'/////bbox');
-        console.log(x, y,'/////x y');
-        console.log(bbox.left, bbox.top,'/////bboxx bboxy');
-        console.log(x-bbox.left, x-bbox.top,'/////x-bboxx x-bboxy');
+        console.log(bbox, '/////bbox');
+        console.log(x, y, '/////x y');
+        // console.log(bbox.left, bbox.top, '/////bbox.left, bbox.top');
+        // console.log(x - bbox.left, y - bbox.top, '/////x-bbox.left, y-bbox.top');
+        console.log(this.lastLeft, this.lastTop, 'this.lastLeft,this.lastTop');
+        console.log(this.scale, 'this.scale');
 
-        // return { x: x - bbox.left, y: y - bbox.top };
-        return { x, y };
+        return { x: x - bbox.left + this.lastLeft * this.scale, y: y - bbox.top + this.lastTop * this.scale };
+
+        // if (this.scale != 1) {
+        // } else {
+        //   return { x: x - bbox.left + this.lastLeft, y: y - bbox.top + this.lastTop };
+        // }
+
+        // return { x, y };
       }
 
     },
@@ -457,8 +471,34 @@ export default {
         this.rotateIndex = -1
       }
 
+      // var angle = 90 * this.rotateIndex
+
+      // if (angle === -270) {
+      //   angle = -90
+      // }
+
+      // this.rotate = angle
+      // this.swordEle.rotateZ = 90 * this.rotateIndex
+
+
       this.rotate = 90 * this.rotateIndex
       this.swordEle.rotateZ = 90 * this.rotateIndex
+
+      // if ((this.rotate == 90 || this.rotate == -270 || this.rotate == -90 || this.rotate == 270)) {
+      //   let bbox = this.canvas.getBoundingClientRect();
+      //   this.lastLeft = bbox.x/this.scale
+      //   this.lastTop = bbox.y/this.scale
+      //   console.log(this.lastLeft, this.lastTop, '旋转过后的this.lastLeft,this.lastTop');
+      // }
+
+      // if ((this.rotate == 90 || this.rotate == -270 || this.rotate == -90 || this.rotate == 270) && this.scale == 1) {
+      //   let bbox = this.canvas.getBoundingClientRect();
+      //   console.log(bbox, '旋转过后的bbox');
+      //   this.lastLeft = bbox.x
+      //   this.lastTop = bbox.y
+      //   console.log(this.lastLeft, this.lastTop, '旋转过后的this.lastLeft,this.lastTop');
+      // }
+
 
       // this.ctx.rotate(30 * Math.PI / 180);//把整个画布旋转30度
       // this.clearScreen()
@@ -508,6 +548,14 @@ export default {
       this.rotate = 90 * this.rotateIndex
       this.swordEle.rotateZ = 90 * this.rotateIndex
 
+      // if ((this.rotate == 90 || this.rotate == -270 || this.rotate == -90 || this.rotate == 270) && this.scale == 1) {
+      //   let bbox = this.canvas.getBoundingClientRect();
+      //   console.log(bbox, '旋转过后的bbox');
+      //   this.lastLeft = bbox.x
+      //   this.lastTop = bbox.y
+      //   console.log(this.lastLeft, this.lastTop, '旋转过后的this.lastLeft,this.lastTop');
+      // }
+
 
 
     },
@@ -545,6 +593,12 @@ export default {
     figure() {
       // let swordEle = document.getElementsByClassName('canvas')[0]
       this.swordEle = document.getElementById('test')
+
+      // console.log("还原");
+
+      // this.swordEle.rotateZ = 0
+      // this.rotate = 0
+
       let _this = this
       var Stage = AlloyPaper.Stage, Bitmap = AlloyPaper.Bitmap, Loader = AlloyPaper.Loader;
 
@@ -631,6 +685,10 @@ export default {
           console.log(initScale, evt.scale, evt, 'evtevt');
           _this.swordEle.scaleX = _this.swordEle.scaleY = initScale * evt.zoom;
           _this.scale = _this.swordEle.scaleX
+
+          // let bbox = _this.canvas.getBoundingClientRect();
+          // _this.lastLeft = bbox.x
+          // _this.lastTop = bbox.y
           console.log("捏合end");
 
         },
@@ -702,6 +760,7 @@ export default {
   },
   mounted() {
     console.log('mounted()');
+
     let _this = this
     this.offCanvas = document.getElementsByClassName('offCanvas')[0] //$('.offCanvas')[0]; // 用于更换背景图
     this.offCtx = this.offCanvas.getContext('2d');
@@ -718,16 +777,44 @@ export default {
     // let isPen = true; // 用于判断涂鸦还是擦除
     // let footerHeight = $('.footer').height(); // 获取底部高度
     //
+
     this.offCanvas.width = window.document.body.offsetWidth
     this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
     this.canvas.width = window.document.body.offsetWidth
     this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+
     this.figure()
     this.containerFigure()
 
-
+    console.log("zheshi ");
 
     window.addEventListener('resize', this.handleResize)
+
+
+    setTimeout(() => {
+      this.rotate = 90
+      this.swordEle.rotateZ = 90
+
+      console.log(this.swordEle, 'this.swordEle');
+
+
+      let bbox = this.swordEle.getBoundingClientRect();
+      console.log(bbox, '初始旋转的bbox');
+      console.log(bbox.width, '初始旋转的bbox');
+      console.log(bbox.top, '初始旋转的bbox');
+      this.lastLeft = bbox.left
+      this.lastTop = bbox.top
+      console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
+
+      this.rotate = 0
+      this.swordEle.rotateZ = 0
+    }, 2000);
+
+
+
+
+
+
 
     // 选择颜色
     // $('.lineColors span').click(function() {
