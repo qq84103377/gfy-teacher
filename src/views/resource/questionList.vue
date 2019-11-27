@@ -135,6 +135,8 @@
       this.$store.commit('setVanLoading', true)
       Promise.all([this.getExamSectionTypeRelation(), this.getSysDictList()]).then(res => {
         this.$store.commit('setVanLoading', false)
+      }).catch(err => {
+        this.$store.commit('setVanLoading', false)
       })
     },
     beforeRouteLeave(to, from, next) {
@@ -270,6 +272,7 @@
             this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
             if(this.$route.query.from === 'examDetail') {
               //先找出sectionName对应的examType
+              console.log(this.tab.questionTypeList,this.selectList,'dkdkdkd');
               this.selectList.forEach(v => {
                this.$set(v,'examType',this.tab.questionTypeList.find(q => q.sectionName === v.sectionName).examType)
               })

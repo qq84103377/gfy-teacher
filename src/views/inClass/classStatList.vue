@@ -101,7 +101,18 @@
           this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
         } else {
           //试卷
-          this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.$route.query.classGrade}&title=${item.testPaperName}`)
+          this.$router.push({
+            path: `/examDetail`, query: {
+              "tchCourseId": this.$route.query.tchCourseId,
+              "sysCourseId": this.$route.query.sysCourseId,
+              "relationCourseId": this.$route.query.relationCourseId,
+              type: 1,
+              testPaperId: item.testPaperId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.$route.query.classGrade,
+              title: item.testPaperName,
+            }
+          })
         }
       },
       handleDelete(item, index) {

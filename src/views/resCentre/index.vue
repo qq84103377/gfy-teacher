@@ -680,15 +680,35 @@
           for (let k in item) {
             const humpKey = toHump(k)
             humpObj[humpKey] = item[k]
-            this.$store.commit('setResourceInfo', humpObj)
-            this.$store.commit("setTaskClassInfo", '')
-            this.$router.push(`/examDetail?type=0&testPaperId=${humpObj.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${humpObj.testPaperName}`)
           }
+          this.$store.commit('setResourceInfo', humpObj)
+          this.$store.commit("setTaskClassInfo", '')
+          this.$router.push({
+            path: `/examDetail`, query: {
+              flag: 1,
+              "sysCourseId": this.courseId,
+              type: 0,
+              testPaperId:humpObj.testPaperId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.gradeTerm.split('|')[0],
+              title: humpObj.testPaperName,
+            }
+          })
         } else {
           //平台资源
           this.$store.commit('setResourceInfo', item)
           this.$store.commit("setTaskClassInfo", '')
-          this.$router.push(`/examDetail?type=0&testPaperId=${item.testPaperId}&subjectType=${localStorage.currentSubjectType}&classGrade=${this.gradeTerm.split('|')[0]}&title=${item.testPaperName}&courseId=${this.courseId}`)
+          this.$router.push({
+            path: `/examDetail`, query: {
+              flag: 1,
+              "sysCourseId": this.courseId,
+              type: 0,
+              testPaperId:item.testPaperId,
+              subjectType: localStorage.currentSubjectType,
+              classGrade: this.gradeTerm.split('|')[0],
+              title: item.testPaperName,
+            }
+          })
         }
       },
       goto(item) {

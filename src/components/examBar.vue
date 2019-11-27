@@ -182,7 +182,7 @@
           this.isRevert = false
         }else {
           if(this.$route.path === '/examDetail') {
-            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.courseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.sysCourseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }else if (this.$route.path === '/questionList') {
             this.$emit('viewRes',1)
@@ -191,6 +191,7 @@
         }
       },
       getClassTeachCourseInfo() {
+        if(!this.canAddCourse) return
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -260,12 +261,18 @@
         addTestPaper(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId || this.$route.query.sysCourseId) {
-              // 有选择加入的课程
-              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+            //先判断canAddCourse能否选择加入课
+            if(this.canAddCourse){
+              if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId) {
+                // 有选择加入的课程
+                this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              }else {
+                //没有选择加入的课程
+                this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              }
             }else {
-              //没有选择加入的课程
-              this.addTestPaperExamInfo(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
+              //不能选择课程,即有默认课程
+              this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }
           } else {
             this.$toast(res.msg)
@@ -280,9 +287,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": this.$route.query.tchCourseId || this.courseList.find(v => v.check).tchCourseInfo.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId || this.courseList.find(v => v.check).tchCourseInfo.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId || this.courseList.find(v => v.check).tchCourseInfo.relationCourseId,
+          "tchCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
+          "sysCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
+          "relationSeqId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -373,14 +380,58 @@
             this.addExam = false
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
-            let courseId = this.$route.query.sysCourseId || this.courseList.find(v => v.check).tchCourseInfo.sysCourseId
             if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
-             courseId = this.$store.getters.getErrorBookQuestionCourse.join('|')
+             let courseId = this.$store.getters.getErrorBookQuestionCourse.join('|')
+              this.$router.push({
+                path: `/examDetail`, query: {
+                  flag: 1,
+                  "sysCourseId": courseId,
+                  type: 1,
+                  testPaperId,
+                  subjectType: localStorage.currentSubjectType,
+                  classGrade: this.$store.getters.getErrorFilterParams.classGrade,
+                  title: name,
+                }
+              })
+            }else {
+              if(this.canAddCourse) {
+                if(this.$route.path === '/examDetail') {
+                  this.$emit('addDone',name)
+                }else {
+                  this.$router.push({
+                    path: `/examDetail`, query: {
+                      flag: 1,
+                      "sysCourseId": this.$route.query.sysCourseId,
+                      type: 1,
+                      testPaperId,
+                      subjectType: localStorage.currentSubjectType,
+                      classGrade: this.$route.query.classGrade,
+                      title: name,
+                    }
+                  })
+                }
+              }else {
+                if(this.$route.path === '/examDetail') {
+                  this.$emit('addDone',name)
+                }else {
+                  this.$router.push({
+                    path: `/examDetail`, query: {
+                      "tchCourseId": this.$route.query.tchCourseId,
+                      "sysCourseId": this.$route.query.sysCourseId,
+                      "relationCourseId": this.$route.query.relationCourseId,
+                      type: 1,
+                      testPaperId,
+                      subjectType: localStorage.currentSubjectType,
+                      classGrade: this.$route.query.classGrade,
+                      title: name,
+                    },
+                  })
+                }
+              }
             }
             /**
              * 某些场景下courseId为空,需要处理(待处理)
              */
-            this.$router.push(`/examDetail?courseId=${courseId}&testPaperId=${testPaperId}&title=${name}&classGrade=${this.$route.query.classGrade || this.$store.getters.getErrorFilterParams.classGrade}`)
             if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
           } else {
             this.$toast(res.msg)

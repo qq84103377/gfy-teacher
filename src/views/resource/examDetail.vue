@@ -1,7 +1,7 @@
 <template>
   <section class="exam-detail">
     <van-nav-bar
-      :title="$route.query.title"
+      :title="title"
       @click-left="$router.back()"
       left-arrow>
     </van-nav-bar>
@@ -32,8 +32,8 @@
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-    <exam-bar v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
-            :canAddCourse="true" :can-select="true"></exam-bar>
+    <exam-bar @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
+            :canAddCourse="$route.query.flag==1" :can-select="true"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
     <!--      设置分数-->
@@ -81,10 +81,20 @@
         }, 0)
       }
     },
+    watch: {
+      '$route'(to,from) {
+        console.log(to,from,'ffffff');
+
+      }
+    },
+    /**
+     * $route.query.flag 是否能选择添加到课程(只有资源中心的试题详情和错题本试题详情和未结束任务的试卷详情才能显示)
+     */
     data() {
       return {
+        title: this.$route.query.title,
         isSend: this.$route.query.type == 1, // 0 未发 1 已发
-        isOther: this.$route.query.isOther == 1, // 1 别人 0 自己
+        // isOther: this.$route.query.isOther == 1, // 1 别人 0 自己
         selectList: [],
         correctShow: false,
         setPointShow: false,
@@ -99,6 +109,11 @@
       }
     },
     methods: {
+      addDone(title) {
+        debugger
+        this.title = title
+        eventBus.$emit('examListRefresh', true)
+      },
       calSectionScore(section) {
         let score = 0
         section.sectionExamList.forEach(s => {

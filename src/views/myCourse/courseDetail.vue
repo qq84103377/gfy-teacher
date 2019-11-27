@@ -58,6 +58,7 @@
                 courseName:this.currCourse.tchCourseInfo.courseName,
                 classGrade:this.currCourse.tchCourseInfo.classGrade,
                 sysCourseId:this.currCourse.tchCourseInfo.sysCourseId,
+                relationCourseId:this.currCourse.tchCourseInfo.relationCourseId,
                 termType:this.currCourse.tchCourseInfo.termType,
                 currCourse: this.currCourse
               }})
