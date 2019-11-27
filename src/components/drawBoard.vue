@@ -326,7 +326,18 @@ export default {
      * [离屏合成图]
      * @param  {[type]} imgArray   [背景图画布和涂鸦画布的地址数组]
      */
-    compositeGraph(imgArray) {
+    loadImg(compositeCtx,img) {
+      return new Promise( (resolve, reject) => {
+        img.onload = function() {
+          compositeCtx.drawImage(img, 0, 0); // 循环绘制图片到离屏画布
+          resolve(img);
+        }
+        img.onerror = function(err){
+          reject(err)
+        }
+      })
+    },
+    async compositeGraph(imgArray) {
       console.log('compositeGraph()');
       // 下载后的文件名
       let filename = 'canvas_' + (new Date()).getTime() + '.png';
@@ -342,41 +353,40 @@ export default {
         img.src = v
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
-      // $.each(imgArray, function (index, val) {
-      //   $('.offImgs').append('<img src="' + val + '" />'); // 增加img元素用于获取合成
-      // });
-      let _this = this
-      for (let i = 0; i < document.querySelectorAll('.offImgs img').length; i++) {
-        const item = document.querySelectorAll('.offImgs img')[i];
-        item.onload = async () => {
-          compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
-          if (i >= document.querySelectorAll('.offImgs img').length - 1) {
-            let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-            await this.getOSSKey()
+      Promise.all([this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[0]),this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[1])]).then(async res => {
+        let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+        await this.getOSSKey()
 
-            var arr = compositeImg.split(","),
-              mime = arr[0].match(/:(.*?);/)[1],
-              bstr = atob(arr[1]),
-              n = bstr.length,
-              u8arr = new Uint8Array(n);
-            while (n--) {
-              u8arr[n] = bstr.charCodeAt(n);
-            }
-            this.curFile = new Blob([u8arr], { type: mime });
-            this.uploadIMG(this.curFile);
+        let arr = compositeImg.split(","),
+          mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]),
+          n = bstr.length,
+          u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        this.curFile = new Blob([u8arr], { type: mime });
+        this.uploadIMG(this.curFile);
+      })
+      // for (let i = 0; i < document.querySelectorAll('.offImgs img').length; i++) {
+      //     const item = document.querySelectorAll('.offImgs img')[i];
+      //     let promise = new Promise((resolve,reject) => {
+      //       item.onload = () => {
+      //         console.log(i,'====================================');
+      //         compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
+      //         resolve()
+      //       }
+      //       item.onerror = () => {
+      //         console.log('sssssssssssss');
+      //       }
+      //     })
+      //    let bb = await promise
+      //   console.log(bb);
+      // }
 
-          }
-        };
-      }
-      // $.each($('.offImgs img'), function (index, val) {
-      //   val.onload = function () {
-      //     compositeCtx.drawImage(val, 0, 0); // 循环绘制图片到离屏画布
-      //     if (index >= $('.offImgs img').length - 1) {
-      //       let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-      //       _this.$emit('exit', compositeImg)
-      //     }
-      //   };
-      // });
+      // if (i >= document.querySelectorAll('.offImgs img').length - 1) {
+
+      // }
     },
     uploadIMG(curFile) {
       console.log('uploadIMG()');
@@ -391,8 +401,6 @@ export default {
       formData.append('signature', this.oSSObject.signature)
       formData.append('file', curFile)
       formData.append('success_action_status', '200')
-
-
 
       // this.$store.commit('setVanLoading', false)
       // this.$emit('submitCb')
@@ -475,7 +483,7 @@ export default {
       //   if (this.rotateIndex == 5) {
       //     this.rotateIndex = 1
       //   }
-      //   this.ctx.rotate(90 * this.rotateIndex * Math.PI / 180);//旋转47度   
+      //   this.ctx.rotate(90 * this.rotateIndex * Math.PI / 180);//旋转47度
       //   this.ctx.translate(-xpos, -ypos);
       //   this.ctx.drawImage(canvasPic, xpos - canvasPic.width / 2, ypos - canvasPic.height / 2);
       //   this.ctx.restore();
