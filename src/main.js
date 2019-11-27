@@ -111,6 +111,21 @@ router.beforeEach((to, from, next) => {
   }
   next()
 })
+
+
+// ios微信浏览器适配导航栏
+pushHistory()
+
+function pushHistory() {
+  var state1 = {}
+  window.history.pushState(state1, "", window.location.href)
+}
+
+document.addEventListener("WeixinJSBridgeReady", function onBridgeReady() {
+  WeixinJSBridge.call("hideToolbar")
+})
+
+
 new Vue({
   router,
   store,
