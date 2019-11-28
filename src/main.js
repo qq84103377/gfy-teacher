@@ -9,7 +9,7 @@ import VueCropper from "vue-cropper"
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
 import * as calculate from './utils/calculate'
-// import VConsole from 'vconsole/dist/vconsole.min.js'
+import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
@@ -71,6 +71,11 @@ import {
 // Vue.use(AlloyFingerPlugin,{
 //   AlloyFinger
 // })
+
+if (process.env.NODE_ENV != "production"){
+  let vConsole = new VConsole()
+}
+
 viewportUnitsBuggyfill.init({
   hacks: viewportUnitsBuggyfill.hacks
 })
@@ -78,7 +83,7 @@ Vue.use(Navigation, {
   router
 })
 Vue.use(VueCropper)
-// let vConsole = new VConsole()
+
 Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)
