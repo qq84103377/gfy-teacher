@@ -255,7 +255,6 @@ export default {
 
       // return { x, y };
 
-
       if (!this.rotate || this.rotate == 0 || this.rotate == 180 || this.rotate == -180 || this.rotate == 360 || this.rotate == -360) {
         console.log("非旋转////");
         console.log(bbox, '/////bbox');
@@ -347,13 +346,13 @@ export default {
      * [离屏合成图]
      * @param  {[type]} imgArray   [背景图画布和涂鸦画布的地址数组]
      */
-    loadImg(compositeCtx, img) {
-      return new Promise((resolve, reject) => {
-        img.onload = function () {
+    loadImg(compositeCtx,img) {
+      return new Promise( (resolve, reject) => {
+        img.onload = function() {
           compositeCtx.drawImage(img, 0, 0); // 循环绘制图片到离屏画布
           resolve(img);
         }
-        img.onerror = function (err) {
+        img.onerror = function(err){
           reject(err)
         }
       })
@@ -374,7 +373,7 @@ export default {
         img.src = v
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
-      Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
+      Promise.all([this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[0]),this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[1])]).then(async res => {
         let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
         await this.getOSSKey()
 
@@ -663,7 +662,6 @@ export default {
             _this.ctx.clip();
             _this.ctx.clearRect(xr / _this.scale - _this.rubberSize / 2, xy / _this.scale - _this.rubberSize / 2, _this.rubberSize, _this.rubberSize); // 清除涂鸦画布内容
             _this.ctx.restore();
-
           }
         },
         touchEnd: function () {
@@ -712,17 +710,16 @@ export default {
           console.log("捏合end");
 
         },
-        // pressMove: function (evt) {
-        //   console.log("pressMove");
-        //   if (_this.isPen || _this.isRubber) return
-        //   let widthDiff = bwidth - swidth;
-        //   let heightDiff = bheight - sheight;
-        //   // if (((evt.deltaX > 0) && (swordEle.translateX >= widthDiff)) || ((evt.deltaY > 0) && (swordEle.translateY >= heightDiff)) || ((swordEle.translateX < 0) && ((evt.deltaX < 0))) || ((swordEle.translateY < 0) && ((evt.deltaY < 0)))) {
-        //   // } else {
-        //   _this.swordEle.translateX += evt.deltaX;
-        //   _this.swordEle.translateY += evt.deltaY;
-        //   // }
-        // },
+        pressMove: function (evt) {
+          // if (_this.isPen || _this.isRubber) return
+          // let widthDiff = bwidth - swidth;
+          // let heightDiff = bheight - sheight;
+          // // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
+          // // } else {
+          // _this.swordEle.translateX += evt.deltaX;
+          // _this.swordEle.translateY += evt.deltaY;
+          // }
+        },
         swipe: function (evt) {
           // evt.stopPropagation();
           // switch (evt.direction) {

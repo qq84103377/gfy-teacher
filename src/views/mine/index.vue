@@ -186,7 +186,9 @@
           })
           .catch(() => {
             // on cancel
+            const loginInfo = JSON.parse(localStorage.loginInfo)
             localStorage.clear();
+            localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
             this.$forceUpdate();
             this.$router.replace("/login");
           });

@@ -7,8 +7,8 @@
       <span>进度：{{progress}}/{{stuArr.length}}</span>
       <i @click="zoom(1)" class="iconGFY icon-enlarge"></i>
       <i @click="zoom(0)" class="iconGFY icon-reduce"></i>
-      <i class="iconGFY icon-rotate-left"></i>
-      <i class="iconGFY icon-rotate-right"></i>
+      <i class="iconGFY icon-rotate-left" @click="rotateLeft"></i>
+      <i class="iconGFY icon-rotate-right" @click="rotateRight"></i>
       <span @click="isShowTitle=true;viewSubject=true">看原题</span>
       <span @click="stuInfo=!stuInfo">阅卷情况</span>
       <span class="action-btn" @click="saveRewardScore('T01')">加分</span>
@@ -291,6 +291,12 @@
       this.figure()
     },
     methods: {
+      rotateLeft() {
+        this.$refs['drawBoard'].rotateLeft()
+      },
+      rotateRight() {
+        this.$refs['drawBoard'].rotateRight()
+      },
       updateExamQuality() {
         this.$store.commit('setVanLoading', true)
         const qualityType = this.stuArr[this.stuIndex].answer[this.aswIndex].qualityType==='Q01'?'Q02':'Q01'
