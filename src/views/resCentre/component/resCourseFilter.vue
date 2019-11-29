@@ -190,7 +190,8 @@
                 }
               }
               this.$emit('filter',this.currentSysCourseId)
-              this.$emit('update:label',(this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+              // this.$emit('update:label',(this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+              this.$emit('update:label',this.currentSysCourseName)
 
             }
           } else {
@@ -200,7 +201,8 @@
             this.unitIndex = 0
             this.selectSysCourse('','')
             this.$emit('filter',this.currentSysCourseId)
-            this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+            // this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+            this.$emit('update:label',this.currentSysCourseName)
 
           }
 
@@ -213,10 +215,9 @@
       handleSubmit() {
         this.show = false
         this.$emit('filter',this.currentSysCourseId)
-        this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+        // this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
+        this.$emit('update:label',this.currentSysCourseName)
       },
-
-
     }
   }
 </script>
