@@ -147,6 +147,10 @@
       next(vm => {
         if(from.path === '/examDetail') {
           vm.selectList = JSON.parse(JSON.stringify(vm.$store.getters.getResQuestionSelect))
+            //先把selectList添加对应的examType
+            vm.selectList.forEach(v => {
+              vm.$set(v,'examType',v.child[0].titleType)
+            })
         }
         vm.$nextTick(() => {
           vm.$refs["body"].scrollTo(0, vm.scrollTop);
@@ -167,6 +171,7 @@
         })
       },
       handleAdd(isRemove, item) {
+        debugger
         if (isRemove) {
           // 移除
           const index = this.selectList.findIndex(v => v.examType === item.titleType)
@@ -270,13 +275,7 @@
         await getExamSectionTypeRelation(params).then(res => {
           if (res.flag) {
             this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
-            if(this.$route.query.from === 'examDetail') {
-              //先找出sectionName对应的examType
-              console.log(this.tab.questionTypeList,this.selectList,'dkdkdkd');
-              this.selectList.forEach(v => {
-               this.$set(v,'examType',this.tab.questionTypeList.find(q => q.sectionName === v.sectionName).examType)
-              })
-            }
+
           }
         })
       },

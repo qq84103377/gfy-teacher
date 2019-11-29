@@ -3,7 +3,7 @@
     <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <div class="question-item-wrap__ctn">
       <slot name="num"></slot>
-      <div v-html="item.title" class="html-img" @click="previewImg"></div>
+      <div ref="title" v-html="item.title" class="html-img" @click="previewImg"></div>
       <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in item.groupExamList" :key="childIndex">
         ({{childIndex+1}})<span v-if="child.examScore>=0">本小题{{child.examScore}}分</span>
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
@@ -83,6 +83,15 @@
         tooltip: false,
         collect: false
       }
+    },
+    mounted() {
+      this.$nextTick(() => {
+        //去掉题目内容的audio下载按钮
+        let dom = this.$refs['title'].querySelectorAll('audio')
+        if(dom.length) {
+          dom[0].controlsList="nodownload"
+        }
+      })
     },
     methods: {
       previewImg($event) {
