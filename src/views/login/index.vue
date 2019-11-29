@@ -25,10 +25,10 @@
         </van-button>
       </div>
       <div class="form-detail" v-else>
-        <van-field class="custom-input" @input.native="userChange" v-model.trim="username" clearable placeholder="请输入手机号/用户名" />
+        <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入手机号/用户名" />
         <div class="vailcode">
           <div class="code-input">
-            <van-field class="custom-input" @input.native="userChange" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
+            <van-field class="custom-input" @input.native="userChange(0)" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
               <!--              <div slot="right-icon">123</div>-->
             </van-field>
             <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span>
@@ -95,6 +95,21 @@ export default {
       password: '',
       loginDisabled2: true,
       version: '',
+    }
+  },
+  // watch: {
+  //   username() {
+  //       if(localStorage.loginInfo) {
+  //         this.password = ''
+  //       }
+  //     }
+  // },
+  created() {
+    if(localStorage.loginInfo) {
+      const loginInfo = JSON.parse(localStorage.loginInfo)
+      this.username = loginInfo.userName
+      this.password = loginInfo.pwd
+      this.loginDisabled2 = false
     }
   },
   mounted() {
@@ -235,7 +250,12 @@ export default {
     },
 
     // 手机/用户名登录模式输入框change
-    userChange() {
+    userChange(type) {
+      if(type && localStorage.loginInfo) {
+        //修改用户名输入框
+        this.password = ''
+        localStorage.removeItem('loginInfo')
+      }
       if (this.username && this.password) {
         this.loginDisabled2 = false
       } else {
@@ -274,6 +294,7 @@ export default {
           }
           this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
           localStorage.setItem("isLogin", true);
+          localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
           this.$router.replace('/index')
 
         } else {
