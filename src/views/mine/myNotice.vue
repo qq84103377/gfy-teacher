@@ -249,8 +249,11 @@
 
       @{deep} .van-button {
         border-radius: 20px;
+        height: 25px;
+        line-height: 25px;
         background-color: transparent;
         color: #999 !important;
+
       }
     }
 
@@ -258,6 +261,7 @@
       .van-tabs__wrap {
         width: 50%;
         margin: 10px 0;
+        height: 25px;
 
         .van-tabs__nav {
           background-color: transparent;
@@ -269,6 +273,7 @@
           margin-left: 10px;
           color: #666666;
           font-size: 14px;
+          line-height: 25px;
         }
 
         .van-tab--active {
