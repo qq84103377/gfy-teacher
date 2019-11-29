@@ -161,10 +161,16 @@ export default {
       // this.ctx.textAlign = "center"
       // this.ctx.fillText(v,this.canvas.width/2,this.canvas.height - 40)
     },
-    rotate(v) {
-      console.log('现在是' + v);
-    }
+    // rotate(v) {
+    //   console.log('现在是' + v);
+    // }
   },
+  computed: {
+    isApp() {
+      return 'cordova' in window
+    },
+  },
+
   methods: {
     clear() {
       console.log('clear()');
@@ -367,7 +373,6 @@ export default {
         img.src = v
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
-      //
       Promise.all([this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[0]),this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[1])]).then(async res => {
         let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
         await this.getOSSKey()
@@ -638,11 +643,24 @@ export default {
             _this.lastTimestamp = curTimestamp;
             _this.lastLineWidth = curLineWidth;
           } else if (_this.isRubber) { // 擦掉
+            console.log(curCoordinate.x, curCoordinate.y, 'curCoordinate.x, curCoordinate.y');
+            const { sin, cos, PI } = Math
+            let arc = PI * _this.rotate / 180
+            console.log(arc, 'arc');
+
+            const origenX = _this.canvas.width / 2
+            const origenY = _this.canvas.height / 2
+
+            var xr = (curCoordinate.x - origenX * _this.scale) * cos(-arc) - (curCoordinate.y - origenY * _this.scale) * sin(-arc) + origenX * _this.scale     // X原点    180度/0度
+            var xy = (curCoordinate.x - origenX * _this.scale) * sin(-arc) + (curCoordinate.y - origenY * _this.scale) * cos(-arc) + origenY * _this.scale      // Y原点
+
+            console.log(xr, xy, 'xr,xy');
+            // return
             _this.ctx.save();
             _this.ctx.beginPath();
-            _this.ctx.arc(curCoordinate.x, curCoordinate.y, _this.rubberSize / 2, 0, Math.PI * 2);
+            _this.ctx.arc(xr / _this.scale, xy / _this.scale, _this.rubberSize / 2, 0, Math.PI * 2);
             _this.ctx.clip();
-            _this.ctx.clearRect(curCoordinate.x - _this.rubberSize / 2, curCoordinate.y - _this.rubberSize / 2, _this.rubberSize, _this.rubberSize); // 清除涂鸦画布内容
+            _this.ctx.clearRect(xr / _this.scale - _this.rubberSize / 2, xy / _this.scale - _this.rubberSize / 2, _this.rubberSize, _this.rubberSize); // 清除涂鸦画布内容
             _this.ctx.restore();
           }
         },
@@ -756,6 +774,23 @@ export default {
       // canvas.height = $(window).height() - footerHeight;
       this.clearScreen()
       this.drawImg(this.imgUrl); // 画图
+
+
+      if (this.isApp) {
+        this.rotate = 90
+        this.swordEle.rotateZ = 90
+        console.log(this.swordEle, 'this.swordEle');
+        let bbox = this.swordEle.getBoundingClientRect();
+        console.log(bbox, '初始旋转的bbox');
+        console.log(bbox.width, '初始旋转的bbox');
+        console.log(bbox.top, '初始旋转的bbox');
+        this.lastLeft = bbox.left
+        this.lastTop = bbox.top
+        console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
+
+        this.rotate = 0
+        this.swordEle.rotateZ = 0
+      }
     }
   },
   mounted() {
@@ -788,29 +823,23 @@ export default {
 
     console.log("zheshi ");
 
+    this.rotate = 90
+    this.swordEle.rotateZ = 90
+
+    console.log(this.swordEle, 'this.swordEle');
+
+    let bbox = this.swordEle.getBoundingClientRect();
+    console.log(bbox, '初始旋转的bbox');
+    console.log(bbox.width, '初始旋转的bbox');
+    console.log(bbox.top, '初始旋转的bbox');
+    this.lastLeft = bbox.left
+    this.lastTop = bbox.top
+    console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
+
+    this.rotate = 0
+    this.swordEle.rotateZ = 0
+
     window.addEventListener('resize', this.handleResize)
-
-
-    setTimeout(() => {
-      this.rotate = 90
-      this.swordEle.rotateZ = 90
-
-      console.log(this.swordEle, 'this.swordEle');
-
-
-      let bbox = this.swordEle.getBoundingClientRect();
-      console.log(bbox, '初始旋转的bbox');
-      console.log(bbox.width, '初始旋转的bbox');
-      console.log(bbox.top, '初始旋转的bbox');
-      this.lastLeft = bbox.left
-      this.lastTop = bbox.top
-      console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
-
-      this.rotate = 0
-      this.swordEle.rotateZ = 0
-    }, 2000);
-
-
 
 
 

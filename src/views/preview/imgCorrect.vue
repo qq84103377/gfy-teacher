@@ -23,7 +23,9 @@
       <i @click="isPen=true;isRubber=false" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
       <i @click="isRubber=true;isPen=false" class="iconGFY icon-rubber" :class="{'icon-rubber-active':isRubber}"></i>
       <i class="iconGFY icon-save" @click="save"></i>
-      <i class="iconGFY icon-arrow" @click="upDo"></i>
+      <i class="updo" @click="upDo">
+        <img src="../../assets/img/updo.png" alt="">
+      </i>
       <van-icon class="close" name="cross" @click="isPen=false;isRubber=false"></van-icon>
     </div>
     <div v-show="!isPen&&!isRubber" class="img-correct-wrap__swipe">
@@ -393,6 +395,18 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 10px;
+
+    .updo {
+      width: 10px;
+      height: 10px;
+      display: flex;
+      align-items: center;
+      
+      img{
+        width: 10px;
+        height: 10px;
+      }
+    }
 
     .close {
       font-size: 10px;
