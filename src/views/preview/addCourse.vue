@@ -571,10 +571,11 @@ export default {
       createTeachCourse(params).then(res => {
         if (res.flag) {
           this.$toast("创建成功")
-          setTimeout(function () {
+          setTimeout(() => {
             this.loadingSubmit = false
-            that.$router.push(`/preview`)
-          }, 200)
+            this.$router.push(`/preview`)
+          }, 200);
+
         } else {
           this.loadingSubmit = false
           this.$toast(res.msg)
@@ -765,7 +766,7 @@ export default {
         if (res) {
           if (res.flag) {
             this.$toast('修改成功')
-            this.$emit('onFinish')
+            this.$emit('onFinish',this.form.name)
           } else {
             this.$toast(res.flag)
           }
