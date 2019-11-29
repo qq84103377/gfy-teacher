@@ -71,11 +71,6 @@ import {
 // Vue.use(AlloyFingerPlugin,{
 //   AlloyFinger
 // })
-
-if (process.env.NODE_ENV != "production"){
-  let vConsole = new VConsole()
-}
-
 viewportUnitsBuggyfill.init({
   hacks: viewportUnitsBuggyfill.hacks
 })
@@ -83,7 +78,7 @@ Vue.use(Navigation, {
   router
 })
 Vue.use(VueCropper)
-
+let vConsole = new VConsole()
 Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)

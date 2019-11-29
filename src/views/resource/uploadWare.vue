@@ -19,12 +19,14 @@
           </div>
         </van-cell>
         <van-cell class="upload-ware__body__cell">
-        <div slot="title" class="aic">
-          <div><span class="red">*</span>课件:</div>
-          <div class="pdlt10" style="flex:1">轻触此添加office或pdf</div>
-          <van-icon @click="" class="add" name="add"/>
-        </div>
-      </van-cell>
+            <div slot="title" class="aic">
+              <div><span class="red">*</span>课件:</div>
+              <div class="pdlt10" style="flex:1">{{wareName||'可添加office文件或pdf'}}</div>
+              <van-uploader :before-read="read" result-type="file">
+                <van-icon @click="" class="add" name="add"/>
+              </van-uploader>
+            </div>
+         </van-cell>
         <van-cell class="upload-ware__body__cell">
           <div slot="title" class="aic">
             <span class="mgr10"><span class="red">*</span>共享:</span>
@@ -81,6 +83,7 @@
               relate: '2',
               btnLoading: false
             },
+            wareName: '',
             wareUrl: '',
             wareSize: '',
             oSSObject: null,
@@ -90,6 +93,44 @@
           this.getOSSKey()
       },
       methods: {
+        uploadWare(curFile) {
+          console.log("开始上传")
+          const suffix = curFile.name.substr(curFile.name.lastIndexOf('.'))
+          var filetime = generateTimeReqestNumber();
+          let randomStr = randomString(5);
+          let formData = new FormData();
+          formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
+            filetime +
+            randomStr + suffix
+          );
+          console.log(this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
+            filetime +
+            randomStr + suffix,'路径');
+          formData.append('policy', this.oSSObject.policyBase64)
+          formData.append('OSSAccessKeyId', this.oSSObject.accessid)
+          formData.append('signature', this.oSSObject.signature)
+          formData.append('file', curFile)
+          formData.append('success_action_status', '200')
+          uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+            console.log('doUpLoad', data);
+            this.wareUrl =
+              this.oSSObject.host +
+              "/" +
+              this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
+              filetime +
+              randomStr + suffix
+          });
+        },
+        read(file,detail) {
+          console.log(file.name,file.type,file,'ffffffffffffffffffffffffffffffffffffff');
+          if(['.pdf','.ppt','.pptx','.doc','.docx','.xls','.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
+            this.wareName = file.name
+            this.wareSize = file.size
+            this.uploadWare(file)
+          }else {
+            this.$toast('请选择office文档或pdf')
+          }
+        },
         getOSSKey() {
           let json = {
             requestJson: JSON.stringify({
@@ -97,7 +138,7 @@
               interPwd: "25d55ad283aa400af464c76d713c07ad",
               operateAccountNo: this.$store.getters.getUserInfo.accountNo,
               belongSchoolId: this.$store.getters.schoolId,
-              docTypeCd: "T02",
+              docTypeCd: "T10",
               sysTypeCd: "T01"
             })
           };
@@ -230,6 +271,9 @@
         .close, .add {
           color: @blue;
           margin-left: 10px;
+        }
+        .van-uploader {
+          height: 22px;
         }
         .add {
           font-size: 22px;

@@ -35,10 +35,11 @@
       </van-cell>
       <van-cell class="res-centre-wrap__body__cell" v-show="!tabIndex">
         <div slot="title" @click="resCourseFilterShow=true" class="aic jcsb">
-          <div class="fs16">课程</div>
-          <div class="fs15"><span class="blue mgr10">{{courseLabel}}</span>
-            <van-icon name="arrow"/>
-          </div>
+          <div style="flex: 0 0 15%" class="fs16">课程</div>
+<!--          <div style="flex: 0 0 80%;justify-content: flex-end" class="fs15 aic">-->
+<!--          </div>-->
+          <div style="flex: 1;width: 50px;text-align: right" class="van-ellipsis"><span class="blue mgr10">{{courseLabel}}</span></div>
+          <van-icon class="fs15" name="arrow"/>
         </div>
       </van-cell>
       <div class="res-centre-wrap__body__title">资源类型</div>
@@ -453,7 +454,7 @@
     },
     watch: {
       subjectLabel() {
-        if (this.tabIndex) {
+        // if (this.tabIndex) {
           //私人资源
           this.activeNames1.forEach(v => {
             if (v == 1) {
@@ -467,7 +468,7 @@
               this.getCollectInfoDetailV2('C02')
             }
           })
-        }
+        // }
       },
       courseId() {
         if (this.courseId) {
@@ -492,6 +493,7 @@
       },
     },
     created() {
+      this.$store.commit('setErrorBookQuestionCourse',[])
     },
     methods: {
       async download(srcUrl,name) {
@@ -625,7 +627,7 @@
           yearSection: this.handleYearSecion(),
           "pageSize": "9999",
           "currentPage": 1,
-          "orderByType": "T05",
+          "orderByType": "T01",
           "resCollectInfo": {
             objectTypeCd,
             "objectId": null,

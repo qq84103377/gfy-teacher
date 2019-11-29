@@ -108,16 +108,16 @@
 
       confirm() {
         const item = this.subjectList[this.index].child.find(v => v.check)
-        if(this.index !== this.tempIndex) {
-         //切换过学年
-          if(item) {
+        if(item) {
+          if(this.index !== this.tempIndex) {
+            //切换过学年
             eventBus.$emit('changeYear',this.index, item?item.subjectType:'')
             this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
+          }else {
+            //没有切换学年,只切换学科
+            eventBus.$emit('changeSubject',item?item.subjectType:'')
+            this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
           }
-       }else {
-         //没有切换学年,只切换学科
-         eventBus.$emit('changeSubject',item?item.subjectType:'')
-          this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
         }
         this.show = false
       },

@@ -110,8 +110,8 @@
     },
     methods: {
       addDone(title) {
-        debugger
         this.title = title
+        this.isModify = false
         eventBus.$emit('examListRefresh', true)
       },
       calSectionScore(section) {

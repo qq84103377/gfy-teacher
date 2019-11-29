@@ -223,11 +223,11 @@
         if (!this.form.name) {
           return this.$toast('请输入试卷名称')
         }
-        if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+        // if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
           if(!this.selectList.length) {
             return this.$toast('请添加试题')
           }
-        }
+        // }
         this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",
@@ -260,9 +260,10 @@
         }
         addTestPaper(params).then(res => {
           this.form.btnLoading = false
+          console.log(this.canAddCourse);
           if (res.flag) {
             //先判断canAddCourse能否选择加入课
-            if(this.canAddCourse){
+            if(this.canAddCourse && !this.isRevert){
               if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId) {
                 // 有选择加入的课程
                 this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
@@ -287,9 +288,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
-          "sysCourseId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
-          "relationSeqId": this.canAddCourse ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
+          "tchCourseId": (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
+          "sysCourseId": (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
+          "relationSeqId": (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -378,6 +379,7 @@
           this.form.btnLoading = false
           if (res.flag) {
             this.addExam = false
+            this.$store.commit('setResQuestionSelect', [])
             this.$store.commit('setResourceInfo', paperInfo)
             this.$store.commit("setTaskClassInfo", '')
             if(this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
@@ -394,7 +396,7 @@
                 }
               })
             }else {
-              if(this.canAddCourse) {
+              if(this.canAddCourse && !this.isRevert) {
                 if(this.$route.path === '/examDetail') {
                   this.$emit('addDone',name)
                 }else {
