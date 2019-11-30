@@ -1,6 +1,8 @@
 <template>
   <section class="res-centre-wrap">
     <van-nav-bar
+      :left-arrow="canBack"
+      @click-left="$router.back()"
       title="资源中心">
     </van-nav-bar>
     <div class="res-centre-wrap__tab">
@@ -403,6 +405,7 @@
 
   export default {
     name: "index",
+    props: ['canBack'],
     components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter, addCoursePop},
     data() {
       return {
@@ -669,11 +672,32 @@
         this.tabIndex = value
       },
       viewQuestion() {
-        if (this.tabIndex) {
-          this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
-        } else {
-          this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+        if(this.canBack) {
+          //有左上角返回按钮的时候
+          if(this.$route.query.from === 'examDetail') {
+            if (this.tabIndex) {
+              this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+            } else {
+              this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+            }
+          }else if (this.$route.query.from === 'questionList') {
+            this.$store.commit('setIsRevert',true)
+            if (this.tabIndex) {
+              this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=questionList&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+            } else {
+              this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=questionList&isRes=1&areaCode=&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+            }
+            // this.$emit('viewRes',1)
+            // this.isRevert = true
+          }
+        }else {
+          if (this.tabIndex) {
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSecion()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+          } else {
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+          }
         }
+
       },
       viewDetail(item) {
         if (this.tabIndex) {

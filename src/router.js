@@ -320,6 +320,11 @@ export default new Router({
           }
         },
         {
+          path: '/resCentreWrap',
+          name: 'resCentreWrap',
+          component: () => import('./views/resCentre/resCentreWrap.vue')
+        },
+        {
           path: '/mine',
           name: 'mine',
           component: () => import('./views/mine/index.vue'),

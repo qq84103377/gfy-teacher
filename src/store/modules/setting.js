@@ -16,6 +16,7 @@ const state = {
   errorFilterParams: {}, //错题本筛选条件
   resQuestionSelect: [], //资源中心选择的试题
   removeQuestionList: [], //资源中心试题列表移除的试题ID
+  isRevert: false, //试题列表选择其他按钮是否显示为返回按钮
 }
 
 const mutations = {
@@ -77,6 +78,9 @@ const mutations = {
   },
   setRemoveQuestionList(state,data) {
     state.removeQuestionList = data
+  },
+  setIsRevert(state,data) {
+    state.isRevert = data
   }
 }
 
@@ -107,6 +111,7 @@ const getters = {
   getErrorFilterParams: state => state.errorFilterParams,
   getResQuestionSelect: state => state.resQuestionSelect,
   getRemoveQuestionList: state => state.removeQuestionList,
+  getIsRevert: state => state.isRevert,
 };
 
 export default {

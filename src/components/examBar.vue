@@ -3,7 +3,7 @@
     <div class="exam-choice" @click="selectPop=!selectPop"><i class="iconGFY icon-file"></i><span
       class="badge">{{total}}</span></div>
     <div style="flex: 1">已选入<span class="fs10 red">{{total}}</span>道试题</div>
-    <div class="select-btn"  @click="viewResCenter" v-if="canSelect && $route.query.from !== 'examDetail'">{{isRevert?'返回':'选择其他'}}</div>
+    <div class="select-btn"  @click="viewResCenter" v-if="(canSelect && $route.query.from !== 'examDetail') || isRevert">{{isRevert?'返回':'选择其他'}}</div>
     <div class="add-btn" @click="handleSubmit" :style="{background:(type=='task'&&!length)?'#ccc':'#39F0DD'}">{{type=='task'?'发任务': ($route.query.from === 'examDetail'?'完成添加':'生成试卷')}}</div>
     <van-overlay
       class-name="exam-bar-overlay"
@@ -107,6 +107,7 @@
   import {Dialog} from 'vant';
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
   import eventBus from "@/utils/eventBus";
+  import { mapMutations, mapGetters, mapState } from 'vuex'
 
   export default {
     props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务
@@ -117,6 +118,9 @@
       event: 'change'
     },
     computed: {
+      ...mapState({
+        isRevert: state => state.setting.isRevert
+      }),
       total() {
         return this.selectList.reduce((t, v) => {
           t += v.child.length
@@ -141,7 +145,7 @@
         tempList: [],
         selectCourse: '',
         courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
-        isRevert: false, //是否显示返回按钮
+        // isRevert: false, //是否显示返回按钮
       }
     },
     watch: {
@@ -177,16 +181,28 @@
     },
     methods: {
       viewResCenter() {
+        // if(this.isRevert) {
+        //   this.$emit('viewRes',0)
+        //   this.isRevert = false
+        // }else {
+        //   if(this.$route.path === '/examDetail') {
+        //     this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.sysCourseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
+        //     this.$store.commit('setResQuestionSelect',this.selectList)
+        //   }else if (this.$route.path === '/questionList') {
+        //     this.$emit('viewRes',1)
+        //     this.isRevert = true
+        //   }
+        // }
         if(this.isRevert) {
-          this.$emit('viewRes',0)
-          this.isRevert = false
+          this.$router.go(-2)
+          this.$store.commit('setIsRevert',false)
         }else {
           if(this.$route.path === '/examDetail') {
-            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.$route.query.sysCourseId}&courseName=${this.courseLabel}&classGrade=${this.$route.query.classGrade}&termType=`)
+            this.$router.push(`/resCentreWrap?from=examDetail`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }else if (this.$route.path === '/questionList') {
-            this.$emit('viewRes',1)
-            this.isRevert = true
+            this.$router.push(`/resCentreWrap?from=questionList`)
+            this.$store.commit('setResQuestionSelect',this.selectList)
           }
         }
       },
@@ -471,7 +487,7 @@
           //从试卷详情点击选择其他,进入到资源中心试题列表
           this.$store.commit('setResQuestionSelect',this.selectList)
           this.$store.commit('setRemoveQuestionList',this.$parent.removeQuestionList)
-          this.$router.back()
+          this.$router.go(-2)
         } else {
           this.addExam = true
           //examDetail

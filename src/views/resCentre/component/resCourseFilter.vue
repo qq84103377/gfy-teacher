@@ -82,6 +82,7 @@
     mounted() {
       eventBus.$off("changeVersion")
       eventBus.$on("changeVersion", ({textBookId,gradeTermId},obj) => {
+        debugger
         this.textBookId = textBookId
         this.gradeTermId = gradeTermId
         if(obj) {
@@ -97,6 +98,7 @@
       })
       eventBus.$off("changeSubject")
       eventBus.$on("changeSubject", (subjectType) => {
+        debugger
         this.subjectType = subjectType
         if(this.gradeTermId) {
           //年级&教材已经加载完毕

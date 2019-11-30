@@ -141,11 +141,14 @@
     },
     beforeRouteLeave(to, from, next) {
       this.scrollTop = this.$refs["body"].scrollTop;
+      if(this.$route.query.from === 'questionList') {
+        this.$store.commit('setIsRevert',false)
+      }
       next();
     },
     beforeRouteEnter(to, from, next) {
       next(vm => {
-        if(from.path === '/examDetail') {
+        if(from.path === '/resCentreWrap') {
           vm.selectList = JSON.parse(JSON.stringify(vm.$store.getters.getResQuestionSelect))
             //先把selectList添加对应的examType
             vm.selectList.forEach(v => {
@@ -171,7 +174,6 @@
         })
       },
       handleAdd(isRemove, item) {
-        debugger
         if (isRemove) {
           // 移除
           const index = this.selectList.findIndex(v => v.examType === item.titleType)

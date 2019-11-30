@@ -84,6 +84,7 @@
     },
     mounted() {
       eventBus.$on("changeYear", (yearIndex,subjectType) => {
+        debugger
         this.yearIndex = yearIndex
         this.$set(this.versionList[this.yearIndex].gradeList[0],'check',true)
         const gradeItem = this.versionList[this.yearIndex].gradeList.find(v => v.check)
