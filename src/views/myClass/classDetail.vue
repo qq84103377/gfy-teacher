@@ -7,8 +7,8 @@
     </van-nav-bar>
     <div class="class-detail-wrap__body">
       <div class="mgb10">
-        <van-cell title="学生分组"/>
-        <van-cell v-for="(item,index) in groupList" :key="index"
+        <van-cell class='fs16' title="学生分组"/>
+        <van-cell class='pre-cell fs14' v-for="(item,index) in groupList" :key="index"
                   v-if="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupId>0"
                   :title="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupName"
                   @click="$router.push({name:'groupDetail',params:{curIndex:index,groupList,classId:$route.query.classId}})"
@@ -19,8 +19,8 @@
         </div>
       </div>
       <div>
-        <van-cell title="未分组学生"/>
-        <van-cell v-if="groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
+        <van-cell class="fs16" title="未分组学生"/>
+        <van-cell class='pre-cell fs14' v-if="groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
                   @click="visible=true;stuInfo=item"
                   v-for="(item,index) in groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent"
                   :key="index" is-link>
@@ -198,6 +198,9 @@
       }
       .group-leader-badge {
         background: #F0AD39;
+      }
+      .pre-cell{
+        padding-left: 25px;
       }
     }
 

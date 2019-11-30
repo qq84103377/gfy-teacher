@@ -119,8 +119,10 @@ export default {
     });
   },
   methods: {
-    toggle() {
-      this.$refs.dropdown.toggle();
+    toggle(data) {
+      this.$refs.dropdown.toggle()
+      this.courseName = data
+      this.dropdownRefresh()
     },
     async changeCourse(type) {
       if (type) {

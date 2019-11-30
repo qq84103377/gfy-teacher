@@ -4,8 +4,8 @@
       <img src="@assets/img/myself-icon-33.png" alt="">
     </div>
     <div class="service-body">
-      <p>教研员：李小玲</p>
-      <p>联系电话：18566860844</p>
+      <p>教研员：{{instructorInfo.name}}</p>
+      <p>联系电话：{{instructorInfo.contactNumber}}</p>
     </div>
 
     <div class="service-footer">
@@ -17,10 +17,17 @@
 </template>
 
 <script>
+  import {getMySchoolInfo} from '@/api/mine';
+
   export default {
     name: "service",
     data() {
-      return {}
+      return {
+        instructorInfo: {
+          name: '--',
+          contactNumber: '--'
+        }
+      }
     },
     methods: {
       handelClick() {
@@ -51,7 +58,34 @@
         }).catch(() => {
           // on cancel
         });
-      }
+      },
+      //获取学校信息
+      getMySchoolInfo() {
+        let obj = {
+          interUser: "runLfb",
+          interPwd: "25d55ad283aa400af464c76d713c07ad",
+          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+          userType: this.$store.getters.getUserInfo.roleType,
+          accountNo: this.$store.getters.getUserInfo.accountNo
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getMySchoolInfo(params).then(res => {
+          if (res.flag && res.data.length > 0) {
+            let mySchoolInfo = res.data[0].mySchoolInfo;
+            if (mySchoolInfo && mySchoolInfo.length > 0) {
+              this.instructorInfo = {
+                name: mySchoolInfo[0].instructorInfo.name,
+                contactNumber: mySchoolInfo[0].instructorInfo.userContactInfo[0].contactNumber
+              }
+            }
+          }
+        })
+      },
+    },
+    mounted() {
+      this.getMySchoolInfo();
     }
   }
 </script>
