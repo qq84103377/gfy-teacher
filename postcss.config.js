@@ -15,7 +15,12 @@ module.exports = {
       viewportUnit: 'vw',     // (String) Expected units.
       selectorBlackList: ['.ignore', '.hairlines'],  // (Array) The selectors to ignore and leave as px.
       minPixelValue: 1,       // (Number) Set the minimum pixel value to replace.
-      mediaQuery: false       // (Boolean) Allow px to be converted in media queries.
+      mediaQuery: false,       // (Boolean) Allow px to be converted in media queries.
+      // landscape: true, 
+      // // 横屏时使用的单位
+      // landscapeUnit: 'vh',            
+      // // 横屏时使用的视口宽度
+      // landscapeWidth: 200
     },
     "postcss-viewport-units":{},
     "cssnano": {

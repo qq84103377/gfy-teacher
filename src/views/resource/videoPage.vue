@@ -1,8 +1,9 @@
 <template>
   <div>
-    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' />
+    <!-- <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' /> -->
     <div class="video-box">
-      <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
+      <!-- <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'> -->
+      <van-nav-bar :title='title' left-arrow @click-left="$router.back()" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
 
       <video v-if='!isMp3' class="video" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
@@ -22,12 +23,12 @@
           <!-- //videoLength 总时间，currentTime 当前时间，videoTime 自定义过滤器 -->
           <span class="time-num">{{initVideo.videoLength | videoTime}}</span>
 
-          <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full">
+          <!-- <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full"> -->
           <!-- <van-icon name="coupon-o" color='#fff' class="icon-play fullscreen" @click.native="full" /> -->
         </div>
       </div>
 
-      <div class="video_control-full" data-way='0' v-show='isShowControl&&!isIphone' v-if='isFullscreen'>
+      <div class="video_control-full" data-way='0' v-show='isShowControl' v-if='isFullscreen'>
         <div class="progress">
           <van-icon v-if='!initVideo.play' name="play" color='#fff' class="icon-play" @click.native="playVideo" />
 
@@ -39,12 +40,12 @@
           <!-- //videoLength 总时间，currentTime 当前时间，videoTime 自定义过滤器 -->
           <span class="time-num">{{initVideo.videoLength | videoTime}}</span>
 
-          <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full">
+          <!-- <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full"> -->
           <!-- <van-icon name="coupon-o" color='#fff' class="icon-play fullscreen" @click.native="full" /> -->
         </div>
       </div>
 
-      <div class="video_control-full true" data-way='0' v-show='isShowControl&&isIphone' v-if='isFullscreen'>
+      <div class="video_control-full true" data-way='0' v-show='isShowControl&&isIphone00' v-if='isFullscreen00'>
         <div class="progress">
           <van-icon v-if='!initVideo.play' name="play" color='#fff' class="icon-play" @click.native="playVideo" />
 
@@ -61,7 +62,7 @@
         </div>
       </div>
 
-      <div class="forword-box" v-show='isFullscreen&&isIphone' v-if='isMove'>
+      <div class="forword-box" v-show='isFullscreen&&isIphone00' v-if='isMove'>
         <span>{{initVideo.currentTime | videoTime}}/{{initVideo.videoLength|videoTime}}</span>
       </div>
     </div>
@@ -125,7 +126,8 @@ export default {
       showMore: false,
       isMove: false,
       isIphone: false,
-      isMp3: this.$route.query.isMp3
+      isMp3: this.$route.query.isMp3,
+      isEnd: 0
     }
   },
   computed: {
@@ -138,6 +140,7 @@ export default {
       console.log('fullscreen');
       console.log(nv, 'fullscreen nv');
       console.log(ov, 'fullscreen ov');
+      return
       if (nv == false) {
         console.log(this.isFullscreen, "this.isFullscreen");
         // if (this.isFullscreen == false && this.isApp) {
@@ -171,6 +174,10 @@ export default {
       }
     },
   },
+  created() {
+    this.isFullscreen = true
+    screen.orientation.lock('landscape')
+  },
   mounted() {
     setTimeout(() => {
       if (this.$refs.video) {
@@ -190,6 +197,10 @@ export default {
     //   }
     // }
     const that = this
+
+    window.addEventListener('resize', this.handleResize)
+
+    return
 
     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
       console.log('苹果设备');
@@ -331,6 +342,10 @@ export default {
 
     // this.mql.removeListener(this.onMatchMeidaChange);
   },
+  beforeDestroy() {
+    screen.orientation.unlock()
+    window.removeEventListener('resize', this.handleResize)
+  },
   filters: {
     videoTime(value) {
       if (isNaN(value)) {
@@ -368,9 +383,12 @@ export default {
     //     this.isLandscape = true
     //   }
     // },
-    goVideoDetail(url) {
-      if (!url) return
-      this.$router.push({ name: 'videoDetail', query: { src: url } })
+    handleResize() {
+      var videobox = document.querySelector('.video-box');
+      console.log(window.document.body.offsetWidth, window.document.body.offsetHeight, window.document.body.clientWidth, window.document.body.clientHeight);
+      videobox.style.width = window.document.body.offsetWidth + "px"
+      videobox.style.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0) + "px"
+
     },
     playVideo() {//播放视频
 
@@ -437,8 +455,15 @@ export default {
           this.initVideo.currentTime = this.$refs.video.currentTime
         }
         if (this.$refs.video.ended) {
-          this.$router.back()
-          // this.full()
+          this.isEnd++
+          if (this.isEnd == 1) {
+            if (this.isFullscreen) {
+              this.$router.back()
+              // this.full()
+            } else {
+              this.$router.back()
+            }
+          }
         }
       }
     },
@@ -596,14 +621,14 @@ export default {
 @deep: ~">>>";
 .video-box {
   width: 100%;
-  height: 216px;
+  height: 120px;
   background: #eeeeee;
   // position: relative;
   position: absolute;
-  top: 50%;
-  // margin-top: 50%;
-  transform: translateY(-50%);
-  overflow: hidden;
+  // top: 50%;
+  // // margin-top: 50%;
+  // transform: translateY(-50%);
+  // overflow: hidden;
   .forword-box {
     position: absolute;
     top: 50%;
