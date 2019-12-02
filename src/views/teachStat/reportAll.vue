@@ -1,7 +1,7 @@
 <template>
   <section class="report-all-wrap">
     <van-nav-bar
-      :title="(getStudentName($route.query.accountNo,$route.query.classId))+'的家庭报告'"
+      :title="$route.query.stuName+'的家庭报告'"
       @click-left="$router.back()"
       left-arrow/>
     <div class="report-all-wrap__body">
@@ -87,7 +87,7 @@
     <div class="report-all-wrap__footer">
       <van-button class="btn" type="info" @click="shareBarShow=true">分享给家长</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="(getStudentName($route.query.accountNo,$route.query.classId))+'的家庭报告'" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="$route.query.stuName+'的家庭报告'" :link="link"></share-bar>
   </section>
 </template>
 

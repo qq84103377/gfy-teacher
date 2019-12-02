@@ -153,7 +153,7 @@
     },
     methods: {
       viewAll() {
-        this.$router.push(`/reportAll?accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
+        this.$router.push(`/reportAll?stuName=${getStudentName(this.stuList[this.stuIndex].accountNo,this.stuList[this.stuIndex].classId)}&accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
       },
       createReport() {
         console.log(this.$refs['body'].scrollTop,'wieieieieie');
