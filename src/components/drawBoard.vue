@@ -763,7 +763,7 @@ export default {
       });
     },
     handleResize() {
-      console.log('handleResize()');
+      console.log('handleResize()xxxxxx');
       this.offCanvas.width = window.document.body.offsetWidth
       this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
       // offCanvas.height = $(window).height() - footerHeight;
