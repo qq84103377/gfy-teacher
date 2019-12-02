@@ -101,6 +101,8 @@ function getDirection(startx, starty, endx, endy) {
     result = 4;
   }
 
+
+
   return result;
 }
 
