@@ -1,9 +1,8 @@
 <template>
   <div>
-    <!-- <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' /> -->
+    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' />
     <div class="video-box">
-      <!-- <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'> -->
-      <van-nav-bar :title='title' left-arrow @click-left="$router.back()" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
+      <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
 
       <video v-if='!isMp3' class="video" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
@@ -23,12 +22,12 @@
           <!-- //videoLength 总时间，currentTime 当前时间，videoTime 自定义过滤器 -->
           <span class="time-num">{{initVideo.videoLength | videoTime}}</span>
 
-          <!-- <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full"> -->
+          <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full">
           <!-- <van-icon name="coupon-o" color='#fff' class="icon-play fullscreen" @click.native="full" /> -->
         </div>
       </div>
 
-      <div class="video_control-full" data-way='0' v-show='isShowControl' v-if='isFullscreen'>
+      <div class="video_control-full" data-way='0' v-show='isShowControl&&!isIphone' v-if='isFullscreen'>
         <div class="progress">
           <van-icon v-if='!initVideo.play' name="play" color='#fff' class="icon-play" @click.native="playVideo" />
 
@@ -40,12 +39,12 @@
           <!-- //videoLength 总时间，currentTime 当前时间，videoTime 自定义过滤器 -->
           <span class="time-num">{{initVideo.videoLength | videoTime}}</span>
 
-          <!-- <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full"> -->
+          <img class="fullscreen" src="../../assets/img/quanpin.png" alt="" @click="full">
           <!-- <van-icon name="coupon-o" color='#fff' class="icon-play fullscreen" @click.native="full" /> -->
         </div>
       </div>
 
-      <div class="video_control-full true" data-way='0' v-show='isShowControl&&isIphone' v-if='isFullscreen00'>
+      <div class="video_control-full true" data-way='0' v-show='isShowControl&&isIphone' v-if='isFullscreen'>
         <div class="progress">
           <van-icon v-if='!initVideo.play' name="play" color='#fff' class="icon-play" @click.native="playVideo" />
 
@@ -101,8 +100,6 @@ function getDirection(startx, starty, endx, endy) {
     result = 4;
   }
 
-
-
   return result;
 }
 
@@ -129,8 +126,7 @@ export default {
       isMove: false,
       isIphone: false,
       isMp3: this.$route.query.isMp3,
-      isEnd: 0,
-      isFullscreen00:false
+      isEnd: 0
     }
   },
   computed: {
@@ -139,47 +135,42 @@ export default {
     })),
   },
   watch: {
-    // fullscreen(nv, ov) {
-    //   console.log('fullscreen');
-    //   console.log(nv, 'fullscreen nv');
-    //   console.log(ov, 'fullscreen ov');
-    //   return
-    //   if (nv == false) {
-    //     console.log(this.isFullscreen, "this.isFullscreen");
-    //     // if (this.isFullscreen == false && this.isApp) {
-    //     if (document.cancelFullScreen) {
-    //       document.cancelFullScreen();
-    //     } else if (document.mozCancelFullScreen) {
-    //       document.mozCancelFullScreen();
-    //     } else if (document.webkitCancelFullScreen) {
-    //       document.webkitCancelFullScreen();
-    //     } else if (document.webkitExitFullScreen) {
-    //       document.webkitExitFullScreen()
-    //     }
-    //     this.isFullscreen = false
+    fullscreen(nv, ov) {
+      console.log('fullscreen');
+      console.log(nv, 'fullscreen nv');
+      console.log(ov, 'fullscreen ov');
+      if (nv == false) {
+        console.log(this.isFullscreen, "this.isFullscreen");
+        // if (this.isFullscreen == false && this.isApp) {
+        if (document.cancelFullScreen) {
+          document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+          document.webkitCancelFullScreen();
+        } else if (document.webkitExitFullScreen) {
+          document.webkitExitFullScreen()
+        }
+        this.isFullscreen = false
 
-    //     if (this.isIphone) {
-    //       console.log('苹果设备');
+        if (this.isIphone) {
+          console.log('苹果设备');
 
-    //       var docHtml = document.documentElement;
-    //       var docBody = document.body;
-    //       var videobox = document.querySelector('.video-box');
-    //       docHtml.style.cssText = "";
-    //       docBody.style.cssText = "";
-    //       videobox.style.cssText = "";
-    //     } else {
-    //       screen.orientation.unlock()
-    //       var videobox = document.querySelector('.video-box');
-    //       videobox.style.cssText = "";
-    //     }
+          var docHtml = document.documentElement;
+          var docBody = document.body;
+          var videobox = document.querySelector('.video-box');
+          docHtml.style.cssText = "";
+          docBody.style.cssText = "";
+          videobox.style.cssText = "";
+        } else {
+          screen.orientation.unlock()
+          var videobox = document.querySelector('.video-box');
+          videobox.style.cssText = "";
+        }
 
-    //     // }
-    //   }
-    // },
-  },
-  created() {
-    this.isFullscreen = true
-    screen.orientation.lock('landscape')
+        // }
+      }
+    },
   },
   mounted() {
     setTimeout(() => {
@@ -201,153 +192,145 @@ export default {
     // }
     const that = this
 
-    window.addEventListener('resize', this.handleResize)
+    if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+      console.log('苹果设备');
+      this.isIphone = true
 
-    return
+      let fullBox = document.querySelector('.video-box')
 
-    // if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
-    //   console.log('苹果设备');
-    //   this.isIphone = true
+      //手指接触屏幕
+      fullBox.addEventListener("touchstart", function (e) {
+        startx = e.touches[0].pageX;
+        starty = e.touches[0].pageY;
+        curLength = that.initVideo.currentTime
 
-    //   let fullBox = document.querySelector('.video-box')
+      }, false);
+      fullBox.addEventListener("touchmove", function (e) {
+        var movex, movey
+        movex = e.touches[0].pageX;
+        movey = e.touches[0].pageY;
+        if (that.isFullscreen) {
+          that.isMove = true
+          if (that.$refs.video) {
+            that.$refs.video.pause()
+          }
+        }
+        var direction = getDirection(startx, starty, movex, movey);
+        switch (direction) {
+          case 0:
+            console.log("未滑动！");
+            break;
+          case 1:
+            if (that.isFullscreen) {
+              console.log("向上！")
+              let changelength = movey - starty
+              console.log(changelength, 'changelength');
+              that.initVideo.currentTime = curLength + parseInt(changelength / 2)
+              if (that.initVideo.currentTime <= 0) {
+                that.initVideo.currentTime = 0
+              }
+              if (that.initVideo.currentTime > that.initVideo.videoLength) {
+                that.initVideo.currentTime = that.initVideo.videoLength - 5
+              }
 
-    //   //手指接触屏幕
-    //   fullBox.addEventListener("touchstart", function (e) {
-    //     startx = e.touches[0].pageX;
-    //     starty = e.touches[0].pageY;
-    //     curLength = that.initVideo.currentTime
+            }
 
-    //   }, false);
-    //   fullBox.addEventListener("touchmove", function (e) {
-    //     var movex, movey
-    //     movex = e.touches[0].pageX;
-    //     movey = e.touches[0].pageY;
-    //     if (that.isFullscreen) {
-    //       that.isMove = true
-    //       if (that.$refs.video) {
-    //         that.$refs.video.pause()
-    //       }
-    //     }
-    //     var direction = getDirection(startx, starty, movex, movey);
-    //     switch (direction) {
-    //       case 0:
-    //         console.log("未滑动！");
-    //         break;
-    //       case 1:
-    //         if (that.isFullscreen) {
-    //           console.log("向上！")
-    //           let changelength = movey - starty
-    //           console.log(changelength, 'changelength');
-    //           that.initVideo.currentTime = curLength + parseInt(changelength / 2)
-    //           if (that.initVideo.currentTime <= 0) {
-    //             that.initVideo.currentTime = 0
-    //           }
-    //           if (that.initVideo.currentTime > that.initVideo.videoLength) {
-    //             that.initVideo.currentTime = that.initVideo.videoLength - 5
-    //           }
+            break;
+          case 2:
+            if (that.isFullscreen) {
+              console.log("向下！")
+              let changelength = movey - starty
+              console.log(changelength, 'changelength');
+              that.initVideo.currentTime = curLength + parseInt(changelength / 2)
+              if (that.initVideo.currentTime <= 0) {
+                that.initVideo.currentTime = 0
+              }
+              if (that.initVideo.currentTime > that.initVideo.videoLength) {
+                that.initVideo.currentTime = that.initVideo.videoLength - 5
+              }
 
-    //         }
+            }
+            break;
+          case 3:
+            console.log("向左！")
+            break;
+          case 4:
+            console.log("向右！")
+            break;
+          default:
+        }
 
-    //         break;
-    //       case 2:
-    //         if (that.isFullscreen) {
-    //           console.log("向下！")
-    //           let changelength = movey - starty
-    //           console.log(changelength, 'changelength');
-    //           that.initVideo.currentTime = curLength + parseInt(changelength / 2)
-    //           if (that.initVideo.currentTime <= 0) {
-    //             that.initVideo.currentTime = 0
-    //           }
-    //           if (that.initVideo.currentTime > that.initVideo.videoLength) {
-    //             that.initVideo.currentTime = that.initVideo.videoLength - 5
-    //           }
+      }, false);
+      //手指离开屏幕
+      fullBox.addEventListener("touchend", function (e) {
+        var endx, endy;
+        endx = e.changedTouches[0].pageX;
+        endy = e.changedTouches[0].pageY;
+        var direction = getDirection(startx, starty, endx, endy);
+        if (that.isFullscreen) {
+          that.isMove = false
+          if (that.$refs.video) {
+            that.$refs.video.play()
+          }
+        }
+        switch (direction) {
+          case 0:
+            console.log("未滑动！");
+            break;
+          case 1:
+            if (that.isFullscreen) {
+              console.log("向上！")
 
-    //         }
-    //         break;
-    //       case 3:
-    //         console.log("向左！")
-    //         break;
-    //       case 4:
-    //         console.log("向右！")
-    //         break;
-    //       default:
-    //     }
+              // let changelength = endy - starty
+              // console.log(changelength, 'changelength');
+              // that.initVideo.currentTime = that.initVideo.currentTime + parseInt(changelength /2)
+              // if (that.initVideo.currentTime <= 0) {
+              //   that.initVideo.currentTime = 0
+              // }
+              // if (that.initVideo.currentTime > that.initVideo.videoLength) {
+              //   that.initVideo.currentTime = that.initVideo.videoLength - 5
+              // }
+              if (that.$refs.video) {
+                that.$refs.video.currentTime = that.initVideo.currentTime;
+              }
+            }
+            break;
+          case 2:
+            if (that.isFullscreen) {
+              console.log("向下！")
 
-    //   }, false);
-    //   //手指离开屏幕
-    //   fullBox.addEventListener("touchend", function (e) {
-    //     var endx, endy;
-    //     endx = e.changedTouches[0].pageX;
-    //     endy = e.changedTouches[0].pageY;
-    //     var direction = getDirection(startx, starty, endx, endy);
-    //     if (that.isFullscreen) {
-    //       that.isMove = false
-    //       if (that.$refs.video) {
-    //         that.$refs.video.play()
-    //       }
-    //     }
-    //     switch (direction) {
-    //       case 0:
-    //         console.log("未滑动！");
-    //         break;
-    //       case 1:
-    //         if (that.isFullscreen) {
-    //           console.log("向上！")
+              // let changelength = endy - starty
+              // console.log(changelength, 'changelength');
+              // that.initVideo.currentTime = that.initVideo.currentTime + parseInt(changelength /2)
+              // if (that.initVideo.currentTime <= 0) {
+              //   that.initVideo.currentTime = 0
+              // }
+              // if (that.initVideo.currentTime > that.initVideo.videoLength) {
+              //   that.initVideo.currentTime = that.initVideo.videoLength - 5
+              // }
+              if (that.$refs.video) {
+                that.$refs.video.currentTime = that.initVideo.currentTime;
+              }
+            }
 
-    //           // let changelength = endy - starty
-    //           // console.log(changelength, 'changelength');
-    //           // that.initVideo.currentTime = that.initVideo.currentTime + parseInt(changelength /2)
-    //           // if (that.initVideo.currentTime <= 0) {
-    //           //   that.initVideo.currentTime = 0
-    //           // }
-    //           // if (that.initVideo.currentTime > that.initVideo.videoLength) {
-    //           //   that.initVideo.currentTime = that.initVideo.videoLength - 5
-    //           // }
-    //           if (that.$refs.video) {
-    //             that.$refs.video.currentTime = that.initVideo.currentTime;
-    //           }
-    //         }
-    //         break;
-    //       case 2:
-    //         if (that.isFullscreen) {
-    //           console.log("向下！")
+            break;
+          case 3:
+            console.log("向左！")
+            break;
+          case 4:
+            console.log("向右！")
+            break;
+          default:
+        }
+      }, false);
 
-    //           // let changelength = endy - starty
-    //           // console.log(changelength, 'changelength');
-    //           // that.initVideo.currentTime = that.initVideo.currentTime + parseInt(changelength /2)
-    //           // if (that.initVideo.currentTime <= 0) {
-    //           //   that.initVideo.currentTime = 0
-    //           // }
-    //           // if (that.initVideo.currentTime > that.initVideo.videoLength) {
-    //           //   that.initVideo.currentTime = that.initVideo.videoLength - 5
-    //           // }
-    //           if (that.$refs.video) {
-    //             that.$refs.video.currentTime = that.initVideo.currentTime;
-    //           }
-    //         }
-
-    //         break;
-    //       case 3:
-    //         console.log("向左！")
-    //         break;
-    //       case 4:
-    //         console.log("向右！")
-    //         break;
-    //       default:
-    //     }
-    //   }, false);
-
-    // }
-    // // this.onMatchMeidaChange(this.mql);
-    // // this.mql.addListener(this.onMatchMeidaChange);
+    }
+    // this.onMatchMeidaChange(this.mql);
+    // this.mql.addListener(this.onMatchMeidaChange);
   },
   deactivated() {
 
     // this.mql.removeListener(this.onMatchMeidaChange);
-  },
-  beforeDestroy() {
-    screen.orientation.unlock()
-    window.removeEventListener('resize', this.handleResize)
   },
   filters: {
     videoTime(value) {
@@ -386,12 +369,9 @@ export default {
     //     this.isLandscape = true
     //   }
     // },
-    handleResize() {
-      var videobox = document.querySelector('.video-box');
-      console.log(window.document.body.offsetWidth, window.document.body.offsetHeight, window.document.body.clientWidth, window.document.body.clientHeight);
-      videobox.style.width = window.document.body.offsetWidth + "px"
-      videobox.style.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0) + "px"
-
+    goVideoDetail(url) {
+      if (!url) return
+      this.$router.push({ name: 'videoDetail', query: { src: url } })
     },
     playVideo() {//播放视频
 
@@ -461,8 +441,7 @@ export default {
           this.isEnd++
           if (this.isEnd == 1) {
             if (this.isFullscreen) {
-              this.$router.back()
-              // this.full()
+              this.full()
             } else {
               this.$router.back()
             }
@@ -490,132 +469,132 @@ export default {
         }
       }
     },
-    // full() {
-    //   // if (window.orientation == 180 || window.orientation == 0) {
-    //   //   // alert("竖屏");
-    //   //   console.log("竖屏");
-    //   //   this.isFullscreen = false
-    //   // }
-    //   // if (window.orientation == 90 || window.orientation == -90) {
-    //   //   // alert("横屏");
-    //   //   console.log("横屏");
-    //   //   this.isFullscreen = true
-    //   // }
+    full() {
+      // if (window.orientation == 180 || window.orientation == 0) {
+      //   // alert("竖屏");
+      //   console.log("竖屏");
+      //   this.isFullscreen = false
+      // }
+      // if (window.orientation == 90 || window.orientation == -90) {
+      //   // alert("横屏");
+      //   console.log("横屏");
+      //   this.isFullscreen = true
+      // }
 
-    //   if (!this.isFullscreen) {
-    //     if (!this.isPlay) {
-    //       if (this.$refs.video) {
-    //         this.$refs.video.play()
-    //         this.timeID = setTimeout(() => {
-    //           this.isShowControl = false
-    //         }, 4000)
-    //       }
-    //     }
-
-
-
-    //     var ele = document.querySelector('.video-box')
-    //     if (ele.requestFullscreen) {
-    //       console.log('ele.requestFullscreen()');
-    //       ele.requestFullscreen()
-    //     } else if (ele.mozRequestFullScreen) {
-    //       console.log("ele.mozRequestFullScreen()");
-    //       ele.mozRequestFullScreen()
-    //     } else if (ele.webkitRequestFullScreen) {
-    //       //安卓微信
-    //       console.log('ele.webkitRequestFullScreen()');
-    //       ele.webkitRequestFullScreen()
-    //     } else {
-    //       console.log('全屏进入else');
-    //     }
-
-    //     ele.style.position = 'relative'
-    //     ele.style.top = 0
-    //     ele.style.transform = "translateY(0)"
-
-    //     function horizontalScreen(className) {
-    //       // document.querySelector(className).style.marginTop = 0
-    //       // document.querySelector(className).style.transform = ""
-    //       // transform 强制横屏
-    //       var conW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    //       var conH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-    //       document.querySelector(className).style.transform = "rotate(90deg) translate(" + ((conH - conW) / 2) + "px," + ((conH - conW) / 2) + "px)"
-    //       document.querySelector(className).style.width = conH + "px"
-    //       document.querySelector(className).style.height = conW + "px"
-    //       document.querySelector(className).style.transformOrigin = "center center"
-    //       document.querySelector(className).style.webkitTransformOrigin = "center center"
-    //       document.querySelector(className).style.zIndex = '9999999999'
-    //       // if (document.querySelector("video")) {
-    //       //   document.querySelector("video").style.zIndex = '100'
-    //       // }
-
-    //       console.log(conW, 'conW');
-    //       console.log(conH, 'conH');
-    //       console.log(document.documentElement, 'document.documentElement');
-
-    //       var max = conW > conH ? conW : conH;
-    //       var min = conW > conH ? conH : conW;
-    //       document.querySelector(className).style.width = max + "px";
-    //       document.querySelector(className).style.height = min + "px";
-
-    //     }
-    //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
-    //       console.log('苹果设备');
-    //       horizontalScreen('.video-box')
-    //     } else {
-    //       screen.orientation.lock('landscape')
-    //     }
-    //     this.isFullscreen = true
-    //     console.log(this.isFullscreen, "进去全屏的isFullscreen");
-
-    //     setTimeout(() => {
-    //       if (this.$refs.video) {
-    //         this.$refs.video.play()
-    //       }
-    //     }, 0);
-
-    //   } else {
+      if (!this.isFullscreen) {
+        if (!this.isPlay) {
+          if (this.$refs.video) {
+            this.$refs.video.play()
+            this.timeID = setTimeout(() => {
+              this.isShowControl = false
+            }, 4000)
+          }
+        }
 
 
-    //     if (document.cancelFullScreen) {
-    //       console.log('document.cancelFullScreen()');
-    //       document.cancelFullScreen();
-    //     } else if (document.mozCancelFullScreen) {
-    //       console.log('document.mozCancelFullScreen()');
-    //       document.mozCancelFullScreen();
-    //     } else if (document.webkitCancelFullScreen) {
-    //       console.log('document.webkitCancelFullScreen()');
-    //       //安卓微信
-    //       document.webkitCancelFullScreen();
-    //     } else if (document.webkitExitFullScreen) {
-    //       console.log('document.webkitExitFullScreen()');
-    //       document.webkitExitFullScreen()
-    //     } else {
-    //       console.log('退出全屏进入else');
-    //     }
 
-    //     if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
-    //       console.log('苹果设备');
+        var ele = document.querySelector('.video-box')
+        if (ele.requestFullscreen) {
+          console.log('ele.requestFullscreen()');
+          ele.requestFullscreen()
+        } else if (ele.mozRequestFullScreen) {
+          console.log("ele.mozRequestFullScreen()");
+          ele.mozRequestFullScreen()
+        } else if (ele.webkitRequestFullScreen) {
+          //安卓微信
+          console.log('ele.webkitRequestFullScreen()');
+          ele.webkitRequestFullScreen()
+        } else {
+          console.log('全屏进入else');
+        }
 
-    //       var docHtml = document.documentElement;
-    //       var docBody = document.body;
-    //       var videobox = document.querySelector('.video-box');
-    //       docHtml.style.cssText = "";
-    //       docBody.style.cssText = "";
-    //       videobox.style.cssText = "";
-    //     } else {
-    //       screen.orientation.unlock()
-    //       var videobox = document.querySelector('.video-box');
-    //       videobox.style.cssText = "";
-    //     }
+        ele.style.position = 'relative'
+        ele.style.top = 0
+        ele.style.transform = "translateY(0)"
 
-    //     this.isFullscreen = false
-    //     console.log(this.isFullscreen, "退出全屏的isFullscreen");
-    //     this.$router.back()
-    //   }
+        function horizontalScreen(className) {
+          // document.querySelector(className).style.marginTop = 0
+          // document.querySelector(className).style.transform = ""
+          // transform 强制横屏
+          var conW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+          var conH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-    // },
+          document.querySelector(className).style.transform = "rotate(90deg) translate(" + ((conH - conW) / 2) + "px," + ((conH - conW) / 2) + "px)"
+          document.querySelector(className).style.width = conH + "px"
+          document.querySelector(className).style.height = conW + "px"
+          document.querySelector(className).style.transformOrigin = "center center"
+          document.querySelector(className).style.webkitTransformOrigin = "center center"
+          document.querySelector(className).style.zIndex = '9999999999'
+          // if (document.querySelector("video")) {
+          //   document.querySelector("video").style.zIndex = '100'
+          // }
+
+          console.log(conW, 'conW');
+          console.log(conH, 'conH');
+          console.log(document.documentElement, 'document.documentElement');
+
+          var max = conW > conH ? conW : conH;
+          var min = conW > conH ? conH : conW;
+          document.querySelector(className).style.width = max + "px";
+          document.querySelector(className).style.height = min + "px";
+
+        }
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+          console.log('苹果设备');
+          horizontalScreen('.video-box')
+        } else {
+          screen.orientation.lock('landscape')
+        }
+        this.isFullscreen = true
+        console.log(this.isFullscreen, "进去全屏的isFullscreen");
+
+        setTimeout(() => {
+          if (this.$refs.video) {
+            this.$refs.video.play()
+          }
+        }, 0);
+
+      } else {
+
+
+        if (document.cancelFullScreen) {
+          console.log('document.cancelFullScreen()');
+          document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+          console.log('document.mozCancelFullScreen()');
+          document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+          console.log('document.webkitCancelFullScreen()');
+          //安卓微信
+          document.webkitCancelFullScreen();
+        } else if (document.webkitExitFullScreen) {
+          console.log('document.webkitExitFullScreen()');
+          document.webkitExitFullScreen()
+        } else {
+          console.log('退出全屏进入else');
+        }
+
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+          console.log('苹果设备');
+
+          var docHtml = document.documentElement;
+          var docBody = document.body;
+          var videobox = document.querySelector('.video-box');
+          docHtml.style.cssText = "";
+          docBody.style.cssText = "";
+          videobox.style.cssText = "";
+        } else {
+          screen.orientation.unlock()
+          var videobox = document.querySelector('.video-box');
+          videobox.style.cssText = "";
+        }
+
+        this.isFullscreen = false
+        console.log(this.isFullscreen, "退出全屏的isFullscreen");
+        this.$router.back()
+      }
+
+    },
   },
 }
 </script>
@@ -628,10 +607,10 @@ export default {
   background: #eeeeee;
   // position: relative;
   position: absolute;
-  // top: 50%;
-  // // margin-top: 50%;
-  // transform: translateY(-50%);
-  // overflow: hidden;
+  top: 50%;
+  // margin-top: 50%;
+  transform: translateY(-50%);
+  overflow: hidden;
   .forword-box {
     position: absolute;
     top: 50%;
