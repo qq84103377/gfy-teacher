@@ -132,11 +132,12 @@ export default {
     this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
   },
   mounted() {
-    this.getMySchoolInfo()
-    this.getGradeTermInfo()
-    this.getPublishByRole()
-    this.getClassTeacherCourseDeploy()
-
+    this.$store.commit('setVanLoading',true)
+    Promise.all([this.getMySchoolInfo(),this.getGradeTermInfo(),this.getPublishByRole(),this.getClassTeacherCourseDeploy()]).then(res => {
+      this.$store.commit('setVanLoading',false)
+    }).catch(err => {
+      this.$store.commit('setVanLoading',false)
+    })
     eventBus.$off("indexEditTask")
     eventBus.$on("indexEditTask", (data) => {
       console.log("index eventbus");
@@ -264,7 +265,7 @@ export default {
         }
       })
     },
-    getMySchoolInfo() {
+    async getMySchoolInfo() {
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -275,7 +276,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
 
-      getMySchoolInfo(params).then(res => {
+     await getMySchoolInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           //重构数据
@@ -442,7 +443,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-      getGradeTermInfo(params).then(res => {
+     await getGradeTermInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           this.$store.commit('setGradeTermList', res.resGradeTermList)
@@ -464,7 +465,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-      getPublishByRole(params).then(res => {
+      await getPublishByRole(params).then(res => {
         console.log(res)
         if (res.flag) {
           this.publishList = res.data
@@ -480,7 +481,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-      getClassTeacherCourseDeploy(params).then(res => {
+      await getClassTeacherCourseDeploy(params).then(res => {
         if (res.flag) {
           if (!res.data || res.data.length == 0) {
             this.$toast("未配置建课信息，请联系管理人员")
@@ -491,7 +492,9 @@ export default {
           let gradeMap = {}
           let dataList = res.data
           dataList.forEach(item => {
-            gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
+            if(item.gradeTermInfo) {
+              gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
+            }
           })
           let deployList = []
           let gradeTermMap = {}
@@ -504,18 +507,20 @@ export default {
             let termList = [];
 
             dataList.forEach(item => {
-              gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
-              if (k === item.gradeTermInfo.grade) {
-                if (!bookMap[item.textBookId]) {
-                  bookMap[item.textBookId] = item.textBookName
-                  bookList.push({
-                    textBookId: item.textBookId,
-                    textBookName: item.textBookName
-                  })
-                }
-                if (!termMap[item.gradeTermInfo.term]) {
-                  termMap[item.gradeTermInfo.term] = item.gradeTermInfo.term
-                  termList.push(termMap[item.gradeTermInfo.term])
+              if(item.gradeTermInfo) {
+                gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
+                if (k === item.gradeTermInfo.grade) {
+                  if (!bookMap[item.textBookId]) {
+                    bookMap[item.textBookId] = item.textBookName
+                    bookList.push({
+                      textBookId: item.textBookId,
+                      textBookName: item.textBookName
+                    })
+                  }
+                  if (!termMap[item.gradeTermInfo.term]) {
+                    termMap[item.gradeTermInfo.term] = item.gradeTermInfo.term
+                    termList.push(termMap[item.gradeTermInfo.term])
+                  }
                 }
               }
             })
