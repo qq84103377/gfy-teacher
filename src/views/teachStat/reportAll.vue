@@ -94,7 +94,7 @@
 <script>
   import shareBar from '../../components/shareBar'
   import echarts from "echarts";
-  import {getSubjectName, getStudentName, getTaskTypeName} from '@/utils/filter'
+  import {getSubjectName, getTaskTypeName} from '@/utils/filter'
   import {getUserKnowledgePointCounter, statStuTaskFinishInfo, getStudentScoreStatistics} from '@/api/index'
   import * as calculate from '@/utils/calculate'
 
@@ -102,9 +102,6 @@
     name: "reportAll",
     components: {shareBar},
     computed: {
-      getStudentName() {
-        return getStudentName
-      },
       link() {
         return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
       }

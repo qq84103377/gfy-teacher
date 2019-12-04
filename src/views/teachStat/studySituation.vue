@@ -18,12 +18,16 @@
         </div>
       </div>
       <div>
-        <div class="echart-label">知识点掌握情况</div>
+        <div class="aic jcsb">
+          <div class="echart-label">知识点掌握情况</div>
+          <div :class="['rein-btn',{active:barIndexArr.length}]" v-if="isReinforce" @click="showSelectKnw">智能补强</div>
+        </div>
         <div v-show="!kwgNotEnough" id="myChart2" ref="myChart2" class="histogram-chart mgt10"></div>
         <div v-if="kwgNotEnough" class="empty-page mgb20">
           <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
           <div class="grey9 fs12">知识点数据不足~</div>
         </div>
+        <div class="select-tip" v-if="isReinforce">点击知识点(选择),再点击智能补强,方可进行智能补强。</div>
       </div>
     </div>
     <div v-show="!isClass">
@@ -48,12 +52,16 @@
               </div>
             </div>
             <div>
-              <div class="echart-label">知识点掌握情况</div>
+              <div class="aic jcsb">
+                <div class="echart-label">知识点掌握情况</div>
+                <div :class="['rein-btn',{active:item.barIndexArr&&item.barIndexArr.length}]"  v-if="isReinforce" @click="showSelectKnw(item)">智能补强</div>
+              </div>
               <div v-show="!item.kwgNotEnough" :id="'his-stu'+index" class="histogram-chart mgt10"></div>
               <div v-if="item.kwgNotEnough" class="empty-page">
                 <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
                 <div class="grey9 fs12">知识点数据不足~</div>
               </div>
+              <div class="select-tip" v-if="isReinforce">点击知识点(选择),再点击智能补强,方可进行智能补强。</div>
             </div>
           </div>
         </div>
@@ -69,6 +77,7 @@
 
   export default {
     name: "studySituation",
+    props: ['isReinforce'],
     data() {
       return {
         gradeSubjectList: JSON.parse(JSON.stringify(this.$parent.gradeSubjectList)),
@@ -76,8 +85,9 @@
         kwgNotEnough: false,
         isClass: true,
         stuList: JSON.parse(localStorage.classMap)[this.$parent.classIndex].studentInfo,
-        stuAccountNo: '',
-        stuIndex: 0
+        barOption: {},
+        barIndexArr: [],
+        xData: [], //记录班级数据的知识点
       }
     },
     watch: {
@@ -88,12 +98,6 @@
         deep: true,
         immediate: true
       },
-      // 'filterParams.classId': {
-      //   handler() {
-      //     this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
-      //     this.stuAccountNo = ''
-      //   },
-      // }
     },
     computed: {
       filterParams() {
@@ -108,13 +112,26 @@
       // this.init()
     },
     methods: {
+      showSelectKnw(item) {
+        if(this.isClass) {
+          if(this.barIndexArr.length) {
+            this.$emit('showPop',this.xData.filter((v,i) => this.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType)
+          }else {
+            this.$toast('请选择知识点')
+          }
+        }else {
+          if(item.barIndexArr.length) {
+            this.$emit('showPop',item.xData.filter((v,i) => item.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType)
+          }else {
+            this.$toast('请选择知识点')
+          }
+        }
+      },
       handleLoad() {
         if (this.isClass) {
           this.init()
-        } else {
-          this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
-          this.stuAccountNo = ''
         }
+          this.stuList = JSON.parse(localStorage.classMap)[this.filterParams.classId].studentInfo
       },
       toggleTab(bol) {
         if (this.isClass === bol) return
@@ -126,16 +143,13 @@
       selectStu(item, index) {
 
         this.$set(item, 'fold', !item.fold)
-        if (this.stuAccountNo !== item.accountNo) {
-          this.stuAccountNo = item.accountNo
-          this.stuIndex = index
+        if(!item.done) {
           this.$nextTick(() => {
-            this.init(item.accountNo, index)
+            this.init(item, index)
           })
         }
-
       },
-      init(accountNo, index) {
+      init(item, index) {
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -148,12 +162,15 @@
           ...this.filterParams,
           beignDate: this.$parent.filterTime.start,
           endDate: this.$parent.filterTime.end,
-          accountNo
+          accountNo:item?item.accountNo:''
         };
         let params = {
           requestJson: JSON.stringify(obj)
         }
         getUserKnowledgePointCounterV2(params).then(res => {
+          if(!this.isClass) {
+            this.$set(item,'done',true)
+          }
           if (res.flag) {
             let courseList = [],
               courseIdList = [],
@@ -168,8 +185,8 @@
                 v['knowledgePointItem'] = [];
                 v['courseAllCount'] = 0;
                 v['courseRightCount'] = 0;
-                v['otherAllCount'] = otherItem.contrastTotalCount||0;
-                v['otherRightCount'] = otherItem.contrastRightCount||0;
+                v['otherAllCount'] = otherItem.contrastTotalCount || 0;
+                v['otherRightCount'] = otherItem.contrastRightCount || 0;
                 courseList.push(v)
               }
               courseList[courseIdList.indexOf(v.courseKnowledgePointItem[0].courseId)].knowledgePointItem.push(v.courseKnowledgePointItem[0].knowledgePointItem[0]);
@@ -188,32 +205,37 @@
                   'courseList': [],
                   'sectionAllCount': 0,
                   'sectionRightCount': 0,
-                  'otherAllCount' : obj.otherAllCount,
-                'otherRightCount' : obj.otherRightCount
+                  'otherAllCount': obj.otherAllCount,
+                  'otherRightCount': obj.otherRightCount
                 });
               }
               sessionList[sessionIndexList.indexOf(obj.sessionIndex)].courseList.push(obj);
               sessionList[sessionIndexList.indexOf(obj.sessionIndex)].sectionAllCount += parseInt(obj.courseAllCount);
               sessionList[sessionIndexList.indexOf(obj.sessionIndex)].sectionRightCount += parseInt(obj.courseRightCount);
               obj.knowledgePointItem.forEach(k => {
-                xData.push(k.knowledgePointName);
+                xData.push({name:k.knowledgePointName,id:k.knowledgePointId,mastery:(((k.rigthCount||0) / k.totalCount) * 100).toFixed(2)});
                 totalCounts.push(k.totalCount);
-                rigthCounts.push(k.rigthCount);
-                masterys.push(((k.rigthCount / k.totalCount) * 100).toFixed(2));
+                rigthCounts.push(k.rigthCount||0);
+                masterys.push((((k.rigthCount||0) / k.totalCount) * 100).toFixed(2));
                 if (k.totalCount > max) {
                   max = k.totalCount;
                 }
               })
             })
             //柱状图
-            this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max, index);
+            if(this.isClass) {
+              this.xData = xData
+            }else {
+              this.$set(item,'xData',xData)
+            }
+            this.setCourseOption(xData, totalCounts, rigthCounts, masterys, max, index,item);
 
             sessionList.forEach(o => {
-             const otherObj = o.courseList.reduce((t,course) => {
-               t.otherAllCount = calculate.add(course.otherAllCount,t.otherAllCount)
-               t.otherRightCount = calculate.add(course.otherRightCount,t.otherRightCount)
+              const otherObj = o.courseList.reduce((t, course) => {
+                t.otherAllCount = calculate.add(course.otherAllCount, t.otherAllCount)
+                t.otherRightCount = calculate.add(course.otherRightCount, t.otherRightCount)
                 return t
-              },{otherAllCount:0,otherRightCount:0})
+              }, {otherAllCount: 0, otherRightCount: 0})
               let sectionPercent = o.sectionAllCount == 0 ? '0%' : this.toPercent(o.sectionRightCount / o.sectionAllCount);
               knowledgeRadar.push({
                 'sectionName': o.sectionName,
@@ -222,7 +244,7 @@
                 'sectionAllCount': o.sectionAllCount,
                 'sectionRightCount': o.sectionRightCount,
                 sectionPercent,
-                otherCountPercent: calculate.div(otherObj.otherRightCount,otherObj.otherAllCount)
+                otherCountPercent: calculate.div(otherObj.otherRightCount, otherObj.otherAllCount)
               });
             })
             //雷达图
@@ -234,7 +256,7 @@
           }
         })
       },
-      setCourseOption(xData, total, right, mastery, max, index) {
+      setCourseOption(xData, total, right, mastery, max, index,item) {
         let option1 = {
           grid: {
             // top: '25%',
@@ -266,7 +288,10 @@
           xAxis: [
             {
               type: 'category',
-              data: xData,
+              triggerEvent: true,
+              data: xData.map(v => {
+                return {value: v.name, textStyle: {color: '#333'}}
+              }),
               axisPointer: {
                 type: 'shadow'
               },
@@ -308,21 +333,43 @@
             {
               name: '总题数',
               type: 'bar',
-              data: total
+              data: total,
+              itemStyle: {
+                normal: {
+                  color: '#56F2E3'
+                },
+              }
             },
             {
               name: '正确数',
               type: 'bar',
-              data: right
+              data: right,
+              itemStyle: {
+                normal: {
+                  color: '#FEB524'
+                },
+              }
             },
             {
               name: '掌握度',
               type: 'line',
               yAxisIndex: 1,
-              data: mastery
+              data: mastery,
+              itemStyle: {
+                normal: {
+                  color: '#E139F0'
+                },
+              }
             }
           ]
         };
+        if(this.isClass) {
+          this.barOption = option1
+          this.barIndexArr = []
+        }else {
+          this.$set(item,'barOption',option1)
+          this.$set(item,'barIndexArr',[])
+        }
         if (max > 0) {
           if (this.isClass) {
             this.kwgNotEnough = false
@@ -330,7 +377,7 @@
             this.$set(this.stuList[index], 'kwgNotEnough', false)
           }
           this.$nextTick(() => {
-            this.drawHistogramX(option1, index)
+            this.drawHistogramX(option1, index, item)
           })
         } else {
           if (this.isClass) {
@@ -368,7 +415,7 @@
           },
           series: [
             {
-              name: this.isClass?'班级':'个人',
+              name: this.isClass ? '班级' : '个人',
               type: 'radar',
               data: tmpSeriesData,
               lineStyle: {
@@ -379,9 +426,9 @@
               }
             },
             {
-              name: this.isClass?'学校':'班级',
+              name: this.isClass ? '学校' : '班级',
               type: 'radar',
-              data: [{value:data.map(v => calculate.mul(v.otherCountPercent,100)),name:''}],
+              data: [{value: data.map(v => calculate.mul(v.otherCountPercent, 100)), name: ''}],
               lineStyle: {
                 color: '#D677EA'
               },
@@ -411,10 +458,10 @@
 
       },
       toPercent(data) {
-        var strData = parseFloat(data) * 10000;
+        let strData = parseFloat(data) * 10000;
         strData = Math.round(strData);
         strData /= 100.00;
-        var ret = strData.toString() + "%";
+        let ret = strData.toString() + "%";
         return ret;
       },
       drawRadar(option, index) {
@@ -463,9 +510,55 @@
         myChart.setOption(option, true);
         this.$store.commit('setVanLoading', false)
       },
-      drawHistogramX(option, index) {
+      drawHistogramX(option, index, item) {
         let myChart = echarts.init(document.getElementById(this.isClass ? 'myChart2' : 'his-stu' + index));
         myChart.setOption(option, true);
+        myChart.off('click')
+        myChart.off('dataZoom')
+        if (this.isReinforce) {
+          myChart.on('click', params => {
+            const selectIndex = params.seriesType ? params.dataIndex : (params.event.target.anid.split('_')[1] * 1)
+
+            if(this.isClass) {
+              const barIndex = this.barIndexArr.indexOf(selectIndex)
+              if (barIndex > -1) {
+                this.barIndexArr.splice(barIndex, 1)
+              } else {
+                this.barIndexArr.push(selectIndex)
+              }
+              this.barOption.xAxis[0].data = this.barOption.xAxis[0].data.map((v, i) => {
+                return {value: v.value, textStyle: {color: this.barIndexArr.some(b => b == i)?'#39F0DD':'#333'}}
+              })
+            }else {
+              const barIndex = item.barIndexArr.indexOf(selectIndex)
+              if (barIndex > -1) {
+                item.barIndexArr.splice(barIndex, 1)
+              } else {
+                item.barIndexArr.push(selectIndex)
+              }
+              item.barOption.xAxis[0].data = item.barOption.xAxis[0].data.map((v, i) => {
+                return {value: v.value, textStyle: {color: item.barIndexArr.some(b => b == i)?'#39F0DD':'#333'}}
+              })
+            }
+
+            let myChart = echarts.init(document.getElementById(this.isClass ? 'myChart2' : 'his-stu' + index));
+            myChart.setOption(this.isClass?this.barOption:item.barOption, true);
+          })
+          //记录滑动的位置,防止重新绘制图表时返回初始位置
+          myChart.on('dataZoom',event => {
+            if (this.isReinforce) {
+              if (event.batch) {
+                if(this.isClass) {
+                  this.barOption.dataZoom[0].start = event.batch[0].start;
+                  this.barOption.dataZoom[0].end = event.batch[0].end;
+                }else {
+                  item.barOption.dataZoom[0].start = event.batch[0].start;
+                  item.barOption.dataZoom[0].end = event.batch[0].end;
+                }
+              }
+            }
+          });
+        }
       },
 
     }
@@ -565,6 +658,31 @@
         background: @blue;
         height: 17px;
         content: '';
+      }
+    }
+
+    .select-tip {
+      background: #f5f5f5;
+      border-radius: 2px;
+      line-height: 20px;
+      padding: 0 5px;
+      color: #999;
+      font-size: 10px;
+      margin: 10px 0;
+    }
+
+    .rein-btn {
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 25px;
+      padding: 0 10px;
+      background: #f5f5f5;
+      color: #333;
+      border-radius: 5px;
+
+      &.active {
+        background: @blue;
+        color: #fff;
       }
     }
   }

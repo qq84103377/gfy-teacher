@@ -91,15 +91,15 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <!-- <div>
+       <div>
           <i class="iconGFY icon-res-plus"></i>
-          <span @click="$toast.fail('敬请期待')">智能补强</span>
+          <span @click="$router.push('/reinforce')">智能补强</span>
         </div>
-        <div>
-          <i class="iconGFY icon-res-plus"></i>
-          <span @click="$router.push(`/specialExer`)">专项练习</span>
-          <span @click="$toast.fail('敬请期待')">专项练习</span>
-        </div> -->
+<!--        <div>-->
+<!--          <i class="iconGFY icon-res-plus"></i>-->
+<!--          <span @click="$router.push(`/specialExer`)">专项练习</span>-->
+<!--          <span @click="$toast.fail('敬请期待')">专项练习</span>-->
+<!--        </div> -->
       </div>
     </div>
   </section>

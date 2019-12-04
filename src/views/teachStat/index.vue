@@ -18,6 +18,8 @@
 
     <router-view ref="routerView"></router-view>
 
+    <slot name="reinforce" ref="reinforce"></slot>
+
     <!--    年级学科-->
     <van-popup
       v-model="gradePop"
@@ -157,6 +159,8 @@
             this.$refs['routerView'].init()
           }else if (this.$route.path === '/studySituation') {
             this.$refs['routerView'].handleLoad()
+          }else if (this.$route.path === '/reinforce') {
+            this.$slots.reinforce[0].componentInstance.handleLoad()
           }
         this.showTime = false
       },
