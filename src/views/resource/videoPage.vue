@@ -125,7 +125,8 @@ export default {
       showMore: false,
       isMove: false,
       isIphone: false,
-      isMp3: this.$route.query.isMp3
+      isMp3: this.$route.query.isMp3,
+      isEnd: 0
     }
   },
   computed: {
@@ -437,8 +438,14 @@ export default {
           this.initVideo.currentTime = this.$refs.video.currentTime
         }
         if (this.$refs.video.ended) {
-          this.$router.back()
-          // this.full()
+          this.isEnd++
+          if (this.isEnd == 1) {
+            if (this.isFullscreen) {
+              this.full()
+            } else {
+              this.$router.back()
+            }
+          }
         }
       }
     },
