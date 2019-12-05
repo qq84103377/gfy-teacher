@@ -113,7 +113,7 @@
     </div>
 
     <div class="add-course-wrap__footer" v-if="isEdit">
-      <van-button class="edit-btn" type="info" @click="$emit('onFinish')">取消</van-button>
+      <van-button v-if='!isFromCourse' class="edit-btn" type="info" @click="$emit('onFinish')">取消</van-button>
       <van-button class="edit-btn" type="info" :loading="loadingEdit" @click="submitEdit" loading-text="修改中...">提交</van-button>
     </div>
     <div class="add-course-wrap__footer" v-else>
@@ -132,7 +132,7 @@ import { getTextBookCourseByParam, getShareCourseDetailV2, createTeachCourse, ge
 
 export default {
   name: "addCourse",
-  props: ['isEdit', 'editCourseInfo'],
+  props: ['isEdit', 'editCourseInfo', 'isFromCourse'],
   data() {
     return {
       loadingEdit: false,
@@ -766,7 +766,7 @@ export default {
         if (res) {
           if (res.flag) {
             this.$toast('修改成功')
-            this.$emit('onFinish',this.form.name)
+            this.$emit('onFinish', this.form.name)
           } else {
             this.$toast(res.flag)
           }
@@ -957,7 +957,8 @@ export default {
     }
 
     .edit-btn {
-      flex: 0 0 125px;
+      flex: 1;
+      // flex: 0 0 125px;
       border-radius: 21px;
       font-size: 16px;
       margin-right: 20px;

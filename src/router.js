@@ -510,6 +510,15 @@ export default new Router({
           component: () => import('./views/myCourse/index.vue')
         },
         {
+          path: '/editMyCourse',
+          name: 'editMyCourse',
+          component: () => import('./views/myCourse/editMyCourse.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '编辑'
+          }
+        },
+        {
           path: '/courseDetail',
           name: 'courseDetail',
           component: () => import('./views/myCourse/courseDetail.vue')
