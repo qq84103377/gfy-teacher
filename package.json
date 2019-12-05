@@ -8,7 +8,8 @@
     "lint": "vue-cli-service lint",
     "alpha": "vue-cli-service build --mode alpha && cordova-hcp build dist",
     "test:unit": "vue-cli-service test:unit",
-    "alpha1": "vue-cli-service build --mode alpha && cd ../cordova-teacher && cordova build android --release && jarsigner -verbose -keystore gfy.keystore -signedjar gfy_signed.apk D:\\gfy\\cordova-teacher\\platforms\\android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk gfy"
+    "alpha1": "vue-cli-service build --mode alpha && cd ../cordova-teacher && cordova build android --release && jarsigner -verbose -keystore gfy.keystore -signedjar gfy_signed.apk D:\\gfy\\cordova-teacher\\platforms\\android\\app\\build\\outputs\\apk\\release\\app-release-unsigned.apk gfy",
+    "sit": "vue-cli-service build --mode sit"
   },
   "dependencies": {
     "alloyfinger": "^0.1.16",

@@ -626,6 +626,15 @@ export default new Router({
           name: 'groupDetail',
           component: () => import('./views/myClass/groupDetail.vue')
         },
+        {
+          path: '/reinforce',
+          name: 'reinforce',
+          component: () => import('./views/reinforce/index.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '智能补强'
+          }
+        },
       ]
     },
     {

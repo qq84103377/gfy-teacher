@@ -12,6 +12,13 @@
           <van-icon v-show="form.name.length && !$route.query.isResend" @click="form.name = ''" class="close" name="clear" />
         </div>
       </van-cell>
+      <van-cell v-if="isReinforce" class="add-task__body__cell">
+        <div @click="showFilter" slot="title" class="add-task__body__cell-ctn mgl5">
+          <div><span class="red">*</span>课程:</div>
+          <span class="course-label">{{tchCourseInfo.courseName}}</span>
+          <van-icon class="grey9" name="arrow-down" />
+        </div>
+      </van-cell>
       <van-cell class="add-task__body__cell">
         <div slot="title" class="add-task__body__cell-ctn mgl5" :class="{ccc:$route.query.isResend}">
           <div><span class="red">*</span>时长:</div>
@@ -34,7 +41,14 @@
       </van-cell>
       <van-cell class="add-task__body__cell" v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||($route.query.taskType=='T03'&& $route.query.resourceType==='R02')||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
         <div slot="title">
-          <div class="add-task__body__cell-ctn" :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
+          <div v-if="isReinforce" class="add-task__body__cell-ctn mgl5">
+            <div><span class="red">*</span>试卷:</div>
+<!--            <div class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}</div>-->
+            <input class="pdlt10" style="flex:1" v-model="form.exam" type="text">
+            <span class="red">{{64 - form.exam.length}}</span>
+            <van-icon v-show="form.exam.length" @click="form.exam = ''" class="close" name="clear" />
+          </div>
+          <div v-else class="add-task__body__cell-ctn" :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
             <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
             </div>
             <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
@@ -45,7 +59,7 @@
             <van-icon v-if="testPaperName&&$route.query.type != 'exam'&&!isEdit" @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}" name="clear" />
             <van-icon v-if="$route.query.type != 'exam'&&!isEdit" @click="selectTestPaper" class="add" :class="{ccc:form.comment}" name="add" />
           </div>
-          <van-checkbox class="allow-fast" v-model="form.allowEdit" v-if="form.exam" :name="form.allowEdit">
+          <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="form.exam||isReinforce" :name="form.allowEdit">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许学生交卷后重新修改答案
           </van-checkbox>
@@ -175,24 +189,31 @@
 
     <exam-filter :visible.sync="filterShow" :testPaperId.sync="testPaperId" :testPaperName.sync="testPaperName"
                  :tchCourseInfo.sync="tchCourseInfo" ref="examFilter"></exam-filter>
+
+    <filter-panel :visible.sync="courseFilterShow" title="选择课程" :list="tempList" @filter="handleFilter"></filter-panel>
+
   </section>
 </template>
 
 <script>
 import { formatTime, generateTimeReqestNumber } from '@/utils/filter'
 import examFilter from '../../components/examFilter'
+import filterPanel from '../../components/filterPanel'
 import {
-  createCourseTask, modifyCourseTask, redoCourseTask
+  createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo
 } from '@/api/index'
 import eventBus from "@/utils/eventBus";
 
 export default {
   name: "addTask",
-  components: { examFilter },
+  components: { examFilter, filterPanel },
   data() {
     return {
+      tempList: [],
+      courseList: [],
       isEdit: this.$route.query.isEdit,
       filterShow: false,
+      courseFilterShow: false,
       currentDate: new Date(),
       tchCourseInfo: {},
       resourceInfo: '',
@@ -223,121 +244,171 @@ export default {
       sendTaskClassSubGroup: {},
       examCount: 0,
       result: [],
-      firstFlag: true
-
+      firstFlag: true,
+      isReinforce: this.$route.query.isReinforce,
+      classId: this.$route.query.classId,
+      accountNo: this.$route.query.accountNo,
     }
   },
-  mounted() {
-    // return
-    this.resourceInfo = this.$store.getters.getResourceInfo
-    console.log('课件', this.resourceInfo)
-
-    if (this.resourceInfo && !this.isEdit) {
-      console.log(this.$route.query.type, '/////////////////');
-      if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
-        if (this.resourceInfo.coursewareName) {
-          if (this.resourceInfo.coursewareName.length > 64) {
-            this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
-          } else {
-            this.form.name = this.resourceInfo.coursewareName
+  async mounted() {
+    if(this.isReinforce) {
+      //智能补强
+      await this.getClassTeachCourseInfo()
+      this.form.name = `智能补强${generateTimeReqestNumber(new Date())}测试卷`
+      // this.testPaperId = this.resourceInfo.testPaperId
+      this.testPaperName = this.form.name
+      this.form.exam = this.form.name
+      // this.form.resourceId = this.resourceInfo.testPaperId
+      // this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
+    }else {
+      this.resourceInfo = this.$store.getters.getResourceInfo
+      if (this.resourceInfo && !this.isEdit) {
+        console.log(this.$route.query.type, '/////////////////');
+        if (this.$route.query.type === 'lesson' || this.$route.query.type === 'material') {
+          if (this.resourceInfo.coursewareName) {
+            if (this.resourceInfo.coursewareName.length > 64) {
+              this.form.name = this.resourceInfo.coursewareName.substring(0, 64)
+            } else {
+              this.form.name = this.resourceInfo.coursewareName
+            }
           }
+
+          this.form.resourceId = this.resourceInfo.coursewareId
+        } else if (this.$route.query.type === 'exam') {
+          if (this.resourceInfo.testPaperName.length > 64) {
+            this.form.name = this.resourceInfo.testPaperName.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.testPaperName
+          }
+          this.testPaperId = this.resourceInfo.testPaperId
+          this.testPaperName = this.resourceInfo.testPaperName
+          this.form.exam = this.resourceInfo.testPaperName
+          this.form.resourceId = this.resourceInfo.testPaperId
+          this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
+        } else if (this.$route.query.type === 'discuss') {
+          console.log('this.$route.query.type discuss//////////////');
+          if (this.resourceInfo.discussName.length > 64) {
+            this.form.name = this.resourceInfo.discussName.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.discussName
+          }
+          this.form.resourceId = this.resourceInfo.discussId
+
+        } else if (this.$route.query.type === 'spoken') {
+          if (this.resourceInfo.spokenTitle.length > 64) {
+            this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.spokenTitle
+          }
+          this.form.resourceId = this.resourceInfo.spokenId
+        }
+      } else if (this.resourceInfo && this.isEdit) {
+
+        this.form.duration = this.resourceInfo.duration
+        this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
+        this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
+        if (this.resourceInfo.description) {
+          this.form.desc = this.resourceInfo.description
+        } else if (this.resourceInfo.desc) {
+          this.form.desc = this.resourceInfo.desc
         }
 
-        this.form.resourceId = this.resourceInfo.coursewareId
-      } else if (this.$route.query.type === 'exam') {
-        if (this.resourceInfo.testPaperName.length > 64) {
-          this.form.name = this.resourceInfo.testPaperName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.testPaperName
-        }
-        this.testPaperId = this.resourceInfo.testPaperId
         this.testPaperName = this.resourceInfo.testPaperName
-        this.form.exam = this.resourceInfo.testPaperName
-        this.form.resourceId = this.resourceInfo.testPaperId
-        this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
-      } else if (this.$route.query.type === 'discuss') {
-        console.log('this.$route.query.type discuss//////////////');
-        if (this.resourceInfo.discussName.length > 64) {
-          this.form.name = this.resourceInfo.discussName.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.discussName
-        }
-        this.form.resourceId = this.resourceInfo.discussId
-
-      } else if (this.$route.query.type === 'spoken') {
-        if (this.resourceInfo.spokenTitle.length > 64) {
-          this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
-        } else {
-          this.form.name = this.resourceInfo.spokenTitle
-        }
-        this.form.resourceId = this.resourceInfo.spokenId
-      }
-    } else if (this.resourceInfo && this.isEdit) {
-
-      this.form.duration = this.resourceInfo.duration
-      this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
-      this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
-      if (this.resourceInfo.description) {
-        this.form.desc = this.resourceInfo.description
-      } else if (this.resourceInfo.desc) {
-        this.form.desc = this.resourceInfo.desc
-      }
-
-      this.testPaperName = this.resourceInfo.testPaperName
-      this.form.comment = '1'
+        this.form.comment = '1'
 
 
-      // this.form.object = this.resourceInfo.description
-      this.resourceInfo.tchClassTastInfo.forEach(ele => {
-        if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
-          this.form.object = '2'
-        } else {
-          this.form.object = '1'
+        // this.form.object = this.resourceInfo.description
+        this.resourceInfo.tchClassTastInfo.forEach(ele => {
+          if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
+            this.form.object = '2'
+          } else {
+            this.form.object = '1'
+          }
+
+        })
+
+        if (this.resourceInfo.tastName) {
+          this.resourceInfo.taskName = this.resourceInfo.tastName
         }
 
-      })
-
-      if (this.resourceInfo.tastName) {
-        this.resourceInfo.taskName = this.resourceInfo.tastName
-      }
-
-      if (this.resourceInfo.taskName.length > 64) {
-        this.form.name = this.resourceInfo.taskName.substring(0, 64)
-      } else {
-        this.form.name = this.resourceInfo.taskName
-        console.log(this.resourceInfo.taskName, 'this.resourceInfo.taskName');
-      }
-      this.form.resourceId = this.resourceInfo.resourceId
-
-      if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
-
-      } else if (this.$route.query.taskType === 'T03' && this.$route.query.resourceType === 'R02') {//试卷exam
-
-        this.testPaperId = this.resourceInfo.testPaperId
-        this.testPaperName = this.resourceInfo.testPaperName
-        this.form.exam = this.resourceInfo.testPaperName
-        this.form.resourceId = this.resourceInfo.testPaperId
-        // this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
-      } else if (this.$route.query.taskType === 'T06') {//discuss
-
-      } else if (this.$route.query.taskType === 'T13') {
-        if (this.resourceInfo.spokenTitle.length > 64) {
-          this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
+        if (this.resourceInfo.taskName.length > 64) {
+          this.form.name = this.resourceInfo.taskName.substring(0, 64)
         } else {
-          this.form.name = this.resourceInfo.spokenTitle
+          this.form.name = this.resourceInfo.taskName
+          console.log(this.resourceInfo.taskName, 'this.resourceInfo.taskName');
         }
-        this.form.resourceId = this.resourceInfo.spokenId
-      }
+        this.form.resourceId = this.resourceInfo.resourceId
 
+        if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
+
+        } else if (this.$route.query.taskType === 'T03' && this.$route.query.resourceType === 'R02') {//试卷exam
+
+          this.testPaperId = this.resourceInfo.testPaperId
+          this.testPaperName = this.resourceInfo.testPaperName
+          this.form.exam = this.resourceInfo.testPaperName
+          this.form.resourceId = this.resourceInfo.testPaperId
+          // this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
+        } else if (this.$route.query.taskType === 'T06') {//discuss
+
+        } else if (this.$route.query.taskType === 'T13') {
+          if (this.resourceInfo.spokenTitle.length > 64) {
+            this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
+          } else {
+            this.form.name = this.resourceInfo.spokenTitle
+          }
+          this.form.resourceId = this.resourceInfo.spokenId
+        }
+
+      }
     }
+
     this.initClass()
 
   },
 
   methods: {
+    async getClassTeachCourseInfo() {
+      this.$store.commit('setVanLoading',true)
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "operateRoleType": "A02",
+        "accountNo": this.$store.getters.getUserInfo.accountNo,
+        "subjectType": this.$route.query.subjectType,
+        "classGrade": this.$route.query.classGrade,
+        "pageSize": "9999",
+        "courseType": "C01",
+        "currentPage": 1,
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getClassTeachCourseInfo(params).then(res => {
+        this.$store.commit('setVanLoading',false)
+        if(res.flag) {
+          this.courseList = res.data || []
+          if(this.courseList.length) {
+            this.$set(this.courseList[0],'check',true)
+            this.tchCourseInfo = this.courseList[0].tchCourseInfo
+          }
+        }
+      })
+    },
+    showFilter() {
+      this.courseFilterShow = true
+      this.tempList = JSON.parse(JSON.stringify(this.courseList))
+    },
+    handleFilter(item) {
+      this.tchCourseInfo = item.tchCourseInfo
+      this.courseList = JSON.parse(JSON.stringify(this.tempList))
+    },
     initClass() {
       //课程信息
-      this.tchCourseInfo = this.$store.getters.getTchCourseInfo
+      if(!this.isReinforce) {
+        this.tchCourseInfo = this.$store.getters.getTchCourseInfo
+      }
       console.log("课程", this.tchCourseInfo)
 
       if (this.tchCourseInfo) {
@@ -429,9 +500,15 @@ export default {
 
           if (classStudent) {
             let student = {}
-            for (let k in classStudent) {
-              this.$set(classStudent[k], 'active', true)
-              student[classStudent[k].accountNo] = true
+            if((this.isReinforce&&(this.classId == item.classId)) || !this.isReinforce) {
+                for (let k in classStudent) {
+                  if(this.accountNo) {
+                    this.$set(classStudent[k], 'active', this.accountNo == k)
+                  }else {
+                    this.$set(classStudent[k], 'active', true)
+                  }
+                  student[classStudent[k].accountNo] = true
+                }
             }
 
             if (this.$route.query._t == "new") {
@@ -443,7 +520,6 @@ export default {
           } else {
             item.classStudent = []
           }
-
           if (!item.classStudent || Object.keys(item.classStudent).length == 0) {
             this.$set(item, 'check', false)
             this.$set(item, 'type', "none")
@@ -451,9 +527,16 @@ export default {
           } else {
             this.$set(item, 'disabled', false)
             if (this.sendTaskClassStudent[item.classId].data) {
-              this.$set(item, 'check', true)
-              this.$set(item, 'type', "all")
-              this.$set(this.sendTaskClassStudent[item.classId], 'check', true)
+              if(this.isReinforce) {
+                this.$set(item, 'check', item.classId==this.classId)
+                this.$set(item, 'type', item.classId==this.classId? (this.accountNo?'part':'all'):'none')
+                this.$set(this.sendTaskClassStudent[item.classId], 'check', item.classId==this.classId)
+              }else {
+                this.$set(item, 'check', true)
+                this.$set(item, 'type', "all")
+                this.$set(this.sendTaskClassStudent[item.classId], 'check', true)
+              }
+
             } else {
               //item.check = false
               this.$set(this.sendTaskClassStudent[item.classId], 'check', false)
@@ -1328,7 +1411,6 @@ export default {
     }
   },
   created() {
-
   },
   watch: {
     '$route'() {
@@ -1453,7 +1535,7 @@ export default {
         display: flex;
         align-items: center;
 
-        input {
+        input,.course-label {
           flex: 1;
           padding: 0 10px;
         }
