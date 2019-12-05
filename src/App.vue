@@ -3,11 +3,14 @@
     <navigation>
       <router-view></router-view>
     </navigation>
+    <upgrade></upgrade>
   </div>
 </template>
 
 <script>
+  import upgrade from './components/Upgrade'
 export default {
+    components: {upgrade},
   data() {
     return {
       mql: window.matchMedia("(orientation: portrait)"),

@@ -461,3 +461,7 @@ export const delCourseWare =(params)=>{
 export const delTestPaper =(params)=>{
   return axios.post('resource/delTestPaper', qs.stringify(params))
 }
+//获取APP最新版本
+export const getLatestModuleVerion =(params)=>{
+  return axios.post('sysModuleVersion/getLatestModuleVerion', qs.stringify(params))
+}

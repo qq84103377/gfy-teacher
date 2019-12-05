@@ -123,12 +123,16 @@
         },
         read(file,detail) {
           console.log(file.name,file.type,file,'ffffffffffffffffffffffffffffffffffffff');
-          if(['.pdf','.ppt','.pptx','.doc','.docx','.xls','.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
-            this.wareName = file.name
-            this.wareSize = file.size
-            this.uploadWare(file)
+          if(file.name) {
+            if(['.pdf','.ppt','.pptx','.doc','.docx','.xls','.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
+              this.wareName = file.name
+              this.wareSize = file.size
+              this.uploadWare(file)
+            }else {
+              this.$toast('请选择office文档或pdf')
+            }
           }else {
-            this.$toast('请选择office文档或pdf')
+            this.$toast('请选择有效文件')
           }
         },
         getOSSKey() {
