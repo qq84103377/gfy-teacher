@@ -53,7 +53,7 @@
           </div>
         </div>
         <div class="reinforce-pop-wrap__footer">
-          <van-button type="info" class="btn">发布任务</van-button>
+          <van-button type="info" class="btn" @click="sendTask">发布任务</van-button>
         </div>
       </div>
     </van-popup>
@@ -1318,10 +1318,18 @@
         diff: '',
         knwIndex: 0,
         diffIndex: 0,
+        subjectType: '',
+        classGrade: '',
+        classId: '',
+        accountNo: '',
       }
     },
     components: {filterWrap, studySituation},
     methods: {
+      sendTask() {
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/addTask?type=exam&_t=new&isReinforce=1&subjectType=${this.subjectType}&classGrade=${this.classGrade}&classId=${this.classId}&accountNo=${this.accountNo}`)
+      },
       selectDiff(diff) {
         this.knwArr[this.knwIndex].examTypeArr[this.diffIndex].diff = diff
         this.diffPop = false
@@ -1333,7 +1341,11 @@
           this.$set(item,'num',e.target.value)
         }
       },
-      showPop(arr, subjectType) {
+      showPop(arr, subjectType, classGrade, classId, accountNo) {
+        this.classGrade = classGrade
+        this.subjectType = subjectType
+        this.classId = classId
+        this.accountNo = accountNo || ''
         const subjectData = this.subjectInitData[subjectType]
         arr.forEach(v => {
          const masteryItem = subjectData.find(s => v.mastery * 1 >= s.min && v.mastery * 1 < s.max)

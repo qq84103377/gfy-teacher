@@ -115,13 +115,13 @@
       showSelectKnw(item) {
         if(this.isClass) {
           if(this.barIndexArr.length) {
-            this.$emit('showPop',this.xData.filter((v,i) => this.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType)
+            this.$emit('showPop',this.xData.filter((v,i) => this.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType,this.gradeSubjectList[this.$parent.gradeIndex].classGrade,this.$parent.classIndex)
           }else {
             this.$toast('请选择知识点')
           }
         }else {
           if(item.barIndexArr.length) {
-            this.$emit('showPop',item.xData.filter((v,i) => item.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType)
+            this.$emit('showPop',item.xData.filter((v,i) => item.barIndexArr.includes(i)),this.gradeSubjectList[this.$parent.gradeIndex].subjectType,this.gradeSubjectList[this.$parent.gradeIndex].classGrade,this.$parent.classIndex,item.accountNo)
           }else {
             this.$toast('请选择知识点')
           }

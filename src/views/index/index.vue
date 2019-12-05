@@ -91,9 +91,9 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-       <div>
+       <div @click="$router.push('/reinforce')">
           <i class="iconGFY icon-res-plus"></i>
-          <span @click="$router.push('/reinforce')">智能补强</span>
+          <span>智能补强</span>
         </div>
 <!--        <div>-->
 <!--          <i class="iconGFY icon-res-plus"></i>-->
