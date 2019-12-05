@@ -806,7 +806,7 @@ export default {
               data: [
                 {
                   value: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
-                    t += v.accountNoList.length
+                    t += (v.accountNoList?v.accountNoList.length:0)
                     return t
                   }, 0), name: '未完成'
                 },
@@ -834,7 +834,7 @@ export default {
           this.stuStatInfo.title = params.name
           if (params.name === '未完成') {
             this.taskFinishInfo.studentUnfinishList.forEach(v => {
-              v.accountNoList.forEach(s => {
+              (v.accountNoList||[]).forEach(s => {
                 const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                 this.stuStatInfo.stu.push(name)
               })
