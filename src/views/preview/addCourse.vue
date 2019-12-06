@@ -543,7 +543,7 @@ export default {
         "sysCourseId": this.shareCourseList[this.form.course].sysCourseId,
         "shareTchCourseId": this.shareCourseList[this.form.course].tchCourseId,
         "courseName": this.form.name,
-        "subjectType": "S01",
+        "subjectType": localStorage.currentSubjectType,
         "courseType": "C01",
         "termType": "T01",
         "shareType": "S01",

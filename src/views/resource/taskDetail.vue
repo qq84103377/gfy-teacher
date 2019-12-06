@@ -117,7 +117,7 @@ export default {
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "operateAccountNo": this.$route.query.accountNo,
         "taskId": this.$route.query.taskId,
         "tchCourseId": this.$route.query.tchCourseId,
 
@@ -221,6 +221,7 @@ export default {
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
+          text-align: right;
         }
       }
     }

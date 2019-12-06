@@ -343,33 +343,7 @@
       </van-cell>
     </div>
 
-    <van-popup
-      v-model="addPop"
-      class="add-pop"
-      position="bottom">
-      <div class="add-pop-wrap">
-        <div class="add-pop-wrap__title"><span>雅鲁藏布大峡谷》课文朗读添加至课程</span>
-          <van-icon name="close"></van-icon>
-        </div>
-        <div class="add-pop-wrap__body">
-          <div class="add-pop-wrap__body__radio-group van-hairline--bottom" v-for="(item,index) in addCourseList"
-               :key="index">
-            <div class="fs15">{{item.name}}</div>
-            <van-radio-group class="radio-group" v-model="item.radio">
-              <van-radio @click="handleClickRadio(item,ci)" v-for="(c,ci) in item.child" :key="ci" :name="ci"
-                         class="mgr10 mgb15"><i slot="icon" slot-scope="props"
-                                                :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-                <div class="aic">{{c.name}} <span v-if="c.name=='无'" class="red mglt10" style="word-break: break-all;">asdjasjkdkjasdkjakdjas</span>
-                </div>
-              </van-radio>
-            </van-radio-group>
-          </div>
-        </div>
-        <div class="add-pop-wrap__footer">
-          <van-button type="info" class="btn">确定</van-button>
-        </div>
-      </div>
-    </van-popup>
+
 
     <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow"></subject-filter>
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel"
@@ -410,14 +384,6 @@
     data() {
       return {
         arr: [{}, {}],
-        addCourseList: [
-          {name: 'asdx', child: [{name: 'csasac'}, {name: '是大V是'},]},
-          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
-          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
-          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
-          {name: '床单asas啊', child: [{name: '官方发布'}, {name: '胜多负少的'}, {name: '无'},]},
-        ],
-        addPop: false,
         tabIndex: 0,
         activeNames: [],
         activeNames1: [],
@@ -1096,14 +1062,6 @@
             this.$toast(res.msg)
           }
         })
-      },
-      handleClickRadio(item, index) {
-        this.addCourseList.forEach(v => {
-          // v.radio = ''
-          this.$set(v, 'radio', '')
-        })
-        this.$set(item, 'radio', index)
-        // item.radio = index
       },
       handleFilter(id) {
         this.courseId = id
