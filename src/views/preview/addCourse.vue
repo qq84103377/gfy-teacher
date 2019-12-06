@@ -113,7 +113,7 @@
     </div>
 
     <div class="add-course-wrap__footer" v-if="isEdit">
-      <van-button v-if='!isFromCourse' class="edit-btn" type="info" @click="$emit('onFinish')">取消</van-button>
+      <van-button v-if='!isFromCourse' class="edit-btn" type="info" @click="$emit('onFinish',form.name,true)">取消</van-button>
       <van-button class="edit-btn" type="info" :loading="loadingEdit" @click="submitEdit" loading-text="修改中...">提交</van-button>
     </div>
     <div class="add-course-wrap__footer" v-else>
@@ -706,6 +706,16 @@ export default {
     },
     submitEdit() {
       console.log("编辑课程")
+
+      if (!this.form.name) {
+        this.$toast("请输入课程名称")
+        return
+      }
+      if (!this.result || this.result.length == 0) {
+        this.$toast("请选择班级")
+        return
+      }
+
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",

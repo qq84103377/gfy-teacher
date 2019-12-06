@@ -119,10 +119,11 @@ export default {
     });
   },
   methods: {
-    toggle(data) {
+    async toggle(data, cancle) {
       this.$refs.dropdown.toggle()
+      if (cancle) return
       this.courseName = data
-      this.dropdownRefresh()
+      await this.dropdownRefresh(true)
     },
     async changeCourse(type) {
       if (type) {
@@ -237,6 +238,7 @@ export default {
       localStorage.setItem('stat', JSON.stringify(item))
     },
     async selectCourse(tchCourseInfo, index) {
+      console.log(tchCourseInfo, 'tchCourseInfo//////');
       this.tchCourseInfo = tchCourseInfo
       this.courseIndex = index
       this.currentTchCourseInfo = tchCourseInfo
@@ -257,11 +259,11 @@ export default {
 
       await this.getClassTeachCourseInfo()
     },
-    async dropdownRefresh() {
+    async dropdownRefresh(isEdit) {
       this.dropdownListLoading = false
       this.dropdownFinish = false
       this.dropdownPage = 1
-      await this.getClassTeachCourseInfo()
+      await this.getClassTeachCourseInfo(isEdit)
       this.$toast('刷新成功')
     },
     async onLoad() {
@@ -303,7 +305,7 @@ export default {
       await this.getCourseTaskList(this.courseName, this.tchCourseId)
       this.$toast('刷新成功')
     },
-    async getClassTeachCourseInfo() {
+    async getClassTeachCourseInfo(isEdit) {
       console.log('getClassTeachCourseInfo....');
       const page = this.dropdownPage
       let obj = {
@@ -347,7 +349,10 @@ export default {
             this.tchCourseInfo = this.courseList[0].tchCourseInfo
             console.log(this.tchCourseInfo, 'this.tchCourseInfo!!!!');
           }
-          this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
+
+          if (!isEdit) {
+            this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
+          }
           if (page >= res.total) {
             this.dropdownFinish = true
           }
