@@ -152,7 +152,7 @@
       <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{appraise:{list:appraiseList},taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info" @click="shareReport">
         分享报告
       </van-button>
     </div>
@@ -241,6 +241,17 @@ export default {
     },
   },
   methods: {
+    shareReport() {
+      this.taskFinishInfo.studentStatList.forEach(v => {
+       v.stuName = getStudentName(v.accountNo,this.info.tchClassTastInfo.find(t => t.active).classId)
+      })
+      this.appraiseList.forEach(v => {
+        v.stuName = getStudentName(v.appraiseAccountNo,this.info.tchClassTastInfo.find(t => t.active).classId)
+      })
+      const taskFinishInfo = JSON.parse(JSON.stringify(this.taskFinishInfo))
+      const appraiseList = JSON.parse(JSON.stringify(this.appraiseList))
+      this.$router.push({path:`/briefing`,query:{appraise:{list:appraiseList},taskType:this.$route.query.taskType,resourceType:this.$route.query.resourceType,testPaperId:this.$route.query.testPaperId, subjectTypeName:this.subjectTypeName,info:taskFinishInfo,title:this.info.taskName,taskId:this.info.taskId,classId:this.info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:this.$store.getters.getUserInfo.accountNo,belongSchoolId:this.$store.getters.schoolId}})
+    },
     sendTask() {
       let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
       tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)

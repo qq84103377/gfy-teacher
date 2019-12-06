@@ -12,7 +12,7 @@
       </div>
       <div class="briefing-wrap__body-ctn-wrap" v-for="(item,index) in scoreSpan" :key="index">
         <div class="fs16">{{item.name}} 共计{{item.stu.length}}人</div>
-        <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{s|getStudentName($route.query.classId)}}{{si < item.stu.length -1 ? '、':''}}</span></div>
+        <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{s}}{{si < item.stu.length -1 ? '、':''}}</span></div>
       </div>
     </div>
     <div class="briefing-wrap__footer">
@@ -43,6 +43,7 @@
       }
     },
     async created() {
+      console.log(this.info);
       this.$store.commit('setVanLoading',true)
       if(!('cordova' in window)) {
         //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
@@ -75,6 +76,11 @@
         await getAppraiseV2(params).then(res => {
           if (res.flag && res.data[0]) {
             this.appraiseList = res.data[0].appraiseListInfo
+
+            res.data[0].appraiseListInfo.forEach((v,i) => {
+              v.stuName = this.appraiseList[i].stuName
+            })
+            this.appraiseList = res.data[0].appraiseListInfo
           } else {
             this.appraiseList = []
           }
@@ -99,6 +105,9 @@
               //因为口语没有testPaperScore这个字段,但是总分是按100分来算的
               res.data[0].testPaperScore = 100
             }
+            res.data[0].studentStatList.forEach((v,i) => {
+              v.stuName = this.info.studentStatList[i].stuName
+            })
             this.info = res.data[0]
           }else {
             this.$toast(res.msg)
@@ -123,16 +132,16 @@
             }
             if (v.endDate) {
               if(percent >= 1) {
-                this.scoreSpan[0].stu.push(v.accountNo)
+                this.scoreSpan[0].stu.push(v.stuName)
               }
               if(percent >= 0.8) {
-                this.scoreSpan[1].stu.push(v.accountNo)
+                this.scoreSpan[1].stu.push(v.stuName)
               }
             } else {
-              this.scoreSpan[2].stu.push(v.accountNo)
+              this.scoreSpan[2].stu.push(v.stuName)
             }
             if(v.redoTimes > 0) {
-              this.scoreSpan[3].stu.push(v.accountNo)
+              this.scoreSpan[3].stu.push(v.stuName)
             }
           })
         }else {
@@ -146,11 +155,11 @@
           this.appraiseList.forEach(v => {
             if(v.essFlag === '1') {
               //有加精华
-              this.scoreSpan[0].stu.push(v.appraiseAccountNo)
+              this.scoreSpan[0].stu.push(v.stuName)
             }
             if(v.praiseList.length) {
               //有人点赞
-              this.scoreSpan[1].stu.push(v.appraiseAccountNo)
+              this.scoreSpan[1].stu.push(v.stuName)
             }
             this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t,v) => {
               t.push(...v.accountNoList)
@@ -158,7 +167,7 @@
             },[])
             this.info.studentStatList.forEach(v => {
               if(v.redoTimes > 0) {
-                this.scoreSpan[3].stu.push(v.accountNo)
+                this.scoreSpan[3].stu.push(v.stuName)
               }
             })
           })
