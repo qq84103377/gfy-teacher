@@ -84,22 +84,22 @@ export const updateFeedback = (params) => {
 
 // 获取商品列表
 export const getGoodsList = (params) => {
-  return axios.post('mall/getMallGoodsInfoForSchool.action', qs.stringify(params))
+  return axios.post('mall/getMallGoodsInfoForSchool', qs.stringify(params))
 }
 
 // 获取收藏记录
 export const getCollectInfo = (params) => {
-  return axios.post('mall/getMallCollectInfo.action', qs.stringify(params))
+  return axios.post('mall/getMallCollectInfo', qs.stringify(params))
 }
 
 // 获取兑换记录
 export const getConvertRecordInfo = (params) => {
-  return axios.post('mall/getMallConvertRecordInfo.action', qs.stringify(params))
+  return axios.post('mall/getMallConvertRecordInfo', qs.stringify(params))
 }
 
 // 商品收藏
 export const addMallCollectInfo = (params) => {
-  return axios.post('mall/addMallCollectInfo.action', qs.stringify(params))
+  return axios.post('mall/addMallCollectInfo', qs.stringify(params))
 }
 
 // 取消商品收藏
