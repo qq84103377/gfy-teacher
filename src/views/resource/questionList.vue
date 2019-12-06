@@ -131,6 +131,15 @@
         removeQuestionList: [], //试卷详情跳转到资源中心试题列表时,移除的试题需要记录起来,返回到试卷详情时要把移除的题目清理掉
       }
     },
+    watch: {
+      '$route'() {
+        this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
+        //先把selectList添加对应的examType
+        this.selectList.forEach(v => {
+          this.$set(v,'examType',v.child[0].titleType)
+        })
+      }
+    },
     created() {
       this.$store.commit('setVanLoading', true)
       Promise.all([this.getExamSectionTypeRelation(), this.getSysDictList()]).then(res => {

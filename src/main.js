@@ -87,9 +87,9 @@ Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview).use(SwipeCell).use(DatetimePicker ).use(Skeleton).use(Grid).use(GridItem).use(Progress).use(Picker).use(Stepper).use(Lazyload).use(slider).use(Sticky)
 
 // 配置fundebug
-fundebug.apikey =
-    "2091a697df9cede7b8df8f5b6d37126230448548399ed1e5227851515fa006eb"
-fundebugVue(fundebug, Vue)
+// fundebug.apikey =
+//     "2091a697df9cede7b8df8f5b6d37126230448548399ed1e5227851515fa006eb"
+// fundebugVue(fundebug, Vue)
 
 //集成环境或者正式环境才收集错误信息
 if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {

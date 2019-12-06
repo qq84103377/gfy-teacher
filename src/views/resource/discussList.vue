@@ -267,7 +267,7 @@
             this.form.btnLoading = false
             if (res.flag) {
               this.popShow = false
-              this.$toast('新建成功')
+              this.$toast('编辑成功')
               this.$refs['body'].scrollTo(0, 0)
               this.onRefresh()
             } else {
