@@ -9,11 +9,13 @@
     </div>
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
-        <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
+        <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">重发任务
           </van-button>
           <van-button class="notice-btn" v-else :class="{remind: remind}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
+        </div>
+        <div class="statistic-wrap__pie-chart-label divider" v-else>任务完成情况:
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
@@ -224,6 +226,7 @@ export default {
       taskFinishInfo: { examstat: [], studentStatList: [], paperDataList: [] },
       remind: false,
       loadWareFlag: true,
+      isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
     }
   },
   computed: {
@@ -313,7 +316,7 @@ export default {
       // }else {
       this.$router.push({
         name: `examView`,
-        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType }
+        params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType: this.$route.query.termType }
       })
       // }
     },
@@ -1000,6 +1003,7 @@ export default {
     },
   },
   async mounted() {
+    // classStatList
     this.$store.commit('setVanLoading', true)
     this.getDailyRemindStatus()
     await this.statTaskStat()
@@ -1027,6 +1031,7 @@ export default {
     this.$store.commit('setVanLoading', false)
     // if (!this.isWk && !this.isSpoken) {
     // }
+
   },
   beforeRouteEnter(to, from, next) {
     if (from.path === '/imgCorrect') {
@@ -1034,14 +1039,14 @@ export default {
         await vm.statTaskStat()
         vm.getAppraise()
       })
-    }else if (from.path === '/examView') {
+    } else if (from.path === '/examView') {
       next(async vm => {
         await vm.statTaskStat()
       })
     }
     else if (from.path === '/addTask') {
       next(vm => {
-       const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
+        const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
         vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
       })
     }
