@@ -196,6 +196,7 @@
         if(this.isRevert) {
           this.$router.go(-2)
           this.$store.commit('setIsRevert',false)
+          this.$store.commit('setResQuestionSelect',this.selectList)
         }else {
           if(this.$route.path === '/examDetail') {
             this.$router.push(`/resCentreWrap?from=examDetail`)
