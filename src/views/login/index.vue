@@ -31,7 +31,7 @@
             <van-field class="custom-input" @input.native="userChange(0)" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
               <!--              <div slot="right-icon">123</div>-->
             </van-field>
-            <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span>
+            <!--<span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span>-->
             <span class="btn-reset-pwd" @click="$router.push(`/forgetPwd`)">忘记密码</span>
           </div>
         </div>
