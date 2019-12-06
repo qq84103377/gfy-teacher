@@ -127,7 +127,7 @@
       },
       read(file, detail) {
         console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
-        if (file.name) {
+        if (file.type) {
           if (['.pdf', '.ppt', '.pptx', '.doc', '.docx', '.xls', '.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             this.wareName = file.name
             this.wareSize = file.size
