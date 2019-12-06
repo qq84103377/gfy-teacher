@@ -25,7 +25,7 @@
         </van-button>
       </div>
       <div class="form-detail" v-else>
-        <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入手机号/用户名" />
+        <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入用户名" />
         <div class="vailcode">
           <div class="code-input">
             <van-field class="custom-input" @input.native="userChange(0)" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
