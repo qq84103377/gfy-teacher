@@ -161,17 +161,17 @@
           //每次点开生成试卷弹窗请求课程列表
           if(this.type === 'error') {
             this.form.name = `错题集试卷${generateTimeReqestNumber()}`
-            this.getClassTeachCourseInfo()
+            if(this.canAddCourse) this.getClassTeachCourseInfo()
           }else if(this.$route.path === '/questionList') {
             if(this.$route.query.isRes) {
-              this.getClassTeachCourseInfo()
+              if(this.canAddCourse) this.getClassTeachCourseInfo()
             }
             if(!this.$route.query.isPri) {
               this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
             }
           }else if (this.$route.path === '/examDetail') {
             this.form.name = `${this.$route.query.title}-副本`
-            this.getClassTeachCourseInfo()
+            if(this.canAddCourse) this.getClassTeachCourseInfo()
           }
         }
       }
@@ -207,8 +207,8 @@
           }
         }
       },
-      getClassTeachCourseInfo() {
-        if(!this.canAddCourse) return
+     async getClassTeachCourseInfo() {
+        this.$store.commit('setVanLoading',true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -229,8 +229,9 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getClassTeachCourseInfo(params).then(res => {
-            if(res.flag) {
+       await getClassTeachCourseInfo(params).then(res => {
+         this.$store.commit('setVanLoading',false)
+         if(res.flag) {
                this.courseList = res.data || []
               this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
             }
@@ -471,18 +472,29 @@
         }
       },
       handleFilter(item) {
-        this.courseList = JSON.parse(JSON.stringify(this.tempList))
+        if(this.type === 'task') {
+          this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
+          this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
+        }else {
+          this.courseList = JSON.parse(JSON.stringify(this.tempList))
+        }
       },
       showFilter() {
         this.filterShow = true
         // this.$set(this.list[0], 'active', true)
         this.tempList = JSON.parse(JSON.stringify(this.courseList))
       },
-      handleSubmit() {
+      async handleSubmit() {
         if (this.type === 'task') {
           if (this.length) {
             // this.$router.push(`/addTask?type=exam`)
-            this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
+            if(JSON.stringify(this.$store.getters.getTchCourseInfo) === '{}') {
+              //没有课程信息的时候
+             await this.getClassTeachCourseInfo()
+              this.showFilter()
+            }else {
+              this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
+            }
           }
         } else if(this.$route.query.from === 'examDetail') {
           //从试卷详情点击选择其他,进入到资源中心试题列表
