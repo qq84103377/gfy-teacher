@@ -129,6 +129,8 @@
               this.index++
               this.courseName = this.courseList[this.index].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+              this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+              this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
               this.resourceCount = this.courseList[this.index].resourceCount
             } else {
               //最后一页
@@ -138,6 +140,8 @@
             this.index++
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+            this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
             this.resourceCount = this.courseList[this.index].resourceCount
           }
 
@@ -150,6 +154,8 @@
             this.index--
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+            this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
             this.resourceCount = this.courseList[this.index].resourceCount
           }
         }

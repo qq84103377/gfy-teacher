@@ -120,7 +120,7 @@ export default {
         "operateAccountNo": this.$route.query.accountNo,
         "taskId": this.$route.query.taskId,
         "tchCourseId": this.$route.query.tchCourseId,
-
+        accountNo: this.$route.query.accountNo
       }
       if (this.$route.query.classId) {
         obj.classId = this.$route.query.classId
