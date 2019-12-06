@@ -1,6 +1,6 @@
 <template>
   <section class="task-detail">
-    <van-nav-bar class="task-detail__header" title="任务详情" left-arrow @click-left="$router.go(-2)" />
+    <van-nav-bar class="task-detail__header" title="任务详情" :left-arrow="isApp" @click-left="$router.go(-2)" />
     <div class="task-detail__body">
       <div class="task-detail__body__top">
         <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
@@ -74,7 +74,7 @@
         </van-cell>
       </div>
     </div>
-    <div class="task-detail__footer">
+    <div v-if="isApp" class="task-detail__footer">
       <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
       <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
     </div>
@@ -110,6 +110,9 @@ export default {
   computed: {
     link() {
       return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+    },
+    isApp() {
+      return 'cordova' in window
     }
   },
   methods: {

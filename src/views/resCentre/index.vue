@@ -463,6 +463,9 @@
     },
     created() {
       this.$store.commit('setErrorBookQuestionCourse',[])
+      if(this.$route.path === '/resCentre') {
+        this.$store.commit('setTchCourseInfo',{})
+      }
     },
     methods: {
       async download(srcUrl,name) {

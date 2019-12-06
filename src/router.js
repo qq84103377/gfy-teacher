@@ -93,11 +93,7 @@ export default new Router({
         {
           path: '/briefing',
           name: 'briefing',
-          component: () => import('./views/preview/briefing.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '简报'
-          }
+          component: () => import('./views/preview/briefing.vue')
         },
         {
           path: '/subjectList',

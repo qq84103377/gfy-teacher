@@ -1,5 +1,10 @@
 <template>
   <section class="briefing-wrap">
+    <van-nav-bar
+      title="简报"
+      @click-left="$router.back()"
+      :left-arrow="isApp">
+    </van-nav-bar>
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
         <div class="fs18" style="color: #000">{{$route.query.subjectTypeName}}练习《{{$route.query.title}}》{{new
@@ -19,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div class="briefing-wrap__footer">
+    <div v-if="isApp" class="briefing-wrap__footer">
       <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
     </div>
     <share-bar :show.sync="shareBarShow" :title="$route.query.title + '完成情况简报'" :link="link"></share-bar>
@@ -46,6 +51,9 @@
     computed: {
       link() {
         return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+      },
+      isApp() {
+        return 'cordova' in window
       }
     },
     async created() {

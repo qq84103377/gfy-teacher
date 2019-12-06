@@ -476,6 +476,9 @@
           this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
           this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
         }else {
+          if(item.tchCourseInfo.sysCourseId) {
+            this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
+          }
           this.courseList = JSON.parse(JSON.stringify(this.tempList))
         }
       },
