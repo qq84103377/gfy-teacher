@@ -9,11 +9,13 @@
     </div>
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
-        <div class="statistic-wrap__pie-chart-label divider">任务完成情况:
+        <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">重发任务
           </van-button>
           <van-button class="notice-btn" v-else :class="{remind: remind}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
+        </div>
+        <div class="statistic-wrap__pie-chart-label divider" v-else>任务完成情况:
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
@@ -224,6 +226,7 @@
         taskFinishInfo: { examstat: [], studentStatList: [], paperDataList: [] },
         remind: false,
         loadWareFlag: true,
+        isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
       }
     },
     computed: {
