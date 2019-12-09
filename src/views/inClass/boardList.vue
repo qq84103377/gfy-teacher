@@ -1,8 +1,8 @@
 <template>
   <section class="board-list">
     <div class="board-list__tab">
-      <div @click="changeTab(0)" class="van-hairline--right" :class="{active:!tabIndex}">教师白板</div>
-      <div @click="changeTab(1)" :class="{active:tabIndex}">学生白板</div>
+      <div @click="changeTab(false)" class="van-hairline--right" :class="{active:!tabIndex}">教师白板</div>
+      <div @click="changeTab(true)" :class="{active:tabIndex}">学生白板</div>
     </div>
     <div class="board-list__body" ref="body">
       <van-pull-refresh v-show="!tabIndex" v-model="teacher.refLoading" @refresh="onRefresh">
@@ -14,7 +14,7 @@
           <van-swipe-cell v-for="(item,index) in teacher.list" :key="index" class="mgt10" style="background: #fff;">
             <div class="board-list__body__item">
               <img :src="item.ClassTeachingData.dataUrl" alt="">
-              <div class="board-list__body__item-name">{{item.ClassTeachingData.name}}</div>
+              <div class="board-list__body__item-name"><span>{{item.ClassTeachingData.name}}</span><span>{{item.sendRangeName}}</span></div>
               <div class="board-list__body__item-time">{{item.ClassTeachingData.createDate}}</div>
             </div>
             <template slot="right">
@@ -31,7 +31,7 @@
           <van-swipe-cell v-for="(item,index) in stu.list" :key="index" class="mgt10" style="background: #fff;">
             <div class="board-list__body__item">
               <img :src="item.ClassTeachingData.dataUrl" alt="">
-              <div class="board-list__body__item-name">{{item.ClassTeachingData.name}}</div>
+              <div class="board-list__body__item-name"><span>{{item.ClassTeachingData.name}}</span><span>{{item.sendRangeName}}</span></div>
               <div class="board-list__body__item-time">{{item.ClassTeachingData.createDate}}</div>
             </div>
             <template slot="right">
@@ -53,7 +53,7 @@
     name: "boardList",
     data() {
       return {
-        tabIndex: 0,
+        tabIndex: this.$store.getters.getIsStuBoard,
         teacher: {
           listLoading: false,
           refLoading: false,
@@ -91,42 +91,44 @@
       });
     },
     methods: {
-      changeTab(index) {
-        this.tabIndex = index
-        if(this.tabIndex) {
-          this.teacher.scrollTop = this.$refs['body'].scrollTop
-          if(this.firstFlag) {
-            this.$nextTick(() => {
-              this.$refs['body'].scrollTo(0,this.stu.scrollTop)
-            })
-          }else {
-            this.firstFlag = true
-            this.onLoad()
-          }
-        }else {
-          this.stu.scrollTop = this.$refs['body'].scrollTop
-          this.$nextTick(() => {
-            this.$refs['body'].scrollTo(0,this.teacher.scrollTop)
-          })
-        }
+      changeTab(bol) {
+        // this.tabIndex = index
+        // if(this.tabIndex) {
+        //   this.teacher.scrollTop = this.$refs['body'].scrollTop
+        //   if(this.firstFlag) {
+        //     this.$nextTick(() => {
+        //       this.$refs['body'].scrollTo(0,this.stu.scrollTop)
+        //     })
+        //   }else {
+        //     this.firstFlag = true
+        //     this.onLoad()
+        //   }
+        // }else {
+        //   this.stu.scrollTop = this.$refs['body'].scrollTop
+        //   this.$nextTick(() => {
+        //     this.$refs['body'].scrollTo(0,this.teacher.scrollTop)
+        //   })
+        // }
+        this.$store.commit('setIsStuBoard',bol)
+        this.$router.back()
       },
       goto(item) {
-          let type = ''
-          const t = item.dataUrl.substring(item.dataUrl.lastIndexOf('.') + 1).toLowerCase();
-          if (t === 'ppt' || t === 'pptx') {
-            type = 'ppt'
-          } else if (t === 'doc' || t === 'docx') {
-            type = 'doc'
-          } else if (t === 'xls' || t === 'xlsx') {
-            type = 'xls'
-          } else if (t === 'pdf') {
-            type = 'pdf'
-          } else if (t == 'jpg' || t == 'png' || t == 'jpeg') {
-            type = 'img'
-          } else if (t == 'mp4' || t == 'mp3') {
-            type = 'video'
-          }
-          this.$router.push({path: '/boardDetail', query: {data: item,type: 'board'}})
+        let type = ''
+        const t = item.dataUrl.substring(item.dataUrl.lastIndexOf('.') + 1).toLowerCase();
+        if (t === 'ppt' || t === 'pptx') {
+          type = 'ppt'
+        } else if (t === 'doc' || t === 'docx') {
+          type = 'doc'
+        } else if (t === 'xls' || t === 'xlsx') {
+          type = 'xls'
+        } else if (t === 'pdf') {
+          type = 'pdf'
+        } else if (t == 'jpg' || t == 'png' || t == 'jpeg') {
+          type = 'img'
+        } else if (t == 'mp4' || t == 'mp3') {
+          type = 'video'
+        }
+        this.$router.push({path: '/boardDetail', query: {data: item,type: 'board'}})
       },
       async onLoad() {
         if (this.tabIndex) {
@@ -167,7 +169,9 @@
           resourceClass: 'C02',
           accountType: this.tabIndex ? 'A03' : 'A02',
           pageSize: 10,
-          currentPage: page
+          currentPage: page,
+          classId: this.$route.query.classId,
+          batchNo: this.$route.query.batchNo
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -278,6 +282,9 @@
           margin-bottom: 8px;
           font-size: 14px;
           color: #333;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
         &-time {
           color: #999;

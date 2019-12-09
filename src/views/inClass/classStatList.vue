@@ -12,7 +12,8 @@
                      :itemTitle="item.taskName"
                      :can-slide="true">
             <div slot="desc">
-              <div class="desc-bottom">
+              <div v-if="item.sendRangeName" class="desc-bottom">{{item.sendRangeName}}</div>
+              <div v-else class="desc-bottom">
                 <div v-for="(c,ci) in item.tchClassTastInfo" :key="ci">{{handleClassName(c.classId)}}:{{c.startDate}} --
                   {{c.endDate}}
                 </div>
@@ -163,7 +164,8 @@
           "tchCourseId": this.$route.query.tchCourseId,
           "taskType": 'T10',
           "pageSize": 10,
-          "currentPage": this.currentPage
+          "currentPage": this.currentPage,
+          classId: this.$route.query.classId
         }
         let params = {
           requestJson: JSON.stringify(obj)
