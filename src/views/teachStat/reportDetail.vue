@@ -340,7 +340,8 @@
         })
         item.active = true
         this.$nextTick(() => {
-          this.$refs["body"].scrollTo(0, item.scrollTop);
+          // this.$refs["body"].scrollTo(0, item.scrollTop);
+          this.$refs["body"].scrollTop = item.scrollTop
         })
       },
       getUserKnowledgePointCounter(item, index) {

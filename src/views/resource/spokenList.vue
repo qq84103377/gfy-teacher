@@ -148,7 +148,8 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.$nextTick(() => {
-        vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+        vm.$refs["body"].scrollTop = vm.scrollTop
       });
     });
   },
@@ -271,7 +272,8 @@ export default {
               )
             })
             if (ret.flag) {
-              this.$refs['body'].scrollTo(0, 0)
+              // this.$refs['body'].scrollTo(0, 0)
+              this.$refs['body'].scrollTop = 0
               this.onRefresh()
               this.$toast('复制成功')
               this.popShow = false

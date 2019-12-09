@@ -76,13 +76,15 @@ export default {
         vm.$store.commit('setIsAddWare', false)
         vm.onLoad()
         vm.$nextTick(() => {
-          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          vm.$refs["body"].scrollTop = vm.scrollTop
         });
       })
     } else {
       next(vm => {
         vm.$nextTick(() => {
-          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          vm.$refs["body"].scrollTop = vm.scrollTop
         });
       })
     }

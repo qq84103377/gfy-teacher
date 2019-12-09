@@ -69,7 +69,8 @@
     beforeRouteEnter(to, from, next) {
       next(vm => {
         vm.$nextTick(() => {
-          vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          vm.$refs['body'].scrollTop = vm.scrollTop
         });
       });
     },
