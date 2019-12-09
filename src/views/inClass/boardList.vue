@@ -86,7 +86,8 @@
     beforeRouteEnter(to, from, next) {
       next(vm => {
         vm.$nextTick(() => {
-          vm.$refs["body"].scrollTo(0, vm.tabIndex?vm.stu.scrollTop:vm.teacher.scrollTop);
+          // vm.$refs["body"].scrollTo(0, vm.tabIndex?vm.stu.scrollTop:vm.teacher.scrollTop);
+          vm.$refs["body"].scrollTop= vm.tabIndex?vm.stu.scrollTop:vm.teacher.scrollTop
         });
       });
     },
