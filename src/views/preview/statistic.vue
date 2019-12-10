@@ -792,7 +792,7 @@
                   formatter: `{b}{d}%>\n({c}人)`,
                   align: 'left'
                 },
-                lableLine: {
+                labelLine: {
                   normal: {
                     show: true
                   },

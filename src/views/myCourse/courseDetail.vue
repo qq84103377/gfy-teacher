@@ -22,7 +22,8 @@
             <van-cell v-if="currentSubjectType === 'S03'" :title="`口语(${currCourse.resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" @click="gotoResource('/spokenList')" is-link/>
           </van-collapse-item>
         </van-collapse>
-        <van-cell class="fs16" @click="" :title="`分层(${currCourse.resourceCount.find(v => v.resourceType === 'R13').resourceCount})`" is-link/>
+        <van-cell class="fs16" @click="$router.push(`/layerTaskList?tchCourseId=${$route.query.tchCourseId}&courseName=${currCourse.tchCourseInfo.courseName}&classGrade=${currCourse.tchCourseInfo.classGrade}&sysCourseId=${currCourse.tchCourseInfo.sysCourseId}&relationCourseId=${currCourse.tchCourseInfo.relationCourseId}`)"
+                  :title="`分层(${currCourse.resourceCount.find(v => v.resourceType === 'R13').resourceCount})`" is-link/>
       </div>
     </section>
 </template>

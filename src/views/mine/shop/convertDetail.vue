@@ -164,7 +164,7 @@
               if (res.flag) {
                 this.$toast.success('取消成功！');
                 // this.recordList.splice(index, 1);
-                this.$router.replace('/converseRecord')
+                this.$router.back();
               } else {
                 this.$toast.fail(res.msg);
               }

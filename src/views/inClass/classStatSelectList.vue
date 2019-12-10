@@ -1,7 +1,11 @@
 <template>
     <section class="class-stat-select-list">
       <div class="class-stat-select-list__body">
-        <van-cell-group class="mgt10">
+        <div v-if="!loading && !classList.length" style="text-align: center;color: #999999">
+          <img class="null-tips" src="../../assets/img/preview/class_stat_empty.png" alt />
+          <div>当前没有内容!</div>
+        </div>
+        <van-cell-group v-if="classList.length" class="mgt10">
           <van-cell v-for="(item,index) in classList" :key="index" class="fs16"
                     :title="item.className"
                     is-link @click="handleSelectClass(item.classId)"/>
@@ -12,13 +16,20 @@
 
 <script>
   import {getTaskGroupByClass} from '@/api/index'
-    export default {
+  import {mapMutations, mapGetters, mapState} from 'vuex'
+  export default {
         name: "classStatSelectList",
       data() {
         return {
-          classList: []
-        }
+          classList: [],
+          tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo)),
+      }
       },
+    computed: {
+      ...mapState({
+        loading: state => state.setting.vanLoading
+      })
+    },
       created() {
           this.getTaskGroupByClass()
       },
@@ -27,7 +38,8 @@
           this.$router.push({
             path: '/classStatList', query: {
               ...this.$route.query,
-              classId
+              classId,
+              tchClassCourseInfo: this.tchClassCourseInfo
             }
           })
         },
@@ -66,6 +78,10 @@
     &__body {
       flex: 1;
       overflow-y: auto;
+    }
+    .null-tips {
+      margin-top: 50px;
+      width: 100%;
     }
   }
 </style>
