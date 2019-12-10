@@ -2,6 +2,7 @@
   <div class="account">
     <div class="account-body">
       <van-cell-group>
+        <!-- <van-cell class="account-safety" title="绑定手机号" is-link to="bindPhoneNo"></van-cell> -->
         <van-cell class="account-safety" title="修改手机号" is-link to="modifyPhoneNo"></van-cell>
         <van-cell title="修改密码" is-link to="/modifyPassword"/>
         <van-cell title="清除缓存" @click="clearCache()" is-link/>
