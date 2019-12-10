@@ -6,10 +6,10 @@
       />
       <div class="reset-pwd__body">
         <h1 class="fs24">重置密码</h1>
-        <van-field class="custom-input" placeholder="请输入密码"
-                   v-model="pwd1"/>
-        <van-field class="custom-input" placeholder="请确认密码"
-                   v-model="pwd2"/>
+        <van-field class="custom-input" :border="false" placeholder="请输入密码" :type="showPwd1?'text':'password'" :right-icon="showPwd1?'eye-o':'closed-eye'"
+                   @click-right-icon="showPwd1=!showPwd1" v-model="pwd1"/>
+        <van-field class="custom-input" :border="false" placeholder="请确认密码" :type="showPwd2?'text':'password'" :right-icon="showPwd2?'eye-o':'closed-eye'"
+                  @click-right-icon="showPwd2=!showPwd2" v-model="pwd2"/>
         <van-button @click="handleConfirm" class="confirm" type="info">确定</van-button>
       </div>
     </section>
@@ -26,6 +26,8 @@
           return {
             pwd1: '',
             pwd2: '',
+            showPwd1: false,
+            showPwd2: false,
           }
       },
       methods: {
@@ -86,6 +88,9 @@
       }
       .custom-input{
         margin-bottom: 20px;
+        &:after {
+          left: 0;
+        }
       }
       .confirm {
         margin-top: 46px;
