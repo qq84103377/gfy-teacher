@@ -21,8 +21,9 @@
         name: "classStatSelectList",
       data() {
         return {
-          classList: []
-        }
+          classList: [],
+          tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo)),
+      }
       },
     computed: {
       ...mapState({
@@ -37,7 +38,8 @@
           this.$router.push({
             path: '/classStatList', query: {
               ...this.$route.query,
-              classId
+              classId,
+              tchClassCourseInfo: this.tchClassCourseInfo
             }
           })
         },
