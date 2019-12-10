@@ -43,9 +43,9 @@
           <div class="icon-wrap yellow"><i class="iconGFY icon-res"></i></div>
           <div>资源</div>
         </div>
-        <div class="index-content-wrap__body__main-icon-item" @click="$toast.fail('敬请期待')">
+        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">
           <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
-          <div>更多</div>
+          <div>分层</div>
         </div>
       </div>
       <div class="jcsb aic mgb10">

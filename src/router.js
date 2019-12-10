@@ -649,6 +649,20 @@ export default new Router({
             title: '智能补强'
           }
         },
+        {
+          path: '/layerTeach',
+          name: 'layerTeach',
+          component: () => import('./views/layerTeach/index.vue')
+        },
+        {
+          path: '/layerTaskList',
+          name: 'layerTaskList',
+          component: () => import('./views/layerTeach/layerTaskList.vue'),
+          meta: {
+            title: '分层',
+            isShowHeader: true,
+          }
+        },
       ]
     },
     {

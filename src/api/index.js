@@ -477,3 +477,11 @@ export const getClassDataGroupByTeacher =(params)=>{
 export const getTaskGroupByClass =(params)=>{
   return axios.post('teach/getTaskGroupByClass', qs.stringify(params))
 }
+//获取分层任务列表
+export const getLayerTaskInfoList =(params)=>{
+  return axios.post('teach/getLayerTaskInfoList', qs.stringify(params))
+}
+//获取分层任务详情
+export const getLayerTaskInfoDetail =(params)=>{
+  return axios.post('teach/getLayerTaskInfoDetail', qs.stringify(params))
+}

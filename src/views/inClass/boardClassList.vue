@@ -5,19 +5,25 @@
       <div @click="changeTab(true)" :class="{active:tabIndex}">学生白板</div>
     </div>
     <div class="board-class-list__body" ref="body">
-      <van-cell-group v-if="!tabIndex" class="mgt10">
-        <van-cell v-for="(item,index) in classList" :key="index" class="fs14"
-                  :title="item.className"
-                  is-link @click="handleSelectClass(item.classId)"/>
-      </van-cell-group>
-      <van-collapse @change="handleChange" v-else v-model="activeNames" class="mgt10">
-        <van-collapse-item class="fs16" v-for="(item,index) in classList" :key="index" :title="item.className"
-                           :name="index">
-          <van-cell class="fs12" v-for="(b,bi) in item.boardList" :key="bi"
-                    :title="b.name"
-                    is-link @click="handleSelectBoard(item.classId,b.batchNo)"/>
-        </van-collapse-item>
-      </van-collapse>
+      <div v-if="classList.length">
+        <van-cell-group v-if="!tabIndex" class="mgt10">
+          <van-cell v-for="(item,index) in classList" :key="index" class="fs14"
+                    :title="item.className"
+                    is-link @click="handleSelectClass(item.classId)"/>
+        </van-cell-group>
+        <van-collapse @change="handleChange" v-else v-model="activeNames" class="mgt10">
+          <van-collapse-item class="fs16" v-for="(item,index) in classList" :key="index" :title="item.className"
+                             :name="index">
+            <van-cell class="fs12" v-for="(b,bi) in item.boardList" :key="bi"
+                      :title="b.name"
+                      is-link @click="handleSelectBoard(item.classId,b.batchNo)"/>
+          </van-collapse-item>
+        </van-collapse>
+      </div>
+      <div v-if="!loading && !classList.length" style="text-align: center;color: #999999">
+        <img class="null-tips" src="../../assets/img/preview/class_stat_empty.png" alt />
+        <div>当前没有内容!</div>
+      </div>
     </div>
   </section>
 </template>
@@ -37,7 +43,8 @@
     },
     computed: {
       ...mapState({
-        tabIndex: state => state.setting.isStuBoard
+        tabIndex: state => state.setting.isStuBoard,
+        loading: state => state.setting.vanLoading
       })
     },
     methods: {
@@ -169,8 +176,6 @@
 
   .null-tips {
     margin-top: 50px;
-    margin-left: 50%;
-    transform: translateX(-50%);
     width: 100%;
   }
 </style>

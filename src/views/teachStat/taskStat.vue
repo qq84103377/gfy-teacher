@@ -656,7 +656,7 @@
                 formatter: `{b}`,
                 align: 'left'
               },
-              lableLine: {
+              labelLine: {
                 normal: {
                   show: true
                 },
