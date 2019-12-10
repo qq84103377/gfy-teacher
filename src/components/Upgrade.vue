@@ -228,6 +228,7 @@ export default {
             // 版本号获取
             _this.version = version;
           });
+
           var platform = device.platform;
           console.log("deviceready", device.platform);
           _this.checkUpgrade(platform);

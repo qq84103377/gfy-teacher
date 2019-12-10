@@ -5,14 +5,12 @@ import Home from '@/views/home'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
+  routes: [{
       path: '/',
       component: Home,
       // component: () => import('./views/login/index.vue'),
       redirect: '/login',
-      children: [
-        {
+      children: [{
           path: '/index',
           name: 'index',
           component: () => import('./views/index/index.vue'),
@@ -456,6 +454,15 @@ export default new Router({
           }
         },
         {
+          path: '/bindPhoneNo',
+          name: 'bindPhoneNo',
+          component: () => import('./views/mine/setting/bindPhoneNo.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '绑定手机号'
+          }
+        },
+        {
           path: '/modifyPassword',
           name: 'modifyPassword',
           component: () => import('./views/mine/setting/modifyPassword.vue'),
@@ -563,8 +570,7 @@ export default new Router({
         {
           path: '/teachStat',
           component: () => import('./views/teachStat/index.vue'),
-          children: [
-            {
+          children: [{
               path: '/',
               name: 'teachStat',
               component: () => import('./views/teachStat/teachStat.vue'),

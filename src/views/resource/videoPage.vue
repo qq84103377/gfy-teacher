@@ -10,6 +10,8 @@
 
       <img v-else src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="">
 
+      <audio v-if='isMp3' ref="video" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate"></audio>
+
       <div class="video_control" data-way='0' v-show='isShowControl' v-if='!isFullscreen'>
         <div class="progress">
           <van-icon v-if='!initVideo.play' name="play" color='#fff' class="icon-play" @click.native="playVideo" />
@@ -126,7 +128,8 @@ export default {
       isMove: false,
       isIphone: false,
       isMp3: this.$route.query.isMp3,
-      isEnd: 0
+      isEnd: 0,
+      timeID1: ''
     }
   },
   computed: {
@@ -173,9 +176,15 @@ export default {
     },
   },
   mounted() {
+    console.log(this.$route.query.src, 'this.$route.query.src');
     setTimeout(() => {
       if (this.$refs.video) {
         this.$refs.video.play()
+        this.timeID1 = setInterval(() => {
+          this.getAudioLength(2)
+          console.log(this.$refs.video.duration, 'this.$refs.video.duration');
+
+        }, 1000);
       }
     }, 0);
     // var mql = window.matchMedia("(orientation: portrait)");
@@ -355,6 +364,19 @@ export default {
       }
     }
   },
+  beforeDestroy() {
+    console.log('beforeDestroy');
+    this.initVideo = {
+      play: false,//播放还是暂停 true播放中
+      videoLength: 3600,//时长
+      url: '',//视频课件Url
+      // url:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201908/20190806041747_W4rnD_4.1使用-http查询MySQL数据.mp4',//视频课件Url
+      currentTime: 0,//当前播放时间
+      lastTime: null,//标记时间戳
+      name: "",
+    }
+    clearInterval(this.timeID1)
+  },
   methods: {
     // onMatchMeidaChange(mql) {
     //   if (mql.matches) {
@@ -388,6 +410,7 @@ export default {
         this.$nextTick(() => {
           if (this.$refs.video) {
             this.$refs.video.play()
+            this.$refs.video.muted = false
           }
 
           if (this.isShowControl) {
@@ -396,7 +419,6 @@ export default {
             }, 4000)
           }
 
-          this.$refs.video.muted = false
         })
 
       }
@@ -433,6 +455,7 @@ export default {
     },
     videoTimeUpdate() {//更新视频时间。节流，每秒触发一次
       console.log("videoTimeUpdate");
+      console.log(this.$refs.video, 'this.$refs.video');
       if (this.$refs.video) {
         if (!isNaN(this.$refs.video.currentTime)) {
           this.initVideo.currentTime = this.$refs.video.currentTime
