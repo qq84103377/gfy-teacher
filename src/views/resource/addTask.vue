@@ -63,6 +63,10 @@
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许学生交卷后重新修改答案
           </van-checkbox>
+          <van-checkbox class="allow-fast mgt10" v-model="form.layer" v-if="(form.exam||isReinforce)&&!$route.query.isResend" :name="form.layer">
+            <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
+            自动分层
+          </van-checkbox>
         </div>
 
       </van-cell>
@@ -230,6 +234,7 @@ export default {
         time2: '',
         desc: '',
         resourceId: '',
+        layer: false,
       },
       showTime: false,
       showLoading: false,
@@ -280,6 +285,7 @@ export default {
           } else {
             this.form.name = this.resourceInfo.testPaperName
           }
+          this.form.layer = this.resourceInfo.layerStatus === 'L02'
           this.testPaperId = this.resourceInfo.testPaperId
           this.testPaperName = this.resourceInfo.testPaperName
           this.form.exam = this.resourceInfo.testPaperName
@@ -305,6 +311,7 @@ export default {
       } else if (this.resourceInfo && this.isEdit) {
 
         this.form.duration = this.resourceInfo.duration
+        this.form.layer = this.resourceInfo.layerStatus === 'L02'
         this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
         this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
         if (this.resourceInfo.description) {
@@ -1026,7 +1033,8 @@ export default {
         "isDrag": isDrag,
         "testPaperId": this.testPaperId,
         "modifyAfterSubmit": modifyAfterSubmit,
-        "sysTypeCd": "S02"
+        "sysTypeCd": "S02",
+        "layerStatus": this.form.layer ? 'L02': 'L01'
       };
       //发布任务的学生
       let classListSelect = []
@@ -1119,7 +1127,7 @@ export default {
           this.showLoading = false
           if (res.flag) {
             eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
-            this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo' + this.$store.getters.getUserInfo.accountNo)
+            this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo=' + this.$store.getters.getUserInfo.accountNo)
             let taskInfo = {
               taskName: this.form.name,
               desc: this.form.desc,
@@ -1258,8 +1266,7 @@ export default {
           "testPaperId": this.testPaperId,
           "modifyAfterSubmit": modifyAfterSubmit,
           "taskId": this.$route.query.taskId,
-          // "layerStatus": '',
-
+          "layerStatus": this.form.layer?'L02':'L01',
         };
       }
       //发布任务的学生

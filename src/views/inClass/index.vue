@@ -19,10 +19,10 @@
                   is-link @click="goto('/lectureList')"/>
         <van-cell class="fs16"
                   :title="`白板(${resourceCount.find(v => v.resourceType === 'R12_C02')?resourceCount.find(v => v.resourceType === 'R12_C02').resourceCount:0})`"
-                  is-link @click="goto('/boardList')"/>
+                  is-link @click="goto('/boardClassList')"/>
         <van-cell class="fs16"
                   :title="`堂测统计(${resourceCount.find(v => v.resourceType === 'R12_C03')?resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`"
-                  is-link @click="goto('/classStatList')"/>
+                  is-link @click="goto('/classStatSelectList')"/>
       </div>
     </div>
   </section>
@@ -100,7 +100,7 @@
         })
       },
       goto(path) {
-        if(path === '/classStatList') {
+        if(path === '/classStatSelectList') {
           localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.courseList[this.index].tchCourseInfo))
         }
         const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, termType, courseName} = this
@@ -129,6 +129,8 @@
               this.index++
               this.courseName = this.courseList[this.index].tchCourseInfo.courseName
               this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+              this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+              this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
               this.resourceCount = this.courseList[this.index].resourceCount
             } else {
               //最后一页
@@ -138,6 +140,8 @@
             this.index++
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+            this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
             this.resourceCount = this.courseList[this.index].resourceCount
           }
 
@@ -150,6 +154,8 @@
             this.index--
             this.courseName = this.courseList[this.index].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+            this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
             this.resourceCount = this.courseList[this.index].resourceCount
           }
         }

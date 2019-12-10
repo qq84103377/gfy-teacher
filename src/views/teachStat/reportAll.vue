@@ -3,7 +3,7 @@
     <van-nav-bar
       :title="$route.query.stuName+'的家庭报告'"
       @click-left="$router.back()"
-      left-arrow/>
+      :left-arrow="isApp"/>
     <div class="report-all-wrap__body">
       <div class="fs16" style="font-weight: bold;">一、知识点掌握情况</div>
       <div>
@@ -84,7 +84,7 @@
         </div>
       </div>
     </div>
-    <div class="report-all-wrap__footer">
+    <div v-if="isApp" class="report-all-wrap__footer">
       <van-button class="btn" type="info" @click="shareBarShow=true">分享给家长</van-button>
     </div>
     <share-bar :show.sync="shareBarShow" :title="$route.query.stuName+'的家庭报告'" :link="link"></share-bar>
@@ -104,6 +104,9 @@
     computed: {
       link() {
         return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+      },
+      isApp() {
+        return 'cordova' in window
       }
     },
     data() {

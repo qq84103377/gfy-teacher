@@ -465,3 +465,15 @@ export const delTestPaper =(params)=>{
 export const getLatestModuleVerion =(params)=>{
   return axios.post('sysModuleVersion/getLatestModuleVerion', qs.stringify(params))
 }
+//获取课中白板课程下的班级信息
+export const getClassDataGroupByClass =(params)=>{
+  return axios.post('teach/getClassDataGroupByClass', qs.stringify(params))
+}
+//班级学生白板按老师白板归类统计
+export const getClassDataGroupByTeacher =(params)=>{
+  return axios.post('teach/getClassDataGroupByTeacher', qs.stringify(params))
+}
+//获取课程下的堂测任务归类的班级信息列表
+export const getTaskGroupByClass =(params)=>{
+  return axios.post('teach/getTaskGroupByClass', qs.stringify(params))
+}

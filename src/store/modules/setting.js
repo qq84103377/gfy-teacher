@@ -17,6 +17,7 @@ const state = {
   resQuestionSelect: [], //资源中心选择的试题
   removeQuestionList: [], //资源中心试题列表移除的试题ID
   isRevert: false, //试题列表选择其他按钮是否显示为返回按钮
+  isStuBoard: false, //课中白板是否选择学生白板
 }
 
 const mutations = {
@@ -81,6 +82,9 @@ const mutations = {
   },
   setIsRevert(state,data) {
     state.isRevert = data
+  },
+  setIsStuBoard(state,data) {
+    state.isStuBoard = data
   }
 }
 
@@ -112,6 +116,7 @@ const getters = {
   getResQuestionSelect: state => state.resQuestionSelect,
   getRemoveQuestionList: state => state.removeQuestionList,
   getIsRevert: state => state.isRevert,
+  getIsStuBoard: state => state.isStuBoard,
 };
 
 export default {

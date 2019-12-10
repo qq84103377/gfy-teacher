@@ -93,11 +93,7 @@ export default new Router({
         {
           path: '/briefing',
           name: 'briefing',
-          component: () => import('./views/preview/briefing.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '简报'
-          }
+          component: () => import('./views/preview/briefing.vue')
         },
         {
           path: '/subjectList',
@@ -298,9 +294,27 @@ export default new Router({
           }
         },
         {
+          path: '/boardClassList',
+          name: 'boardClassList',
+          component: () => import('./views/inClass/boardClassList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '白板'
+          }
+        },
+        {
           path: '/classStatList',
           name: 'classStatList',
           component: () => import('./views/inClass/classStatList.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '堂测统计'
+          }
+        },
+        {
+          path: '/classStatSelectList',
+          name: 'classStatSelectList',
+          component: () => import('./views/inClass/classStatSelectList.vue'),
           meta: {
             isShowHeader: true,
             title: '堂测统计'
