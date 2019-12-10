@@ -29,10 +29,14 @@
         }
       }
     },
+    beforeRouteLeave(to, from, next) {
+      this.$dialog.close();
+      next();
+    },
     methods: {
       handelClick() {
         this.$dialog.confirm({
-          message: '18566860844',
+          message: this.instructorInfo.contactNumber,
           confirmButtonText: '呼叫',
           confirmButtonColor: '#39F0DD'
         }).then(() => {
