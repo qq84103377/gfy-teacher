@@ -1,15 +1,16 @@
 <template>
   <section class="resource-wrap">
     <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
-      <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
-      <div slot="right" class="resource-wrap-header-right">
-        <van-dropdown-menu active-color="none" class="edit-btn">
-          <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true" :editCourseInfo.sync="tchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
-          </van-dropdown-item>
-        </van-dropdown-menu>
-      </div>
-
+<!--      <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>-->
+<!--      <div slot="right" class="resource-wrap-header-right">-->
+<!--        <van-dropdown-menu active-color="none" class="edit-btn">-->
+<!--          <van-dropdown-item title="编辑" ref="dropdown">-->
+<!--            <edit-course :is-edit="true" :editCourseInfo.sync="tchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>-->
+<!--          </van-dropdown-item>-->
+<!--        </van-dropdown-menu>-->
+<!--      </div>-->
+      <div slot="left" class="fs14" @click="changeCourse(0)">上一课</div>
+      <div slot="right" class="fs14" @click="changeCourse(1)">下一课</div>
     </dropdown-header>
     <div class="resource-wrap__body">
       <div v-if="!courseList.length && !firstFlag" class="empty-page">
@@ -64,6 +65,7 @@ export default {
       ],
       firstFlag: true,
       currentTchCourseInfo: {},
+      index: 0, //选中的课程index
     }
   },
   computed: {
@@ -72,10 +74,52 @@ export default {
     }
   },
   methods: {
-    toggle(data) {
-      this.$refs.dropdown.toggle()
-      this.courseName = data
-      this.dropdownRefresh()
+    // toggle(data) {
+    //   this.$refs.dropdown.toggle()
+    //   this.courseName = data
+    //   this.dropdownRefresh()
+    // },
+    async changeCourse(type) {
+      if (type) {
+        //下一题
+        if (this.index >= this.courseList.length - 1) {
+          // 当前课程已是列表的最后一个
+          if (!this.dropdownFinish) {
+            //还能加载下一页
+            await this.dropdownOnLoad()
+            this.index++
+            this.courseName = this.courseList[this.index].tchCourseInfo.courseName
+            this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+            this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+            this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+            this.resourceCount = this.courseList[this.index].resourceCount
+          } else {
+            //最后一页
+            this.$toast('没有下一课了')
+          }
+        } else {
+          this.index++
+          this.courseName = this.courseList[this.index].tchCourseInfo.courseName
+          this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+          this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+          this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+          this.resourceCount = this.courseList[this.index].resourceCount
+        }
+
+      } else {
+        //上一题
+        if (this.index <= 0) {
+          // 当前课程已是列表的第一个
+          this.$toast('没有上一课了')
+        } else {
+          this.index--
+          this.courseName = this.courseList[this.index].tchCourseInfo.courseName
+          this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
+          this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
+          this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+          this.resourceCount = this.courseList[this.index].resourceCount
+        }
+      }
     },
     goto(path) {
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
