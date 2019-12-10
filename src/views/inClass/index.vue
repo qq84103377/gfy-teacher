@@ -96,6 +96,7 @@
           this.$store.commit('setVanLoading', false)
           if(res.flag) {
            this.resourceCount = res.data[0].resourceCount
+            this.courseList[this.index].resourceCount = this.resourceCount
           }
         })
       },
