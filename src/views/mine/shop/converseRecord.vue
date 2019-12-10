@@ -70,7 +70,7 @@
         let d = new Date(date);
         let YY = d.getFullYear();
         let MM = (d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1);
-        let DD = d.getDate() > 10 ? d.getDate() : '0' + d.getDate();
+        let DD = d.getDate() >= 10 ? d.getDate() : '0' + d.getDate();
         let week = d.getDay();
         let str = '星期';
         switch (week) {
@@ -204,6 +204,11 @@
       }
     },
     mounted() {
+      console.log('mounted')
+    },
+    activated() {
+      console.log('activated')
+      // this.onLoad()
     }
   }
 </script>
