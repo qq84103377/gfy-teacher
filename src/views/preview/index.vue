@@ -87,6 +87,7 @@ export default {
       dropdownRefLoading: false,
       dropdownListLoading: false,
       dropdownFinish: false,
+      dropdownTotal: 0,
       total: 0,
       currentTchCourseInfo: {},
       classGrade: '',
@@ -257,7 +258,9 @@ export default {
     },
     async dropdownOnLoad() {
       this.dropdownPage++
-
+      if (this.dropdownPage > this.dropdownTotal && this.dropdownPage > 1) {
+        return
+      }
       await this.getClassTeachCourseInfo()
     },
     async dropdownRefresh(isEdit) {
@@ -328,6 +331,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
       await getClassTeachCourseInfo(params).then(res => {
+        this.dropdownTotal = res.total
         this.dropdownListLoading = false
         this.dropdownRefLoading = false
         if (res.flag && res.data && res.data[0]) {

@@ -47,6 +47,7 @@ export default {
       dropdownListLoading: false,
       dropdownFinish: false,
       dropdownRefLoading: false,
+      dropdownTotal: 0,
       courseName: '',
       tchCourseId: '',
       sysCourseId: '',
@@ -143,7 +144,9 @@ export default {
     },
     async dropdownOnLoad() {
       this.dropdownPage++
-
+      if (this.dropdownPage > this.dropdownTotal && this.dropdownPage > 1) {
+        return
+      }
       await this.getClassTeachCourseInfo()
     },
     async dropdownRefresh() {
@@ -154,6 +157,7 @@ export default {
       this.$toast('刷新成功')
     },
     async getClassTeachCourseInfo() {
+      const page = this.dropdownPage
 
       let obj = {
         "interUser": "runLfb",
@@ -168,7 +172,7 @@ export default {
         "pageSize": "20",
         "courseType": "C01",
         "classId": "",
-        "currentPage": this.dropdownPage
+        "currentPage": page
       }
       let params = {
         requestJson: JSON.stringify(obj)
@@ -177,9 +181,9 @@ export default {
         this.$store.commit('setVanLoading', false)
         this.dropdownListLoading = false
         this.dropdownRefLoading = false
-        this.total = res.total
-        if (res.flag) {
-          this.courseList = this.dropdownPage === 1 ? res.data : this.courseList.concat(res.data)
+        this.dropdownTotal = res.total
+        if (res.flag && res.data && res.data[0]) {
+          this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
           if (!this.courseName) {
             this.tchCourseInfo = this.courseList[0].tchCourseInfo
             this.resourceCount = this.courseList[0].resourceCount
@@ -193,11 +197,12 @@ export default {
             this.tchClassCourseInfo = this.courseList[0].tchCourseInfo.tchClassCourseInfo
             this.classGrade = this.courseList[0].tchCourseInfo.classGrade
           }
-          if (this.dropdownPage >= res.total) {
+          if (page >= res.total) {
             this.dropdownFinish = true
           }
         } else {
-          this.$toast(res.msg)
+          this.courseList = page === 1 ? [] : this.courseList.concat([])
+          this.dropdownFinish = true
         }
         this.firstFlag = false
       }).catch(err => {

@@ -168,6 +168,8 @@
             }
             if(!this.$route.query.isPri) {
               this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
+              // localStorage.courseIdList
+             // (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
             }
           }else if (this.$route.path === '/examDetail') {
             this.form.name = `${this.$route.query.title}-副本`

@@ -45,6 +45,7 @@
         dropdownListLoading: false,
         dropdownFinish: false,
         dropdownRefLoading: false,
+        dropdownTotal: 0,
         courseList: [],
         firstFlag: true,
         index: 0, //选中的课程index
@@ -249,7 +250,9 @@
       },
       async dropdownOnLoad() {
         this.dropdownPage++
-
+        if (this.dropdownPage > this.dropdownTotal && this.dropdownPage > 1) {
+          return
+        }
         await this.getClassTeachCourseInfo()
       },
       async dropdownRefresh() {
@@ -284,14 +287,15 @@
           this.$store.commit('setVanLoading', false)
           this.dropdownListLoading = false
           this.dropdownRefLoading = false
-          this.total = res.total
-          if (res.flag) {
+          this.dropdownTotal = res.total
+          if (res.flag && res.data && res.data[0]) {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
-            if (this.dropdownPage >= res.total) {
+            if (page >= res.total) {
               this.dropdownFinish = true
             }
           } else {
-            this.$toast(res.msg)
+            this.courseList = page === 1 ? [] : this.courseList.concat([])
+            this.dropdownFinish = true
           }
           this.firstFlag = false
         }).catch(err => {
