@@ -1,5 +1,5 @@
 <template>
-  <div class="correct-wrap">
+  <div class="correct-wrap" id="correct-wrap">
     <div class="correct-wrap__header" v-show="!isFold">
       <van-icon @click="$router.back()" name="arrow-left"/>
       <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}</span>
@@ -496,7 +496,9 @@
                   title: "",
                   message: "已经全部批改完该大题,是否回到批改列表?",
                   cancelButtonText: "取消",
-                  confirmButtonText: "确定"
+                  confirmButtonText: "确定",
+                  className: 'finish-dialog',
+                  getContainer: '#correct-wrap'
                 }).then(() => {
                   this.$router.back()
                 })
@@ -688,6 +690,18 @@
   @deep: ~">>>";
   .correct-wrap {
     overflow: hidden;
+    @{deep} .finish-dialog.van-dialog {
+       .van-dialog__message {
+        font-size: 10px;
+        padding: 10px;
+      }
+       .van-button {
+        height: 20px;
+        line-height: 20px;
+        font-size: 10px;
+      }
+      width: 130px;
+    }
 
     @{deep} .van-popup--right {
       transform: translate3d(0, 0, 0);
