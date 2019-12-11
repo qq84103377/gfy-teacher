@@ -99,6 +99,7 @@
     methods: {
       uploadWare(curFile) {
         console.log("开始上传")
+        this.$store.commit('setVanLoading', true)
         const suffix = curFile.name.substr(curFile.name.lastIndexOf('.'))
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
@@ -116,20 +117,23 @@
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+          this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
+          this.wareName = curFile.name
           this.wareUrl =
             this.oSSObject.host +
             "/" +
             this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
             filetime +
             randomStr + suffix
-        });
+        }).catch(err => {
+          this.$store.commit('setVanLoading', false)
+        })
       },
       read(file, detail) {
         console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
         if (file.type) {
           if (['.pdf', '.ppt', '.pptx', '.doc', '.docx', '.xls', '.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
-            this.wareName = file.name
             this.wareSize = file.size
             this.uploadWare(file)
           } else {

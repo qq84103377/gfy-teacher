@@ -174,6 +174,7 @@
       uploadIMG(curFile) {
         console.log("开始上传")
         console.log(this.oSSObject)
+        this.$store.commit('setVanLoading', true)
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
@@ -188,6 +189,7 @@
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+          this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
           var imgUrl =
             this.oSSObject.host +
@@ -201,7 +203,9 @@
             size: curFile.size
           };
           this.imgList.push(imgObj);
-        });
+        }).catch(err => {
+          this.$store.commit('setVanLoading', false)
+        })
       },
       handleSelect(item, index) {
         // index 0 相册  1 拍照

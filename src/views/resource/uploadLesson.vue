@@ -171,7 +171,6 @@
           this.wareFile = obj.curFile;
           this.form.name = obj.curFile.name.split('.')[0]
           this.wareSize = obj.curFile.size
-          this.wareName = obj.curFile.name
           this.uploadWare(obj.curFile);
 
         })
@@ -374,6 +373,7 @@
         this.showActionSheet = !this.showActionSheet
       },
       uploadWare(curFile) {
+        this.$store.commit('setVanLoading',true)
         console.log("开始上传")
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
@@ -392,17 +392,22 @@
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.wareOSSObject.host, formData).then(data => {
           console.log('doUpLoad', data);
+          this.$store.commit('setVanLoading',false)
+          this.wareName = curFile.name
           this.wareUrl =
             this.wareOSSObject.host +
             "/" +
             this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
             filetime +
             randomStr + '.' + curFile.type.split('/')[1]
-        });
+        }).catch(err => {
+          this.$store.commit('setVanLoading',false)
+        })
       },
       uploadIMG(curFile) {
         console.log("开始上传")
         console.log(this.oSSObject)
+        this.$store.commit('setVanLoading',true)
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
@@ -417,6 +422,7 @@
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+          this.$store.commit('setVanLoading',false)
           console.log('doUpLoad', data);
           var imgUrl =
             this.oSSObject.host +
@@ -428,7 +434,9 @@
             url: imgUrl
           };
           this.imgList.push(imgObj);
-        });
+        }).catch(err => {
+          this.$store.commit('setVanLoading',false)
+        })
       },
       handleSelect(item, index) {
         // index 0 相册  1 拍照
