@@ -100,7 +100,14 @@
        getSubjectType(params).then(res => {
           // this.$set(this.filter.subjectList[index],'done',true) // 是否已加载了数据
           if(res.flag) {
-            this.subjectList[index].child = res.resSubjectTypeInfoList
+            //由于目前后台还没有做权限控制,所以前台先将年级对应的科目筛选,过滤掉多余的科目
+            this.subjectList[index].child = res.resSubjectTypeInfoList.filter(v => {
+              if(index == 0) {
+                return ['S01','S02','S03'].includes(v.subjectType)
+              }else if (index == 1 || index == 2) {
+                return ['S01','S02','S03','S04','S05','S06','S07','S08','S09'].includes(v.subjectType)
+              }
+            })
             if(index === this.index) {
               const subjectIndex = this.subjectList[index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
               this.$emit('update:label',this.subjectList[index].name + this.subjectList[index].child[subjectIndex].subjectName)
