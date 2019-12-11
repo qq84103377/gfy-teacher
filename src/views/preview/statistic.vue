@@ -1037,6 +1037,11 @@
           vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
         })
       }
+      else if (from.path === '/subjectList') {
+        next(async vm => {
+          await vm.statTaskStat()
+        })
+      }
       else {
         next()
       }
