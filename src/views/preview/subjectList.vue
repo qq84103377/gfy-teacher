@@ -10,7 +10,7 @@
         <div class="subject-list-wrap__body-top">
           <div class="fs16">
             <div class="detail html-img" :class="{'fold':fold}">
-              <div style="flex: 1;word-break: break-all">
+              <div :style="{'width': fold?'80%':'100%','word-break': 'break-all'}">
                 <div ref="title" v-html="info.title"></div>
                 <div v-if="info.groupExamList.length">
                   <div class="fs14" v-for="(item,index) in info.groupExamList" :key="index">
