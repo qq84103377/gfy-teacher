@@ -74,7 +74,7 @@
 <script>
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
-  import {addCourseWare, addTeachCourseRes} from '@/api/index'
+  import {addCourseWare, addTeachCourseRes, createCourseSummitInfo} from '@/api/index'
 
   export default {
     name: "uploadWare",
@@ -216,17 +216,7 @@
         addCourseWare(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            if (this.form.relate === '3') {
-              // 关联课中
-              this.addTeachCourseRes(res.coursewareIdList[0])
-            } else {
-              //仅资源
-              this.$toast('添加成功')
-              this.$store.commit('setIsAddWare', true)
-              this.$router.back()
-            }
-
-
+            this.addTeachCourseRes(res.coursewareIdList[0])
           } else {
             this.$toast(res.msg)
           }
@@ -252,16 +242,55 @@
         }
         addTeachCourseRes(params).then(res => {
           this.form.btnLoading = false
+
           if (res.flag) {
-            this.$toast('添加成功')
-            this.$store.commit('setIsAddWare', true)
-            this.$router.back()
+            if (this.form.relate === '3') {
+              // 关联课中
+              this.createCourseSummitInfo(resourceId)
+            } else {
+              //仅资源
+              this.$toast('添加成功')
+              this.$store.commit('setIsAddWare', true)
+              this.$router.back()
+            }
           } else {
             this.$toast(res.msg)
           }
         })
       },
-
+      createCourseSummitInfo(resourceId) {
+        this.form.btnLoading = true
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          accountType: 'A02',
+          "belongSchoolId": this.$store.getters.schoolId,
+          dataUrl: this.wareUrl,
+          dataType: 'D04',
+          "resourceType": "R01",
+          resourceClass: 'C01',
+          resourceId,
+          majorLevel:'M01',
+          "tchCourseId": this.$route.query.tchCourseId,
+          classId: this.$route.query.classId,
+          subjectType: this.$route.query.subjectType
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        createCourseSummitInfo(params).then(res => {
+          this.form.btnLoading = false
+          if(res.flag) {
+            this.$toast('添加成功')
+            this.$store.commit('setIsAddWare', true)
+            this.$router.back()
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      }
     }
   }
 </script>
