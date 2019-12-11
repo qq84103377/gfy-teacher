@@ -78,7 +78,7 @@
       <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
       <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="'新任务--'+taskDetail.tastName" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="`${$route.query.subjectTypeName}练习--《${taskDetail.tastName}》`" desc="我布置了一份练习,请家长督促学生完成" :link="link"></share-bar>
   </section>
 </template>
 

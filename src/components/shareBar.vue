@@ -17,7 +17,7 @@
 import clipboardJs from 'clipboard'
 export default {
   name: 'shareBar',
-  props: ['show', 'title', 'pic', 'link', 'type'],
+  props: ['show', 'title', 'pic', 'link', 'type', 'desc'],
   computed: {
     visible: {
       get() {
@@ -58,31 +58,13 @@ export default {
     handleClass(item) {
       return `iconGFY icon-${item.type}`
     },
-    handleDesc() {
-      let descArr = [
-        '家长圈APP,每个家长都在用的APP',
-        '这里有你想要的资讯',
-        '快来看,这有实用的干货',
-        '看看有哪些你喜欢的资讯',
-        '你也来看看这条大家都在关注的资讯吧'
-      ]
-      if (this.type == 'art') {
-        return descArr[Math.floor(Math.random() * 5)]
-      } else if (this.type == 'psy') {
-        return '我做了一个测试，你也来试试吧'
-      } else if (this.type == 'task') {
-        return '任务已发放，请帮忙督促哦'
-      } else {
-        return ''
-      }
-    },
     share(item) {
       let _this = this
       if (item.type === 'wx' || item.type === 'timeline') {
         Wechat.share({
           message: {
             title: _this.title,
-            description: '',
+            description: this.desc || '',
             thumb: _this.pic || 'https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/share_icon/teacher_share.png',
             // mediaTagName: "TEST-TAG-001",
             // messageExt: "这是第三方带的测试字段",
@@ -112,7 +94,7 @@ export default {
         args.scene = item.type === 'qq' ? QQSDK.Scene.QQ : QQSDK.Scene.QQZone//QQSDK.Scene.QQZone,QQSDK.Scene.Favorite
         args.url = this.link
         args.title = this.title
-        args.description = ''
+        args.description = this.desc || ''
         args.image = this.pic || 'https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/share_icon/teacher_share.png'
         QQSDK.shareNews(() => {
           this.$toast.success('分享成功')

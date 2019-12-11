@@ -27,7 +27,7 @@
     <div v-if="isApp" class="briefing-wrap__footer">
       <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="$route.query.title + '完成情况简报'" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="`${$route.query.subjectTypeName}练习--《${$route.query.title}》完成情况简报--请家长及时查看`" desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
   </section>
 </template>
 <script>
