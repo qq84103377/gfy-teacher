@@ -48,7 +48,7 @@
       return {
         index: 0,
         subjectList: [
-          {name: '小学',value:'Y01',active:true,child:[]},
+          {name: '小学',value:'Y01',active:false,child:[]},
           {name: '初中',value:'Y02',active:false,child:[]},
           {name: '高中',value:'Y03',active:false,child:[]},
         ],
@@ -75,7 +75,12 @@
       }
     },
    created() {
-      this.subjectList.forEach((v,i) => {
+      const classMap = JSON.parse(localStorage.classMap)
+     this.subjectList.forEach((v,i) => {
+       if(v.value === classMap[Object.keys(classMap)[0]].classYearSection) {
+         v.active = true
+         this.index = i
+       }
        this.getSubjectType(i)
       })
     },
@@ -96,7 +101,7 @@
           // this.$set(this.filter.subjectList[index],'done',true) // 是否已加载了数据
           if(res.flag) {
             this.subjectList[index].child = res.resSubjectTypeInfoList
-            if(!index) {
+            if(index === this.index) {
               const subjectIndex = this.subjectList[index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
               this.$emit('update:label',this.subjectList[index].name + this.subjectList[index].child[subjectIndex].subjectName)
               this.$set(this.subjectList[index].child[subjectIndex],'check',true)
@@ -118,6 +123,8 @@
             eventBus.$emit('changeSubject',item?item.subjectType:'')
             this.$emit('update:label',this.subjectList[this.index].name + (item?item.subjectName:''))
           }
+        }else {
+         return this.$toast('请选择科目')
         }
         this.show = false
       },
@@ -162,6 +169,16 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
+        const childIndex = this.subjectList[index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
+        if(childIndex > -1){
+          //如果切换后的年级刚好有切换前的科目,则选中
+          this.subjectList.forEach(v => {
+            v.child.forEach(c => {
+              this.$set(c,'check',false)
+            })
+          })
+          this.$set(this.subjectList[index].child[childIndex],'check',true)
+        }
         // this.$set(item.child[0],'check',true)
         // this.$emit('selectParent', index)
       },
