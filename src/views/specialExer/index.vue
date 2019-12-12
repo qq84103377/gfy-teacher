@@ -47,7 +47,6 @@
         <div class="blue">{{filter.more}}</div>
       </van-cell>
 
-
       <question-type v-if="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
       <knowledge-point v-if="active == 1"></knowledge-point>
       <review-test v-if="active == 2"></review-test>
@@ -121,6 +120,7 @@
     </van-popup>
 
     <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList"></subject-filter>
+
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
 
   </section>
@@ -256,7 +256,7 @@ export default {
 
       typesList: [],
       areaCode: '0757',
-      courseIds:[]
+      courseIds: []
 
 
     };

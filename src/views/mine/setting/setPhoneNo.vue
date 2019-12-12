@@ -22,7 +22,7 @@
     </van-cell-group>
 
     <div class="confirm">
-      <van-button type="info" size="large" @click="verifyCode()">绑定</van-button>
+      <van-button type="info" size="large" @click="verifyCode()">设置</van-button>
     </div>
     <div class="tips">
       收不到验证码？请点击<span @click="$router.push('/service')">为您服务</span>咨询
@@ -141,43 +141,10 @@ export default {
         }
       })
     },
-    // 确定更换手机号
-    confirmChange() {
-      var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
-      if (!reg.test(this.newTel)) {
-        this.$toast("新手机号格式不正确!");
-        return;
-      }
-      let obj = {
-        interUser: "runLfb",
-        interPwd: hex_md5(1234578),
-        newPhoneNo: this.newTel,
-        sysType: "S01",
-        accountNo: this.$store.getters.getUserInfo.accountNo
-      };
 
-      replacementPhone(obj).then(res => {
-        if (res.flag) {
-          this.$toast.success("更换手机号成功");
-          this.phoneNo = this.newTel;
-          this.mobileNo = this.phoneNo.substr(0, 3) + '****' + this.phoneNo.substr(this.phoneNo.length - 4);
-          this.$store.commit("setUserInfo", res.data[0].usrInfo);
-          setTimeout(() => {
-            this.$router.replace('/setting')
-          }, 1000)
-        } else {
-          this.$toast.fail(res.msg);
-        }
-      });
-    },
   },
   created: function () {
-    // if (!this.$store.getters.getUserInfo) {
-    //   return;
-    // }
-    // this.phoneNo = this.$store.getters.getUserInfo.phoneNo;
-    // this.mobileNo = this.phoneNo.substr(0, 3) + '****' + this.phoneNo.substr(this.phoneNo.length - 4);
-
+    
   }
 };
 </script>

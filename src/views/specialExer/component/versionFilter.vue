@@ -34,12 +34,12 @@
 
 <script>
 import { Dialog } from 'vant';
-import { getTextBookVersionInfo, getGradeTermInfo, getTextBookCourseInfo,getVersionGradeList } from '@/api/index'
+import { getTextBookVersionInfo, getGradeTermInfo, getTextBookCourseInfo, getVersionGradeList } from '@/api/index'
 import eventBus from "@/utils/eventBus";
 
 export default {
   name: "versionFilter",
-  props: ['visible', 'label', 'gradeTerm','courseIds'],
+  props: ['visible', 'label', 'gradeTerm', 'courseIds'],
   data() {
     return {
       index: 0,
@@ -84,6 +84,8 @@ export default {
     this.versionList.forEach(async (v, i) => {
       await this.getGradeTermInfo(v)
       this.getTextBookVersionInfo(v, i)
+      // this.getVersionGradeList(v, i)
+
     })
   },
   mounted() {
@@ -134,7 +136,7 @@ export default {
             textBookList.forEach(function (item) {
               newArr.push(item.courseId)
             })
-            this.courseIds=newArr = Array.from(new Set(newArr))
+            this.courseIds = newArr = Array.from(new Set(newArr))
             console.log(courseIds, 'courseIds');
 
             this.$emit('update:courseIds', this.courseIds)
@@ -213,6 +215,7 @@ export default {
 
       })
     },
+
     async getGradeTermInfo(v) {
       // if(this.filter.subjectList[index].gradeDone) return
       let obj = {
@@ -251,6 +254,48 @@ export default {
       getTextBookVersionInfo(params).then(res => {
         // this.$set(this.filter.subjectList[index],'versionDone',true) // 是否已加载了年级数据
         console.log('getTextBookVersionInfo', res);
+        if (res.flag) {
+          v.arr = res.textbookVersionList
+          v.arr.forEach((ver, i) => {
+            if (!i) {
+              this.textItem = ver
+              this.$set(ver, 'active', true)
+            }
+
+            // this.$set(ver,'child',JSON.parse(JSON.stringify(v.gradeList)))
+            if (!index && !i) {
+              this.$set(v.gradeList[0], 'check', true)
+              this.$emit('update:label', ver.textBookName + v.gradeList[0].gradeTermName)
+              this.$emit('update:gradeTerm', v.gradeList[0].grade + '|' + v.gradeList[0].term)
+
+              this.gradeTermItem = v.gradeList[0]
+              // eventBus.$emit('changeVersion',{textBookId:ver.textBookId,gradeTermId:v.gradeList[0].gradeTermId})
+
+              this.getTextBookCourseInfo()
+            }
+          })
+        }
+      })
+    },
+
+    getVersionGradeList(v, index) {
+      // if(this.filter.subjectList[index].versionDone) return
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "subjectType": localStorage.currentSubjectType,
+        yearSection: v.year,
+        pageSize: 9999,
+        currentPage: 1
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      getVersionGradeList(params).then(res => {
+        // this.$set(this.filter.subjectList[index],'versionDone',true) // 是否已加载了年级数据
+        console.log('getVersionGradeList', res);
         if (res.flag) {
           v.arr = res.textbookVersionList
           v.arr.forEach((ver, i) => {

@@ -485,3 +485,7 @@ export const getLayerTaskInfoList =(params)=>{
 export const getLayerTaskInfoDetail =(params)=>{
   return axios.post('teach/getLayerTaskInfoDetail', qs.stringify(params))
 }
+//获取题型详情的教材版本年级信息
+export const getVersionGradeList =(params)=>{
+  return axios.post('resource/getVersionGradeList', qs.stringify(params))
+}
