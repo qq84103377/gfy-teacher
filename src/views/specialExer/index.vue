@@ -13,9 +13,15 @@
         <div class="blue">{{filter.area}}</div>
       </van-cell>
 
-      <van-cell v-if="active != 2" @click="changeList(subject,'科目');filterShow=true" title="科目" is-link>
+      <!-- <van-cell v-if="active != 2" @click="changeList(subject,'科目');filterShow=true" title="科目" is-link>
         <div class="blue">
           {{filter.subject}}
+        </div>
+      </van-cell>  -->
+
+      <van-cell v-if="active != 2" @click="subjectFilterShow=true" title="科目" is-link>
+        <div class="blue">
+          {{subjectLabel}}
         </div>
       </van-cell>
 
@@ -25,9 +31,15 @@
         </div>
       </van-cell>
 
-      <van-cell v-if="active != 2" @click="changeList(testbook,'教材');filterShow=true" title="教材" is-link>
+      <!-- <van-cell v-if="active != 2" @click="changeList(testbook,'教材');filterShow=true" title="教材" is-link>
         <div class="blue">
           {{filter.testbook}}
+        </div>
+      </van-cell> -->
+
+      <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" is-link>
+        <div class="blue">
+          {{versionLabel}}
         </div>
       </van-cell>
 
@@ -35,14 +47,13 @@
         <div class="blue">{{filter.more}}</div>
       </van-cell>
 
-      <!-- <router-view ref="routerView"></router-view> -->
-      <question-type v-if="active == 0"></question-type>
+
+      <question-type v-if="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
       <knowledge-point v-if="active == 1"></knowledge-point>
       <review-test v-if="active == 2"></review-test>
 
     </div>
     <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter" :double='double'></filter-panel>
-
 
     <!--    复习套卷-年级学科-->
     <van-popup v-model="gradePop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
@@ -108,6 +119,10 @@
         </div>
       </div>
     </van-popup>
+
+    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList"></subject-filter>
+    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
+
   </section>
 </template>
 
@@ -117,7 +132,18 @@ import reviewTest from "./component/reviewTest";
 import questionType from "./component/questionType";
 import knowledgePoint from "./component/knowledgePoint";
 import filterPanel from './component/filterPanel'
-import { gettestbookVersionInfo, getSubjectType } from '@/api/index'
+import {  getResCourseWareInfo,
+  delCollectInfo,
+  createCollectInfo,
+  getClassTeachCourseInfo,
+  getSysCourseTestPaperList,
+  getCollectInfoDetailV2,
+  delTestPaper, getMySchoolInfo} from '@/api/index'
+import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
+import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
+
+import subjectFilter from './component/subjectFilter'
+import versionFilter from './component/versionFilter'
 
 export default {
   name: "index",
@@ -125,7 +151,9 @@ export default {
     reviewTest,
     questionType,
     knowledgePoint,
-    filterPanel
+    filterPanel,
+    subjectFilter,
+    versionFilter,
   },
   data() {
     return {
@@ -145,23 +173,26 @@ export default {
       },
       double: true,
 
-      area: [
-        { name: '广东', active: true, child: [{ name: '广州市' }, { name: '清远市' }, { name: '韶关市' }] },
-        { name: '广西', child: [{ name: '玉林市' }, { name: '贵港市' }, { name: '南陵市' }] },
-      ],
-      subject: [
-        { name: '语文', value: 'Y01', active: true, child: [] },
-        { name: '数学', value: 'Y02', active: false, child: [] },
-        { name: '英语', value: 'Y03', active: false, child: [] },
-        { name: '物理', value: 'Y03', active: false, child: [] },
-        { name: '化学', value: 'Y03', active: false, child: [] },
-        { name: '高中', value: 'Y03', active: false, child: [] },
-      ],
-      subjectIndex:0,
+      // area: [
+      //   { name: '广东', active: true, child: [{ name: '广州市' }, { name: '清远市' }, { name: '韶关市' }] },
+      //   { name: '广西', child: [{ name: '玉林市' }, { name: '贵港市' }, { name: '南陵市' }] },
+      // ],
+      // subject: [
+      //   { name: '语文', value: 'Y01', active: true, child: [] },
+      //   { name: '数学', value: 'Y02', active: false, child: [] },
+      //   { name: '英语', value: 'Y03', active: false, child: [] },
+      //   { name: '物理', value: 'Y03', active: false, child: [] },
+      //   { name: '化学', value: 'Y03', active: false, child: [] },
+      //   { name: '高中', value: 'Y03', active: false, child: [] },
+      // ],
+      area: [],
+      subject: [],
+
       testbook: [
         { name: '粤教沪科版(沪粤版)', active: true, child: [{ name: '亲年级上册' }, { name: '八年级下册' }, { name: '老头教学' }] },
         { name: '外研版', child: [{ name: 'asdasd' }, { name: '八年级fdfgd下册' }, { name: '老头sdfs教学' }] },
       ],
+
       course: [
         { name: '一单元', child: [{ name: '说和做砂进口的' }, { name: '的境况是假的' }, { name: '健康的时刻纯净水' }] },
         { name: '五座', child: [{ name: '四渡赤水都吃' }, { name: 'as' }, { name: '的深V是' }] },
@@ -202,9 +233,227 @@ export default {
       classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
 
       classList: JSON.parse(localStorage.getItem("classMap")),
+
+      subjectList: [],
+      schoolList: [],
+      classList: [],
+      postList: [],
+      schoolName: '',
+      subjectName: '',
+
+      className: {
+        name: "",
+        stuNum: 0
+      },
+      subjectFilterShow: false,
+      versionFilterShow: false,
+      areaFilterShow: false,
+      resCourseFilterShow: false,
+      addCourseShow: false,
+      subjectLabel: '',
+      versionLabel: '',
+      gradeTerm: '', //年级学期
+
+      typesList: [],
+      areaCode: '0757',
+      courseIds:[]
+
+
     };
   },
+  watch: {
+    subjectLabel() {
+      // if (this.tabIndex) {
+      //私人资源
+      // this.activeNames1.forEach(v => {
+      //   if (v == 1) {
+      //     // 微课
+      //     this.getCollectInfoDetailV2('C03')
+      //   } else if (v == '2') {
+      //     //素材
+      //     this.getCollectInfoDetailV2('C04')
+      //   } else if (v == '3') {
+      //     //试卷
+      //     this.getCollectInfoDetailV2('C02')
+      //   }
+      // })
+      // }
+    },
+
+  },
   methods: {
+    async getSysAreaList() {
+      this.$store.commit('setVanLoading', true)
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "pageSize": 1000,
+        currentPage: 1
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await sysAreaApi.getSysAreaList(params).then(respone => {
+        this.$store.commit('setVanLoading', false)
+        console.log(respone, "getSysAreaList respone");
+        if (respone == null) {
+        } else {
+          if (respone.data[0].sysAreaInfoList) {
+            //重构数据
+            let map = {};
+            let list = [];
+            let areaList = respone.data[0].sysAreaInfoList;
+            if (areaList && areaList.length > 0) {
+              //获取省
+              let provinceMap = {};
+              for (let i = 0; i < areaList.length; i++) {
+                areaList[i].name = areaList[i].areaName
+                if (areaList[i].parentCode == 0) {
+                  provinceMap[areaList[i].areaCode + ""] =
+                    areaList[i].areaName;
+                }
+              }
+              console.log(provinceMap);
+              for (let i = 0; i < areaList.length; i++) {
+                let ai = areaList[i];
+                if (ai.parentCode == 0) {
+                  continue;
+                }
+                if (!map[ai.parentCode]) {
+                  if (ai.areaCode == "0757") {
+                    ai.check = true
+                  } else {
+                    ai.check = false
+                  }
+
+                  let p = {
+                    areaCode: ai.parentCode,
+                    areaName: provinceMap[ai.parentCode + ""]
+                      ? provinceMap[ai.parentCode + ""]
+                      : "其他",
+                    name: provinceMap[ai.parentCode + ""]
+                      ? provinceMap[ai.parentCode + ""]
+                      : "其他",
+                    child: [ai]
+                  }
+                  if (ai.parentCode == "44") {
+                    p.active = true
+                  } else {
+                    p.active = false
+                  }
+
+                  list.push(p);
+                  map[ai.parentCode] = ai;
+                } else {
+                  for (let j = 0; j < list.length; j++) {
+                    let dj = list[j];
+                    if (ai.parentCode == "44") {
+                      if (ai.areaCode == "0757") {
+                        ai.check = true
+                      } else {
+                        ai.check = false
+                      }
+                    }
+                    if (dj.areaCode == ai.parentCode) {
+                      dj.child.push(ai);
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+
+            console.log(list);
+            console.log(respone.data[0].sysAreaInfoList);
+            this.area = list
+            this.filter.area = "广东省佛山市"
+            //let province = respone.data[0].sysAreaInfoList.pop();
+
+            // this.sysAreaInfoList = list;//////
+
+            // if (that.sysAreaInfoList && that.sysAreaInfoList.length > 0) {
+            //   that.selectCity = that.sysAreaInfoList[0].areaCode;
+            // }
+
+            // this.currentProvince = this.sysAreaInfoList[0];//////
+            // this.selectProvince = this.currentProvince.areaCode;//////
+            // this.selectCity = this.currentProvince.childList[0].areaCode;//////
+
+            //that.selectProvinceName = province.areaName;
+          } else {
+          }
+        }
+      },
+        errMsg => { }
+
+      )
+    },
+    //获取学校信息
+    async getMySchoolInfo() {
+      let obj = {
+        interUser: "runLfb",
+        interPwd: "25d55ad283aa400af464c76d713c07ad",
+        operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+        userType: this.$store.getters.getUserInfo.roleType,
+        accountNo: this.$store.getters.getUserInfo.accountNo
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getMySchoolInfo(params).then(res => {
+        console.log('getMySchoolInfo', res)
+        if (res.flag && res.data.length > 0) {
+          console.log("?");
+          let schoolList = res.data[0].schoolList;
+          let length = schoolList.length;
+          this.schoolList = schoolList.map(item => {
+            return { name: item.schoolName }
+          })
+          this.schoolName = this.schoolList[0] ? this.schoolList[0].name : '';
+          console.log("??");
+          // 获取老师科目列表，去重后
+          for (let i = 0; i < length; i++) {
+            let gradeList = schoolList[i].classGradeList;
+            let gradeLen = gradeList.length;
+            console.log("???");
+            for (let j = 0; j < gradeLen; j++) {
+              let subjectList = gradeList[j].subjectList;
+              let arr = subjectList.map(item => {
+                let obj = {
+                  name: item.subjectName,
+                  subjectType: item.subjectType
+                }
+                if (item.subjectName == localStorage.getItem("currentSubjectTypeName")) {
+                  obj.active = true
+                } else {
+                  obj.active = false
+                }
+                return obj;
+              })
+              this.subject = Array.from(new Set([...this.subject, ...arr]));
+            }
+          }
+          console.log("????");
+
+          console.log(this.subject, 'this.subject ');
+
+          // 去重
+          let a = {}
+          this.subject = this.subject.reduce((cur, next) => {
+            a[next.subjectType] ? "" : a[next.subjectType] = true && cur.push(next);
+            return cur;
+          }, [])
+
+          console.log(this.subject, 'this.subject ');
+
+          this.filter.subject = localStorage.getItem("currentSubjectTypeName")
+
+        }
+      })
+    },
+
     selectParent(index) {
       // return
       if (this.title === '科目') {
@@ -274,21 +523,28 @@ export default {
       this.list = JSON.parse(JSON.stringify(arr))
     },
     handleFilter(item) {
+      console.log(item, 'handleFilter item');
       if (this.title === '地区') {
         let area = item.child.find(v => v.check)
-        this.filter.area = item.name + "-" + area.name
+        this.filter.area = item.name + area.name
+        this.areaCode = area.areaCode
         this.checkItem(this.area, item)
-      } else if (this.title === '教材') {
-        let testbook = item.child.find(v => v.check)
-        this.filter.testbook = item.name + "-" + testbook.name
-        this.checkItem(this.testbook, item)
-      } else if (this.title === '科目') {
-        this.filter.subject = item.name
-        this.checkItem(this.subject, item)
-      } else if (this.title === '课程') {
-        // this.filter.course = item.name
-        // this.checkItem(this.course, item)
+
       }
+
+      // else if (this.title === '教材') {
+      //   let testbook = item.child.find(v => v.check)
+      //   this.filter.testbook = item.name + "-" + testbook.name
+      //   this.checkItem(this.testbook, item)
+      // } else if (this.title === '科目') {
+      //   this.filter.subject = item.name
+      //   this.checkItem(this.subject, item)
+      //   localStorage.setItem("currentSubjectTypeName", item.name);
+      //   localStorage.setItem("currentSubjectType", item.subjectType);
+      // } else if (this.title === '课程') {
+      //   // this.filter.course = item.name
+      //   // this.checkItem(this.course, item)
+      // }
     },
     checkItem(arr, item) {
       if (this.double) {
@@ -297,6 +553,7 @@ export default {
           if (v.name === item.name) {
             v.child.forEach((_v, index) => {
               this.$set(_v, 'check', item.child[index].check)
+              this.areaCode = item.child[index].areaCode
             })
           }
         })
@@ -474,12 +731,35 @@ export default {
         this.morePop = false;
 
       }
-    }
+    },
+
+
+    handleYearSecion() {
+      const year = this.subjectLabel.substr(0, 2)
+      if (year === '小学') {
+        return 'Y01'
+      } else if (year === '初中') {
+        return 'Y02'
+      } else {
+        return 'Y03'
+      }
+    },
   },
-  // created() {
-  //   this.gettestbookVersionInfo()
-  //   this.getSubjectType()
-  // }
+  mounted() {
+    // this.gettestbookVersionInfo()
+    // this.getSubjectType()
+
+    // this.$store.commit('setVanLoading', true)
+    // Promise.all([this.getSysAreaList(), this.getGradeTermInfo(), this.getPublishByRole(), this.getClassTeacherCourseDeploy()]).then(res => {
+    //   this.$store.commit('setVanLoading', false)
+    // }).catch(err => {
+    //   this.$store.commit('setVanLoading', false)
+    // })
+
+
+    this.getSysAreaList()
+    // this.getMySchoolInfo()
+  }
 };
 </script>
 

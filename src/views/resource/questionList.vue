@@ -1,9 +1,11 @@
 <template>
   <section class="question-list">
+    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" class="title" />
+
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
     <div class="question-list__tab">
-      <div>
-        <div class="dropdown__title" @click="tab.questionType=!tab.questionType">
+      <div v-if='!isQuestionType'>
+        <div class="dropdown__title" @click="tab.questionType=!tab.questionType" >
           <div class="ellipsis">{{tab.questionTypeList.find(v => v.active)?tab.questionTypeList.find(v =>
             v.active).examTypeName:'题型'}}
           </div>
@@ -60,7 +62,7 @@
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'" @load="onLoad" :offset='80'>
           <!--          <div class="question-num">1.选择题</div>-->
-          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index" :item="item" :index="index"></question-item>
+          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index" :item="item" :index="index" ></question-item>
         </van-list>
       </van-pull-refresh>
 
@@ -68,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @setQuestionSelect="setQuestionSelect" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true"></exam-bar>
+    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
   </section>
 </template>
 
@@ -78,14 +80,16 @@ import examBar from '../../components/examBar'
 import { teachApi } from "../../api/parent-GFY";
 import { getExamSectionTypeRelation, getSysDictList, getResExamInfo, getCollectInfoDetailV2 } from '@/api/index'
 import correctPop from '../../components/correctPop'
-import eventBus from "@/utils/eventBus";
 
 export default {
   name: "questionList",
   components: { questionItem, examBar, correctPop },
   data() {
     return {
+      title: '试题',
       isRes: this.$route.query.isRes,
+      isQuestionType: this.$route.query.isQuestionType,
+      qesTypeName: this.$route.query.item?this.$route.query.item.examTypeName:'',
       selectList: [], //添加的试题列表
       addInfo: {},
       correctInfo: {},
@@ -123,35 +127,17 @@ export default {
     }
   },
   watch: {
-    '$route'(v) {
-      if(v.path === '/questionList') {
-        //用于在资源中心试题列表点击返回按钮返回到资源试题列表,要把资源中心选择的试题带回去资源试题列表
-        this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
-        //先把selectList添加对应的examType
-        this.selectList.forEach(v => {
-          this.$set(v, 'examType', v.child[0].titleType)
-        })
-      }
+    '$route'() {
+      this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
+      //先把selectList添加对应的examType
+      this.selectList.forEach(v => {
+        this.$set(v, 'examType', v.child[0].titleType)
+      })
     }
   },
-  // destroyed() {
-  //   eventBus.$off("setQuestionSelect")
-  // },
-  mounted() {
-    // if(!this.$route.query.isRes) {
-    //   eventBus.$off("setQuestionSelect")
-    //   eventBus.$on("setQuestionSelect", (data) => {
-    //     this.setQuestionSelect()
-    //   })
-    // }else {
-    //   eventBus.$off("setQuestionSelectByRes")
-    //   eventBus.$on("setQuestionSelectByRes", (data) => {
-    //     this.setQuestionSelect()
-    //   })
-    // }
-  },
-  created() {
+  async created() {
     this.$store.commit('setVanLoading', true)
+
     Promise.all([this.getExamSectionTypeRelation(), this.getSysDictList()]).then(res => {
       this.$store.commit('setVanLoading', false)
     }).catch(err => {
@@ -181,11 +167,11 @@ export default {
     });
   },
   methods: {
-    setQuestionSelect() {
-      //用于试题列表生成试卷后,将试题列表选中的状态移除,防止返回试题列表时出现已选0题,但列表内还有题目选中的状态
-      this.list.forEach(v => {
-        this.$set(v, 'isRemove', false)
-      })
+    viewRes(type) {
+      //试题列表查看资源中心试题或返回试题列表
+      this.isRes = type
+      this.$store.commit('setVanLoading', true)
+      this.onRefresh()
     },
     clear() {
       //清空所有试题时需要移除试题的添加状态样式
@@ -224,6 +210,7 @@ export default {
           // const typeItem = this.tab.questionTypeList.find(v => v.examType === item.titleType)
           const sectionIndex = this.tab.questionTypeList.findIndex(v => v.examType === item.titleType)
           const typeItem = this.tab.questionTypeList[sectionIndex]
+          console.log(typeItem, 'typeItem----');
           this.selectList.push({
             sectionName: typeItem.sectionName,
             examType: typeItem.examType,
@@ -278,6 +265,7 @@ export default {
       })
     },
     async getExamSectionTypeRelation() {
+      console.log("getExamSectionTypeRelation");
       let obj = {
         "interUser": "runLfb",
         "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
@@ -288,7 +276,7 @@ export default {
         "examSectionTypeRlation": {
           "seqId": null,//编号可空
           "subjectType": localStorage.currentSubjectType,
-          "examType": null,//题型，可空
+          "examType": this.$route.query.item ? this.$route.query.item.examType : null,//题型，可空
           "sectionType": null //章节类型，可空
         }
       }
@@ -296,6 +284,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
       await getExamSectionTypeRelation(params).then(res => {
+         console.log(res,"getExamSectionTypeRelation");
         if (res.flag) {
           this.tab.questionTypeList.push(...res.examSectionTypeRlationList)
 
@@ -388,7 +377,8 @@ export default {
         if (this.$route.query.isPri) {
           //私人资源
           this.getCollectInfoDetailV2()
-        } else {
+        }
+        else {
           //平台资源
           let sysCourseIdList = [this.$route.query.courseId || this.$route.query.sysCourseId]
           if (this.$store.getters.getErrorBookQuestionCourse.length) {
@@ -443,6 +433,67 @@ export default {
             })
           })
         }
+      } else if (this.$route.query.isQuestionType) {
+        console.log("来自题型专项");
+        //题型专项过来的
+        this.filterParam.titleType = this.$route.query.item.examType
+        this.title = this.$route.query.item.examTypeName
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "orderByType": this.filterParam.orderByType,
+          'areaCode': this.$route.query.areaCode,
+          // "sysCourseIdList": this.$route.query.courseIds,
+          "sysCourseIdList": [0, 6450],
+          "pageSize": "10",
+          "currentPage": page,
+
+          "filterParam": {
+            "keyWord": '',
+            "titleType": this.filterParam.titleType,
+            "titleDegree": this.filterParam.titleDegree,
+            "belongType": this.filterParam.belongType,
+            titleTypeList: null,
+            belongAreaCode: null,
+            createYear: null,
+            shareType: null
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getResExamInfo(params).then(res => {
+          console.log(res, '题型专项getResExamInfo res');
+          if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
+          this.listLoading = false
+          this.refLoading = false
+          this.total = res.total
+          if (res.flag && res.examQuestionList) {
+            this.list = page === 1 ? res.examQuestionList : this.list.concat(res.examQuestionList)
+            if (page >= res.total) {
+              this.finished = true
+            }
+          } else {
+            this.list = page === 1 ? [] : this.list.concat([])
+            this.finished = true
+          }
+          this.list.forEach(v => {
+            v.groupExamList = v.groupExamList || []
+          })
+          // 加载列表时需要对已添加的试题修改状态
+          this.selectList.forEach(s => {
+            s.child.forEach(c => {
+              this.list.forEach(v => {
+                if (c.examId === v.examId) {
+                  this.$set(v, 'isRemove', true)
+                }
+              })
+            })
+          })
+        })
       } else {
         let obj = {
           "interUser": "runLfb",
@@ -507,10 +558,18 @@ export default {
     background: transparent;
   }
 
+  .title {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+
   &__tab {
     flex: 0 0 44px;
     display: flex;
     background: #fff;
+    padding-top: 50px;
 
     .ellipsis {
       text-align: center;
