@@ -1,6 +1,6 @@
 <template>
   <section class="question-list">
-    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" class="title" />
+    <van-nav-bar :title="title" left-arrow @click-left="$router.back()"/>
 
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
     <div class="question-list__tab">
@@ -70,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
+    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
   </section>
 </template>
 
@@ -127,12 +127,21 @@ export default {
     }
   },
   watch: {
-    '$route'() {
-      this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
-      //先把selectList添加对应的examType
-      this.selectList.forEach(v => {
-        this.$set(v, 'examType', v.child[0].titleType)
-      })
+    '$route'(v) {
+      if(v.path === '/questionList') {
+        this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
+        //先把selectList添加对应的examType
+        this.selectList.forEach(s => {
+          this.$set(s, 'examType', s.child[0].titleType)
+          s.child.forEach(c => {
+            this.list.forEach(item => {
+              if (c.examId === item.examId) {
+                this.$set(item, 'isRemove', true)
+              }
+            })
+          })
+        })
+      }
     }
   },
   async created() {
@@ -167,12 +176,6 @@ export default {
     });
   },
   methods: {
-    viewRes(type) {
-      //试题列表查看资源中心试题或返回试题列表
-      this.isRes = type
-      this.$store.commit('setVanLoading', true)
-      this.onRefresh()
-    },
     clear() {
       //清空所有试题时需要移除试题的添加状态样式
       this.list.forEach(v => {
@@ -558,18 +561,10 @@ export default {
     background: transparent;
   }
 
-  .title {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    top: 0;
-  }
-
   &__tab {
     flex: 0 0 44px;
     display: flex;
     background: #fff;
-    padding-top: 50px;
 
     .ellipsis {
       text-align: center;
