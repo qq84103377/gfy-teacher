@@ -240,7 +240,7 @@
         return localStorage.currentSubjectTypeName
       },
       isTaskEnd() {
-        return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate).getTime()
+        return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g,"/")).getTime()
       },
     },
     methods: {

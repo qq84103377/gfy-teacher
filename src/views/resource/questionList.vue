@@ -1,7 +1,6 @@
 <template>
   <section class="question-list">
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
-    <div @click="$router.push('/index')">askdalksdlas</div>
     <div class="question-list__tab">
       <div>
         <div class="dropdown__title" @click="tab.questionType=!tab.questionType">

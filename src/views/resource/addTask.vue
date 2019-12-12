@@ -421,7 +421,7 @@ export default {
       if (this.tchCourseInfo) {
         this.currentTchCourseId = this.tchCourseInfo.tchCourseId
         // if (!this.isEdit) {
-        let endDate = new Date(this.tchCourseInfo.tchClassCourseInfo[0].endDate)
+        let endDate = new Date(this.tchCourseInfo.tchClassCourseInfo[0].endDate.replace(/-/g,"/"))
         endDate.setHours(23)
         endDate.setMinutes(59)
         let now = new Date()
@@ -590,16 +590,18 @@ export default {
             for (let m in this.classList) {
               tchClassCourseInfo.forEach(ele => {
                 if (ele.classId == this.classList[m].classId) {
-                  this.$set(this.classList[m], 'startDate', formatTime(new Date(ele.startDate)))
-                  this.$set(this.classList[m], 'endDate', formatTime(new Date(ele.endDate)))
+                  const startDate = ele.startDate.replace(/-/g,"/")
+                  const endDate = ele.endDate.replace(/-/g,"/")
+                  this.$set(this.classList[m], 'startDate', formatTime(new Date(startDate)))
+                  this.$set(this.classList[m], 'endDate', formatTime(new Date(endDate)))
 
-                  this.classList[m]['startDate'] = formatTime(new Date(ele.startDate))
+                  this.classList[m]['startDate'] = formatTime(new Date(startDate))
                   if (this.$route.query.isResend) {
                     let now = new Date()
                     now.setDate(now.getDate() + 3)
                     this.classList[m]['endDate'] = formatTime(new Date(now))
                   } else {
-                    this.classList[m]['endDate'] = formatTime(new Date(ele.endDate))
+                    this.classList[m]['endDate'] = formatTime(new Date(endDate))
                   }
 
                 }
@@ -609,9 +611,10 @@ export default {
             console.log("统一设置时间");
             //统一
             this.form.time = "1"
-
-            this.form.time1 = formatTime(new Date(tchClassCourseInfo[0].startDate))
-            this.form.time2 = formatTime(new Date(tchClassCourseInfo[0].endDate))
+            const startDate = tchClassCourseInfo[0].startDate.replace(/-/g,"/")
+            const endDate = tchClassCourseInfo[0].endDate.replace(/-/g,"/")
+            this.form.time1 = formatTime(new Date(startDate))
+            this.form.time2 = formatTime(new Date(endDate))
           }
 
 
@@ -847,36 +850,37 @@ export default {
       if (this.form.time == "1") {
         if (type == "begin") {
           this.minDate = new Date()
-          this.currentDate = new Date(this.form.time1)
+          this.currentDate = new Date(this.form.time1.replace(/-/g,"/"))
         } else if (type == "end") {
-          let date = new Date(this.form.time1)
+          let date = new Date(this.form.time1.replace(/-/g,"/"))
           date.setDate(date.getDate() + 1)
           this.minDate = date
-          this.currentDate = new Date(this.form.time2)
+          this.currentDate = new Date(this.form.time2.replace(/-/g,"/"))
         }
 
         //分班设置
       } else if (this.form.time == "2") {
         if (type == 'begin') {//开始时间
           this.minDate = new Date()
-          this.currentDate = new Date(this.classList[index].startDate)
+          this.currentDate = new Date(this.classList[index].startDate.replace(/-/g,"/"))
         } else if (type == 'end') {//结束时间
-          let date = new Date(this.classList[index].startDate)
+          let date = new Date(this.classList[index].startDate.replace(/-/g,"/"))
           date.setDate(date.getDate() + 1)
           this.minDate = date
-          this.currentDate = new Date(this.classList[index].endDate)
+          this.currentDate = new Date(this.classList[index].endDate.replace(/-/g,"/"))
         }
 
       }
     },
     handleSelectTime(v) {
+      console.log(v,'vvvvvvvvvvvv');
       //统一设置
       if (this.form.time == "1") {
         if (this.timeType == 'begin') {
           this.form.time1 = formatTime(v)
           //判断结束时间时候小于结束时间
-          let time1 = new Date(this.form.time1)
-          let time2 = new Date(this.form.time2)
+          let time1 = new Date(this.form.time1.replace(/-/g,"/"))
+          let time2 = new Date(this.form.time2.replace(/-/g,"/"))
           if (time1.getTime() >= time2.getTime()) {
             time1.setDate(time1.getDate() + 3)
             this.form.time2 = formatTime(time1)
@@ -888,8 +892,8 @@ export default {
       } else if (this.form.time == "2") {
         if (this.timeType == 'begin') {
           this.classList[this.currentClassIdIndex]['startDate'] = formatTime(v)
-          let begin = new Date(this.classList[this.currentClassIdIndex]['startDate'])
-          let end = new Date(this.classList[this.currentClassIdIndex]['endDate'])
+          let begin = new Date(this.classList[this.currentClassIdIndex]['startDate'].replace(/-/g,"/"))
+          let end = new Date(this.classList[this.currentClassIdIndex]['endDate'].replace(/-/g,"/"))
           if (begin.getTime() >= end.getTime()) {
             begin.setDate(begin.getDate() + 3)
             this.classList[this.currentClassIdIndex]['endDate'] = formatTime(begin)
@@ -1335,10 +1339,10 @@ export default {
         let end = this.form.time2
         let index = 1
         if(this.$route.query.isResend) {
-          if (new Date(start).getTime() > new Date(end).getTime()) {
+          if (new Date(start.replace(/-/g,"/")).getTime() > new Date(end.replace(/-/g,"/")).getTime()) {
             return this.$toast('开始时间不能大于结束时间')
           }
-          if(new Date(end).getTime() < new Date().getTime()) {
+          if(new Date(end.replace(/-/g,"/")).getTime() < new Date().getTime()) {
             return this.$toast('结束时间不能小于当前时间')
           }
           obj.endTime = end
@@ -1356,10 +1360,10 @@ export default {
         this.classList.forEach((item) => {
           if (item.check) {
             if(this.$route.query.isResend) {
-              if (new Date(item.startDate).getTime() > new Date(item.endDate).getTime()) {
+              if (new Date(item.startDate.replace(/-/g,"/")).getTime() > new Date(item.endDate.replace(/-/g,"/")).getTime()) {
                 return this.$toast('开始时间不能大于结束时间')
               }
-              if(new Date(item.endDate).getTime() < new Date().getTime()) {
+              if(new Date(item.endDate.replace(/-/g,"/")).getTime() < new Date().getTime()) {
                 return this.$toast('结束时间不能小于当前时间')
               }
               obj.endTime = item.endDate
