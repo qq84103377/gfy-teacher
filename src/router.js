@@ -575,8 +575,7 @@ export default new Router({
               name: 'teachStat',
               component: () => import('./views/teachStat/teachStat.vue'),
               meta: {
-                isShowHeader: true,
-                title: '教学统计'
+                isShowNav: true,
               },
             },
             {

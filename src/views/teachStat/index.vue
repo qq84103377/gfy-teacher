@@ -1,5 +1,9 @@
 <template>
   <section class="teach-stat-wrap">
+    <van-nav-bar
+      v-if="$route.path === '/teachStat/'"
+      title="教学统计">
+    </van-nav-bar>
     <div>
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
       <van-cell @click="openGradePop" title="年级学科" is-link>
@@ -221,6 +225,7 @@
       }
     },
     created() {
+      console.log(this.$route.path,'dddddd');
       let arr = []
       let flag = true
       JSON.parse(localStorage.gradeList).forEach(v => {
