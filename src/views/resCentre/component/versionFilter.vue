@@ -77,7 +77,11 @@
       }
     },
    created() {
-      this.versionList.forEach(async (v,i) => {
+     const classMap = JSON.parse(localStorage.classMap)
+     this.versionList.forEach(async (v,i) => {
+       if(v.year === classMap[Object.keys(classMap)[0]].classYearSection) {
+         this.yearIndex = i
+       }
        await this.getGradeTermInfo(v)
         this.getTextBookVersionInfo(v,i)
       })
@@ -139,7 +143,7 @@
             v.arr.forEach((ver,i) => {
               if(!i) this.$set(ver,'active',true)
               // this.$set(ver,'child',JSON.parse(JSON.stringify(v.gradeList)))
-              if(!index && !i) {
+              if((index == this.yearIndex) && !i) {
                 this.$set(v.gradeList[0],'check',true)
                 this.$emit('update:label',ver.textBookName + v.gradeList[0].gradeTermName)
                 this.$emit('update:gradeTerm',v.gradeList[0].grade + '|' + v.gradeList[0].term)
