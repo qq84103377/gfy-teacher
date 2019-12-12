@@ -8,8 +8,8 @@
         <van-list v-model="listLoading" :finished="finished" :finished-text="taskList.length>0?'没有更多了':'当前没有未结束任务～'" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in taskList" @clickTo="goto(item)" :key="index" :can-slide="true" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="$set(item,'fold',!item.fold)">
-                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
+              <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div @click="editTask(item)">

@@ -22,9 +22,12 @@
         <div slot="title" class="upload-lesson__body__cell-ctn mgl5">
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
-          <van-icon @click="fileSelect" class="add" name="add"/>
-          <input type="file" id="fileSelect" accept="video/*" style="display: none;">
-
+<!--          <van-icon @click="fileSelect" class="add" name="add"/>-->
+<!--          <input type="file" id="fileSelect" accept="video/*" style="display: none;">-->
+          <van-uploader
+            accept="video/*,audio/*" :before-read="read">
+            <van-icon @click="" class="add" name="add"/>
+          </van-uploader>
         </div>
       </van-cell>
       <van-cell class="upload-lesson__body__cell">
@@ -131,6 +134,17 @@
       this.getOSSKey();
     },
     methods: {
+      read(file, detail) {
+        console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
+          if (['.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
+            this.wareFile = file;
+            this.form.name = file.name.split('.')[0]
+            this.wareSize = file.size
+            this.uploadWare(file);
+          } else {
+            this.$toast('请上传MP4、WMV、AVI格式的视频文件')
+          }
+      },
       previewImg(startPosition) {
           ImagePreview({
             images: this.imgList.map(v => v.url),
@@ -168,6 +182,10 @@
       },
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
+
+          const fileType = obj.curFile.name.substr(obj.curFile.name.lastIndexOf('.'))
+          console.log(fileType,'ttttttttttttttttttttttttt');
+          if(['.mov'].includes(fileType.toLowerCase())) return this.$toast('请上传MP4、WMV、AVI格式的视频文件')
           this.wareFile = obj.curFile;
           this.form.name = obj.curFile.name.split('.')[0]
           this.wareSize = obj.curFile.size

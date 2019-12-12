@@ -61,8 +61,8 @@
         <div v-else v-for="item in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
           <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="$set(item,'fold',!item.fold)">
-                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
+              <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div @click="editTask(item)">
@@ -91,15 +91,15 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-<!--       <div @click="$router.push('/reinforce')">-->
-<!--          <i class="iconGFY icon-res-plus"></i>-->
-<!--          <span>智能补强</span>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <i class="iconGFY icon-res-plus"></i>-->
-<!--          <span @click="$router.push(`/specialExer`)">专项练习</span>-->
-<!--          <span @click="$toast.fail('敬请期待')">专项练习</span>-->
-<!--        </div> -->
+        <!-- <div @click="$router.push('/reinforce')">
+          <i class="iconGFY icon-res-plus"></i>
+          <span>智能补强</span>
+        </div>
+        <div @click="$router.push(`/specialExer`)">
+          <i class="iconGFY icon-res-plus"></i>
+          <span>专项练习</span>
+          <span @click="$toast.fail('敬请期待')">专项练习</span>
+        </div> -->
       </div>
     </div>
   </section>
@@ -132,11 +132,11 @@ export default {
     this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
   },
   mounted() {
-    this.$store.commit('setVanLoading',true)
-    Promise.all([this.getMySchoolInfo(),this.getGradeTermInfo(),this.getPublishByRole(),this.getClassTeacherCourseDeploy()]).then(res => {
-      this.$store.commit('setVanLoading',false)
+    this.$store.commit('setVanLoading', true)
+    Promise.all([this.getMySchoolInfo(), this.getGradeTermInfo(), this.getPublishByRole(), this.getClassTeacherCourseDeploy()]).then(res => {
+      this.$store.commit('setVanLoading', false)
     }).catch(err => {
-      this.$store.commit('setVanLoading',false)
+      this.$store.commit('setVanLoading', false)
     })
     eventBus.$off("indexEditTask")
     eventBus.$on("indexEditTask", (data) => {
@@ -276,7 +276,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
 
-     await getMySchoolInfo(params).then(res => {
+      await getMySchoolInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           //重构数据
@@ -443,7 +443,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-     await getGradeTermInfo(params).then(res => {
+      await getGradeTermInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           this.$store.commit('setGradeTermList', res.resGradeTermList)
@@ -492,7 +492,7 @@ export default {
           let gradeMap = {}
           let dataList = res.data
           dataList.forEach(item => {
-            if(item.gradeTermInfo) {
+            if (item.gradeTermInfo) {
               gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
             }
           })
@@ -507,7 +507,7 @@ export default {
             let termList = [];
 
             dataList.forEach(item => {
-              if(item.gradeTermInfo) {
+              if (item.gradeTermInfo) {
                 gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
                 if (k === item.gradeTermInfo.grade) {
                   if (!bookMap[item.textBookId]) {
