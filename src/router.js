@@ -454,12 +454,12 @@ export default new Router({
           }
         },
         {
-          path: '/bindPhoneNo',
-          name: 'bindPhoneNo',
-          component: () => import('./views/mine/setting/bindPhoneNo.vue'),
+          path: '/setPhoneNo',
+          name: 'setPhoneNo',
+          component: () => import('./views/mine/setting/setPhoneNo.vue'),
           meta: {
             isShowHeader: true,
-            title: '绑定手机号'
+            title: '设置手机号'
           }
         },
         {

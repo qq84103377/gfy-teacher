@@ -99,7 +99,7 @@
           <i class="iconGFY icon-res-plus"></i>
           <span>专项练习</span>
           <span @click="$toast.fail('敬请期待')">专项练习</span>
-        </div> -->
+        </div>  -->
       </div>
     </div>
   </section>

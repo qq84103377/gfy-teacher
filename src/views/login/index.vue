@@ -32,7 +32,7 @@
               <van-field class="custom-input" @input.native="userChange(0)" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
                 <!--              <div slot="right-icon">123</div>-->
               </van-field>
-              <!-- <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span> -->
+              <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span>
               <span class="btn-reset-pwd" @click="$router.push(`/forgetPwd`)">忘记密码</span>
             </div>
           </div>
@@ -261,17 +261,12 @@ export default {
             return
           }
 
+
           this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
-          this.$store.commit('seThirdInfo', res.data[0].loginInfoVo.usrThirdPartyInfo)
+          localStorage.setItem("isLogin", true);
+          localStorage.setItem("loginInfo", JSON.stringify({ userName: this.username, pwd: this.password }));
+          this.$router.replace('/index')
 
-          this.$store.commit('SET_LOGININFO', res.data[0].loginInfoVo.usrInfo);
-
-          if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A02') {
-            localStorage.setItem("isLogin", true);
-            this.$router.replace('/index')
-          } else {
-            this.$router.push({ name: 'settings', params: { accountNo: res.data[0].loginInfoVo.usrInfo.accountNo } })
-          }
         } else {
           console.log(res.msg)
           this.$toast(res.msg)
@@ -366,21 +361,16 @@ export default {
         this.loginBtnLoading = false
         console.log(res)
         if (res.flag) {
-          if (res.code == '10112') {
-            this.isChoose = true
-            this.accountList = res.data
-            return
-          }
 
           this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
-          this.$store.commit('seThirdInfo', res.data[0].loginInfoVo.usrThirdPartyInfo)
+          localStorage.setItem("isLogin", true);
+          localStorage.setItem("loginInfo", JSON.stringify({ userName: this.username, pwd: this.password }));
+          this.$router.replace('/index')
 
-          this.$store.commit('SET_LOGININFO', res.data[0].loginInfoVo.usrInfo);
-
-          if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A02') {
-            localStorage.setItem("isLogin", true);
-            this.$router.replace('/index')
-          }
+          // if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A02') {
+          //   localStorage.setItem("isLogin", true);
+          //   this.$router.replace('/index')
+          // }
         } else {
           console.log(res.msg)
           this.$toast(res.msg)
@@ -472,7 +462,7 @@ export default {
       height: 36px;
       line-height: 36px;
       font-size: 18px;
-      background-color: #57c3fe;
+      background-color: #39f0dd;
       position: fixed;
       bottom: 15px;
       left: 0;
