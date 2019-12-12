@@ -22,8 +22,8 @@
         <van-list v-model="listLoading" :finished="finished" :finished-text="courseList.length?(courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'):'当前没有课程,快去新建课程吧！'" @load="onLoad" :offset='80'>
           <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="$set(item,'fold',!item.fold)">
-                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
+              <div @click="item.tchClassTastInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchClassTastInfo.length>2,'icon-arrow-grey':item.tchClassTastInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div @click="editTask(item)">

@@ -253,7 +253,7 @@
             this.examNum = this.tabList.find(v => v.active).num
             let stuArr = []
             const key = res.data[0].groupExamList.length ? 'groupFinishMap' : 'finishMap'
-            Object.keys(res.data[0][key]).forEach(k => {
+            Object.keys(res.data[0][key]).sort().forEach(k => {
               let examId = k.split('_')[0],
                 accountNo = k.split('_')[1],
                 errorArr = [],

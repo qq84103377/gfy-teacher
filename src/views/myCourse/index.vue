@@ -11,8 +11,8 @@
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
           <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="$set(item,'fold',!item.fold)">
-                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
+              <div @click="item.tchCourseInfo.tchClassCourseInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseInfo.tchClassCourseInfo.length>2,'icon-arrow-grey':item.tchCourseInfo.tchClassCourseInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div>
