@@ -1,6 +1,7 @@
 <template>
   <section class="question-list">
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
+    <div @click="$router.push('/index')">askdalksdlas</div>
     <div class="question-list__tab">
       <div>
         <div class="dropdown__title" @click="tab.questionType=!tab.questionType">
@@ -68,7 +69,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true"></exam-bar>
+    <exam-bar @setQuestionSelect="setQuestionSelect" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true"></exam-bar>
   </section>
 </template>
 
@@ -78,6 +79,7 @@ import examBar from '../../components/examBar'
 import { teachApi } from "../../api/parent-GFY";
 import { getExamSectionTypeRelation, getSysDictList, getResExamInfo, getCollectInfoDetailV2 } from '@/api/index'
 import correctPop from '../../components/correctPop'
+import eventBus from "@/utils/eventBus";
 
 export default {
   name: "questionList",
@@ -122,13 +124,32 @@ export default {
     }
   },
   watch: {
-    '$route'() {
-      this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
-      //先把selectList添加对应的examType
-      this.selectList.forEach(v => {
-        this.$set(v, 'examType', v.child[0].titleType)
-      })
+    '$route'(v) {
+      if(v.path === '/questionList') {
+        //用于在资源中心试题列表点击返回按钮返回到资源试题列表,要把资源中心选择的试题带回去资源试题列表
+        this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
+        //先把selectList添加对应的examType
+        this.selectList.forEach(v => {
+          this.$set(v, 'examType', v.child[0].titleType)
+        })
+      }
     }
+  },
+  // destroyed() {
+  //   eventBus.$off("setQuestionSelect")
+  // },
+  mounted() {
+    // if(!this.$route.query.isRes) {
+    //   eventBus.$off("setQuestionSelect")
+    //   eventBus.$on("setQuestionSelect", (data) => {
+    //     this.setQuestionSelect()
+    //   })
+    // }else {
+    //   eventBus.$off("setQuestionSelectByRes")
+    //   eventBus.$on("setQuestionSelectByRes", (data) => {
+    //     this.setQuestionSelect()
+    //   })
+    // }
   },
   created() {
     this.$store.commit('setVanLoading', true)
@@ -161,11 +182,11 @@ export default {
     });
   },
   methods: {
-    viewRes(type) {
-      //试题列表查看资源中心试题或返回试题列表
-      this.isRes = type
-      this.$store.commit('setVanLoading', true)
-      this.onRefresh()
+    setQuestionSelect() {
+      //用于试题列表生成试卷后,将试题列表选中的状态移除,防止返回试题列表时出现已选0题,但列表内还有题目选中的状态
+      this.list.forEach(v => {
+        this.$set(v, 'isRemove', false)
+      })
     },
     clear() {
       //清空所有试题时需要移除试题的添加状态样式

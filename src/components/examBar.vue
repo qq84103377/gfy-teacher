@@ -167,9 +167,12 @@
               if(this.canAddCourse) this.getClassTeachCourseInfo()
             }
             if(!this.$route.query.isPri) {
-              this.form.name = `《${this.$route.query.courseName}》标准测试卷1`
-              // localStorage.courseIdList
-             // (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
+              let  testPaperIndex = 1
+              const courseId = (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
+              if(localStorage.courseIdMap) {
+                testPaperIndex = JSON.parse(localStorage.courseIdMap)[courseId]?JSON.parse(localStorage.courseIdMap)[courseId]+1:1
+              }
+              this.form.name = `《${this.$route.query.courseName}》标准测试卷${testPaperIndex}`
             }
           }else if (this.$route.path === '/examDetail') {
             this.form.name = `${this.$route.query.title}-副本`
@@ -204,7 +207,7 @@
             this.$router.push(`/resCentreWrap?from=examDetail`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }else if (this.$route.path === '/questionList') {
-            this.$router.push(`/resCentreWrap?from=questionList`)
+            this.$router.push(`/resCentreWrap?from=questionList&tchCourseId=${this.$route.query.tchCourseId}&sysCourseId=${this.$route.query.sysCourseId}&relationCourseId=${this.$route.query.relationCourseId}`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }
         }
@@ -420,6 +423,8 @@
                 if(this.$route.path === '/examDetail') {
                   this.$emit('addDone',name)
                 }else {
+                  this.setTestPaperNameIndex()
+                  this.$emit('setQuestionSelect')
                   this.$router.push({
                     path: `/examDetail`, query: {
                       flag: 1,
@@ -436,6 +441,8 @@
                 if(this.$route.path === '/examDetail') {
                   this.$emit('addDone',name)
                 }else {
+                  this.setTestPaperNameIndex()
+                  this.$emit('setQuestionSelect')
                   this.$router.push({
                     path: `/examDetail`, query: {
                       "tchCourseId": this.$route.query.tchCourseId,
@@ -459,6 +466,22 @@
             this.$toast(res.msg)
           }
         })
+      },
+      setTestPaperNameIndex() {
+        let courseIdMap
+        const courseId = (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
+        if(localStorage.courseIdMap) {
+          courseIdMap = JSON.parse(localStorage.courseIdMap)
+          if(courseIdMap[courseId]) {
+            courseIdMap[courseId]++
+          }else {
+            courseIdMap[courseId] = 1
+          }
+        }else {
+          courseIdMap = {}
+          courseIdMap[courseId] = 1
+        }
+        localStorage.setItem('courseIdMap',JSON.stringify(courseIdMap))
       },
       clearQuestion() {
         if (this.selectList.length) {
