@@ -91,15 +91,15 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-<!--       <div @click="$router.push('/reinforce')">-->
-<!--          <i class="iconGFY icon-res-plus"></i>-->
-<!--          <span>智能补强</span>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <i class="iconGFY icon-res-plus"></i>-->
-<!--          <span @click="$router.push(`/specialExer`)">专项练习</span>-->
-<!--          <span @click="$toast.fail('敬请期待')">专项练习</span>-->
-<!--        </div> -->
+        <!-- <div @click="$router.push('/reinforce')">
+          <i class="iconGFY icon-res-plus"></i>
+          <span>智能补强</span>
+        </div>
+        <div @click="$router.push(`/specialExer`)">
+          <i class="iconGFY icon-res-plus"></i>
+          <span>专项练习</span>
+          <span @click="$toast.fail('敬请期待')">专项练习</span>
+        </div> -->
       </div>
     </div>
   </section>
@@ -132,11 +132,11 @@ export default {
     this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
   },
   mounted() {
-    this.$store.commit('setVanLoading',true)
-    Promise.all([this.getMySchoolInfo(),this.getGradeTermInfo(),this.getPublishByRole(),this.getClassTeacherCourseDeploy()]).then(res => {
-      this.$store.commit('setVanLoading',false)
+    this.$store.commit('setVanLoading', true)
+    Promise.all([this.getMySchoolInfo(), this.getGradeTermInfo(), this.getPublishByRole(), this.getClassTeacherCourseDeploy()]).then(res => {
+      this.$store.commit('setVanLoading', false)
     }).catch(err => {
-      this.$store.commit('setVanLoading',false)
+      this.$store.commit('setVanLoading', false)
     })
     eventBus.$off("indexEditTask")
     eventBus.$on("indexEditTask", (data) => {
@@ -276,7 +276,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
 
-     await getMySchoolInfo(params).then(res => {
+      await getMySchoolInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           //重构数据
@@ -443,7 +443,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-     await getGradeTermInfo(params).then(res => {
+      await getGradeTermInfo(params).then(res => {
         console.log(res)
         if (res.flag) {
           this.$store.commit('setGradeTermList', res.resGradeTermList)
@@ -492,7 +492,7 @@ export default {
           let gradeMap = {}
           let dataList = res.data
           dataList.forEach(item => {
-            if(item.gradeTermInfo) {
+            if (item.gradeTermInfo) {
               gradeMap[item.gradeTermInfo.grade] = item.gradeTermInfo.grade
             }
           })
@@ -507,7 +507,7 @@ export default {
             let termList = [];
 
             dataList.forEach(item => {
-              if(item.gradeTermInfo) {
+              if (item.gradeTermInfo) {
                 gradeTermMap[item.gradeTermInfo.grade + '_' + item.gradeTermInfo.term] = item.gradeTermInfo.gradeTermId
                 if (k === item.gradeTermInfo.grade) {
                   if (!bookMap[item.textBookId]) {

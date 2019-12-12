@@ -142,7 +142,7 @@ import {  getResCourseWareInfo,
 import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
 import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
-import subjectFilter from './component/subjectFilter'
+import subjectFilter from '../resCentre/component/subjectFilter'
 import versionFilter from './component/versionFilter'
 
 export default {

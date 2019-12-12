@@ -202,10 +202,10 @@ export default new Router({
           path: '/questionList',
           name: 'questionList',
           component: () => import('./views/resource/questionList.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '试题'
-          }
+          // meta: {
+          //   isShowHeader: true,
+          //   title: '试题'
+          // }
         },
         {
           path: '/discussList',
