@@ -83,8 +83,8 @@ export default {
     console.log('subjectfilter created');
     this.versionList.forEach(async (v, i) => {
       await this.getGradeTermInfo(v)
-      this.getTextBookVersionInfo(v, i)
-      // this.getVersionGradeList(v, i)
+      // this.getTextBookVersionInfo(v, i)
+      this.getVersionGradeList(v, i)
 
     })
   },
@@ -297,6 +297,15 @@ export default {
         // this.$set(this.filter.subjectList[index],'versionDone',true) // 是否已加载了年级数据
         console.log('getVersionGradeList', res);
         if (res.flag) {
+          for (const key in res.data) {
+            v.arr.push(res.data[key])
+          }
+
+          console.log(v.arr,'v.arr');
+
+          return
+          
+      
           v.arr = res.textbookVersionList
           v.arr.forEach((ver, i) => {
             if (!i) {
