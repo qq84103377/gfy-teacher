@@ -81,6 +81,8 @@
 <script>
   import {getMallConvertRecordInfoById, cancelExchangeApplyGoodsInfo} from "@/api/mine";
   import format from "@/api/date";
+  import eventBus from "@/utils/eventBus";
+
 
 
   export default {
@@ -164,6 +166,7 @@
               if (res.flag) {
                 this.$toast.success('取消成功！');
                 // this.recordList.splice(index, 1);
+                eventBus.$emit("convertRecordRefresh", true);
                 this.$router.back();
               } else {
                 this.$toast.fail(res.msg);

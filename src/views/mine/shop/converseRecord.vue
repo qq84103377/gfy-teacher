@@ -1,56 +1,59 @@
 <template>
   <section class="record" ref="record">
-    <van-list
-      v-model="loading"
-      :finished="finished"
-      finished-text=""
-      @load="onLoad"
-    >
-      <div v-if="recordList.length>0">
-        <van-swipe-cell v-for="(item,index) in recordList">
-          <div class="item" @click="$router.push(`/convertDetail/${item.recordId}`)">
-            <div class="item-title">
-              <span>{{item.convertDate | formateDate}}</span>
-              <span class="status">{{item.status|getStatus}}</span>
-            </div>
-            <div class="goodsItem">
-              <div class="goodsPic">
-                <img :src="item.goodsPhotoUrl" alt="">
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        finished-text=""
+        @load="onLoad"
+      >
+        <div v-if="recordList.length>0">
+          <van-swipe-cell v-for="(item,index) in recordList">
+            <div class="item" @click="$router.push(`/convertDetail/${item.recordId}`)">
+              <div class="item-title">
+                <span>{{item.convertDate | formateDate}}</span>
+                <span class="status">{{item.status|getStatus}}</span>
               </div>
-              <div class="goodsInfo">
-                <div class="goodsName">
-                  {{item.goodsName}}
+              <div class="goodsItem">
+                <div class="goodsPic">
+                  <img :src="item.goodsPhotoUrl" alt="">
                 </div>
-                <div class="otherInfo">
-                  <div class="price">
-                    <img src="@assets/img/myself-icon-16.png" alt="">
-                    {{Math.ceil(item.consumeIntegral/10)}}
+                <div class="goodsInfo">
+                  <div class="goodsName">
+                    {{item.goodsName}}
                   </div>
-                  <div class="count">
-                    x{{item.convertGoodsCount}}
+                  <div class="otherInfo">
+                    <div class="price">
+                      <img src="@assets/img/myself-icon-16.png" alt="">
+                      {{Math.ceil(item.consumeIntegral/10)}}
+                    </div>
+                    <div class="count">
+                      x{{item.convertGoodsCount}}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <template slot="right">
-            <van-button square type="danger" text="删除" @click="delRecord(item.recordId,index,item.status)"/>
-          </template>
-        </van-swipe-cell>
-      </div>
+            <template slot="right">
+              <van-button square type="danger" text="删除" @click="delRecord(item.recordId,index,item.status)"/>
+            </template>
+          </van-swipe-cell>
+        </div>
 
-      <div v-else v-show="!loading" class="placeholderImg">
-        <img src="@assets/img/blank.png"/>
-        <p>您还没有兑换过商品，快去兑换吧！~</p>
-      </div>
+        <div v-else v-show="!loading" class="placeholderImg">
+          <img src="@assets/img/blank.png"/>
+          <p>您还没有兑换过商品，快去兑换吧！~</p>
+        </div>
 
-    </van-list>
-
+      </van-list>
+    </van-pull-refresh>
   </section>
 </template>
 
 <script>
   import {getConvertRecordInfo, delExchangeApplyGoodsInfo} from "@/api/mine";
+  import eventBus from "@/utils/eventBus";
+
 
   export default {
     name: "converseRecord",
@@ -63,6 +66,7 @@
         total: 1,
         recordList: [],
         record: 0,  //滚动距离,记录上次浏览位置
+        isLoading: false,
       }
     },
     filters: {
@@ -127,6 +131,11 @@
       });
     },
     methods: {
+      async onRefresh() {
+        this.currentPage = 1;
+        this.recordList = [];
+        await this.getConvertRecord();
+      },
       onLoad() {
         console.log('onload')
         this.loading = true;
@@ -139,7 +148,7 @@
         }
       },
       // 获取兑换记录
-      getConvertRecord() {
+      async getConvertRecord() {
         let obj = {
           interUser: "runLfb",
           interPwd: "25d55ad283aa400af464c76d713c07ad",
@@ -151,9 +160,10 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        getConvertRecordInfo(params).then(res => {
+        await getConvertRecordInfo(params).then(res => {
           // console.log('getConvertRecordInfo', res)
           this.loading = false;
+          this.isLoading = false;
           if (res.flag && res.data) {
             this.total = res.total;
             this.recordList = [...this.recordList, ...res.data];
@@ -174,7 +184,7 @@
           })
           .then(() => {
             // on confirm
-            if (status == 'S01' || status == 'S02'|| status == 'S08') {
+            if (status == 'S01' || status == 'S02' || status == 'S08') {
               this.$toast.fail('申请中和确认中的记录无法删除');
               return;
             }
@@ -204,12 +214,17 @@
       }
     },
     mounted() {
-      console.log('mounted')
+      eventBus.$off("convertRecordRefresh")
+      eventBus.$on("convertRecordRefresh", (data) => {
+        this.onRefresh();
+      })
     },
-    activated() {
-      console.log('activated')
-      // this.onLoad()
-    }
+    // activated() {
+    //   eventBus.$off("convertRecordRefresh")
+    //   eventBus.$on("convertRecordRefresh", (data) => {
+    //     this.onRefresh();
+    //   })
+    // }
   }
 </script>
 
