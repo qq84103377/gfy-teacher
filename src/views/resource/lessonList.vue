@@ -130,7 +130,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: item.url, title: item.coursewareName, isMp3: item.source == "S01" ? true : false } })
+        this.$router.push({ name: 'videoPage', query: { src: item.url, title: item.coursewareName, isMp3: item.coursewareType == "T06" ? true : false } })
       }).catch(() => {
         this.$store.commit('setVanLoading', false)
         this.$toast('资源错误')
