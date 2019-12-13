@@ -19,28 +19,6 @@
         </div>
       </van-cell>
     </div>
-    <div v-show="showTime" class="teach-stat__time-picker-wrap">
-      <div class="time-piker-header">
-        <div>
-          <span v-for="(item,index) in rangeList" :key="index" :class="['mgr15',{blue:item.active}]" @click="dateRange(item.mtd1,item.mtd2,item.num,index)">{{item.name}}</span>
-        </div>
-        <div class="blue" @click="confirmDate">确认</div>
-      </div>
-      <div class="date-box">
-        <div @click="filterTime.type = true;currentDate = new Date(filterTime.start)" class="date-select" :class="{active:filterTime.type}">{{filterTime.start}}</div>
-        <div class="mgr10 mglt10">~</div>
-        <div @click="filterTime.type = false;currentDate = new Date(filterTime.end)" class="date-select" :class="{active:!filterTime.type}">{{filterTime.end}}</div>
-      </div>
-      <van-datetime-picker
-        ref="datePicker"
-        confirm-button-text=" "
-        cancel-button-text=" "
-        v-model="currentDate"
-        :max-date="maxDate"
-        type="date"
-        @change="changeDate"
-      />
-    </div>
 
     <router-view ref="routerView"></router-view>
 
