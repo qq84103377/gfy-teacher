@@ -2,7 +2,7 @@
     <section class="reset-pwd">
       <van-nav-bar
         left-arrow
-        @click-left="$router.back()"
+        @click-left="goBack"
       />
       <div class="reset-pwd__body">
         <h1 class="fs24">重置密码</h1>
@@ -31,6 +31,9 @@
           }
       },
       methods: {
+        goBack(){
+          this.common.goBack(this)
+        },
         handleConfirm() {
           if(this.pwd1 === this.pwd2) {
 

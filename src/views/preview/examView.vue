@@ -2,7 +2,7 @@
   <section class="exam-view-wrap">
     <van-nav-bar
       :title="title"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="exam-view-wrap__tab">
@@ -103,6 +103,9 @@
     },
     components: {scoreTable},
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       statTaskStat() {
         this.$store.commit('setVanLoading',true)
         let obj = {

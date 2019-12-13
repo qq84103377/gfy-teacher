@@ -18,6 +18,10 @@ const state = {
   removeQuestionList: [], //资源中心试题列表移除的试题ID
   isRevert: false, //试题列表选择其他按钮是否显示为返回按钮
   isStuBoard: false, //课中白板是否选择学生白板
+
+  filterYear: '', //筛选年段
+  filterSubject: '', //筛选科目
+  filterSubjectLabel:''
 }
 
 const mutations = {
@@ -85,6 +89,18 @@ const mutations = {
   },
   setIsStuBoard(state,data) {
     state.isStuBoard = data
+  },
+  setFilterYear(state,data) {
+    state.filterYear = data
+    localStorage.setItem('filterYear', JSON.stringify(data))
+  },
+  setFilterSubject(state,data) {
+    state.filterSubject = data
+    localStorage.setItem('filterSubject', JSON.stringify(data))
+  },
+  setFilterSubjectLabel(state,data) {
+    state.filterSubjectLabel = data
+    localStorage.setItem('filterSubjectLabel', JSON.stringify(data))
   }
 }
 
@@ -117,6 +133,10 @@ const getters = {
   getRemoveQuestionList: state => state.removeQuestionList,
   getIsRevert: state => state.isRevert,
   getIsStuBoard: state => state.isStuBoard,
+
+  getFilterYear: state => state.user.filterYear || JSON.parse(localStorage.getItem('filterYear')),
+  getFilterSubject: state => state.user.filterSubject || JSON.parse(localStorage.getItem('filterSubject')),
+  getFilterSubjectLabel: state => state.user.filterSubjectLabel || JSON.parse(localStorage.getItem('filterSubjectLabel')),
 };
 
 export default {

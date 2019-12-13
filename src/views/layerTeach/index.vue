@@ -1,6 +1,6 @@
 <template>
     <section class="layer-teach">
-      <van-nav-bar :title="$route.query.taskName" @click-left="$router.back()" left-arrow/>
+      <van-nav-bar :title="$route.query.taskName" @click-left="goBack" left-arrow/>
       <div class="layer-teach__tab-scroll">
         <div v-for="(item,index) in tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="layer-teach__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
         </div>
@@ -81,6 +81,9 @@
         }),
       },
       methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
         drawPie() {
           this.$nextTick(() => {
             if(this.isNull) return

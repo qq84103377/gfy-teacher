@@ -2,7 +2,7 @@
   <section class="error-book">
     <van-nav-bar
       title="错题集"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
       <div slot="right" class="fs12 blue" @click="filterShow=true">筛选</div>
     </van-nav-bar>
@@ -119,6 +119,9 @@
       })
     },
     methods: {
+   goBack(){
+          this.common.goBack(this)
+        },
       getExamSectionTypeRelation() {
         let obj = {
           "interUser": "runLfb",

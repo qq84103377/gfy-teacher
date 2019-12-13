@@ -1,6 +1,6 @@
 <template>
   <section class="question-list">
-    <van-nav-bar :title="title" left-arrow @click-left="$router.back()"/>
+    <van-nav-bar :title="title" left-arrow @click-left="goBack" class="title" />
 
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
     <div class="question-list__tab">
@@ -70,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
+    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
   </section>
 </template>
 
@@ -176,6 +176,9 @@ export default {
     });
   },
   methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
     clear() {
       //清空所有试题时需要移除试题的添加状态样式
       this.list.forEach(v => {
@@ -450,8 +453,8 @@ export default {
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "orderByType": this.filterParam.orderByType,
           'areaCode': this.$route.query.areaCode,
-          // "sysCourseIdList": this.$route.query.courseIds,
-          "sysCourseIdList": [0, 6450],
+          "sysCourseIdList": this.$route.query.courseIds,
+          // "sysCourseIdList": [0, 6450],
           "pageSize": "10",
           "currentPage": page,
 

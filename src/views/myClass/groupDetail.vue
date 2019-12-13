@@ -1,6 +1,6 @@
 <template>
   <section class="group-detail-wrap">
-    <van-nav-bar :title="groupList[curIndex].tchClassSubGroupStudent.tchClassSubGroup.subgroupName" @click-left="$router.back()" left-arrow>
+    <van-nav-bar :title="groupList[curIndex].tchClassSubGroupStudent.tchClassSubGroup.subgroupName" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="group-detail-wrap__body">
       <div class="mgb10" :class="{disabled:isAdd}" style="position: relative;">
@@ -114,6 +114,9 @@ export default {
     }
   },
   methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
     modifyByBatch() {
       if (!this.isAdd && !this.isDel) return this.$toast('请选择学生')
       this.$store.commit('setVanLoading', true)

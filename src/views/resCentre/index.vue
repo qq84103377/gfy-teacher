@@ -2,7 +2,7 @@
   <section class="res-centre-wrap">
     <van-nav-bar
       :left-arrow="canBack"
-      @click-left="$router.back()"
+      @click-left="goBack"
       title="资源中心">
     </van-nav-bar>
     <div class="res-centre-wrap__tab">
@@ -468,6 +468,9 @@
       }
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       async download(srcUrl,name) {
         let url = srcUrl;
         if (url.indexOf("pubquanlang") > -1) {

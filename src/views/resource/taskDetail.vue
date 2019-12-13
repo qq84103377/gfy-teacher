@@ -1,6 +1,6 @@
 <template>
   <section class="task-detail">
-    <van-nav-bar class="task-detail__header" title="任务详情" :left-arrow="isApp" @click-left="$router.go(-2)" />
+    <van-nav-bar class="task-detail__header" title="任务详情" :left-arrow="isApp" @click-left="goBack" />
     <div class="task-detail__body">
       <div class="task-detail__body__top">
         <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
@@ -116,6 +116,18 @@ export default {
     }
   },
   methods: {
+       goBack() {
+      console.log('路由页面' + this.$route.meta.title + '按了返回')
+      console.log('appHeader当前路由记录' + this.$navigation.getRoutes())
+      if (this.$navigation.getRoutes()&&this.$navigation.getRoutes().length>1) {
+        console.log('存在路由记录')
+        // this.$router.back()
+        window.history.back(-2)
+      } else {
+        this.$router.replace('/index')
+      }
+        // this.$router.back()
+    },
     initTaskDetail() {
       let obj = {
         "interUser": "runLfb",

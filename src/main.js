@@ -3,6 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store/store'
 import VueCropper from "vue-cropper"
+import common from "./utils/common"
+
+Vue.prototype.common = common
 
 import * as fundebug from 'fundebug-javascript'
 import fundebugVue from 'fundebug-vue'

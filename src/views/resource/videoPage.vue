@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" v-if='!isFullscreen' />
+    <van-nav-bar :title="title" left-arrow @click-left="goBack" v-if='!isFullscreen' />
     <div class="video-box">
       <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
@@ -180,11 +180,11 @@ export default {
     setTimeout(() => {
       if (this.$refs.video) {
         this.$refs.video.play()
-        this.timeID1 = setInterval(() => {
-          this.getAudioLength(2)
-          console.log(this.$refs.video.duration, 'this.$refs.video.duration');
+        // this.timeID1 = setInterval(() => {
+        //   this.getAudioLength(2)
+        //   console.log(this.$refs.video.duration, 'this.$refs.video.duration');
 
-        }, 1000);
+        // }, 1000);
       }
     }, 0);
     // var mql = window.matchMedia("(orientation: portrait)");
@@ -366,16 +366,16 @@ export default {
   },
   beforeDestroy() {
     console.log('beforeDestroy');
-    this.initVideo = {
-      play: false,//播放还是暂停 true播放中
-      videoLength: 3600,//时长
-      url: '',//视频课件Url
-      // url:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201908/20190806041747_W4rnD_4.1使用-http查询MySQL数据.mp4',//视频课件Url
-      currentTime: 0,//当前播放时间
-      lastTime: null,//标记时间戳
-      name: "",
-    }
-    clearInterval(this.timeID1)
+    // this.initVideo = {
+    //   play: false,//播放还是暂停 true播放中
+    //   videoLength: 3600,//时长
+    //   url: '',//视频课件Url
+    //   // url:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201908/20190806041747_W4rnD_4.1使用-http查询MySQL数据.mp4',//视频课件Url
+    //   currentTime: 0,//当前播放时间
+    //   lastTime: null,//标记时间戳
+    //   name: "",
+    // }
+    // clearInterval(this.timeID1)
   },
   methods: {
     // onMatchMeidaChange(mql) {
@@ -391,6 +391,11 @@ export default {
     //     this.isLandscape = true
     //   }
     // },
+
+     goBack(){
+          this.common.goBack(this)
+        },
+        
     goVideoDetail(url) {
       if (!url) return
       this.$router.push({ name: 'videoDetail', query: { src: url } })

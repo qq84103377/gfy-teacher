@@ -2,7 +2,7 @@
   <section class="stu-analyse">
     <van-nav-bar
       :title="getStudentName($route.query.accountNo,$route.query.classId) + '的做题情况'"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <analyse-wrap @toggle="toggleQuestion">
@@ -53,6 +53,9 @@
       }
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       toggleTab(item, index) {
         if (item.active) return
         this.curIndex = index;

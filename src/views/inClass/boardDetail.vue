@@ -1,6 +1,6 @@
 <template>
   <section class="board-detail">
-    <van-nav-bar :title="info.name" @click-left="$router.back()" left-arrow>
+    <van-nav-bar :title="info.name" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="board-detail__body">
       <video v-if="type === 'mp4'"  webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(info.dataUrl)' :src="info.dataUrl"></video>
@@ -53,6 +53,9 @@ export default {
     })
   },
   methods: {
+    goBack(){
+          this.common.goBack(this)
+        },
     goVideoPage(url) {
       if (!url) return
       this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name } })

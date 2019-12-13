@@ -2,7 +2,7 @@
     <section class="course-detail">
       <van-nav-bar
         :title="currCourse.tchCourseInfo.courseName"
-        @click-left="$router.back()"
+        @click-left="goBack"
         left-arrow>
       </van-nav-bar>
       <div class="course-detail__body">
@@ -54,6 +54,9 @@
         }
       },
       methods: {
+         goBack(){
+          this.common.goBack(this)
+        },
           gotoPreview() {
             this.$router.push({path:'/preview',query:{
                 from:'course',
