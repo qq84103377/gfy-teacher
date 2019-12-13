@@ -1,20 +1,18 @@
 <template>
-  <van-nav-bar
-    :title="$route.meta.title"
-    left-arrow
-    @click-left="$router.back()"
-  />
+  <van-nav-bar :title="$route.meta.title" left-arrow @click-left="goBack" />
 </template>
 
 <script>
 export default {
   name: 'AppHeader',
-  data () {
+  data() {
     return {
     }
   },
   methods: {
-
+    goBack() {
+      this.common.goBack(this)
+    },
   }
 
 }
@@ -22,5 +20,4 @@ export default {
 
 <style lang="less" scoped>
 @deep: ~">>>";
-
 </style>
