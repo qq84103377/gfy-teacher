@@ -1,5 +1,6 @@
 <template>
-  <section class="myCollect">
+  <section class="myCollect" ref="record">
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
     <van-list
       v-model="loading"
       :finished="finished"
@@ -40,11 +41,13 @@
       </div>
 
     </van-list>
+    </van-pull-refresh>
   </section>
 </template>
 
 <script>
   import {cancelMallCollectInfo, getCollectInfo} from "@/api/mine";
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "myCollect",
@@ -55,10 +58,34 @@
         currentPage: 0,
         pageSize: 10,
         total: 1,
-        collectList: []
+        collectList: [],
+        isLoading:false,
+        record:0
       }
     },
+    beforeRouteLeave(to, from, next) {
+      this.record = this.$refs["record"].scrollTop;
+      next();
+    },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.$refs["record"].scrollTop = vm.record;
+        });
+      });
+    },
+    mounted() {
+      eventBus.$off("collectListRefresh")
+      eventBus.$on("collectListRefresh", (data) => {
+        this.onRefresh();
+      })
+    },
     methods: {
+      onRefresh() {
+        this.currentPage = 1;
+        this.collectList = [];
+        this.getCollectInfo();
+      },
       onLoad() {
         console.log('onload')
         this.loading = true;
@@ -103,8 +130,9 @@
           requestJson: JSON.stringify(obj)
         };
         getCollectInfo(params).then(res => {
-          console.log('getCollectInfo', res);
+          // console.log('getCollectInfo', res);
           this.loading = false;
+          this.isLoading = false;
           if (res.flag && res.data) {
             this.total = res.total;
             this.collectList = [...this.collectList, ...res.data];
@@ -114,6 +142,7 @@
         })
       }
     },
+
 
   }
 </script>
