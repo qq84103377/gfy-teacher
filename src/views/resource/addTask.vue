@@ -63,10 +63,10 @@
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许学生交卷后重新修改答案
           </van-checkbox>
-          <van-checkbox class="allow-fast mgt10" v-model="form.layer" v-if="(form.exam||isReinforce)&&!$route.query.isResend" :name="form.layer">
-            <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
-            自动分层
-          </van-checkbox>
+<!--          <van-checkbox class="allow-fast mgt10" v-model="form.layer" v-if="(form.exam||isReinforce)&&!$route.query.isResend" :name="form.layer">-->
+<!--            <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>-->
+<!--            自动分层-->
+<!--          </van-checkbox>-->
         </div>
 
       </van-cell>
@@ -1041,7 +1041,7 @@ export default {
         "testPaperId": this.testPaperId,
         "modifyAfterSubmit": modifyAfterSubmit,
         "sysTypeCd": "S02",
-        "layerStatus": this.form.layer ? 'L02': 'L01'
+        // "layerStatus": this.form.layer ? 'L02': 'L01'
       };
       //发布任务的学生
       let classListSelect = []
