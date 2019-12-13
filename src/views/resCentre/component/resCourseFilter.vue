@@ -2,6 +2,7 @@
   <!--    <section class="course-filter-wrap"></section>-->
   <van-popup
     :close-on-click-overlay="false"
+    get-container="#app"
     v-model="show"
     position="bottom"
     :style="{ height:'93%' }">

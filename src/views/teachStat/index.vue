@@ -19,6 +19,28 @@
         </div>
       </van-cell>
     </div>
+    <div v-show="showTime" class="teach-stat__time-picker-wrap">
+      <div class="time-piker-header">
+        <div>
+          <span v-for="(item,index) in rangeList" :key="index" :class="['mgr15',{blue:item.active}]" @click="dateRange(item.mtd1,item.mtd2,item.num,index)">{{item.name}}</span>
+        </div>
+        <div class="blue" @click="confirmDate">确认</div>
+      </div>
+      <div class="date-box">
+        <div @click="filterTime.type = true;currentDate = new Date(filterTime.start)" class="date-select" :class="{active:filterTime.type}">{{filterTime.start}}</div>
+        <div class="mgr10 mglt10">~</div>
+        <div @click="filterTime.type = false;currentDate = new Date(filterTime.end)" class="date-select" :class="{active:!filterTime.type}">{{filterTime.end}}</div>
+      </div>
+      <van-datetime-picker
+        ref="datePicker"
+        confirm-button-text=" "
+        cancel-button-text=" "
+        v-model="currentDate"
+        :max-date="maxDate"
+        type="date"
+        @change="changeDate"
+      />
+    </div>
 
     <router-view ref="routerView"></router-view>
 
@@ -26,6 +48,7 @@
 
     <!--    年级学科-->
     <van-popup
+      get-container="#app"
       v-model="gradePop"
       :close-on-click-overlay="false"
       round
@@ -48,6 +71,7 @@
     </van-popup>
     <!--    班级-->
     <van-popup
+      get-container="#app"
       v-model="classPop"
       round
       position="bottom"
@@ -70,10 +94,11 @@
 <!--时间-->
     <van-popup
       v-model="showTime"
+      get-container="#app"
       position="bottom"
       :close-on-click-overlay="false"
       :style="{ height: '50%' }">
-      <div>
+      <div class="teach-stat__time-picker-wrap">
         <div class="time-piker-header">
           <div>
             <span v-for="(item,index) in rangeList" :key="index" :class="['mgr15',{blue:item.active}]" @click="dateRange(item.mtd1,item.mtd2,item.num,index)">{{item.name}}</span>
@@ -96,6 +121,8 @@
         />
       </div>
     </van-popup>
+
+
   </section>
 </template>
 
@@ -225,7 +252,7 @@
       }
     },
     created() {
-      console.log(this.$route.path,'dddddd');
+
       let arr = []
       let flag = true
       JSON.parse(localStorage.gradeList).forEach(v => {
@@ -255,76 +282,79 @@
     flex-direction: column;
     background: #f5f5f5;
 
-    @{deep} .van-picker__toolbar {
-      display: none;
-    }
-    .time-piker-header {
-      height: 42px;
-      padding: 0 10px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .date-box {
-      height: 40px;
-      padding: 0 15px;
-      background: #f5f5f5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      .date-select {
-        flex: 1;
-        border-radius: 3px;
-        border: 1px solid #999;
-        line-height: 22px;
-        background: #fff;
-        text-align: center;
-        &.active {
-          border: 1px solid @blue;
-        }
-      }
-    }
 
     &__body {
       flex: 1;
       overflow-y: auto;
     }
 
-    .grade-pop-wrap {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
-      .close {
-        font-size: 22px;
-        position: absolute;
-        right: 10px;
-        top: 13px;
-        color: #999;
-        z-index: 1;
-      }
-      &__title {
-        font-size: 18px;
-        text-align: center;
-        line-height: 50px;
-      }
-
-      &__body {
-        flex: 1;
-        overflow-y: auto;
-      }
-
-      &__footer {
-        flex: 0 0 44px;
-        padding: 5px 10px;
-
-        .btn {
-          border-radius: 22px;
-          width: 100%;
-        }
-      }
-    }
   }
+   .grade-pop-wrap {
+     display: flex;
+     flex-direction: column;
+     height: 100%;
+     position: relative;
+     .close {
+       font-size: 22px;
+       position: absolute;
+       right: 10px;
+       top: 13px;
+       color: #999;
+       z-index: 1;
+     }
+     &__title {
+       font-size: 18px;
+       text-align: center;
+       line-height: 50px;
+     }
+
+     &__body {
+       flex: 1;
+       overflow-y: auto;
+     }
+
+     &__footer {
+       flex: 0 0 44px;
+       padding: 5px 10px;
+
+       .btn {
+         border-radius: 22px;
+         width: 100%;
+       }
+     }
+   }
+   .teach-stat__time-picker-wrap {
+     @{deep} .van-picker__toolbar {
+       display: none;
+     }
+     .time-piker-header {
+       height: 42px;
+       padding: 0 10px;
+       font-size: 14px;
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+     }
+     .date-box {
+       height: 40px;
+       padding: 0 15px;
+       background: #f5f5f5;
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+       font-size: 12px;
+       .date-select {
+         flex: 1;
+         border-radius: 3px;
+         border: 1px solid #999;
+         line-height: 22px;
+         background: #fff;
+         text-align: center;
+         &.active {
+           border: 1px solid @blue;
+         }
+       }
+     }
+   }
+
 </style>

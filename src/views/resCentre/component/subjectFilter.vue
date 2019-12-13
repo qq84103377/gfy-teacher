@@ -1,5 +1,5 @@
 <template>
-  <van-popup v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
+  <van-popup get-container="#app" v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
     <div class="res-filter-wrap">
       <div class="res-filter-wrap__header van-hairline--bottom">
         <div class="res-filter-wrap__header-tab">
@@ -71,8 +71,17 @@ export default {
   },
   created() {
     const classMap = JSON.parse(localStorage.classMap)
+    let year = ''
+    for(let k in classMap) {
+      const index = classMap[k].teacherInfoList.findIndex(t => t.subjectType === localStorage.currentSubjectType)
+      if(index > -1) {
+        year = classMap[k].classYearSection
+        break
+      }
+    }
+
     this.subjectList.forEach((v, i) => {
-      if (v.value === classMap[Object.keys(classMap)[0]].classYearSection) {
+      if (v.value === year) {
         v.active = true
         this.index = i
       }
