@@ -2,7 +2,7 @@
   <section class="briefing-wrap">
     <van-nav-bar
       title="简报"
-      @click-left="$router.back()"
+      @click-left="goBack"
       :left-arrow="isApp">
     </van-nav-bar>
     <div class="briefing-wrap__body">
@@ -71,6 +71,9 @@
       this.$store.commit('setVanLoading', false)
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       handleStudentName(accountNo) {
        const item = this.classStudentList.find(v => v.accountNo == accountNo)
         if(item) {

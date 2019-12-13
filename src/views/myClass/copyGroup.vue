@@ -2,7 +2,7 @@
   <section class="copy-group-wrap">
     <van-nav-bar
       :title="$route.query.title"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="copy-group-wrap__body">
@@ -66,6 +66,9 @@
       }),
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       getSubGroupStudent() {
         this.$store.commit('setVanLoading',true)
         let obj = {

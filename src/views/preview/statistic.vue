@@ -1,6 +1,6 @@
 <template>
   <section class="statistic-wrap">
-    <van-nav-bar :title="info.taskName" @click-left="$router.back()" left-arrow>
+    <van-nav-bar :title="info.taskName" @click-left="goBack" left-arrow>
       <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll">
@@ -244,6 +244,9 @@
       },
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       sendTask() {
         let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
         tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)

@@ -2,7 +2,7 @@
     <section class="spoken-analyse">
       <van-nav-bar
         title="题目分析"
-        @click-left="$router.back()"
+        @click-left="goBack"
         left-arrow>
       </van-nav-bar>
       <div class="spoken-analyse__topic" v-if="$route.params.type == 'analyse'">{{info[index].splitSentence.sentenceContent}}</div>
@@ -34,6 +34,9 @@
         }
       },
       methods: {
+         goBack(){
+          this.common.goBack(this)
+        },
         toggle(type) {
           if(type) {
             // 下一题

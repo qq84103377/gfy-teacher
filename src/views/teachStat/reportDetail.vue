@@ -2,7 +2,7 @@
   <section class="report-detail">
     <van-nav-bar
       :title="(getStudentName(stuList[stuIndex].accountNo,stuList[stuIndex].classId))+'的家庭报告'"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
       <div slot="right" class="fs14 blue" @click="viewAll">生成报告</div>
     </van-nav-bar>
@@ -152,6 +152,9 @@
       },
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       viewAll() {
         this.$router.push(`/reportAll?stuName=${getStudentName(this.stuList[this.stuIndex].accountNo,this.stuList[this.stuIndex].classId)}&accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
       },

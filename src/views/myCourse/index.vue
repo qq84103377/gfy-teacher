@@ -1,6 +1,6 @@
 <template>
   <section class="my-course-list">
-    <van-nav-bar title="我的课程" @click-left="$router.back()" left-arrow>
+    <van-nav-bar title="我的课程" @click-left="goBack" left-arrow>
       <div slot="right" class="fs12 blue" @click="filterShow=true">筛选</div>
     </van-nav-bar>
     <div class="my-course-list__body" ref="body">
@@ -79,6 +79,9 @@ export default {
     })
   },
   methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
     goEdit(item) {
       this.$router.push({ path: '/editMyCourse', query: { currentTchCourseInfo: item } })
     },

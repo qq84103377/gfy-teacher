@@ -1,6 +1,6 @@
 <template>
   <section class="question-list">
-    <van-nav-bar :title="title" left-arrow @click-left="$router.back()" class="title" />
+    <van-nav-bar :title="title" left-arrow @click-left="goBack" class="title" />
 
     <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
     <div class="question-list__tab">
@@ -167,6 +167,9 @@ export default {
     });
   },
   methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
     viewRes(type) {
       //试题列表查看资源中心试题或返回试题列表
       this.isRes = type
@@ -446,8 +449,8 @@ export default {
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "orderByType": this.filterParam.orderByType,
           'areaCode': this.$route.query.areaCode,
-          // "sysCourseIdList": this.$route.query.courseIds,
-          "sysCourseIdList": [0, 6450],
+          "sysCourseIdList": this.$route.query.courseIds,
+          // "sysCourseIdList": [0, 6450],
           "pageSize": "10",
           "currentPage": page,
 

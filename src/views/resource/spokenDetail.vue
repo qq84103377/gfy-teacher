@@ -2,7 +2,7 @@
   <section class="spoken-detail">
     <van-nav-bar
       :title="info.spokenTitle"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="spoken-detail__body">
@@ -44,6 +44,9 @@
       }
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
      async getDetail() {
         let obj = {
           "spokenId": this.$route.query.spokenId,

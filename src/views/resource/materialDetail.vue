@@ -2,7 +2,7 @@
   <section class="board-detail">
     <van-nav-bar
       :title="info.coursewareName"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="board-detail__body">
@@ -61,6 +61,9 @@
       })
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       handleIcon (url) {
         var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
         if (t == 'ppt' || t == 'pptx') {

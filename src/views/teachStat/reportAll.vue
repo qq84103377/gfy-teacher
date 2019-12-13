@@ -2,7 +2,7 @@
   <section class="report-all-wrap">
     <van-nav-bar
       :title="$route.query.stuName+'的家庭报告'"
-      @click-left="$router.back()"
+      @click-left="goBack"
       :left-arrow="isApp"/>
     <div class="report-all-wrap__body">
       <div class="fs16" style="font-weight: bold;">一、知识点掌握情况</div>
@@ -141,6 +141,10 @@
       })
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
+        
       handleSuggest(currentNum, totalNum, masteryNum) {
         let suggest = ''
         if (calculate.div(currentNum, totalNum) <= 0.8 && totalNum <= 20) {

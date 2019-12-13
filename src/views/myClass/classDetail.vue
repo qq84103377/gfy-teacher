@@ -2,7 +2,7 @@
   <section class="class-detail-wrap">
     <van-nav-bar
       :title="$route.query.className"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="class-detail-wrap__body">
@@ -120,6 +120,9 @@
       })
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       copyGroup() {
         const arr = this.classTeacherList.filter(item => item.accountNo != this.$store.getters.getUserInfo.accountNo && item.subjectType !== localStorage.currentSubjectType)
         if (arr.length) {

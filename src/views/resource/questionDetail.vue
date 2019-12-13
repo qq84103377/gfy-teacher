@@ -2,7 +2,7 @@
   <section class="question-detail">
     <van-nav-bar
       :title="$route.query.title"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="question-detail__body">
@@ -40,6 +40,9 @@
       }
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       previewImg($event) {
         if ($event.target.nodeName == "IMG") {
           console.log($event.target.src);

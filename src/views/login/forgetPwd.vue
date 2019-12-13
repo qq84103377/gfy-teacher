@@ -2,7 +2,7 @@
     <section class="forget-pwd">
       <van-nav-bar
         left-arrow
-        @click-left="$router.back()"
+        @click-left="goBack"
       />
       <div class="forget-pwd__body">
         <h1 class="fs24">个人信息</h1>
@@ -52,6 +52,9 @@
           }
       },
       methods: {
+        goBack(){
+          this.common.goBack(this)
+        },
         // 获取验证码
         getVailCode () {
           if (this.timer) return

@@ -281,6 +281,14 @@ export default {
     },
 
   },
+  // beforeRouteLeave(to, from, next) {
+  //   // ...
+  //   console.log(to, "to");
+  //   if (to.path == 'index') {
+  //     this.$store.commit('setFilterSubjectLabel', null)
+  //   }
+  //   next()
+  // },
   methods: {
     async getSysAreaList() {
       this.$store.commit('setVanLoading', true)

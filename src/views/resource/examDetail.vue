@@ -2,7 +2,7 @@
   <section class="exam-detail">
     <van-nav-bar
       :title="title"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="exam-detail__body">
@@ -109,6 +109,9 @@
       }
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       addDone(title) {
         this.title = title
         this.isModify = false

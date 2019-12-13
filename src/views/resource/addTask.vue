@@ -1,7 +1,7 @@
 <template>
   <section class="add-task">
 
-    <van-nav-bar :title="isEdit?'编辑':handleTitle()" @click-left="$router.back()" left-arrow>
+    <van-nav-bar :title="isEdit?'编辑':handleTitle()" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="add-task__body">
       <van-cell class="add-task__body__cell">
@@ -374,6 +374,9 @@ export default {
   },
 
   methods: {
+     goBack(){
+          this.common.goBack(this)
+        },
     async getClassTeachCourseInfo() {
       this.$store.commit('setVanLoading',true)
       let obj = {

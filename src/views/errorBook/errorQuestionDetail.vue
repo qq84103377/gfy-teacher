@@ -2,7 +2,7 @@
   <section class="error-question-detail">
     <van-nav-bar
       :title="$route.query.courseName"
-      @click-left="$router.back()"
+      @click-left="goBack"
       left-arrow>
     </van-nav-bar>
     <div class="error-question-detail__body">
@@ -43,6 +43,9 @@
       }
     },
     methods: {
+   goBack(){
+          this.common.goBack(this)
+        },
       clear() {
         //清空所有试题时需要移除试题的添加状态样式
         this.questionList.forEach(v => {

@@ -2,7 +2,7 @@
   <section class="goodsDetail" @scroll="scroll" ref="goodsDetail">
 
     <div class="goodsDetail-header">
-      <van-nav-bar :title="title" left-arrow @click-left="$router.back()"/>
+      <van-nav-bar :title="title" left-arrow @click-left="goBack"/>
       <!--      <img v-if="goodsInfo" :src="goodsInfo.goodsPhotoUrl" alt="">-->
       <van-swipe v-if="goodsInfo" :autoplay="3000" @change="swiperChange">
         <van-swipe-item v-for="(image, index) in images" :key="index" @click="previewImg">
@@ -88,6 +88,9 @@
       });
     },
     methods: {
+       goBack(){
+          this.common.goBack(this)
+        },
       // 轮播图滑动改变索引
       swiperChange(index) {
         // console.log('当前轮播图索引', index);

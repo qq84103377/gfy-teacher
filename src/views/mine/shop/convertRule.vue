@@ -1,6 +1,6 @@
 <template>
   <section class="convertRule">
-    <van-nav-bar title="兑换规则" left-arrow @click-left="$router.back()">
+    <van-nav-bar title="兑换规则" left-arrow @click-left="goBack">
       <div slot="right" class="tips" @click="$router.push('/service')">为您服务</div>
     </van-nav-bar>
     <div class="convertRule-body">
@@ -30,7 +30,12 @@
 
 <script>
   export default {
-    name: "convertRule"
+    name: "convertRule",
+    methods: {
+      goBack(){
+          this.common.goBack(this)
+        },
+    },
   }
 </script>
 
