@@ -407,7 +407,7 @@
         addTestPaperExamInfo(params).then(res => {
           this.form.btnLoading = false
           if (res.flag) {
-            if(this.$route.query.from === 'examList') eventBus.$emit('examListRefresh', true);
+              eventBus.$emit('examListRefresh', true);
             this.addExam = false
             this.$store.commit('setResQuestionSelect', [])
             this.$store.commit('setResourceInfo', paperInfo)
