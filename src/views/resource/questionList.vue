@@ -316,7 +316,7 @@ export default {
         "belongSchoolId": this.$store.getters.schoolId,
         subjectType: localStorage.currentSubjectType,
         yearSection: this.$route.query.year,
-        "pageSize": "9999",
+        "pageSize": "10",
         "currentPage": 1,
         "orderByType": this.filterParam.orderByType,
         "resCollectInfo": {
@@ -330,7 +330,8 @@ export default {
           "titleDegree": this.filterParam.titleDegree, //难度
           "titleType": this.filterParam.titleType, //题型
           "belongType": this.filterParam.belongType, //类型
-          "belongAreaCode": this.$route.query.areaCode,
+          // "belongAreaCode": this.$route.query.areaCode,
+          "belongAreaCode": '',
           "keyWord": "",
           "createYear": "",
           "courseWareType": ""
