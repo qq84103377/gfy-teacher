@@ -70,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @viewRes="viewRes" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
+    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
   </section>
 </template>
 
