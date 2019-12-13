@@ -169,6 +169,7 @@ export default {
     // this.getClassTeachCourseInfo()
     eventBus.$off("examListRefresh")
     eventBus.$on("examListRefresh", (data) => {
+      debugger
       this.onRefresh()
     })
   },
@@ -181,7 +182,7 @@ export default {
         path: `/questionList`, query: {
           "tchCourseId": this.$route.query.tchCourseId,
           "sysCourseId": this.$route.query.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId,
+          "relationCourseId": this.$route.query.relationCourseId,
           "courseName": this.$route.query.courseName,
           from: 'examList'
         }

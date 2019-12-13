@@ -105,6 +105,15 @@ if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {
   // fundebug.silentConsole = true
 }
 
+// 过滤监控 unhandledrejection
+if ("fundebug" in window) {
+  fundebug.filters = [
+    {
+      type: /^unhandledrejection$/
+    }
+  ]
+}
+
 Object.keys(myFilter).forEach(key => {
   Vue.filter(key, myFilter[key])
 })
