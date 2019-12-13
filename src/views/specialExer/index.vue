@@ -54,36 +54,7 @@
     </div>
     <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter" :double='double'></filter-panel>
 
-    <!--    复习套卷-年级学科-->
-    <van-popup v-model="gradePop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
-      <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(0,gradeSubjectList)" class="close" name="close" />
-        <div class="grade-pop-wrap__subject van-hairline--bottom">
-          <span v-for="(item, index) in subject" :key="index" :class="[{ blue: item.active }]" @click="handleSelectSubject(item)">{{ item.name }}</span>
-        </div>
-        <div class="grade-pop-wrap__body">
-
-          <div class="grade-pop-wrap__body-left">
-            <div @click="selectGradeParent(item,index)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
-            </div>
-          </div>
-
-          <div class="grade-pop-wrap__body-right">
-            <div class="" v-for="(item,index) in gradeSubjectList[gradeIndex].child" :key="index">
-              <div @click="handleSelectGrade(item)" class="van-hairline--bottom">
-                <div :class="['cell__item',{active:item.check}]">{{item.name}}
-                  <van-icon v-show="item.check" class="check blue" name="success" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="grade-pop-wrap__footer">
-          <van-button class="btn" type="info" @click="confirm(1)">确定</van-button>
-        </div>
-      </div>
-    </van-popup>
-
+   
     <!--  更多-->
     <van-popup v-model="morePop" round position="bottom" :style="{ height: '93%' }">
       <div class="grade-pop-wrap">
@@ -123,6 +94,8 @@
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
 
+    <!-- <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" ></year-subject> -->
+
   </section>
 </template>
 
@@ -144,6 +117,7 @@ import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
 import subjectFilter from '../resCentre/component/subjectFilter'
 import versionFilter from './component/versionFilter'
+import yearSubject from './component/yearSubject'
 
 export default {
   name: "index",
@@ -154,6 +128,7 @@ export default {
     filterPanel,
     subjectFilter,
     versionFilter,
+    // yearSubject
   },
   data() {
     return {
@@ -256,7 +231,10 @@ export default {
 
       typesList: [],
       areaCode: '0757',
-      courseIds: []
+      courseIds: [],
+
+      yearSubjectLabel:'',
+      yearSubjectShow:false
 
 
     };
@@ -537,22 +515,7 @@ export default {
         this.filter.area = item.name + area.name
         this.areaCode = area.areaCode
         this.checkItem(this.area, item)
-
       }
-
-      // else if (this.title === '教材') {
-      //   let testbook = item.child.find(v => v.check)
-      //   this.filter.testbook = item.name + "-" + testbook.name
-      //   this.checkItem(this.testbook, item)
-      // } else if (this.title === '科目') {
-      //   this.filter.subject = item.name
-      //   this.checkItem(this.subject, item)
-      //   localStorage.setItem("currentSubjectTypeName", item.name);
-      //   localStorage.setItem("currentSubjectType", item.subjectType);
-      // } else if (this.title === '课程') {
-      //   // this.filter.course = item.name
-      //   // this.checkItem(this.course, item)
-      // }
     },
     checkItem(arr, item) {
       if (this.double) {
@@ -638,29 +601,7 @@ export default {
       }
 
     },
-    selectGradeParent(item, index) {
-      this.gradeIndex = index
-      if (item.active) return
-      this.gradeSubjectList.forEach(v => {
-        this.$set(v, 'active', false)
-        v.child.forEach(_v => {
-          this.$set(_v, 'check', false)
-        });
-      })
-      this.$set(item, 'active', true)
-      // 默认选中第一个
-      // this.$set(item.child[0], 'check', true)
-    },
-    handleSelectGrade(item) {
-      if (item.check) return
-      this.gradeSubjectList.forEach(v => {
-        v.child.forEach(_v => {
-          this.$set(_v, 'check', false)
-        });
-      })
-      this.$set(item, 'check', true)
 
-    },
     selectItem(item, index, arr) {
       if (item.active) return;
       for (let key in arr) {

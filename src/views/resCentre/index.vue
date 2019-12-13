@@ -792,7 +792,7 @@
             query: {
               src: this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
               title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
-              isMp3: (this.tabIndex ? item.source : item.resCourseWareInfo.source) == "S01" ? true : false
+              isMp3: (this.tabIndex ? item.coursewareType : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
             }
           })
         }).catch(() => {
