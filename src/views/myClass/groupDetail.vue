@@ -15,9 +15,9 @@
               </div>
             </div>
           </div>
-          <div class="aic" style="justify-content: flex-end">
+          <div class="aic" @click="stuInfo=item;visible=true" style="justify-content: flex-end;height: 100%;">
             <div v-if="item.studentNumber" class="fs15 grey6 mgr10">学号: {{item.studentNumber}}</div>
-            <van-icon name="arrow" @click="stuInfo=item;visible=true" style="vertical-align: middle;" />
+            <van-icon name="arrow" style="vertical-align: middle;" />
           </div>
         </van-cell>
         <div v-if="(!groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent || groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent.length === 0) && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
@@ -37,9 +37,9 @@
                 <div class="aic">{{s.studentName}}<span v-if="s.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="s.identityType === 'I02'" class="group-leader-badge">组</span></div>
               </div>
 
-              <div class="aic" style="justify-content: flex-end">
+              <div class="aic" @click="stuInfo=s;visible=true" style="justify-content: flex-end;height: 100%;">
                 <div v-if="s.studentNumber" class="fs15 grey6 mgr10">学号: {{s.studentNumber}}</div>
-                <van-icon @click="stuInfo=s;visible=true" name="arrow" style="vertical-align: middle;" />
+                <van-icon name="arrow" style="vertical-align: middle;" />
               </div>
             </van-cell>
           </div>
