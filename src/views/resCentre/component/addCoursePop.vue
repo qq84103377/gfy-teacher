@@ -1,6 +1,7 @@
 <template>
   <van-popup
     v-model="show"
+    get-container="#app"
     :closeable="true"
     close-icon="close"
     :close-on-click-overlay="false"

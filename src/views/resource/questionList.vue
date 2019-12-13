@@ -127,12 +127,21 @@ export default {
     }
   },
   watch: {
-    '$route'() {
-      this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
-      //先把selectList添加对应的examType
-      this.selectList.forEach(v => {
-        this.$set(v, 'examType', v.child[0].titleType)
-      })
+    '$route'(v) {
+      if(v.path === '/questionList') {
+        this.selectList = JSON.parse(JSON.stringify(this.$store.getters.getResQuestionSelect))
+        //先把selectList添加对应的examType
+        this.selectList.forEach(s => {
+          this.$set(s, 'examType', s.child[0].titleType)
+          s.child.forEach(c => {
+            this.list.forEach(item => {
+              if (c.examId === item.examId) {
+                this.$set(item, 'isRemove', true)
+              }
+            })
+          })
+        })
+      }
     }
   },
   async created() {
@@ -170,12 +179,6 @@ export default {
      goBack(){
           this.common.goBack(this)
         },
-    viewRes(type) {
-      //试题列表查看资源中心试题或返回试题列表
-      this.isRes = type
-      this.$store.commit('setVanLoading', true)
-      this.onRefresh()
-    },
     clear() {
       //清空所有试题时需要移除试题的添加状态样式
       this.list.forEach(v => {
@@ -316,7 +319,7 @@ export default {
         "belongSchoolId": this.$store.getters.schoolId,
         subjectType: localStorage.currentSubjectType,
         yearSection: this.$route.query.year,
-        "pageSize": "9999",
+        "pageSize": "10",
         "currentPage": 1,
         "orderByType": this.filterParam.orderByType,
         "resCollectInfo": {
@@ -330,7 +333,8 @@ export default {
           "titleDegree": this.filterParam.titleDegree, //难度
           "titleType": this.filterParam.titleType, //题型
           "belongType": this.filterParam.belongType, //类型
-          "belongAreaCode": this.$route.query.areaCode,
+          // "belongAreaCode": this.$route.query.areaCode,
+          "belongAreaCode": '',
           "keyWord": "",
           "createYear": "",
           "courseWareType": ""
@@ -561,18 +565,10 @@ export default {
     background: transparent;
   }
 
-  .title {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    top: 0;
-  }
-
   &__tab {
     flex: 0 0 44px;
     display: flex;
     background: #fff;
-    padding-top: 50px;
 
     .ellipsis {
       text-align: center;

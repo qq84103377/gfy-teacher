@@ -58,6 +58,7 @@
 <script>
   import {getGoodsList, addMallCollectInfo, cancelMallCollectInfo, addExchangeApplyGoodsInfo,getUserCounterList} from "@/api/mine";
   import {ImagePreview} from 'vant';
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "goodsDetail",
@@ -169,6 +170,7 @@
           // console.log('cancelMallCollectInfo', res)
           if (res.flag) {
             this.isCollect = false;
+            eventBus.$emit("collectListRefresh", true);
             this.$toast.success('取消收藏成功！')
           }
         })
