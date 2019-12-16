@@ -180,11 +180,6 @@ export default {
     setTimeout(() => {
       if (this.$refs.video) {
         this.$refs.video.play()
-        // this.timeID1 = setInterval(() => {
-        //   this.getAudioLength(2)
-        //   console.log(this.$refs.video.duration, 'this.$refs.video.duration');
-
-        // }, 1000);
       }
     }, 0);
     // var mql = window.matchMedia("(orientation: portrait)");
@@ -366,16 +361,6 @@ export default {
   },
   beforeDestroy() {
     console.log('beforeDestroy');
-    // this.initVideo = {
-    //   play: false,//播放还是暂停 true播放中
-    //   videoLength: 3600,//时长
-    //   url: '',//视频课件Url
-    //   // url:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201908/20190806041747_W4rnD_4.1使用-http查询MySQL数据.mp4',//视频课件Url
-    //   currentTime: 0,//当前播放时间
-    //   lastTime: null,//标记时间戳
-    //   name: "",
-    // }
-    // clearInterval(this.timeID1)
   },
   methods: {
     // onMatchMeidaChange(mql) {
@@ -460,7 +445,6 @@ export default {
     },
     videoTimeUpdate() {//更新视频时间。节流，每秒触发一次
       console.log("videoTimeUpdate");
-      console.log(this.$refs.video, 'this.$refs.video');
       if (this.$refs.video) {
         if (!isNaN(this.$refs.video.currentTime)) {
           this.initVideo.currentTime = this.$refs.video.currentTime

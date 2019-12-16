@@ -4,59 +4,46 @@
     <div class="grade-pop-wrap">
       <van-icon @click="closePop" class="close" name="close" />
       <div class="grade-pop-wrap__subject van-hairline--bottom">
-        <span v-for="(item, index) in subject" :key="index" :class="[{ blue: item.active }]" @click="handleSelectSubject(item)">{{ item.name }}</span>
+        <span v-for="(item, index) in subjectList" :key="index" :class="[{ blue: item.active }]" @click="handleSelectSubject(item)">{{ item.name }}</span>
       </div>
       <div class="grade-pop-wrap__body">
 
         <div class="grade-pop-wrap__body-left">
-          <div @click="selectGradeParent(item,index)" v-for="(item,index) in yearSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
+          <div @click="handleSelectGrade(item,index)" v-for="(item,index) in yearSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
           </div>
         </div>
 
         <div class="grade-pop-wrap__body-right">
           <div class="" v-for="(item,index) in termList" :key="index">
             <div @click="handleSelectTerm(item)" class="van-hairline--bottom">
-              <div :class="['cell__item',{active:item.check}]">{{item.name}}
-                <van-icon v-show="item.check" class="check blue" name="success" />
+              <div :class="['cell__item',{active:item.active}]">{{item.name}}
+                <van-icon v-show="item.active" class="check blue" name="success" />
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="grade-pop-wrap__footer">
-        <van-button class="btn" type="info" @click="confirm(1)">确定</van-button>
+        <van-button class="btn" type="info" @click="confirm()">确定</van-button>
       </div>
     </div>
   </van-popup>
 </template>
 
 <script>
+import { getMySchoolInfo } from '@/api/index'
+
 export default {
   name: 'yearSubject',
-  props: ['visible', 'label', 'gradeTerm', 'courseIds'],
+  props: ['visible', 'label', 'grade', 'term', 'subjectList'],
   data() {
     return {
-      index: 0,
-      yearIndex: 0,
       termList: [
-        { name: '上学期',value:'S01', check: true},
-        { name: '下学期',value:'S02', check: false},
-      ], 
-      yearSubjectList: { year: '', arr: [] },
-      gradeIndex: 0,
-      gradeOldIndex: 0,
-      gradeIndex2: -1,
-
-      tempList: [],
-      tempIndex: 0,
-
-      textBookId: '',
-      gradeTermId: '',
-      subjectType: '',
-
-      textItem: '',
-      gradeTermItem: '',
-      subject:[]
+        { name: '上学期', value: 'S01', active: true },
+        { name: '下学期', value: 'S02', active: false },
+      ],
+      yearSubjectList: [],
+      // subject: []
     }
   },
   computed: {
@@ -71,39 +58,95 @@ export default {
   },
   watch: {
     visible(v) {
-      if (v) {
-        this.tempIndex = this.index
-        // this.tempList = JSON.parse(JSON.stringify(this.versionList))
-      }
+      // if (v) {
+      //   this.tempIndex = this.index
+      //   // this.tempList = JSON.parse(JSON.stringify(this.versionList))
+      // }
     },
   },
-  created() {
+  async created() {
     console.log('yearSubjectfilter created');
-    this.getMySchoolInfo()
+    // this.getMySchoolInfo()
+    const classMap = JSON.parse(localStorage.classMap)
+    let classMapArr = Object.values(classMap)
+    console.log(classMapArr, 'classMapArr');
+    let res1 = classMapArr.some(ele => ele.classYearSection == "Y01")
+    if (res1) {
+      let garde1 = ['G01', 'G02', 'G03', 'G04', 'G05', 'G06']
+      for (var i = 0; i < 6; i++) {
+        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde1[i]], value: garde1[i], active: '' })
+      }
+    }
+    let res2 = classMapArr.some(ele => ele.classYearSection == "Y02")
+    if (res2) {
+      let garde2 = ['G07', 'G08', 'G09']
+      for (var i = 0; i < 3; i++) {
+        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde2[i]], value: garde2[i], active: '' })
+      }
+    }
+    let res3 = classMapArr.some(ele => ele.classYearSection == "Y03")
+    if (res3) {
+      let garde3 = ['G10', 'G11', 'G12']
+      for (var i = 0; i < 3; i++) {
+        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde3[i]], value: garde3[i], active: '' })
+      }
+    }
+    let first = this.yearSubjectList.some((ele, index) => {
+      if (ele.value == classMapArr[0].classGrade) {
+        this.yearSubjectList[index].active = true
+        const termItem = this.termList.find(v => v.active)
+        this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[index].name + termItem.name)
+        this.$emit('update:gradeItem', this.yearSubjectList[index])
+        this.$emit('update:termItem', termItem)
+        return true
+      }
+    })
+    if (!first) {
+      this.yearSubjectList[0].active = true
+      const termItem = this.termList.find(v => v.active)
+
+      this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[0].name + termItem.name)
+      this.$emit('update:gradeItem', this.yearSubjectList[0])
+      this.$emit('update:termItem', termItem)
+    }
+
   },
   methods: {
     closePop() {
-      this.yearSubjectList = this.tempList
-      this.index = this.tempIndex
+
       this.show = false
     },
-    openGradePop() {
-      this.gradePop = true;
-      this.gradeIndex = this.gradeOldIndex
-      this.$set(this.gradeSubjectList[this.gradeIndex], "active", true);
-      if (this.gradeIndex2 >= 0) {
-        this.$set(this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2], "active", true);
-      }
+
+    handleSelectSubject(item) {
+      if (item.subjectType == localStorage.currentSubjectType) return
+      this.$dialog
+        .confirm({
+          title: "提示",
+          message: "是否进行科目的切换？科目切换后，首页的科目也将进行切换",
+          confirmButtonColor: "#39F0DD",
+          className: "change-subject"
+        })
+        .then(() => {
+          // on confirm
+          this.subjectList.forEach(v => {
+            this.$set(v, 'active', false)
+          })
+          this.$set(item, 'active', true)
+          localStorage.setItem("currentSubjectTypeName", item.name);
+          localStorage.setItem("currentSubjectType", item.subjectType);
+
+          this.$emit('update:subjectList', this.subjectList)
+        })
+        .catch(() => {
+          // on cancel
+        })
     },
 
-    selectGradeParent(item, index) {
+    handleSelectGrade(item, index) {
       this.gradeIndex = index
       if (item.active) return
-      this.gradeSubjectList.forEach(v => {
+      this.yearSubjectList.forEach(v => {
         this.$set(v, 'active', false)
-        v.child.forEach(_v => {
-          this.$set(_v, 'check', false)
-        });
       })
       this.$set(item, 'active', true)
       // 默认选中第一个
@@ -112,35 +155,21 @@ export default {
     handleSelectTerm(item) {
       if (item.check) return
       this.termList.forEach(v => {
-          this.$set(_v, 'check', false)
+        this.$set(v, 'active', false)
       })
-      this.$set(item, 'check', true)
-
+      this.$set(item, 'active', true)
     },
-    confirm(flag) {
+    confirm() {
+      const gradeItem = this.yearSubjectList.find(v => v.active)
+      const termItem = this.termList.find(v => v.active)
+      this.$emit('update:label', localStorage.currentSubjectTypeName + gradeItem.name + termItem.name)
+      this.$emit('update:gradeItem', gradeItem)
+      this.$emit('update:termItem', termItem)
+      this.show = false
+
+      return
+
       if (flag) {
-
-        // this.$dialog
-        //   .confirm({
-        //     title: "提示",
-        //     message: "是否进行科目的切换？科目切换后，首页的科目也将进行切换",
-        //     confirmButtonColor: "#39F0DD",
-        //     className: "change-subject"
-        //   })
-        //   .then(() => {
-        //     // on confirm
-        //     for (let key in this.classList) {
-        //       if (this.classList[key].active) {
-        //         this.classIndex = key * 1;
-        //         break;
-        //       }
-        //     }
-        //     this.subjectPop = false;
-
-        //   })
-        //   .catch(() => {
-        //     // on cancel
-        //   });
 
         let gradeIndex2 = this.gradeSubjectList[this.gradeIndex].child.findIndex(ele => ele.check)
 
@@ -189,7 +218,7 @@ export default {
 
       }
     },
-     //获取学校信息
+    //获取学校信息
     async getMySchoolInfo() {
       let obj = {
         interUser: "runLfb",
@@ -245,7 +274,7 @@ export default {
             return cur;
           }, [])
 
-          console.log(this.subject, 'this.subject ');
+          console.log(this.subject, 'this.subject 11111');
 
           // this.filter.subject = localStorage.getItem("currentSubjectTypeName")
 
@@ -321,6 +350,7 @@ export default {
     font-size: 16px;
     text-align: center;
     line-height: 50px;
+    height: 50px;
     padding: 0 40px 0 20px;
     // display: flex;
     // justify-content: space-around;
@@ -340,7 +370,7 @@ export default {
     // overflow-y: auto;
 
     &-left {
-      flex: 0 0 95px;
+      flex: 1 1 20%;
       overflow-y: auto;
 
       > div {
@@ -360,7 +390,7 @@ export default {
     }
 
     &-right {
-      flex: 1;
+      flex: 1 1 80%;
       overflow-y: auto;
 
       .tip {
