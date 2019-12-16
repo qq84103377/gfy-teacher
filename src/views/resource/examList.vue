@@ -169,7 +169,6 @@ export default {
     // this.getClassTeachCourseInfo()
     eventBus.$off("examListRefresh")
     eventBus.$on("examListRefresh", (data) => {
-      debugger
       this.onRefresh()
     })
   },
