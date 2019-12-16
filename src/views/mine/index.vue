@@ -376,63 +376,63 @@
         this.avatar = base64;
         this.blob = blob;
       },
-      async uploadIMG(curFile) {
-        let formData = new FormData();
-        let filetime = generateTimeReqestNumber();
-        let randomStr = randomString(5);
-
-        formData.append(
-          "key",
-          this.oSSObject.key +
-          this.$store.getters.GET_LOGININFO.accountNo +
-          filetime +
-          randomStr +
-          ".png"
-        );
-        formData.append("policy", this.oSSObject.policyBase64);
-        formData.append("OSSAccessKeyId", this.oSSObject.accessid);
-        formData.append("signature", this.oSSObject.signature);
-        formData.append("file", curFile);
-        formData.append("success_action_status", "200");
-        console.log("formData", formData);
-        doUpLoad(this.oSSObject.host, formData)
-          .then(data => {
-            console.log("doUpLoad", data);
-            this.iconUrl =
-              this.oSSObject.host +
-              "/" +
-              this.oSSObject.key +
-              this.$store.getters.GET_LOGININFO.accountNo +
-              filetime +
-              randomStr +
-              ".png";
-            console.log(this.iconUrl);
-          })
-          .catch(err => {
-            console.log("err", err);
-          });
-      },
-      async getOSSKey() {
-        let json = {
-          requestJson: JSON.stringify({
-            docTypeCd: "T01",
-            sysTypeCd: "T07"
-          })
-        };
-        await stsAuthCoverAccessUrl(json).then(data => {
-          let obj = data.data[0].tokenInfo;
-          let tmpSignatureObj = {
-            host: obj.host,
-            policyBase64: obj.policy,
-            accessid: obj.accessid,
-            signature: obj.signature,
-            expire: parseInt(obj.expire),
-            key: obj.dir + "/",
-            size: obj.sizelimit
-          };
-          this.oSSObject = tmpSignatureObj;
-        });
-      },
+      // async uploadIMG(curFile) {
+      //   let formData = new FormData();
+      //   let filetime = generateTimeReqestNumber();
+      //   let randomStr = randomString(5);
+      //
+      //   formData.append(
+      //     "key",
+      //     this.oSSObject.key +
+      //     this.$store.getters.GET_LOGININFO.accountNo +
+      //     filetime +
+      //     randomStr +
+      //     ".png"
+      //   );
+      //   formData.append("policy", this.oSSObject.policyBase64);
+      //   formData.append("OSSAccessKeyId", this.oSSObject.accessid);
+      //   formData.append("signature", this.oSSObject.signature);
+      //   formData.append("file", curFile);
+      //   formData.append("success_action_status", "200");
+      //   console.log("formData", formData);
+      //   doUpLoad(this.oSSObject.host, formData)
+      //     .then(data => {
+      //       console.log("doUpLoad", data);
+      //       this.iconUrl =
+      //         this.oSSObject.host +
+      //         "/" +
+      //         this.oSSObject.key +
+      //         this.$store.getters.GET_LOGININFO.accountNo +
+      //         filetime +
+      //         randomStr +
+      //         ".png";
+      //       console.log(this.iconUrl);
+      //     })
+      //     .catch(err => {
+      //       console.log("err", err);
+      //     });
+      // },
+      // async getOSSKey() {
+      //   let json = {
+      //     requestJson: JSON.stringify({
+      //       docTypeCd: "T01",
+      //       sysTypeCd: "T07"
+      //     })
+      //   };
+      //   await stsAuthCoverAccessUrl(json).then(data => {
+      //     let obj = data.data[0].tokenInfo;
+      //     let tmpSignatureObj = {
+      //       host: obj.host,
+      //       policyBase64: obj.policy,
+      //       accessid: obj.accessid,
+      //       signature: obj.signature,
+      //       expire: parseInt(obj.expire),
+      //       key: obj.dir + "/",
+      //       size: obj.sizelimit
+      //     };
+      //     this.oSSObject = tmpSignatureObj;
+      //   });
+      // },
     },
 
     created() {
