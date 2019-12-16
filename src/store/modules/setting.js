@@ -134,9 +134,9 @@ const getters = {
   getIsRevert: state => state.isRevert,
   getIsStuBoard: state => state.isStuBoard,
 
-  getFilterYear: state => state.filterYear || JSON.parse(localStorage.getItem('filterYear')),
-  getFilterSubject: state => state.filterSubject || JSON.parse(localStorage.getItem('filterSubject')),
-  getFilterSubjectLabel: state => state.filterSubjectLabel || JSON.parse(localStorage.getItem('filterSubjectLabel')),
+  getFilterYear: state => state.filterYear || localStorage.getItem('filterYear') ? JSON.parse(localStorage.getItem('filterYear')) : '',
+  getFilterSubject: state => state.filterSubject ||  localStorage.getItem('filterSubject') ?JSON.parse(localStorage.getItem('filterSubject')):'',
+  getFilterSubjectLabel: state => state.filterSubjectLabel ||  localStorage.getItem('filterSubjectLabel') ?JSON.parse(localStorage.getItem('filterSubjectLabel')):'',
 };
 
 export default {

@@ -774,15 +774,16 @@
         this.$store.commit('setVanLoading', true)
         pubApi.checkUrlPermission({requestJson: JSON.stringify(permissionParams)}).then((respone) => {
           this.$store.commit('setVanLoading', false)
+            let src_url,srcUrl
           if (respone.flag) {
-            this.tabIndex ? item.src_url = respone.data[0].accessUrl
-              : item.resCourseWareInfo.srcUrl = respone.data[0].accessUrl
+            this.tabIndex ?src_url = respone.data[0].accessUrl
+              : srcUrl = respone.data[0].accessUrl
           } else {
-            this.tabIndex ? item.src_url = ''
-              : item.resCourseWareInfo.srcUrl = ''
+            this.tabIndex ? src_url = ''
+              : srcUrl = ''
           }
 
-          if (this.tabIndex ? !item.src_url : !item.resCourseWareInfo.srcUrl) {
+          if (this.tabIndex ? !src_url : !srcUrl) {
             this.$toast('暂无资源')
             return
           }
@@ -790,7 +791,7 @@
           this.$router.push({
             name: 'videoPage',
             query: {
-              src: this.tabIndex ? item.src_url : item.resCourseWareInfo.srcUrl,
+              src: this.tabIndex ? src_url : srcUrl,
               title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
               isMp3: (this.tabIndex ? item.coursewareType : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
             }

@@ -505,27 +505,28 @@ export default {
       this.$store.commit('setVanLoading', true)
       pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
         this.$store.commit('setVanLoading', false)
+        let assUrl
         if (respone.flag) {
           if (this.type == 'office' || this.type == 'pdf') {
             if (url.indexOf('pubquanlang') > -1) {
-              url = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
+              assUrl = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
 
             } else {
-              url = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
+              assUrl = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
             }
           } else {
-            url = respone.data[0].accessUrl
+            assUrl = respone.data[0].accessUrl
           }
         } else {
-          url = ''
+          assUrl = ''
         }
 
-        if (!url) {
+        if (!assUrl) {
           this.$toast('暂无资源')
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: url, title } })
+        this.$router.push({ name: 'videoPage', query: { src: assUrl, title } })
       }).catch(() => {
         this.$toast('资源错误')
       })

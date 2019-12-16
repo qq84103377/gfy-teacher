@@ -110,27 +110,28 @@ export default {
       this.$store.commit('setVanLoading', true)
       pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
         this.$store.commit('setVanLoading', false)
+        let assUrl
         if (respone.flag) {
           if (this.type == 'office' || this.type == 'pdf') {
             if (item.url.indexOf('pubquanlang') > -1) {
-              item.url = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
+              assUrl = 'http://ow365.cn/?i=17383&n=5&furl=' + respone.data[0].accessUrl
 
             } else {
-              item.url = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
+              assUrl = 'http://ow365.cn/?i=17387&n=5&furl=' + respone.data[0].accessUrl
             }
           } else {
-            item.url = respone.data[0].accessUrl
+            assUrl = respone.data[0].accessUrl
           }
         } else {
-          item.url = ''
+          assUrl = ''
         }
 
-        if (!item.url) {
+        if (!assUrl) {
           this.$toast('暂无资源')
           return
         }
 
-        this.$router.push({ name: 'videoPage', query: { src: item.url, title: item.coursewareName, isMp3: item.coursewareType == "T06" ? true : false } })
+        this.$router.push({ name: 'videoPage', query: { src: assUrl, title: item.coursewareName, isMp3: item.coursewareType == "T06" ? true : false } })
       }).catch(() => {
         this.$store.commit('setVanLoading', false)
         this.$toast('资源错误')

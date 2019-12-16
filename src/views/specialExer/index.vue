@@ -54,7 +54,6 @@
     </div>
     <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter" :double='double'></filter-panel>
 
-   
     <!--  更多-->
     <van-popup v-model="morePop" round position="bottom" :style="{ height: '93%' }">
       <div class="grade-pop-wrap">
@@ -94,7 +93,7 @@
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
 
-    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" ></year-subject>
+    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :termItem.sync='termItem' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList'></year-subject>
 
   </section>
 </template>
@@ -233,8 +232,10 @@ export default {
       areaCode: '0757',
       courseIds: [],
 
-      yearSubjectLabel:'',
-      yearSubjectShow:false
+      yearSubjectLabel: '',
+      yearSubjectShow: false,
+      termItem: '',
+      gradeItem: '',
 
 
     };
@@ -411,7 +412,7 @@ export default {
                   name: item.subjectName,
                   subjectType: item.subjectType
                 }
-                if (item.subjectName == localStorage.getItem("currentSubjectTypeName")) {
+                if (item.subjectType == localStorage.currentSubjectType) {
                   obj.active = true
                 } else {
                   obj.active = false
@@ -434,7 +435,7 @@ export default {
 
           console.log(this.subject, 'this.subject ');
 
-          this.filter.subject = localStorage.getItem("currentSubjectTypeName")
+          // this.filter.subject = localStorage.getItem("currentSubjectTypeName")
 
         }
       })
@@ -694,7 +695,7 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     // this.gettestbookVersionInfo()
     // this.getSubjectType()
 
@@ -707,7 +708,7 @@ export default {
 
 
     this.getSysAreaList()
-    this.getMySchoolInfo()
+    await this.getMySchoolInfo()
   }
 };
 </script>
