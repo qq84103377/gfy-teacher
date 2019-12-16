@@ -1,6 +1,6 @@
 <template>
   <!--    复习套卷-年级学科-->
-  <van-popup v-model="gradePop" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
+  <van-popup v-model="show" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
     <div class="grade-pop-wrap">
       <van-icon @click="closePop" class="close" name="close" />
       <div class="grade-pop-wrap__subject van-hairline--bottom">
@@ -33,14 +33,42 @@
 <script>
 export default {
   name: 'yearSubject',
+  props: ['visible', 'label', 'gradeTerm', 'courseIds'],
   data() {
     return {
+      index: 0,
+      yearIndex: 0,
+      // versionList: [
+      //   { year: 'Y01', arr: [], gradeList: [] },
+      //   { year: 'Y02', arr: [], gradeList: [] },
+      //   { year: 'Y03', arr: [], gradeList: [] },
+      // ], 
+      yearSubjectList: { year: '', arr: [] },
+      tempList: [],
+      tempIndex: 0,
 
+      textBookId: '',
+      gradeTermId: '',
+      subjectType: '',
+
+      textItem: '',
+      gradeTermItem: '',
     }
+  },
+  watch: {
+    visible(v) {
+      if (v) {
+        this.tempIndex = this.index
+        // this.tempList = JSON.parse(JSON.stringify(this.versionList))
+      }
+    },
+  },
+  created() {
+    console.log('yearSubjectfilter created');
   },
   methods: {
     closePop() {
-      this.versionList = this.tempList
+      this.yearSubjectList = this.tempList
       this.index = this.tempIndex
       this.show = false
     },
@@ -154,5 +182,148 @@ export default {
 }
 </script>
 
-<style>
+<style lang='less' scoped>
+.grade-pop-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+
+  &__body__group {
+    background: #fff;
+    font-size: 14px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+
+    &-wrap {
+      padding-left: 21px;
+      display: flex;
+      flex-wrap: wrap;
+
+      &-item {
+        flex: 0 0 79px;
+        line-height: 37px;
+        border-radius: 5px;
+        font-size: 12px;
+        margin-right: 8px;
+        margin-bottom: 10px;
+        background-color: #f5f5f5;
+        color: #333;
+        text-align: center;
+        border: 1px solid transparent;
+        border-left-width: 1px !important;
+
+        &:nth-child(4n) {
+          margin-right: 0;
+        }
+
+        &.active {
+          border-color: @blue;
+          background-color: #e0fffc !important;
+        }
+      }
+    }
+  }
+
+  .close {
+    font-size: 22px;
+    position: absolute;
+    right: 10px;
+    top: 13px;
+    color: #999;
+    z-index: 1;
+  }
+
+  &__title {
+    font-size: 18px;
+    text-align: center;
+    line-height: 50px;
+    font-weight: 700;
+  }
+
+  &__subject {
+    font-size: 16px;
+    text-align: center;
+    line-height: 50px;
+    padding: 0 40px 0 20px;
+    // display: flex;
+    // justify-content: space-around;
+    font-weight: 700;
+    overflow-x: scroll;
+    white-space: nowrap;
+
+    > span {
+      margin-left: 5px;
+      margin-right: 10px;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    // overflow-y: auto;
+
+    &-left {
+      flex: 0 0 95px;
+      overflow-y: auto;
+
+      > div {
+        height: 44px;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        font-size: 15px;
+        border-left: 2.5px solid transparent;
+
+        &.active {
+          color: @blue;
+          border-left: 2.5px solid #16aab7;
+        }
+      }
+    }
+
+    &-right {
+      flex: 1;
+      overflow-y: auto;
+
+      .tip {
+        padding: 0 20px 10px;
+      }
+      .cell__item {
+        justify-content: space-between;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        color: #666;
+        font-size: 14px;
+        word-break: break-all;
+        padding: 0 20px;
+
+        .check {
+          flex: 0 0 20px;
+          text-align: right;
+        }
+
+        &.active {
+          color: @blue;
+        }
+      }
+    }
+  }
+  &__body-more {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    flex: 0 0 44px;
+    padding: 5px 10px;
+
+    .btn {
+      border-radius: 22px;
+      width: 100%;
+    }
+  }
+}
 </style>

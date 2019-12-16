@@ -25,9 +25,9 @@
         </div>
       </van-cell>
 
-      <van-cell v-else @click="openGradePop" title="年级学科" is-link>
+      <van-cell v-else @click="yearSubjectShow=true" title="年级学科" is-link>
         <div class="blue">
-          {{filter.grade}}
+          {{yearSubjectLabel}}
         </div>
       </van-cell>
 
@@ -94,7 +94,7 @@
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
 
-    <!-- <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" ></year-subject> -->
+    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" ></year-subject>
 
   </section>
 </template>
@@ -128,7 +128,7 @@ export default {
     filterPanel,
     subjectFilter,
     versionFilter,
-    // yearSubject
+    yearSubject
   },
   data() {
     return {
