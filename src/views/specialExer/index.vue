@@ -707,7 +707,7 @@ export default {
 
 
     this.getSysAreaList()
-    // this.getMySchoolInfo()
+    this.getMySchoolInfo()
   }
 };
 </script>

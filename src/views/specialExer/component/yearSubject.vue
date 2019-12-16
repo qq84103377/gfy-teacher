@@ -9,13 +9,13 @@
       <div class="grade-pop-wrap__body">
 
         <div class="grade-pop-wrap__body-left">
-          <div @click="selectGradeParent(item,index)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
+          <div @click="selectGradeParent(item,index)" v-for="(item,index) in yearSubjectList" :key="index" :class="{active:item.active}">{{item.name}}
           </div>
         </div>
 
         <div class="grade-pop-wrap__body-right">
-          <div class="" v-for="(item,index) in gradeSubjectList[gradeIndex].child" :key="index">
-            <div @click="handleSelectGrade(item)" class="van-hairline--bottom">
+          <div class="" v-for="(item,index) in termList" :key="index">
+            <div @click="handleSelectTerm(item)" class="van-hairline--bottom">
               <div :class="['cell__item',{active:item.check}]">{{item.name}}
                 <van-icon v-show="item.check" class="check blue" name="success" />
               </div>
@@ -38,12 +38,15 @@ export default {
     return {
       index: 0,
       yearIndex: 0,
-      // versionList: [
-      //   { year: 'Y01', arr: [], gradeList: [] },
-      //   { year: 'Y02', arr: [], gradeList: [] },
-      //   { year: 'Y03', arr: [], gradeList: [] },
-      // ], 
+      termList: [
+        { name: '上学期',value:'S01', check: true},
+        { name: '下学期',value:'S02', check: false},
+      ], 
       yearSubjectList: { year: '', arr: [] },
+      gradeIndex: 0,
+      gradeOldIndex: 0,
+      gradeIndex2: -1,
+
       tempList: [],
       tempIndex: 0,
 
@@ -53,7 +56,18 @@ export default {
 
       textItem: '',
       gradeTermItem: '',
+      subject:[]
     }
+  },
+  computed: {
+    show: {
+      get() {
+        return this.visible
+      },
+      set() {
+        this.$emit('update:visible', false)
+      }
+    },
   },
   watch: {
     visible(v) {
@@ -65,6 +79,7 @@ export default {
   },
   created() {
     console.log('yearSubjectfilter created');
+    this.getMySchoolInfo()
   },
   methods: {
     closePop() {
@@ -94,12 +109,10 @@ export default {
       // 默认选中第一个
       // this.$set(item.child[0], 'check', true)
     },
-    handleSelectGrade(item) {
+    handleSelectTerm(item) {
       if (item.check) return
-      this.gradeSubjectList.forEach(v => {
-        v.child.forEach(_v => {
+      this.termList.forEach(v => {
           this.$set(_v, 'check', false)
-        });
       })
       this.$set(item, 'check', true)
 
@@ -175,6 +188,69 @@ export default {
         this.morePop = false;
 
       }
+    },
+     //获取学校信息
+    async getMySchoolInfo() {
+      let obj = {
+        interUser: "runLfb",
+        interPwd: "25d55ad283aa400af464c76d713c07ad",
+        operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+        userType: this.$store.getters.getUserInfo.roleType,
+        accountNo: this.$store.getters.getUserInfo.accountNo
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getMySchoolInfo(params).then(res => {
+        console.log('getMySchoolInfo', res)
+        if (res.flag && res.data.length > 0) {
+          console.log("?");
+          let schoolList = res.data[0].schoolList;
+          let length = schoolList.length;
+          this.schoolList = schoolList.map(item => {
+            return { name: item.schoolName }
+          })
+          this.schoolName = this.schoolList[0] ? this.schoolList[0].name : '';
+          console.log("??");
+          // 获取老师科目列表，去重后
+          for (let i = 0; i < length; i++) {
+            let gradeList = schoolList[i].classGradeList;
+            let gradeLen = gradeList.length;
+            console.log("???");
+            for (let j = 0; j < gradeLen; j++) {
+              let subjectList = gradeList[j].subjectList;
+              let arr = subjectList.map(item => {
+                let obj = {
+                  name: item.subjectName,
+                  subjectType: item.subjectType
+                }
+                if (item.subjectName == localStorage.getItem("currentSubjectTypeName")) {
+                  obj.active = true
+                } else {
+                  obj.active = false
+                }
+                return obj;
+              })
+              this.subject = Array.from(new Set([...this.subject, ...arr]));
+            }
+          }
+          console.log("????");
+
+          console.log(this.subject, 'this.subject ');
+
+          // 去重
+          let a = {}
+          this.subject = this.subject.reduce((cur, next) => {
+            a[next.subjectType] ? "" : a[next.subjectType] = true && cur.push(next);
+            return cur;
+          }, [])
+
+          console.log(this.subject, 'this.subject ');
+
+          // this.filter.subject = localStorage.getItem("currentSubjectTypeName")
+
+        }
+      })
     },
 
   },

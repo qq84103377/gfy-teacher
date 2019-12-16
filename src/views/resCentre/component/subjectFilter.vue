@@ -33,7 +33,7 @@
 
 <script>
 import { Dialog } from 'vant';
-import { getSubjectType, getExamSectionTypeRelation, getVersionGradeList, getTextBookCourseInfo } from '@/api/index'
+import { getSubjectType, getExamSectionTypeRelation } from '@/api/index'
 import eventBus from "@/utils/eventBus";
 
 export default {
@@ -74,9 +74,9 @@ export default {
     this.$store.commit('setFilterSubjectLabel', null)
     const classMap = JSON.parse(localStorage.classMap)
     let year = ''
-    for(let k in classMap) {
+    for (let k in classMap) {
       const index = classMap[k].teacherInfoList.findIndex(t => t.subjectType === localStorage.currentSubjectType)
-      if(index > -1) {
+      if (index > -1) {
         year = classMap[k].classYearSection
         break
       }
@@ -120,15 +120,13 @@ export default {
             this.$set(this.subjectList[index].child[subjectIndex], 'check', true)
             eventBus.$emit('changeSubject', this.subjectList[index].child[subjectIndex].subjectType)
 
-            
-
-            this.$store.commit('setVanLoading', true)
-            this.$store.commit('setFilterYear', this.subjectList[this.index].value)
-            this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
-            this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + this.subjectList[index].child[subjectIndex].subjectName)
-
             if (this.types) {
               this.getExamSectionTypeRelation(this.subjectList[index].child[subjectIndex].subjectType)
+
+              this.$store.commit('setVanLoading', true)
+              this.$store.commit('setFilterYear', this.subjectList[this.index].value)
+              this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
+              this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + this.subjectList[index].child[subjectIndex].subjectName)
 
 
               // await this.getVersionGradeList(this.subjectList[index].value, this.subjectList[index].child[subjectIndex].subjectType)
@@ -149,19 +147,24 @@ export default {
           eventBus.$emit('changeYear', this.index, item ? item.subjectType : '')
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
 
-          this.$store.commit('setVanLoading', true)
-          this.$store.commit('setFilterYear', this.subjectList[this.index].value)
-          this.$store.commit('setFilterSubject', item.subjectType)
-          this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
-
+          if (types) {
+            this.$store.commit('setVanLoading', true)
+            this.$store.commit('setFilterYear', this.subjectList[this.index].value)
+            this.$store.commit('setFilterSubject', item.subjectType)
+            this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+          }
         } else {
           //没有切换学年,只切换学科
           eventBus.$emit('changeSubject', item ? item.subjectType : '')
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
-          
-          this.$store.commit('setVanLoading', true)
-          this.$store.commit('setFilterSubject', item.subjectType)
-          this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+
+          if (types) {
+            this.$store.commit('setVanLoading', true)
+            this.$store.commit('setFilterSubject', item.subjectType)
+            this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+          }
+
+
         }
       } else {
         return this.$toast('请选择科目')
@@ -253,168 +256,7 @@ export default {
       })
     },
 
-    getVersionGradeList(yearSection, subjectType) {
-      // if(this.filter.subjectList[index].versionDone) return
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        subjectType,
-        yearSection,
-        pageSize: 9999,
-        currentPage: 1
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      getVersionGradeList(params).then(res => {
-        // this.$set(this.filter.subjectList[index],'versionDone',true) // 是否已加载了年级数据
-        console.log('getVersionGradeList', res);
 
-        let list = { year: '', arr: [], gradeList: [] }
-
-        if (res.flag) {
-          for (const key in res.data) {
-            list.arr.push(res.data[key])
-          }
-
-          list.year = yearSection
-
-
-          console.log(List.arr, 'List.arr');
-          console.log(List, 'List');
-
-
-          list.arr.forEach((ver, i) => {
-            if (!i) {
-              this.textItem = ver
-              this.$set(ver, 'active', true)
-            }
-
-            if (!i) {
-              this.$set(List.arr[0].gradeList[0], 'check', true)
-              this.$emit('update:versionLabel', list.arr[0].textBookName + list.arr[0].gradeList[0].gradeTermName)
-              this.$emit('update:versionGradeTerm', list.arr[0].gradeList[0].grade + '|' + list.arr[0].gradeList[0].term)
-              this.$emit('update:versionList', list.arr[0].gradeList[0].grade + '|' + list.arr[0].gradeList[0].term)
-
-              this.gradeTermItem = list.arr[0].gradeList[0]
-              this.textItem = list.arr[0]
-              // eventBus.$emit('changeVersion',{textBookId:ver.textBookId,gradeTermId:v.gradeList[0].gradeTermId})
-
-              this.getTextBookCourseInfo()
-            }
-          })
-        }
-      })
-    },
-
-    async getTextBookCourseInfo() {
-      this.$store.commit('setVanLoading', true)
-      this.unitIndex = 0
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "textBookId": this.textItem.textBookId,
-        "gradeTermId": this.gradeTermItem.gradeTermId,
-        "subjectType": localStorage.currentSubjectType,
-        'nodeType': 'N00'
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-
-      getTextBookCourseInfo(params).then(res => {
-        this.$store.commit('setVanLoading', false)
-        console.log("课程：", res)
-        if (res.flag) {
-          if (res.resTextbookCourseInfoList && res.resTextbookCourseInfoList.length > 0) {
-            let textBookList = res.resTextbookCourseInfoList
-            let newArr = [];
-            textBookList.forEach(function (item) {
-              newArr.push(item.courseId)
-            })
-            newArr = newArr = Array.from(new Set(newArr))
-            // console.log(courseIds, 'courseIds');
-
-            this.$emit('update:courseIds', newArr)
-
-          }
-
-        }
-
-        return
-        if (res.flag) {
-          //重构数据
-          let textBookList = res.resTextbookCourseInfoList
-          if (textBookList) {
-            //1.找出第一个节点
-            let nodeId = "-1";
-            for (let book of textBookList) {
-              if (book.parentId == -1) {
-                nodeId = book.nodeId
-                break
-              }
-            }
-
-            //2.获取左侧列表
-            this.unitList = []
-            let textBookMap = {}
-            let list = []
-            textBookList.forEach(item => {
-              //按照parentId分组
-              if (!textBookMap[item.parentId + '']) {
-                textBookMap[item.parentId + ''] = [item]
-              } else {
-                textBookMap[item.parentId + ''].push(item)
-              }
-              if (item.parentId == nodeId) {
-                this.unitList.push(item)
-              }
-            })
-            //3.组件每单元下的数据
-            this.unitList.forEach(item => {
-              let tmp = textBookMap[item.nodeId + '']
-              if (tmp) {
-                tmp.forEach(obj => {
-                  obj.childNodeList = textBookMap[obj.nodeId + '']
-                })
-                item.courseList = tmp
-              }
-            })
-            this.courseList = (this.unitList[this.unitIndex] && this.unitList[this.unitIndex].courseList) ? this.unitList[this.unitIndex].courseList : []
-            //选默认值
-            // if (this.courseList.length) {
-            //   const item = this.courseList[0]
-            //   if (item.childNodeList && item.childNodeList.length > 0) {
-            //     this.$set(item, 'fold', true)
-            //     this.selectSysCourse(item.childNodeList[0].courseId, item.childNodeList[0].nodeName)
-            //   } else {
-            //     this.$set(item, 'fold', true)
-            //     this.selectSysCourse(item.courseId, item.nodeName)
-            //   }
-            // }
-            // this.$emit('filter', this.currentSysCourseId)
-            // // this.$emit('update:label',(this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
-            // this.$emit('update:label', this.currentSysCourseName)
-
-          }
-        } else {
-          // this.$toast(res.msg)
-          this.courseList = []
-          this.unitList = []
-          this.unitIndex = 0
-          // this.selectSysCourse('', '')
-          // this.$emit('filter', this.currentSysCourseId)
-          // // this.$emit('update:label',this.unitList[this.unitIndex]?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
-          // this.$emit('update:label', this.currentSysCourseName)
-
-        }
-
-      })
-    },
   }
 }
 </script>
