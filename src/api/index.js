@@ -493,3 +493,7 @@ export const getVersionGradeList =(params)=>{
 export const getTestPaperInfoList =(params)=>{
   return axios.post('resource/getTestPaperInfoList', qs.stringify(params))
 }
+//修改分层情况
+export const updateTchTeachLayerInfo =(params)=>{
+  return axios.post('teach/updateTchTeachLayerInfo', qs.stringify(params))
+}

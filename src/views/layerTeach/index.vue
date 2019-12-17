@@ -1,221 +1,391 @@
 <template>
-    <section class="layer-teach">
-      <van-nav-bar :title="$route.query.taskName" @click-left="goBack" left-arrow/>
-      <div class="layer-teach__tab-scroll">
-        <div v-for="(item,index) in tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="layer-teach__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
+  <section class="layer-teach">
+    <van-nav-bar :title="$route.query.taskName" @click-left="goBack" left-arrow/>
+    <div class="layer-teach__tab-scroll">
+      <div v-for="(item,index) in tchClassTastInfo" :key="index" @click="handleSelectTab(item)"
+           class="layer-teach__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
+      </div>
+    </div>
+    <div v-if="!vanLoading && isNull" style="text-align: center;color: #999999">
+      <img class="null-tips" src="../../assets/img/preview/task_null.png" alt/>
+      <div>该任务没有分层信息!</div>
+    </div>
+    <div v-if="!isNull" class="layer-teach__body">
+      <div class="layer-teach__body__pie-chart">
+        <div class="layer-teach__body__pie-chart-label divider">任务完成情况:</div>
+        <div id="myChart1" ref="myChart1" class="pie-chart"></div>
+      </div>
+      <div class="layer-teach__body__achievement">
+        <div class="layer-teach__body__achievement-label divider">全班成绩概况:</div>
+        <div class="layer-teach__body__achievement-score">
+          <div>
+            <span>班级平均分</span>
+            <span class="mgt10">{{calculate.div(taskInfo.totalScore||0,taskInfo.finshCount||0,0)}}分</span>
+          </div>
+          <div>
+            <span>班级最高分</span>
+            <span class="mgt10">{{taskInfo.maxScore || 0}}分</span>
+          </div>
+          <div>
+            <span>班级最低分</span>
+            <span class="red mgt10">{{taskInfo.minScore || 0}}分</span>
+          </div>
         </div>
       </div>
-      <div v-if="!vanLoading && isNull" style="text-align: center;color: #999999">
-        <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
-        <div>该任务没有分层信息!</div>
-      </div>
-      <div v-if="!isNull" class="layer-teach__body">
-        <div class="layer-teach__body__pie-chart">
-          <div class="layer-teach__body__pie-chart-label divider">任务完成情况:</div>
-          <div id="myChart1" ref="myChart1" class="pie-chart"></div>
-        </div>
-        <div class="layer-teach__body__achievement">
-          <div class="layer-teach__body__achievement-label divider">全班成绩概况:</div>
-          <div class="layer-teach__body__achievement-score">
-            <div>
-              <span>班级平均分</span>
-              <span class="mgt10">{{calculate.div(taskInfo.totalScore||0,taskInfo.finshCount||0,0)}}分</span>
-            </div>
-            <div>
-              <span>班级最高分</span>
-              <span class="mgt10">{{taskInfo.maxScore || 0}}分</span>
-            </div>
-            <div>
-              <span>班级最低分</span>
-              <span class="red mgt10">{{taskInfo.minScore || 0}}分</span>
+      <div class="layer-teach__body__layer-group">
+        <div class="layer-teach__body__layer-group-label divider">
+          <div class="aic jcsb">
+            <span>分层情况:</span>
+            <div class="layer-btn-group">
+              <div :class="['layer-btn',{active:isEdit}]" @click="isEdit=!isEdit">修改分层情况</div>
+              <div class="layer-btn">使用该分层</div>
             </div>
           </div>
         </div>
-        <div class="layer-teach__body__layer-group">
-          <div class="layer-teach__body__layer-group-label divider">
-            <div class="aic jcsb">
-              <span>分层情况:</span>
-              <div class="layer-btn-group">
-                <div class="layer-btn">修改分层情况</div>
-                <div class="layer-btn">使用该分层</div>
+        <div class="layer-wrapper">
+          <div :class="['layer-wrapper__detail',{active:isEdit}]"
+               v-for="(item,index) in taskInfo.layerInfo.layerGroupInfoList" :key="index">
+            <div class="layer-wrapper__detail__label">{{item.layerGroupInfo.subgroupName}}(<span :class="{blue:isEdit}"
+                                                                                                 @click="selectScore">{{item.layerGroupInfo.subgroupScoreEnd}}-{{item.layerGroupInfo.subgroupScoreStart}}分</span>){{item.layerGroupStudentList?item.layerGroupStudentList.length:0}}人:
+            </div>
+            <div class="layer-wrapper__detail__stu-group">
+              <div :class="['layer-wrapper__detail__stu-group__item',{active:stu.active}]" @click="selectStu(stu)"
+                   v-for="(stu,si) in item.layerGroupStudentList" :key="si">
+                {{stu.stuName}}
               </div>
             </div>
           </div>
-          <div class="layer-wrapper">
-            <div class="layer-wrapper__detail" v-for="b in 5" :key="b">
-              <div class="layer-wrapper__detail__label">A层(<span>90-100分</span>)5人:</div>
-              <div class="layer-wrapper__detail__stu-group">
-                <div class="layer-wrapper__detail__stu-group__item" v-for="a in 10" :key="a">李华</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+    </div>
 
-      <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
-        <div class="stat-dialog-wrap">
-          <div class="stat-dialog-wrap__header"><span class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}学生</span>
-            <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false" />
-          </div>
-          <div class="stat-dialog-wrap__body">
-            <div v-for="(item,index) in stuStatInfo.stu" :key="index">{{item}}</div>
+    <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
+      <div class="stat-dialog-wrap">
+        <div class="stat-dialog-wrap__header"><span
+          class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}学生</span>
+          <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false"/>
+        </div>
+        <div class="stat-dialog-wrap__body">
+          <div v-for="(item,index) in stuStatInfo.stu" :key="index" @click="">{{item}}</div>
+        </div>
+      </div>
+    </van-dialog>
+
+    <van-dialog v-model="scoreEditVisible"
+                :show-confirm-button="false">
+      <div class="score-edit-dialog">
+        <div class="score-edit-dialog__title">分数段调整</div>
+        <div style="display: flex;flex-direction: column;align-items: center;">
+          <div v-for="(item,index) in tempLayerList" :key="index" class="score-edit-dialog__layer">
+            <div class="score-edit-dialog__layer__label">{{item.layerGroupInfo.subgroupName}}:</div>
+            <input v-model="item.layerGroupInfo.subgroupScoreEnd" @input="handleInput($event,item,'subgroupScoreEnd')" type="tel"/>
+            <div>—</div>
+            <input :disabled="!index"  v-model="item.layerGroupInfo.subgroupScoreStart" @input="handleInput($event,item,'subgroupScoreStart')" type="tel"/>
+            <van-icon @click="delLayer(index)" :class="['del',{blue:tempLayerList.length>2&&index}]" name="clear"/>
           </div>
         </div>
-      </van-dialog>
+        <div class="fs12 grey9" style="text-align: center;"><span class="red">*</span>点击每层的分数可以修改分数范围</div>
+        <div @click="addLayer" class="score-edit-dialog__add">
+          <van-icon :class="['add',{blue:tempLayerList.length<6}]" name="add"/>
+          添加分数段
+        </div>
+        <div class="btn-group van-hairline--top">
+          <div @click="scoreEditVisible = false">取消</div>
+          <div class="van-hairline--left blue" @click="scoreConfirm">确定</div>
+        </div>
+      </div>
+    </van-dialog>
 
-    </section>
+  </section>
 </template>
 
 <script>
-  import { mapMutations, mapGetters, mapState } from 'vuex'
-  import { getStudentName } from '@/utils/filter'
+  import {mapMutations, mapGetters, mapState} from 'vuex'
+  import {getStudentName} from '@/utils/filter'
   import * as calculate from '@/utils/calculate'
-  import {getLayerTaskInfoDetail} from '@/api/index'
+  import {getLayerTaskInfoDetail, updateTchTeachLayerInfo} from '@/api/index'
   import echarts from "echarts";
-  export default {
-        name: "index",
-      data() {
-          return {
-            taskIndex: 0,
-            taskInfo: {},
-            stuStatInfo: {
-              title: '',
-              stu: [],
-              statDialog: false
-            },
-            isNull: false,
-            tchClassTastInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassTastInfo))
-          }
-      },
-      computed: {
-          classId() {
-            const item = this.tchClassTastInfo.find(v => v.active)
-             return item?item.classId:''
-          },
-        calculate() {
-            return calculate
-        },
-        ...mapState({
-          vanLoading: state => state.setting.vanLoading
-        }),
-      },
-      methods: {
-     goBack(){
-          this.common.goBack(this)
-        },
-        drawPie() {
-          this.$nextTick(() => {
-            if(this.isNull) return
-            let myChart = echarts.init(this.$refs.myChart1);
-            // 绘制图表
-            var _option = {
-              calculable: true,
-              color: ['#FB5522', '#2BFF93'],
-              series: [
-                {
-                  name: '文言文全章复习与巩固',
-                  type: 'pie',
-                  radius: [0, 53],
-                  label: {
-                    emphasis: {
-                      show: true
-                    },
-                    position: 'outside',
-                    formatter: `{b}{d}%>\n({c}人)`,
-                    align: 'left'
-                  },
-                  labelLine: {
-                    normal: {
-                      show: true
-                    },
-                    emphasis: {
-                      show: true
-                    }
-                  },
-                  itemStyle: {
-                    emphasis: {
-                      shadowBlur: 10,
-                      shadowColor: '#ccc',
-                    }
-                  },
-                  data: [
-                    {
-                      value: this.taskInfo.studentUnfinishList.reduce((t, v) => {
-                        t += (v.accountNoList?v.accountNoList.length:0)
-                        return t
-                      }, 0), name: '未完成'
-                    },
-                    { value: this.taskInfo.finshCount, name: '已完成' }
-                  ]
-                }
-              ],
-            };
-            myChart.setOption(_option, true)
-            myChart.on('click', params => {
-              this.stuStatInfo.stu = []
-              this.stuStatInfo.title = params.name
-              if (params.name === '未完成') {
-                this.taskInfo.studentUnfinishList.forEach(v => {
-                  (v.accountNoList||[]).forEach(s => {
-                    const name = getStudentName(s, this.classId)
-                    this.stuStatInfo.stu.push(name)
-                  })
-                })
-              } else {
-                this.taskInfo.finishStudent.reduce((t, v) => {
-                  const name = getStudentName(v, this.classId)
-                  t.push(name)
-                  return t
-                }, this.stuStatInfo.stu)
-              }
 
-              this.stuStatInfo.statDialog = true
-            })
-          });
+  export default {
+    name: "index",
+    data() {
+      return {
+        taskIndex: 0,
+        taskInfo: {layerInfo: {}},
+        stuStatInfo: {
+          title: '',
+          stu: [],
+          statDialog: false
         },
-       async handleSelectTab(item) {
-          if (item.active) return
-         this.$store.commit('setVanLoading',true)
-         this.tchClassTastInfo.forEach(v => {
-            this.$set(v, 'active', false)
-          })
-          item.active = true
-         await this.getLayerTaskInfoDetail()
-          this.drawPie()
-         this.$store.commit('setVanLoading',false)
-       },
-        async getLayerTaskInfoDetail() {
-          let obj = {
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            tchCourseId: this.$route.query.tchCourseId,
-            taskId: this.$route.query.taskId,
-            classId: this.classId
+        isNull: false,
+        tchClassTastInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassTastInfo)),
+        isEdit: false,
+        scoreEditVisible: false,
+        tempLayerList: []
+      }
+    },
+    computed: {
+      classId() {
+        const item = this.tchClassTastInfo.find(v => v.active)
+        return item ? item.classId : ''
+      },
+      calculate() {
+        return calculate
+      },
+      ...mapState({
+        vanLoading: state => state.setting.vanLoading
+      }),
+    },
+    methods: {
+      updateTchTeachLayerInfo() {
+        this.$store.commit('setVanLoading', true)
+        let layerGroupInfoList = this.tempLayerList.map(v => {
+          return {
+            "subgroupName":v.layerGroupInfo.subgroupName,
+            "subgroupScoreStart":v.layerGroupInfo.subgroupScoreStart,
+            "subgroupScoreEnd":v.layerGroupInfo.subgroupScoreEnd,
+            "layerGroupStudentInfoList":(v.layerGroupStudentList||[]).map(s => {
+              return {
+                "accountNo":s.accountNo,
+                "allotType":s.allotType,
+                "subgroupId":s.subgroupId
+              }
+            })
           }
-          let params = {
-            requestJson: JSON.stringify(obj)
+        })
+
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          layerId: this.taskInfo.layerInfo.layerId,
+          layerGroupInfoList
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        updateTchTeachLayerInfo(params).then(async res => {
+          if(res.flag) {
+            this.scoreEditVisible = false
+            await this.getLayerTaskInfoDetail()
+            this.$store.commit('setVanLoading', false)
+          }else {
+            this.$toast(res.msg)
+            this.$store.commit('setVanLoading', false)
           }
-          await getLayerTaskInfoDetail(params).then(res => {
-            if(res.flag) {
-              this.isNull = false
-              this.taskInfo = res.data || {}
-            }else {
-              this.taskInfo = {}
-              this.isNull = true
-              this.$toast(res.msg)
+        })
+      },
+      scoreConfirm() {
+        let flag = false
+        for (let index in this.tempLayerList) {
+          if(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart === '' || this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd === '') {
+            this.$toast('目前分层存在分段为空的情况，请检查分层。')
+            flag = true
+            break
+          }
+          if(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart <= this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd) {
+            this.$toast(`${this.tempLayerList[index].layerGroupInfo.subgroupName}分数段设置错误，请检查分层。`)
+            flag = true
+            break
+          }
+          if(index*1 > 0) {
+            if(Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart + 1) < Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)){
+              console.log(123);
+              this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
+              flag = true
+              break
             }
-          })
+            if(Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart) >= Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)){
+              this.$toast(`${this.tempLayerList[index - 1].layerGroupInfo.subgroupName}和${this.tempLayerList[index].layerGroupInfo.subgroupName}的分数重复了，请检查分数。`)
+              flag = true
+              break
+            }
+            if((index*1 === this.tempLayerList.length - 1) && this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd*1>0) {
+              console.log(321);
+              this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
+              flag = true
+              break
+            }
+          }
+        }
+        if(!flag) {
+          this.updateTchTeachLayerInfo()
         }
       },
-      async created() {
-        this.$store.commit('setVanLoading',true)
-       await this.getLayerTaskInfoDetail()
+      delLayer(index) {
+        if(this.tempLayerList.length<=2 || !index) return
+        if(this.tempLayerList[index].layerGroupStudentList&&this.tempLayerList[index].layerGroupStudentList.length) return this.$toast('该分层存在着学生名单，无法删除')
+        this.tempLayerList.splice(index,1)
+        this.tempLayerList.forEach((v,i) => {
+          v.layerGroupInfo.subgroupName = this.handleSubgroupName(i)
+        })
+      },
+      addLayer() {
+        if(this.tempLayerList.length >= 6) return
+        this.tempLayerList.push({layerGroupStudentList:[],layerGroupInfo:{subgroupName:this.handleSubgroupName(this.tempLayerList.length),subgroupScoreEnd:'',subgroupScoreStart:''}})
+      },
+      handleSubgroupName(num) {
+        let subgroupName = ''
+        switch (num) {
+          case 0 :
+            subgroupName = 'A层'
+            break;
+          case 1 :
+            subgroupName = 'B层'
+            break;
+          case 2 :
+            subgroupName = 'C层'
+            break;
+          case 3 :
+            subgroupName = 'D层'
+            break;
+          case 4 :
+            subgroupName = 'E层'
+            break;
+          case 5 :
+            subgroupName = 'F层'
+            break;
+        }
+        return subgroupName
+      },
+      selectScore() {
+        this.tempLayerList = JSON.parse(JSON.stringify(this.taskInfo.layerInfo.layerGroupInfoList))
+        this.scoreEditVisible = true
+      },
+      selectStu(item) {
+        if (this.isEdit) {
+          this.$set(item, 'active', !item.active)
+        }
+      },
+      handleInput(e, item, key) {
+        const reg = /^[0-9]\d*$/
+        if (!reg.test(e.target.value)) {
+          e.target.value = e.target.value.substr(0, e.target.value.length - 1)
+          this.$set(item.layerGroupInfo,key,e.target.value)
+        }
+      },
+      goBack() {
+        this.common.goBack(this)
+      },
+      drawPie() {
+        this.$nextTick(() => {
+          if (this.isNull) return
+          let myChart = echarts.init(this.$refs.myChart1);
+          // 绘制图表
+          var _option = {
+            calculable: true,
+            color: ['#FB5522', '#2BFF93'],
+            series: [
+              {
+                name: '文言文全章复习与巩固',
+                type: 'pie',
+                radius: [0, 53],
+                label: {
+                  emphasis: {
+                    show: true
+                  },
+                  position: 'outside',
+                  formatter: `{b}{d}%>\n({c}人)`,
+                  align: 'left'
+                },
+                labelLine: {
+                  normal: {
+                    show: true
+                  },
+                  emphasis: {
+                    show: true
+                  }
+                },
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowColor: '#ccc',
+                  }
+                },
+                data: [
+                  {
+                    value: this.taskInfo.studentUnfinishList.reduce((t, v) => {
+                      t += (v.accountNoList ? v.accountNoList.length : 0)
+                      return t
+                    }, 0), name: '未完成'
+                  },
+                  {value: this.taskInfo.finshCount, name: '已完成'}
+                ]
+              }
+            ],
+          };
+          myChart.setOption(_option, true)
+          myChart.on('click', params => {
+            this.stuStatInfo.stu = []
+            this.stuStatInfo.title = params.name
+            if (params.name === '未完成') {
+              this.taskInfo.studentUnfinishList.forEach(v => {
+                (v.accountNoList || []).forEach(s => {
+                  const name = getStudentName(s, this.classId)
+                  this.stuStatInfo.stu.push(name)
+                })
+              })
+            } else {
+              this.taskInfo.finishStudent.reduce((t, v) => {
+                const name = getStudentName(v, this.classId)
+                t.push(name)
+                return t
+              }, this.stuStatInfo.stu)
+            }
+
+            this.stuStatInfo.statDialog = true
+          })
+        });
+      },
+      async handleSelectTab(item) {
+        if (item.active) return
+        this.$store.commit('setVanLoading', true)
+        this.tchClassTastInfo.forEach(v => {
+          this.$set(v, 'active', false)
+        })
+        item.active = true
+        await this.getLayerTaskInfoDetail()
         this.drawPie()
-        this.$store.commit('setVanLoading',false)
+        this.$store.commit('setVanLoading', false)
+      },
+      async getLayerTaskInfoDetail() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          tchCourseId: this.$route.query.tchCourseId,
+          taskId: this.$route.query.taskId,
+          classId: this.classId
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getLayerTaskInfoDetail(params).then(res => {
+          if (res.flag) {
+            this.isNull = false
+            this.taskInfo = res.data || {layerInfo: {}}
+            this.taskInfo.layerInfo.layerGroupInfoList.forEach(v => {
+              (v.layerGroupStudentList||[]).forEach(s => {
+                this.$set(s,'stuName',getStudentName(s.accountNo,this.taskInfo.layerInfo.classId))
+              })
+            })
+          } else {
+            this.taskInfo = {layerInfo: {}}
+            this.isNull = true
+            this.$toast(res.msg)
+          }
+        })
       }
+    },
+    async created() {
+      this.$store.commit('setVanLoading', true)
+      await this.getLayerTaskInfoDetail()
+      this.drawPie()
+      this.$store.commit('setVanLoading', false)
     }
+  }
 </script>
 
 <style lang="less" scoped>
@@ -223,6 +393,7 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     .divider {
       &::after {
         content: " ";
@@ -232,6 +403,7 @@
         background: @blue;
       }
     }
+
     &__tab-scroll {
       flex: 0 0 42px;
       background: #f5f5f5;
@@ -255,11 +427,9 @@
         /*}*/
 
         &.active {
-          background: linear-gradient(
-            0deg,
-            rgba(57, 240, 221, 1),
-            rgba(140, 247, 238, 1)
-          );
+          background: linear-gradient(0deg,
+          rgba(57, 240, 221, 1),
+          rgba(140, 247, 238, 1));
           color: #fff;
         }
       }
@@ -268,6 +438,7 @@
     &__body {
       flex: 1;
       overflow-y: auto;
+
       &__pie-chart {
         background: #fff;
         padding: 15px 10px;
@@ -278,6 +449,7 @@
 
         }
       }
+
       &__achievement {
         background: #fff;
         padding: 15px 10px;
@@ -309,10 +481,12 @@
           }
         }
       }
+
       &__layer-group {
         background: #fff;
         padding: 15px 10px;
         margin-top: 5px;
+
         &-label {
           font-size: 15px;
           color: #333;
@@ -321,7 +495,8 @@
 
           .layer-btn-group {
             display: flex;
-            .layer-btn{
+
+            .layer-btn {
               border-radius: 5px;
               font-size: 11px;
               line-height: 25px;
@@ -329,27 +504,36 @@
               margin-left: 10px;
               background: #F5F6FA;
               color: #666;
-              &.active{
+
+              &.active {
                 background: @blue;
                 color: #fff;
               }
             }
           }
         }
+
         .layer-wrapper {
           &__detail {
-            background: #f5f6fa;
+            background: #fff;
             border-radius: 5px;
             padding: 10px;
             font-size: 14px;
             margin-bottom: 10px;
+
+            &.active {
+              background: #f5f6fa;
+            }
+
             &__label {
               font-weight: bold;
               margin-bottom: 15px;
             }
-            &__stu-group{
+
+            &__stu-group {
               display: flex;
               flex-wrap: wrap;
+
               &__item {
                 flex: 0 0 75px;
                 background: #eee;
@@ -359,10 +543,12 @@
                 text-align: center;
                 margin-right: 10px;
                 margin-bottom: 10px;
+
                 &:nth-child(4n) {
                   margin-right: 0;
                 }
-                &.active{
+
+                &.active {
                   color: #fff;
                   background: @blue;
                 }
@@ -372,6 +558,7 @@
         }
       }
     }
+
     .stat-dialog-wrap {
       display: flex;
       flex-direction: column;
@@ -427,15 +614,74 @@
         }
       }
     }
+
     .pie-chart {
       width: 100%;
       height: 200px;
       margin: 0 auto;
       margin-top: 20px;
     }
+
     .null-tips {
       margin-top: 50px;
       width: 100%;
+    }
+
+    .score-edit-dialog {
+      &__title {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 70px;
+      }
+
+      &__layer {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+
+        &:last-child {
+          margin-bottom: 10px;
+        }
+
+        input {
+          width: 60px;
+          border-bottom: 1px solid #999;
+          margin: 0 10px;
+          text-align: center;
+          border-radius: 0;
+        }
+
+        .del {
+          font-size: 15px;
+          color: #ccc;
+        }
+      }
+
+      &__add {
+        padding: 16px 0;
+        font-size: 14px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .add {
+          font-size: 22px;
+          color: #ccc;
+          margin-right: 5px;
+        }
+      }
+      .btn-group {
+        display: flex;
+        >div{
+          flex: 1;
+          font-size: 18px;
+          line-height: 55px;
+          text-align: center;
+          color: #666;
+        }
+      }
     }
   }
 </style>
