@@ -43,6 +43,11 @@
           <span @click="$toast.fail('敬请期待')">注册帮助</span>
           <span class="van-hairline--left" @click="$toast.fail('敬请期待')">随便看看</span>
         </div>
+        <div class="fs10" v-if="!isApp" style="text-align: center">
+          <!-- <p>Copyright<img src="../../assets/img/c.png" alt="">2017 高分云版权所有 </p> -->
+          <p>Copyright© 2017 高分云版权所有 </p>
+          <p>广州高分云教育科技有限公司 <a href="http://www.beian.miit.gov.cn">粤ICP备17113230号</a></p>
+        </div>
       </div>
     </div>
 
@@ -121,13 +126,11 @@ export default {
       radio: '',
     }
   },
-  // watch: {
-  //   username() {
-  //       if(localStorage.loginInfo) {
-  //         this.password = ''
-  //       }
-  //     }
-  // },
+  computed: {
+    isApp() {
+      return "cordova" in window;
+    },
+  },
   created() {
     if (localStorage.loginInfo) {
       const loginInfo = JSON.parse(localStorage.loginInfo)

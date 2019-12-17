@@ -10,7 +10,7 @@ const state = {
   sendTaskClassSubGroup: {}, //发任务班级分组信息
   sendTaskInfo: {}, //发布的任务信息
   fullscreen: false,
-  errorBookSelected: [], //错题本选择的试题
+  errorBookSelected: [],  //错题本选择的试题
   errorBookCourse: [], //错题本选择的课程
   errorBookQuestionCourse: [], //错题本选择试题时对应的课程ID
   errorFilterParams: {}, //错题本筛选条件
@@ -21,84 +21,84 @@ const state = {
 
   filterYear: '', //筛选年段
   filterSubject: '', //筛选科目
-  filterSubjectLabel: ''
+  filterSubjectLabel:''
 }
 
 const mutations = {
-  setVanLoading(state, data) {
+  setVanLoading (state, data) {
     state.vanLoading = data
   },
-  setTeamList(state, data) {
+  setTeamList (state,data) {
     state.teamList = data
   },
   setResourceInfo(state, data) {
     console.log("resourceInfo", data)
     state.resourceInfo = data
   },
-  setTchCourseInfo(state, tch) {
+  setTchCourseInfo(state,tch){
     state.tchCourseInfo = tch
   },
-  setTaskClassInfo(state, data) {
+  setTaskClassInfo(state,data){
     state.taskClassInfo = data
   },
-  setGradeTermList(state, data) {
+  setGradeTermList(state,data){
     state.gradeTermList = data
   },
-  setIsAddWare(state, data) {
+  setIsAddWare (state,data) {
     state.isAddWare = data
   },
-  setSendTaskClassStudent(state, data) {
+  setSendTaskClassStudent(state, data){
     state.sendTaskClassStudent = data
   },
-  setSendTaskClassSubGroup(state, data) {
+  setSendTaskClassSubGroup(state, data){
     state.sendTaskClassSubGroup = data
   },
-  setSendTaskInfo(state, data) {
+  setSendTaskInfo(state, data){
     state.sendTaskInfo = data
   },
   setFullscreen(state, fullscreen) {
     state.fullscreen = fullscreen
     localStorage.setItem("fullscreen", JSON.stringify(fullscreen))
   },
-  setErrorBookSelected(state, data) {
+  setErrorBookSelected(state,data) {
     state.errorBookSelected = data
   },
-  setErrorBookCourse(state, data) {
+  setErrorBookCourse(state,data) {
     state.errorBookCourse = data
   },
-  setErrorBookQuestionCourse(state, data) {
-    if (Array.isArray(data)) {
+  setErrorBookQuestionCourse(state,data) {
+    if(Array.isArray(data)) {
       state.errorBookQuestionCourse = data
-    } else {
-      if (state.errorBookQuestionCourse.indexOf(data) === -1) {
+    }else {
+      if(state.errorBookQuestionCourse.indexOf(data) === -1) {
         state.errorBookQuestionCourse.push(data)
       }
     }
   },
-  setErrorFilterParams(state, data) {
+  setErrorFilterParams(state,data) {
     state.errorFilterParams = data
   },
-  setResQuestionSelect(state, data) {
+  setResQuestionSelect(state,data) {
     state.resQuestionSelect = data
   },
-  setRemoveQuestionList(state, data) {
+  setRemoveQuestionList(state,data) {
     state.removeQuestionList = data
   },
-  setIsRevert(state, data) {
+  setIsRevert(state,data) {
     state.isRevert = data
   },
-  setIsStuBoard(state, data) {
+  setIsStuBoard(state,data) {
     state.isStuBoard = data
   },
-  setFilterYear(state, data) {
+  setFilterYear(state,data) {
     state.filterYear = data
     localStorage.setItem('filterYear', JSON.stringify(data))
   },
-  setFilterSubject(state, data) {
+  setFilterSubject(state,data) {
     state.filterSubject = data
     localStorage.setItem('filterSubject', JSON.stringify(data))
   },
-  setFilterSubjectLabel(state, data) {
+  setFilterSubjectLabel(state,data) {
     state.filterSubjectLabel = data
     localStorage.setItem('filterSubjectLabel', JSON.stringify(data))
   }

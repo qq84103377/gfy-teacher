@@ -161,7 +161,7 @@
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
               "collectId": this.item.collectId,
-              "objectTypeCd": "C04",
+              "objectTypeCd": "C01",
               "objectId": this.item.examId,
               "collectType": "C01",
               "accountNo": this.$store.getters.getUserInfo.accountNo,

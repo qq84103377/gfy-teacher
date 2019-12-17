@@ -14,13 +14,13 @@
       </div>
       <div class="res-filter-wrap__body">
         <div class="res-filter-wrap__body-left">
-          <div @click="selectParent(item,index)" v-for="(item,index) in versionList[yearIndex].arr" :key="index"
+          <div @click="selectParent(item,index)" v-for="(item,index) in versionList" :key="index"
                :class="{active:item.active}">{{item.textBookName}}
           </div>
         </div>
         <div class="res-filter-wrap__body-right">
-          <div v-if="versionList[yearIndex].arr[index]">
-            <div class=""  v-for="(grade,ci) in versionList[yearIndex].gradeList" :key="ci">
+          <div v-if="versionList[index]">
+            <div class=""  v-for="(grade,ci) in versionList[index].gradeList" :key="ci">
               <div @click="handleSelect(grade)" class="van-hairline--bottom">
                 <div :class="['cell__item',{active:grade.check}]">{{grade.gradeTermName}}
                   <van-icon v-show="grade.check" class="check blue" name="success"/>
@@ -40,7 +40,7 @@
 
 <script>
   import {Dialog} from 'vant';
-  import {getTextBookVersionInfo, getGradeTermInfo} from '@/api/index'
+  import {getTextBookVersionInfo, getGradeTermInfo, getVersionGradeList} from '@/api/index'
   import eventBus from "@/utils/eventBus";
 
   export default {
@@ -48,15 +48,17 @@
     props: ['visible','label','gradeTerm'],
     data() {
       return {
-        index: 0,
+        index: 0, //选中版本的index
         yearIndex: 0,
-        versionList: [
-          {year:'Y01',arr:[],gradeList:[]},
-          {year:'Y02',arr:[],gradeList:[]},
-          {year:'Y03',arr:[],gradeList:[]},
-        ],
+        // versionList: [
+        //   {year:'Y01',arr:[],gradeList:[]},
+        //   {year:'Y02',arr:[],gradeList:[]},
+        //   {year:'Y03',arr:[],gradeList:[]},
+        // ],
+        versionList: [],
         tempList: [],
         tempIndex: 0,
+        subjectType: ''
       }
     },
     computed: {
@@ -78,30 +80,59 @@
       }
     },
    created() {
-     const classMap = JSON.parse(localStorage.classMap)
-     this.versionList.forEach(async (v,i) => {
-       if(v.year === classMap[Object.keys(classMap)[0]].classYearSection) {
-         this.yearIndex = i
-       }
-       await this.getGradeTermInfo(v)
-        this.getTextBookVersionInfo(v,i)
-      })
+     // const classMap = JSON.parse(localStorage.classMap)
+     // this.versionList.forEach(async (v,i) => {
+     //   if(v.year === classMap[Object.keys(classMap)[0]].classYearSection) {
+     //     this.yearIndex = i
+     //   }
+     //   await this.getGradeTermInfo(v)
+     //    this.getTextBookVersionInfo(v,i)
+     //  })
     },
     mounted() {
       eventBus.$off("changeYear")
       eventBus.$on("changeYear", (yearIndex,subjectType) => {
         this.yearIndex = yearIndex
-        this.$set(this.versionList[this.yearIndex].gradeList[0],'check',true)
-        const gradeItem = this.versionList[this.yearIndex].gradeList.find(v => v.check)
-        const textItem = this.versionList[this.yearIndex].arr.find(v => v.active)
-        this.$emit('update:label',textItem.textBookName + gradeItem.gradeTermName)
-        this.$emit('update:gradeTerm',gradeItem.grade + '|' + gradeItem.term)
-        eventBus.$emit('changeVersion',{
-          textBookId: textItem.textBookId,
-          gradeTermId: gradeItem.gradeTermId},{subjectType})
+        this.subjectType = subjectType
+        this.getVersionGradeList()
+        // this.$set(this.versionList[this.yearIndex].gradeList[0],'check',true)
+        // const gradeItem = this.versionList[this.yearIndex].gradeList.find(v => v.check)
+        // const textItem = this.versionList[this.yearIndex].arr.find(v => v.active)
+        // this.$emit('update:label',textItem.textBookName + gradeItem.gradeTermName)
+        // this.$emit('update:gradeTerm',gradeItem.grade + '|' + gradeItem.term)
+        // eventBus.$emit('changeVersion',{
+        //   textBookId: textItem.textBookId,
+        //   gradeTermId: gradeItem.gradeTermId},{subjectType})
       })
     },
     methods: {
+      getVersionGradeList() {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          yearSection: this.yearIndex==2?'Y03':(this.yearIndex==1?'Y02':'Y01'),
+          subjectType: this.subjectType
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getVersionGradeList(params).then(res => {
+          if(res.flag) {
+            this.versionList = Object.keys(res.data).map(v => {
+              return {...res.data[v]}
+            })
+            this.$set(this.versionList[0],'active',true)
+            this.$set(this.versionList[0].gradeList[0],'check',true)
+            this.$emit('update:label',this.versionList[0].textBookName + this.versionList[0].gradeList[0].gradeTermName)
+            this.$emit('update:gradeTerm',this.versionList[0].gradeList[0].grade + '|' + this.versionList[0].gradeList[0].term)
+            eventBus.$emit('changeVersion',{
+              textBookId: this.versionList[0].textBookId,
+              gradeTermId: this.versionList[0].gradeList[0].gradeTermId},{subjectType:this.subjectType})
+          }
+        })
+      },
       async getGradeTermInfo(v) {
         // if(this.filter.subjectList[index].gradeDone) return
         let obj = {
@@ -155,11 +186,11 @@
         })
       },
       confirm() {
-        const textItem = this.versionList[this.yearIndex].arr.find(v => v.active)
-        const gradeTermItem = this.versionList[this.yearIndex].gradeList.find(v => v.check)
+        const textItem = this.versionList.find(v => v.active)
+        const gradeTermItem = textItem.gradeList.find(v => v.check)
         eventBus.$emit('changeVersion',{
           textBookId: textItem.textBookId,
-          gradeTermId: gradeTermItem.gradeTermId})
+          gradeTermId: gradeTermItem.gradeTermId},{subjectType:this.subjectType})
         this.$emit('update:label',textItem.textBookName + gradeTermItem.gradeTermName)
         this.$emit('update:gradeTerm',gradeTermItem.grade + '|' + gradeTermItem.term)
         this.show = false
@@ -171,7 +202,7 @@
       },
       handleSelect(item) {
         if (item.check) return
-        this.versionList[this.yearIndex].gradeList.forEach(v => {
+        this.versionList[this.index].gradeList.forEach(v => {
             this.$set(v,'check',false)
         })
         this.$set(item, 'check', true)
@@ -179,10 +210,13 @@
       selectParent(item, index) {
         this.index = index
         if (item.active) return
-        this.versionList[this.yearIndex].arr.forEach(v => {
+        this.versionList.forEach(v => {
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
+        item.gradeList.forEach((v,i) => {
+          this.$set(v,'check',i===0)
+        })
         // this.$emit('selectParent', index)
       },
     }

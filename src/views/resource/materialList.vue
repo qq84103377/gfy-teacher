@@ -130,7 +130,7 @@ export default {
         .toLowerCase();
       var fileName = item.coursewareName + "." + type;
       var url = _this.accessUrl; //课件路径
-      var targetPath = cordova.file.externalCacheDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
+      var targetPath = cordova.file.dataDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
       var trustHosts = true;
 
       console.log("url:" + url);

@@ -85,26 +85,26 @@
       eventBus.$on("changeVersion", ({textBookId,gradeTermId},obj) => {
         this.textBookId = textBookId
         this.gradeTermId = gradeTermId
-        if(obj) {
+        // if(obj) {
           //切换学年导致教材切换的时候
           this.subjectType = obj.subjectType
           this.getTextBookCourseInfo()
-        }else {
-          if(this.subjectType) {
-            //科目已经加载完毕
-            this.getTextBookCourseInfo()
-          }
-        }
+        // }else {
+        //   if(this.subjectType) {
+        //     //科目已经加载完毕
+        //     this.getTextBookCourseInfo()
+        //   }
+        // }
       })
-      eventBus.$off("changeSubject")
-      eventBus.$on("changeSubject", (subjectType) => {
-
-        this.subjectType = subjectType
-        if(this.gradeTermId) {
-          //年级&教材已经加载完毕
-          this.getTextBookCourseInfo()
-        }
-      })
+      // eventBus.$off("changeSubject")
+      // eventBus.$on("changeSubject", (subjectType) => {
+      //
+      //   this.subjectType = subjectType
+      //   if(this.gradeTermId) {
+      //     //年级&教材已经加载完毕
+      //     this.getTextBookCourseInfo()
+      //   }
+      // })
     },
     created() {
     },
@@ -187,13 +187,16 @@
                     this.$set(item,'fold',true)
                     this.selectSysCourse(item.childNodeList[0].courseId,item.childNodeList[0].nodeName)
                 }else {
-                    this.$set(item,'fold',true)
+                  this.$set(item,'fold',true)
                     this.selectSysCourse(item.courseId,item.nodeName)
                 }
+                this.$emit('update:label',this.currentSysCourseName)
+                this.$emit('filter',this.currentSysCourseId)
+              }else {
+                this.$emit('update:label','')
+                this.$emit('filter','')
               }
-              this.$emit('filter',this.currentSysCourseId)
               // this.$emit('update:label',(this.unitList[this.unitIndex]&&this.unitList[this.unitIndex].courseList)?(this.unitList[this.unitIndex].nodeName+ this.currentSysCourseName):'' )
-              this.$emit('update:label',this.currentSysCourseName)
 
             }
           } else {

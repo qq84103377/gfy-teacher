@@ -43,9 +43,13 @@
           <div class="icon-wrap yellow"><i class="iconGFY icon-res"></i></div>
           <div>资源</div>
         </div>
-        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">
+        <!--        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">-->
+        <!--          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>-->
+        <!--          <div>分层</div>-->
+        <!--        </div>-->
+        <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">
           <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
-          <div>分层</div>
+          <div>更多</div>
         </div>
       </div>
       <div class="jcsb aic mgb10">
@@ -61,8 +65,8 @@
         <div v-else v-for="item in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
           <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="$set(item,'fold',!item.fold)">
-                <i class="iconGFY icon-arrow" :class="{fold:item.fold}"></i>
+              <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div @click="editTask(item)">

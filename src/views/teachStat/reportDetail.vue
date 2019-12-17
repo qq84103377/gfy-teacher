@@ -159,36 +159,34 @@
         this.$router.push(`/reportAll?stuName=${getStudentName(this.stuList[this.stuIndex].accountNo,this.stuList[this.stuIndex].classId)}&accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
       },
       createReport() {
-        console.log(this.$refs['body'].scrollTop,'wieieieieie');
-        // let aa = document.getElementById('screenshot')
-        let aa = document.createElement('div')
-        aa.innerHTML = 'asjdjaksdjkakdjakjsdkasda'
-        aa.style.height = '16380px'
-        aa.style.width = '100%'
-        aa.style.color = 'red'
-        aa.style.fontSize = '80px'
-        aa.style.background = '#fff'
-        aa.id = 'diaoni'
-        document.body.appendChild(aa)
-        html2canvas(aa,{
-          type: 'view',
-          allowTaint :true,
-          backgroundColor: null,
-          useCORS: true,
-          x: 0,
-          y: 88,
-          // width: window.screen.availWidth,
-          // height:this.$refs['screenshot'].scrollHeight,
-          windowWidth: aa.scrollWidth,
-          windowHeight: aa.scrollHeight,
-        }).then((canvas) => {
-          document.body.removeChild(document.getElementById('diaoni'))
-          debugger
-          // let dataURL = canvas.toDataURL("image/png");
-          let imgUri = canvas.toDataURL("image/png")
-          this.dataURL = imgUri
-          console.log(imgUri,'dddd');
-        })
+        // let aa = document.createElement('div')
+        // aa.innerHTML = 'asjdjaksdjkakdjakjsdkasda'
+        // aa.style.height = '16380px'
+        // aa.style.width = '100%'
+        // aa.style.color = 'red'
+        // aa.style.fontSize = '80px'
+        // aa.style.background = '#fff'
+        // aa.id = 'diaoni'
+        // document.body.appendChild(aa)
+        // html2canvas(aa,{
+        //   type: 'view',
+        //   allowTaint :true,
+        //   backgroundColor: null,
+        //   useCORS: true,
+        //   x: 0,
+        //   y: 88,
+        //   // width: window.screen.availWidth,
+        //   // height:this.$refs['screenshot'].scrollHeight,
+        //   windowWidth: aa.scrollWidth,
+        //   windowHeight: aa.scrollHeight,
+        // }).then((canvas) => {
+        //   document.body.removeChild(document.getElementById('diaoni'))
+        //   debugger
+        //   // let dataURL = canvas.toDataURL("image/png");
+        //   let imgUri = canvas.toDataURL("image/png")
+        //   this.dataURL = imgUri
+        //   console.log(imgUri,'dddd');
+        // })
       },
       getStudentScoreStatistics(item, index) {
         this.$store.commit('setVanLoading', true)
