@@ -347,7 +347,7 @@
                   //   cordova.file.externalDataDirectory +
                   //   "目录下查看"
                   // );
-                  _this.$toast(`请在${fileEntry.toInternalURL()}目录下查看`)
+                  _this.$toast(`请在${fileEntry.nativeURL()}目录下查看`)
                 }
             );
           };
