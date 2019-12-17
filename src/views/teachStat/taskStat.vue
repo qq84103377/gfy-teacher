@@ -292,51 +292,69 @@
       //创建并写入文件
       createAndWriteFile(dataObj) {
         //持久化数据保存
-        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
-
+        // window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
+        //
+        //   console.log('打开的文件系统: ' + fs.name);
+        //   fs.root.getFile("学生任务完成情况.xlsx", {create: true, exclusive: false},
+        //     (fileEntry) => {
+        //
+        //       console.log("是否是个文件？" + fileEntry.isFile.toString());
+        //       //写入文件
+        //       this.writeFile(fileEntry, dataObj);
+        //
+        //     }, this.onErrorCreateFile);
+        //
+        // }, this.onErrorLoadFs);
+        var that = this
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function (fs) {
           console.log('打开的文件系统: ' + fs.name);
-          fs.root.getFile("学生任务完成情况.xlsx", {create: true, exclusive: false},
-            (fileEntry) => {
-
-              console.log("是否是个文件？" + fileEntry.isFile.toString());
-              //写入文件
-              this.writeFile(fileEntry, dataObj);
-
-            }, this.onErrorCreateFile);
-
-        }, this.onErrorLoadFs);
+          fs.root.getDirectory('gaofenyun', {create: true}, function (dirEntry) {
+            dirEntry.getDirectory('counter', {create: true}, function (subDirEntry) {
+              subDirEntry.getFile("学生任务完成情况.xlsx", {create: true, exclusive: false}, function (fileEntry) {
+                fileEntry.name == '学生任务完成情况.xlsx';
+                fileEntry.fullPath == 'gaofenyun/counter/学生任务完成情况.xlsx';
+                //文件内容
+                //写入文件
+                console.log(fileEntry)
+                that.writeFile(fileEntry, dataObj);
+              }, that.onErrorCreateFile);
+            }, that.onErrorGetDir);
+          }, that.onErrorGetDir);
+        }, that.onErrorLoadFs);
       },
 
       //将内容数据写入到文件中
       writeFile(fileEntry, dataObj) {
         let _this = this
         //创建一个写入对象
-        fileEntry.createWriter((fileWriter) => {
+        fileEntry.createWriter(function (fileWriter) {
 
           //文件写入成功
-          fileWriter.onwriteend = () => {
-            this.$store.commit('setVanLoading',false)
-            console.log("Successful file read...");
-            console.log(fileEntry.toInternalURL(),'fileEntry.toInternalURL()');
+          fileWriter.onwriteend = function () {
+            _this.$store.commit('setVanLoading',false)
+            console.log("Successful file write...");
+            console.log(fileEntry);
+            console.log(fileEntry.nativeURL,'fileEntry.toInternalURL()');
             cordova.plugins.fileOpener2.showOpenWithDialog(
-              fileEntry.toInternalURL(),
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-              function onSuccess(data) {
-                console.log("成功预览:" );
-              },
-              function onError(error) {
-                // console.log(
-                //   "出错！请在" +
-                //   cordova.file.externalDataDirectory +
-                //   "目录下查看"
-                // );
-                _this.$toast(`请在${fileEntry.toInternalURL()}目录下查看`)
-              }
+                fileEntry.nativeURL,
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                function onSuccess(data) {
+                  console.log("成功预览:" );
+                },
+                function onError(error) {
+                  // console.log(
+                  //   "出错！请在" +
+                  //   cordova.file.externalDataDirectory +
+                  //   "目录下查看"
+                  // );
+                  _this.$toast(`请在${fileEntry.toInternalURL()}目录下查看`)
+                }
             );
           };
 
           //文件写入失败
-          fileWriter.onerror = (e) => {
+          fileWriter.onerror = function (e) {
+            console.log("Failed file write: " + e.toString());
             this.$store.commit('setVanLoading',false)
             console.log("Failed file read: " + e.toString());
             this.$toast("文件写入失败！")
@@ -345,6 +363,42 @@
           //写入文件
           fileWriter.write(dataObj);
         });
+
+
+        // fileEntry.createWriter((fileWriter) => {
+        //
+        //   //文件写入成功
+        //   fileWriter.onwriteend = () => {
+        //     this.$store.commit('setVanLoading',false)
+        //     console.log("Successful file read...");
+        //     console.log(fileEntry.toInternalURL(),'fileEntry.toInternalURL()');
+        //     cordova.plugins.fileOpener2.showOpenWithDialog(
+        //       fileEntry.toInternalURL(),
+        //       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //       function onSuccess(data) {
+        //         console.log("成功预览:" );
+        //       },
+        //       function onError(error) {
+        //         // console.log(
+        //         //   "出错！请在" +
+        //         //   cordova.file.externalDataDirectory +
+        //         //   "目录下查看"
+        //         // );
+        //         _this.$toast(`请在${fileEntry.toInternalURL()}目录下查看`)
+        //       }
+        //     );
+        //   };
+        //
+        //   //文件写入失败
+        //   fileWriter.onerror = (e) => {
+        //     this.$store.commit('setVanLoading',false)
+        //     console.log("Failed file read: " + e.toString());
+        //     this.$toast("文件写入失败！")
+        //   };
+        //
+        //   //写入文件
+        //   fileWriter.write(dataObj);
+        // });
       },
 
       //文件创建失败回调
@@ -359,6 +413,11 @@
         this.$store.commit('setVanLoading',false)
         console.log("文件系统加载失败！")
         this.$toast("文件系统加载失败！")
+      },
+      onErrorGetDir(error){
+        this.$store.commit('setVanLoading',false)
+        console.log("目录创建失败！")
+        this.$toast("目录创建失败！")
       },
 
 
