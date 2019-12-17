@@ -45,7 +45,7 @@
         </div>
         <!--        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">-->
         <!--          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>-->
-        <!--          <div>分层</div>-->
+        <!--          <div>分层123</div>-->
         <!--        </div>-->
         <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">
           <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
@@ -102,7 +102,7 @@
         <div @click="$router.push(`/specialExer`)">
           <i class="iconGFY icon-res-plus"></i>
           <span>专项1练习</span>
-          <!--<span @click="$toast.fail('敬请期待')">专项练习</span> 
+          <!--<span @click="$toast.fail('敬请期待')">专项练习</span>
         </div>-->
       </div>
     </div>
