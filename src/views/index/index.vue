@@ -50,6 +50,7 @@
         <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">
           <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
           <div>更多</div>
+        </div>
       </div>
       <div class="jcsb aic mgb10">
         <span class="fs16 black">未结束任务</span>
