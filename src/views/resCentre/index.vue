@@ -718,7 +718,7 @@
           }
           this.$router.push({path: '/materialDetail', query: {data: humpObj}})
         } else {
-          this.$router.push({path: '/materialDetail', query: {data: item}})
+          this.$router.push({path: '/materialDetail', query: {data: item.resCourseWareInfo}})
         }
       },
       sendTask(obj, key) {
