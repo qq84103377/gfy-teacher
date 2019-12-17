@@ -147,7 +147,7 @@ export default {
           eventBus.$emit('changeYear', this.index, item ? item.subjectType : '')
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
 
-          if (types) {
+          if (this.types) {
             this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterYear', this.subjectList[this.index].value)
             this.$store.commit('setFilterSubject', item.subjectType)
@@ -158,7 +158,7 @@ export default {
           eventBus.$emit('changeSubject', item ? item.subjectType : '')
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
 
-          if (types) {
+          if (this.types) {
             this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterSubject', item.subjectType)
             this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))

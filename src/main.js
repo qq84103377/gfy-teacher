@@ -7,12 +7,12 @@ import common from "./utils/common"
 
 Vue.prototype.common = common
 
-import * as fundebug from 'fundebug-javascript'
-import fundebugVue from 'fundebug-vue'
+// import * as fundebug from 'fundebug-javascript'
+// import fundebugVue from 'fundebug-vue'
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
 import * as calculate from './utils/calculate'
-import VConsole from 'vconsole/dist/vconsole.min.js'
+// import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
@@ -88,31 +88,31 @@ Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
   .use(List).use(PullRefresh).use(Search).use(Tag).use(Popup).use(IndexBar).use(IndexAnchor).use(Row).use(Col).use(Divider)
   .use(Notify).use(RadioGroup).use(Radio).use(ImagePreview).use(SwipeCell).use(DatetimePicker).use(Skeleton).use(Grid).use(GridItem).use(Progress).use(Picker).use(Stepper).use(Lazyload).use(slider).use(Sticky)
 
-// 配置fundebug
-fundebug.apikey =
-    "2091a697df9cede7b8df8f5b6d37126230448548399ed1e5227851515fa006eb"
-fundebugVue(fundebug, Vue)
+// // 配置fundebug
+// fundebug.apikey =
+//     "2091a697df9cede7b8df8f5b6d37126230448548399ed1e5227851515fa006eb"
+// fundebugVue(fundebug, Vue)
 
-if (process.env.NODE_ENV != "production") {
-  let vConsole = new VConsole()
-}
-//集成环境或者正式环境才收集错误信息
-if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {
-  fundebug.silentDev = false
-  // fundebug.silentConsole = false
-} else {
-  fundebug.silentDev = true
-  // fundebug.silentConsole = true
-}
+// if (process.env.NODE_ENV != "production") {
+//   let vConsole = new VConsole()
+// }
+// //集成环境或者正式环境才收集错误信息
+// if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {
+//   fundebug.silentDev = false
+//   // fundebug.silentConsole = false
+// } else {
+//   fundebug.silentDev = true
+//   // fundebug.silentConsole = true
+// }
 
-// 过滤监控 unhandledrejection
-if ("fundebug" in window) {
-  fundebug.filters = [
-    {
-      type: /^unhandledrejection$/
-    }
-  ]
-}
+// // 过滤监控 unhandledrejection
+// if ("fundebug" in window) {
+//   fundebug.filters = [
+//     {
+//       type: /^unhandledrejection$/
+//     }
+//   ]
+// }
 
 Object.keys(myFilter).forEach(key => {
   Vue.filter(key, myFilter[key])

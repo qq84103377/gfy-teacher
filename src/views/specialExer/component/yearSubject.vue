@@ -96,8 +96,8 @@ export default {
         this.yearSubjectList[index].active = true
         const termItem = this.termList.find(v => v.active)
         this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[index].name + termItem.name)
-        this.$emit('update:gradeItem', this.yearSubjectList[index])
-        this.$emit('update:termItem', termItem)
+        this.$emit('update:gradeItem', this.yearSubjectList[index].value)
+        this.$emit('update:termType', termItem.value)
         return true
       }
     })
@@ -106,8 +106,8 @@ export default {
       const termItem = this.termList.find(v => v.active)
 
       this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[0].name + termItem.name)
-      this.$emit('update:gradeItem', this.yearSubjectList[0])
-      this.$emit('update:termItem', termItem)
+      this.$emit('update:gradeItem', this.yearSubjectList[0].value)
+      this.$emit('update:termType', termItem.value)
     }
 
   },
@@ -163,60 +163,11 @@ export default {
       const gradeItem = this.yearSubjectList.find(v => v.active)
       const termItem = this.termList.find(v => v.active)
       this.$emit('update:label', localStorage.currentSubjectTypeName + gradeItem.name + termItem.name)
-      this.$emit('update:gradeItem', gradeItem)
-      this.$emit('update:termItem', termItem)
+      this.$emit('update:gradeItem', gradeItem.value)
+      this.$emit('update:termType', termItem.value)
       this.show = false
 
       return
-
-      if (flag) {
-
-        let gradeIndex2 = this.gradeSubjectList[this.gradeIndex].child.findIndex(ele => ele.check)
-
-        if (gradeIndex2 < 0) {
-          this.$toast('请选择')
-          return
-        }
-
-        this.gradePop = false
-        this.gradeIndex2 = gradeIndex2
-        this.gradeOldIndex = this.gradeIndex
-
-        this.filter.grade = this.gradeSubjectList[this.gradeIndex].name + "-" + this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2].name
-
-      } else {
-        let arr = []
-        let index = ''
-        this.moreList.forEach(ele => {
-          index = ele.findIndex(v => v.active)
-          arr.push(index)
-          // if (index >= 0) {
-          //   arr.push(index)
-          // }
-        })
-        console.log(arr, 'arr');
-        if (arr.length) {
-          this.moreIndex = arr
-          if (this.moreList[0][this.moreIndex[0]]) {
-            this.filter.more = this.moreList[0][this.moreIndex[0]].name
-          }
-          if (this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = this.moreList[1][this.moreIndex[1]].name
-          }
-          if (this.moreList[0][this.moreIndex[0]] && this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = this.moreList[0][this.moreIndex[0]].name + '，' + this.moreList[1][this.moreIndex[1]].name
-          }
-          if (!this.moreList[0][this.moreIndex[0]] && !this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = ''
-          }
-
-        } else {
-          this.moreIndex = ''
-        }
-
-        this.morePop = false;
-
-      }
     },
     //获取学校信息
     async getMySchoolInfo() {

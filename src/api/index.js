@@ -489,3 +489,7 @@ export const getLayerTaskInfoDetail =(params)=>{
 export const getVersionGradeList =(params)=>{
   return axios.post('resource/getVersionGradeList', qs.stringify(params))
 }
+//获取试卷信息列表
+export const getTestPaperInfoList =(params)=>{
+  return axios.post('resource/getTestPaperInfoList', qs.stringify(params))
+}

@@ -41,16 +41,90 @@
 </template>
 
 <script>
+import { getTestPaperInfoList } from '@/api/index'
+
 export default {
   name: "reviewTest",
+  props: ['start','classGrade','testPaperType','areaCode','provinceCode','belongYear','testPaperModeList','yearNum','termType'],
   data() {
     return {
-      list: [1, 2, 3, 4, 5, 6, 7]
+      list: [1, 2, 3, 4, 5, 6, 7],
+      currentPage: 0
+    }
+  },
+  watch: {
+    start(nv, ov) {
+      console.log("start nv",nv);
+      console.log("start ov",ov);
+      if (nv) {
+        this.getTestPaperInfoList()
+        this.$emit('update:start', false)
+      }
     }
   },
   methods: {
     go(item) {
       this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+    },
+    async getTestPaperInfoList() {
+      console.log(getTestPaperInfoList,'getTestPaperInfoList');
+      const page = this.currentPage
+      let params = {
+        requestJson: JSON.stringify({
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          pageSize: 10,
+          currentPage: page,
+          classGrade:this.classGrade?this.classGrade:'',
+          testPaperType:this.testPaperType?this.testPaperType:'',
+          areaCode:this.areaCode?this.areaCode:'',
+          provinceCode:this.provinceCode?this.provinceCode:'',
+          belongYear:this.belongYear?this.belongYear:'',
+          testPaperModeList:this.testPaperModeList?this.testPaperModeList:'',
+          yearNum:this.yearNum?this.yearNum:'',
+          termType:this.termType?this.termType:'',
+          subjectType:localStorage.currentSubjectType,
+        })
+      }
+      let response = await getTestPaperInfoList(params)
+      console.log(response,'getTestPaperInfoList response');
+      if (!response.flag || !response.data.length) {
+        let r = await getTestPaperInfoList({
+          requestJson: JSON.stringify({
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            pageSize: 10,
+            currentPage: page,
+            classGrade,
+            testPaperType,
+            areaCode,
+            provinceCode,
+            belongYear,
+            testPaperModeList,
+            yearNum,
+            termType,
+            subjectType,
+          })
+        })
+
+        if (r.flag) {
+          this.$toast('编辑成功')
+          const index = this.list.findIndex(v => v.spokenId === this.form.spokenId)
+          this.list[index].spokenTitle = this.form.name
+          this.list[index].spokenDegree = this.form.difficult
+          this.list[index].shareType = this.form.share
+          this.popShow = false
+        } else {
+          this.$toast(r.msg)
+        }
+      } else {
+
+        // this.$toast(response.msg)
+      }
     }
   },
 
