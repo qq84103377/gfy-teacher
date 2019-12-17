@@ -22,7 +22,7 @@
                   is-link @click="goto('/boardClassList')"/>
         <van-cell class="fs16"
                   :title="`堂测统计(${resourceCount.find(v => v.resourceType === 'R12_C03')?resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`"
-                  is-link @click="goto('/classStatSelectList')"/>
+                  is-link @click="goto('/classStatList')"/>
       </div>
     </div>
   </section>
@@ -102,7 +102,7 @@
         })
       },
       goto(path) {
-        if(path === '/classStatSelectList') {
+        if(path === '/classStatList') {
           localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.courseList[this.index].tchCourseInfo))
         }
         const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, termType, courseName} = this
