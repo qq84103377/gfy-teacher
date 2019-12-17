@@ -97,7 +97,7 @@
         </div>
          <!--<div @click="$router.push('/reinforce')">
           <i class="iconGFY icon-res-plus"></i>
-          <span>智能补强</span>
+          <span>智能补强33</span>
         </div>
         <div @click="$router.push(`/specialExer`)">
           <i class="iconGFY icon-res-plus"></i>
