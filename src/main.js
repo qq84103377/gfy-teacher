@@ -12,7 +12,7 @@ Vue.prototype.common = common
 import Navigation from 'vue-navigation'
 import * as myFilter from './utils/filter'
 import * as calculate from './utils/calculate'
-// import VConsole from 'vconsole/dist/vconsole.min.js'
+import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
 
 // 引入vant组件
@@ -94,7 +94,7 @@ Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay)
 // fundebugVue(fundebug, Vue)
 
 // if (process.env.NODE_ENV != "production") {
-//   let vConsole = new VConsole()
+  let vConsole = new VConsole()
 // }
 // //集成环境或者正式环境才收集错误信息
 // if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {
