@@ -31,6 +31,25 @@
             </div>
           </div>
         </div>
+        <div class="layer-teach__body__layer-group">
+          <div class="layer-teach__body__layer-group-label divider">
+            <div class="aic jcsb">
+              <span>分层情况:</span>
+              <div class="layer-btn-group">
+                <div class="layer-btn">修改分层情况</div>
+                <div class="layer-btn">使用该分层</div>
+              </div>
+            </div>
+          </div>
+          <div class="layer-wrapper">
+            <div class="layer-wrapper__detail" v-for="b in 5" :key="b">
+              <div class="layer-wrapper__detail__label">A层(<span>90-100分</span>)5人:</div>
+              <div class="layer-wrapper__detail__stu-group">
+                <div class="layer-wrapper__detail__stu-group__item" v-for="a in 10" :key="a">李华</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
@@ -286,6 +305,68 @@
 
             &:last-child {
               margin-right: 0;
+            }
+          }
+        }
+      }
+      &__layer-group {
+        background: #fff;
+        padding: 15px 10px;
+        margin-top: 5px;
+        &-label {
+          font-size: 15px;
+          color: #333;
+          line-height: 26px;
+          margin-bottom: 10px;
+
+          .layer-btn-group {
+            display: flex;
+            .layer-btn{
+              border-radius: 5px;
+              font-size: 11px;
+              line-height: 25px;
+              padding: 0 8px;
+              margin-left: 10px;
+              background: #F5F6FA;
+              color: #666;
+              &.active{
+                background: @blue;
+                color: #fff;
+              }
+            }
+          }
+        }
+        .layer-wrapper {
+          &__detail {
+            background: #f5f6fa;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            &__label {
+              font-weight: bold;
+              margin-bottom: 15px;
+            }
+            &__stu-group{
+              display: flex;
+              flex-wrap: wrap;
+              &__item {
+                flex: 0 0 75px;
+                background: #eee;
+                border-radius: 11px;
+                color: #333;
+                line-height: 22px;
+                text-align: center;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                &:nth-child(4n) {
+                  margin-right: 0;
+                }
+                &.active{
+                  color: #fff;
+                  background: @blue;
+                }
+              }
             }
           }
         }
