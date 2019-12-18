@@ -166,7 +166,7 @@
           "taskType": 'T10',
           "pageSize": 10,
           "currentPage": this.currentPage,
-          classId: this.$route.query.classId
+          // classId: this.$route.query.classId
         }
         let params = {
           requestJson: JSON.stringify(obj)

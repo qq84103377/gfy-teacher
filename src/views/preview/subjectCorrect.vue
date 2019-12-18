@@ -36,7 +36,7 @@
                                :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">
               <div class="menu-wrap">
                 <div @click="selectScore(ai,score,asw)" class="menu-item"
-                     v-for="(score,scoreIndex) in  splitScore(asw.examScore || 0)"
+                     v-for="(score,scoreIndex) in  splitScore(asw.examScore || 5)"
                      :key="scoreIndex">{{score}}分
                 </div>
               </div>
@@ -333,7 +333,7 @@
           "belongSchoolId": this.$store.getters.schoolId,
           "taskId": this.$route.params.taskId,
           examId: this.stuArr[this.stuIndex].answer[this.aswIndex].examId || this.stuArr[this.stuIndex].answer[this.aswIndex].examGroupId,
-          examScore: this.stuArr[this.stuIndex].answer[this.aswIndex].examScore || 0,
+          examScore: this.stuArr[this.stuIndex].answer[this.aswIndex].examScore || 5,
           studentScore,
           groupId: this.stuArr[this.stuIndex].answer[this.aswIndex].groupId,
           titleType: this.stuArr[this.stuIndex].answer[this.aswIndex].titleType
