@@ -38,7 +38,7 @@ import eventBus from "@/utils/eventBus";
 
 export default {
   name: "subjectFilter",
-  props: ['visible', 'label','types'],
+  props: ['visible', 'label','types','subjectType'],
   data() {
     return {
       index: 0,
@@ -155,11 +155,18 @@ export default {
         } else {
           //没有切换学年,只切换学科
           eventBus.$emit('changeYear',this.index, item ? item.subjectType : '')
+          
+          localStorage.setItem("currentSubjectTypeName", item.subjectName);
+          localStorage.setItem("currentSubjectType", item.subjectType);
+
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
           if (this.types) {
             this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterSubject', item.subjectType)
             this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+            this.$emit('update:subjectType', item.subjectType)
+             this.$emit('update:changeYearSubject', true)
+            this.getExamSectionTypeRelation(item.subjectType)
           }
         }
       } else {
@@ -186,12 +193,15 @@ export default {
             })
           })
           this.$set(item, 'check', true)
-          localStorage.setItem("currentSubjectTypeName", item.subjectName);
-          localStorage.setItem("currentSubjectType", item.subjectType);
 
-          if (this.types) {
-            this.getExamSectionTypeRelation(item.subjectType)
-          }
+          // localStorage.setItem("currentSubjectTypeName", item.subjectName);
+          // localStorage.setItem("currentSubjectType", item.subjectType);
+
+          // if (this.types) {
+          //   this.$emit('update:subjectType', item.subjectType)
+          //   this.$emit('update:changeYearSubject', true)
+          //   this.getExamSectionTypeRelation(item.subjectType)
+          // }
         }).catch(() => {
 
         })

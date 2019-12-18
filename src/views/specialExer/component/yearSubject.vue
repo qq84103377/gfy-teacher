@@ -35,7 +35,7 @@ import { getMySchoolInfo } from '@/api/index'
 
 export default {
   name: 'yearSubject',
-  props: ['visible', 'label', 'grade', 'term', 'subjectList'],
+  props: ['visible', 'label', 'subjectList', 'termType', 'gradeItem', 'changeYearSubject', 'toggleNum2'],
   data() {
     return {
       termList: [
@@ -63,6 +63,43 @@ export default {
       //   // this.tempList = JSON.parse(JSON.stringify(this.versionList))
       // }
     },
+    subjectList: {
+      handler(nv, ov) {
+        console.log("year subjectList nv", nv);
+        console.log("year subjectList ov", ov);
+
+        const gradeItem = this.yearSubjectList.find(v => v.active)
+        const termItem = this.termList.find(v => v.active)
+        const subject = this.subjectList.find(v => v.active)
+
+        console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
+
+        localStorage.setItem("currentSubjectTypeName", subject.subjectName);
+        localStorage.setItem("currentSubjectType", subject.subjectType);
+
+        if (this.toggleNum2 != 0) {
+          this.$emit('update:changeYearSubject', true)
+        }
+
+        this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
+
+        if (this.termType == termItem.value && this.gradeItem == gradeItem.value) {
+
+          return
+        }
+
+        this.$emit('update:gradeItem', gradeItem.value)
+        this.$emit('update:termType', termItem.value)
+
+        // this.$emit('update:changeYearSubject', true)
+
+
+
+      },
+      deep: true
+    }
+
+
   },
   async created() {
     console.log('yearSubjectfilter created');
@@ -132,10 +169,34 @@ export default {
             this.$set(v, 'active', false)
           })
           this.$set(item, 'active', true)
-          localStorage.setItem("currentSubjectTypeName", item.name);
-          localStorage.setItem("currentSubjectType", item.subjectType);
 
-          this.$emit('update:subjectList', this.subjectList)
+
+          // localStorage.setItem("currentSubjectTypeName", item.name);
+          // localStorage.setItem("currentSubjectType", item.subjectType);
+          // // this.$emit('update:subjectType', item.subjectType)
+
+          // const gradeItem = this.yearSubjectList.find(v => v.active)
+          // const termItem = this.termList.find(v => v.active)
+          // const subject = this.subjectList.find(v => v.active)
+
+          // console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
+
+          // this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
+
+          // // if (this.termType == termItem.value && this.gradeItem == gradeItem.value) {
+          // //   this.show = false
+          // //   return
+          // // }
+
+          // this.$emit('update:gradeItem', gradeItem.value)
+          // this.$emit('update:termType', termItem.value)
+
+          // this.$emit('update:changeYearSubject', true)
+          // this.show = false
+
+          // // this.$emit('update:label', item.name + gradeItem.name + termItem.name)
+
+          // this.$emit('update:subjectList', this.subjectList)
         })
         .catch(() => {
           // on cancel
@@ -162,12 +223,26 @@ export default {
     confirm() {
       const gradeItem = this.yearSubjectList.find(v => v.active)
       const termItem = this.termList.find(v => v.active)
-      this.$emit('update:label', localStorage.currentSubjectTypeName + gradeItem.name + termItem.name)
+      const subject = this.subjectList.find(v => v.active)
+
+
+      localStorage.setItem("currentSubjectTypeName", item.name);
+      localStorage.setItem("currentSubjectType", item.subjectType);
+
+      console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
+
+      this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
+
+      if (this.termType == termItem.value && this.gradeItem == gradeItem.value) {
+        this.show = false
+        return
+      }
+
       this.$emit('update:gradeItem', gradeItem.value)
       this.$emit('update:termType', termItem.value)
-      this.show = false
 
-      return
+      this.$emit('update:changeYearSubject', true)
+      this.show = false
     },
     //获取学校信息
     async getMySchoolInfo() {

@@ -1,42 +1,47 @@
 <template>
   <section class="review-test-wrap">
-    <van-cell title="试卷" style="background: #f5f5f5;color: #999" />
-    <div v-if="!list && list.length==0" style="text-align: center;color: #999999">
-      <img class="null-tips" src="../../../assets/img/preview/board_empty.png" alt />
-    </div>
-    <div v-else>
-      <van-cell v-for='item in list' :key='item' @click='go(item)'>
+    <van-list v-model="listLoading" :finished="finished" @load="onLoad" :finished-text="testList.length>0?'没有更多了':'本地区无相关套卷'" :offset='80'>
+      <van-cell title="试卷" style="background: #f5f5f5;color: #999" />
+      <div class="null-box" v-if="!testList || testList.length==0">
+        <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+        <p class="fs12" style="text-align: center;color: #999999">本地区无相关套卷</p>
+      </div>
+      <div v-else>
+        <van-cell v-for='item in testList' :key='item.testPaperId' @click='go(item)'>
+          <template slot="title">
+            <div class="fs18">{{item.testPaperName}}</div>
+            <div class="fs14 grey6 mgt5">
+              <span class="mgr10" v-if='item.testPaperType'>{{item.testPaperType|dealType(reviewTestType)}}</span>
+              <span class="mgr10" v-if='item.testPaperMode'>{{item.testPaperMode|dealType(reviewTestType)}}</span>
+              <!-- <span>模拟</span> -->
+            </div>
+          </template>
+        </van-cell>
+      </div>
+      <van-cell class="mgt10" style="background: #f5f5f5;color: #999">
         <template slot="title">
-          <div class="fs18">我是邓稼先的题我是邓稼先的微课邓稼微...</div>
-          <div class="fs14 grey6 mgt5">
-            <span class="mgr10">听力笔试套卷</span>
-            <span>模拟</span>
-          </div>
+          <span class="custom-title">为您推荐</span>
+          <span class="red fs10" v-if='totalNumber'>
+            已推荐<span>{{totalNumber}}</span>套同教材复习套卷
+          </span>
         </template>
       </van-cell>
-    </div>
-    <van-cell style="background: #f5f5f5;color: #999">
-      <template slot="title">
-        <span class="custom-title">为您推荐</span>
-        <span class="red fs10">
-          已推荐102套同教材复习套卷
-        </span>
-      </template>
-    </van-cell>
-    <div v-if="list.length==0" style="text-align: center;color: #999999">
-      <img class="null-tips" src="../../../assets/img/preview/board_empty.png" alt />
-    </div>
-    <div v-else>
-      <van-cell v-for='item in list' :key='item' @click='go(item)'>
-        <template slot="title">
-          <div class="fs18">我是邓稼先的题我是邓稼先的微课邓稼微...</div>
-          <div class="fs14 grey6 mgt5">
-            <span class="mgr10">听力笔试套卷</span>
-            <span>模拟</span>
-          </div>
-        </template>
-      </van-cell>
-    </div>
+      <div class="null-box" v-if="totalNumber==0">
+        <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+      </div>
+      <div v-else>
+        <van-cell v-for='item in recommendList' :key='item.testPaperId' @click='go(item)'>
+          <template slot="title">
+            <div class="fs18">{{item.testPaperName}}</div>
+            <div class="fs14 grey6 mgt5">
+              <span class="mgr10" v-if='item.testPaperType'>{{item.testPaperType|dealType(reviewTestType)}}</span>
+              <span class="mgr10" v-if='item.testPaperMode'>{{item.testPaperMode|dealType(reviewTestType)}}</span>
+              <!-- <span>模拟</span> -->
+            </div>
+          </template>
+        </van-cell>
+      </div>
+    </van-list>
   </section>
 </template>
 
@@ -45,30 +50,188 @@ import { getTestPaperInfoList } from '@/api/index'
 
 export default {
   name: "reviewTest",
-  props: ['start','classGrade','testPaperType','areaCode','provinceCode','belongYear','testPaperModeList','yearNum','termType'],
+  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeYearSubject', 'changeMore','active'],
   data() {
     return {
-      list: [1, 2, 3, 4, 5, 6, 7],
-      currentPage: 0
+      testList: [],
+      recommendList: [],
+      currentPage: 0,
+      totalPage:5,
+      listLoading: false,
+      finished: false,
+      without: false,
+      reviewTestType: this.$store.state.reviewTestType,
+      totalNumber: 0
     }
+  },
+  filters: {
+    dealType(val1, val2) {
+      return val2[val1];
+    },
   },
   watch: {
     start(nv, ov) {
-      console.log("start nv",nv);
-      console.log("start ov",ov);
+      console.log("start nv", nv);
+      console.log("start ov", ov);
       if (nv) {
-        this.getTestPaperInfoList()
+        this.onLoad()
+        // this.getTestPaperInfoList()
         this.$emit('update:start', false)
       }
-    }
+    },
+    areaCode(nv, ov) {
+      console.log("areaCode nv", nv);
+      console.log("areaCode ov", ov);
+      // this.testList= []
+      // this.recommendList= []
+      this.currentPage = 0
+      this.totalPage = 5
+      this.listLoading = false
+      this.finished = false
+      this.without = false
+      this.onLoad()
+
+    },
+    changeYearSubject(nv, ov) {
+      console.log("changeYearSubject nv", nv);
+      console.log("changeYearSubject ov", ov);
+      if (nv) {
+        console.log("this.$parent", this.$parent);
+        this.$parent.changeYearSubject = false
+        this.currentPage = 0
+        this.totalPage = 5
+        this.listLoading = false
+        this.finished = false
+        this.without = false
+        this.onLoad()
+      }
+    },
+    changeMore(nv, ov) {
+      console.log("changeMore nv", nv);
+      console.log("changeMore ov", ov);
+      if (nv) {
+        console.log("this.$parent", this.$parent);
+        this.$parent.changeMore = false
+        this.currentPage = 0
+        this.totalPage = 5
+        this.listLoading = false
+        this.finished = false
+        this.without = false
+        this.onLoad()
+      }
+    },
   },
+  // computed: {
+  //   subjectType() {
+  //     return localStorage.currentSubjectType
+  //   }
+  // },
   methods: {
     go(item) {
-      this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+      this.$router.push({
+        path: `/examDetail`, query: {
+          // "tchCourseId": this.$route.query.tchCourseId,
+          // "sysCourseId": this.$route.query.sysCourseId,
+          // "relationCourseId": this.$route.query.relationCourseId,
+          flag:1,
+          type: item.stateName ? 1 : 0,
+          testPaperId: item.testPaperId,
+          subjectType: localStorage.currentSubjectType,
+          classGrade: item.classGrade,
+          title: item.testPaperName,
+        }
+      })
+
+      // this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
+    },
+    onLoad() {
+      console.log("onLoad");
+      // if (!this.start) {
+      //   return
+      // }
+      if (!this.without) {
+        console.log("onLoad1");
+        this.currentPage++
+        if (this.currentPage > this.totalPage && this.currentPage > 1) {
+          return
+        }
+        console.log("onLoad11");
+        this.getTestPaperInfoList()
+      } else {
+        console.log("onLoad2");
+        this.currentPage++
+        if (this.currentPage > this.totalPage && this.currentPage > 1) {
+          return
+        }
+        console.log("onLoad22");
+        this.getTestPaperInfoList2()
+      }
+
     },
     async getTestPaperInfoList() {
-      console.log(getTestPaperInfoList,'getTestPaperInfoList');
-      const page = this.currentPage
+      console.log('getTestPaperInfoList');
+      let params = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        pageSize: 10,
+        currentPage: this.currentPage,
+        classGrade: this.classGrade ? this.classGrade : '',
+
+        areaCode: this.areaCode ? this.areaCode : '',
+        provinceCode: this.provinceCode ? this.provinceCode : '',
+        termType: this.termType ? this.termType : '',
+        subjectType: localStorage.currentSubjectType,
+      }
+      if (this.reviewType) {
+        params.testPaperModeList = this.reviewTypeItem
+      } else {
+        params.testPaperType = this.reviewTypeItem
+      }
+      if (this.belongYear) {
+        params.belongYear = this.belongYear
+      }
+      if (this.belongYear == 'earlier') {
+        params.yearNum = 5
+      }
+
+      let obj = { requestJson: JSON.stringify(params) }
+
+      let response = await getTestPaperInfoList(obj)
+      console.log(response, 'getTestPaperInfoList response');
+      this.listLoading = false
+      if (this.currentPage === 1) {
+        this.testList = []
+      }
+      if (!response.flag || !response.data.length) {
+        this.testList = []
+        this.without = true
+        this.currentPage = 0
+        this.onLoad()
+        return
+        let r = await getTestPaperInfoList({
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          pageSize: 10,
+          currentPage: page,
+          subjectType: localStorage.currentSubjectType,
+        })
+
+        if (r.flag) {
+          console.log(r, 'getTestPaperInfoList r');
+        } else {
+          this.$toast(r.msg)
+        }
+      } else {
+        this.totalPage = response.total
+        this.testList = this.testList.concat(response.data)
+      }
+    },
+    async getTestPaperInfoList2() {
+      console.log('getTestPaperInfoList2');
       let params = {
         requestJson: JSON.stringify({
           "interUser": "runLfb",
@@ -76,55 +239,30 @@ export default {
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           pageSize: 10,
-          currentPage: page,
-          classGrade:this.classGrade?this.classGrade:'',
-          testPaperType:this.testPaperType?this.testPaperType:'',
-          areaCode:this.areaCode?this.areaCode:'',
-          provinceCode:this.provinceCode?this.provinceCode:'',
-          belongYear:this.belongYear?this.belongYear:'',
-          testPaperModeList:this.testPaperModeList?this.testPaperModeList:'',
-          yearNum:this.yearNum?this.yearNum:'',
-          termType:this.termType?this.termType:'',
-          subjectType:localStorage.currentSubjectType,
+          currentPage: this.currentPage,
+          subjectType: localStorage.currentSubjectType,
         })
       }
-      let response = await getTestPaperInfoList(params)
-      console.log(response,'getTestPaperInfoList response');
-      if (!response.flag || !response.data.length) {
-        let r = await getTestPaperInfoList({
-          requestJson: JSON.stringify({
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            pageSize: 10,
-            currentPage: page,
-            classGrade,
-            testPaperType,
-            areaCode,
-            provinceCode,
-            belongYear,
-            testPaperModeList,
-            yearNum,
-            termType,
-            subjectType,
-          })
-        })
+      let r = await getTestPaperInfoList(params)
+      this.listLoading = false
+      if (this.currentPage === 1) {
+        this.recommendList = []
+      }
+      if (r.flag) {
+        this.totalPage = r.total
+        this.totalNumber = r.totalNumber
+        this.recommendList = this.recommendList.concat(r.data)
+        console.log(r, 'getTestPaperInfoList r');
 
-        if (r.flag) {
-          this.$toast('编辑成功')
-          const index = this.list.findIndex(v => v.spokenId === this.form.spokenId)
-          this.list[index].spokenTitle = this.form.name
-          this.list[index].spokenDegree = this.form.difficult
-          this.list[index].shareType = this.form.share
-          this.popShow = false
-        } else {
-          this.$toast(r.msg)
+        if (this.currentPage >= res.total) {
+          this.finished = true
         }
-      } else {
 
-        // this.$toast(response.msg)
+      } else {
+        this.$toast(r.msg)
+        this.finished = true
       }
+
     }
   },
 
@@ -139,5 +277,17 @@ export default {
 .fs14 {
   height: 30px;
   line-height: 30px;
+}
+.null-box {
+  padding: 30px 0;
+  text-align: center;
+  color: #999999;
+  background: #fff;
+  .null-tips {
+    // margin-top: 350px;
+    // margin-left: 50%;
+    // transform: translateX(-50%);
+    width: 60%;
+  }
 }
 </style>

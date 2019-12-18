@@ -3,17 +3,17 @@
     <div class="ware-filter-wrap">
       <div class="ware-filter-wrap__header van-hairline--bottom">
         <div class="ware-filter-wrap__header-tab">
-          <span>{{title}}</span>
-          <van-icon class="icon-close" @click="show=false" name="close" />
+          <span>地区</span>
+          <van-icon class="icon-close" @click="closePop" name="close" />
         </div>
       </div>
-      <div class="ware-filter-wrap__body">
+      <div class="ware-filter-wrap__body" v-if='list.length'>
         <div v-if='double' class="ware-filter-wrap__body-left">
           <div @click="selectParent(item,index)" v-for="(item,index) in list" :key="index" :class="{active:item.active}">{{item.name}}
           </div>
         </div>
         <div class="ware-filter-wrap__body-right" v-if='double'>
-          <div class="" v-for="(item,index) in list[index].child" :key="index">
+          <div class="" v-for="(item,index) in list[provinceIndex].child" :key="index">
             <div @click="handleSelect(item)" class="van-hairline--bottom">
               <div :class="['cell__item',{active:item.check}]">{{item.name}}
                 <van-icon v-show="item.check" class="check blue" name="success" />
@@ -44,10 +44,12 @@
 import { Dialog } from 'vant';
 export default {
   name: "filterPanel",
-  props: ['visible', 'list', 'title', 'label', 'double'],
+  props: ['visible', 'list', 'areaCode', 'provinceCode', 'title', 'label', 'double'],
   data() {
     return {
-      index: 0,
+      provinceIndex: 0,
+      tempList:[],
+      tempIndex:''
     }
   },
   computed: {
@@ -65,69 +67,44 @@ export default {
     // },
   },
   watch: {
-    list: {
-      handler(v) {
-        console.log("list变化-----------");
-        if (this.double) {
-          this.index = v.findIndex(v => {
-            return v.active
-          })
-          this.index = this.index ? this.index : 0
-        }
-
-      },
-      deep: true
-    },
     visible(v) {
-      if (!v) {
-        this.index = 0
+      if (v) {
+        console.log(v, 'v////');
+        this.provinceIndex = this.list.findIndex(ver => ver.areaCode == this.provinceCode)
+        this.tempIndex=this.provinceIndex
+        this.tempList = JSON.parse(JSON.stringify(this.list))
       }
     }
   },
   methods: {
+     closePop() {
+      this.versionList = this.tempList
+      this.index = this.tempIndex
+      this.show = false
+    },
     confirm() {
-      if (this.title === '科目') {
-        // 如果选择的科目与首页科目不一致,则弹出dialog
-
-        this.$dialog.confirm({
-          title: '提示',
-          message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
-          confirmButtonColor: '#39F0DD',
-          className: 'change-subject'
-        }).then(() => {
-          this.show = false
-          let item = this.list.find(v => v.active)
-          console.log(item);
-          this.$emit('filter', item || {})
-        }).catch(() => {
-          // on cancel
-        });
-      } else {
-
-        let item, _item;
-        if (this.double) {
-          item = this.list.find(v => v.active)
-          _item = this.list.find(v => {
-            return v.child.find(_V => {
-              return _V.check
-            });
-          })
-          console.log(item, 'item', _item);
-          if (!item || !_item) {
-            this.$toast('请选择')
-            return
-          }
-        } else {
-          item = this.list.find(v => v.check)
-          if (!item) {
-            this.$toast('请选择')
-            return
-          }
+      let item, _item;
+      if (this.double) {
+        item = this.list.find(v => v.active)
+        _item = item.child.find(v => {
+          return v.check
+        })
+        console.log(item, 'item', _item);
+        if (!item || !_item) {
+          this.$toast('请选择')
+          return
         }
-        console.log(item, _item);
-        this.show = false
-        this.$emit('filter', item || {}, _item)
+
+        this.$emit('update:label', item.name + _item.name)
+        this.$emit('update:areaCode', _item.areaCode)
+        this.$emit('update:provinceCode', item.provinceCode)
+
+
       }
+      // console.log(item, _item);
+      this.show = false
+      // this.$emit('filter', item || {}, _item)
+
 
     },
     handleSelect(item) {
@@ -149,10 +126,24 @@ export default {
 
     },
     selectParent(item, index) {
+      this.provinceIndex = index
+      if (item.active) return
+      this.list.forEach(v => {
+        this.$set(v, 'active', false)
+      })
+      this.$set(item, 'active', true)
+      // this.$emit('selectParent', index)
+
+      this.list[index].child.forEach(v => {
+        this.$set(v, 'check', false)
+      })
+
+      return
+
       if (this.title == "科目") {
 
       }
-      this.index = index
+      this.provinceIndex = index
       if (item.active) return
       this.list.forEach(v => {
         this.$set(v, 'active', false)

@@ -10,7 +10,7 @@
       <van-cell title="筛选" style="background: #f5f5f5;color: #999" />
 
       <van-cell @click="changeList(area,'地区');filterShow=true" title="地区" is-link>
-        <div class="blue">{{filter.area}}</div>
+        <div class="blue">{{areaLabel}}</div>
       </van-cell>
 
       <!-- <van-cell v-if="active != 2" @click="changeList(subject,'科目');filterShow=true" title="科目" is-link>
@@ -49,18 +49,18 @@
 
       <question-type v-show="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
       <knowledge-point v-show="active == 1"></knowledge-point>
-      <review-test v-show="active == 2" :start.sync='startReviewTest' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :testPaperType.sync='testPaperType' :provinceCode.sync='provinceCode' :belongYear.sync='belongYear' :testPaperModeList.sync='testPaperModeList' :yearNum.sync='yearNum' :termType.sync='termType'></review-test>
+      <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeYearSubject.sync='changeYearSubject' :changeMore.sync='changeMore'></review-test>
 
     </div>
-    <filter-panel @selectParent="selectParent" :label="label" :visible.sync="filterShow" :title="title" :list="list" @filter="handleFilter" :double='double'></filter-panel>
+    <filter-panel :label.sync="areaLabel" :visible.sync="filterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList"></subject-filter>
+    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></subject-filter>
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
 
-    <year-subject v-show='active==2' :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :termType.sync='termType' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList' :reviewtypeList.sync='reviewtypeList'></year-subject>
+    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList' :reviewtypeList.sync='reviewtypeList' :changeYearSubject.sync='changeYearSubject'></year-subject>
 
-    <more-Filter v-show='active==2' :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList'></more-Filter>
+    <more-Filter :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList' :yearItem.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :changeMore.sync='changeMore'></more-Filter>
 
   </section>
 </template>
@@ -129,7 +129,7 @@ export default {
       //   { name: '化学', value: 'Y03', active: false, child: [] },
       //   { name: '高中', value: 'Y03', active: false, child: [] },
       // ],
-      area: [],
+
       subject: [],
 
       testbook: [
@@ -141,11 +141,11 @@ export default {
         { name: '一单元', child: [{ name: '说和做砂进口的' }, { name: '的境况是假的' }, { name: '健康的时刻纯净水' }] },
         { name: '五座', child: [{ name: '四渡赤水都吃' }, { name: 'as' }, { name: '的深V是' }] },
       ],
-      list: [
-        { name: '小学', value: 'Y01', active: true, child: [] },
-        { name: '初中', value: 'Y02', active: false, child: [] },
-        { name: '高中', value: 'Y03', active: false, child: [] },
-      ],
+      // list: [
+      //   { name: '小学', value: 'Y01', active: true, child: [] },
+      //   { name: '初中', value: 'Y02', active: false, child: [] },
+      //   { name: '高中', value: 'Y03', active: false, child: [] },
+      // ],
       moreList: [
         [
           { name: '小学', value: 'Y01', active: true, child: [] },
@@ -189,11 +189,17 @@ export default {
         name: "",
         stuNum: 0
       },
-      subjectFilterShow: false,
-      subjectLabel: '',
+
+      area: [],
+      areaLabel: '广东省佛山市',
       areaFilterShow: false,
       areaCode: '0757',
       provinceCode: '44',
+
+      subjectFilterShow: false,
+      subjectLabel: '',
+      subjectType: localStorage.currentSubjectType,
+
       resCourseFilterShow: false,
       addCourseShow: false,
       versionFilterShow: false,
@@ -212,65 +218,64 @@ export default {
       startReviewTest: false, //是否开始查询
 
       reviewMoreShow: false,
-      reviewtypeList: [{
-        name: '不限', value: '', active: true,
-        name: '真题', value: 'T01', active: false,
-        name: '模拟题', value: 'T02', active: false,
-        name: '期中', value: '[M03]', type: true, active: false,
-        name: '期末', value: '[M04]', type: true, active: false,
-        name: '练习卷', value: '[M01,M02]', type: true, active: false,
-      }],
+      reviewtypeList: [
+        { name: '不限', value: '', active: true },
+        { name: '真题', value: 'T01', active: false },
+        { name: '模拟题', value: 'T02', active: false },
+        { name: '期中', value: '[M03]', type: true, active: false },
+        { name: '期末', value: '[M04]', type: true, active: false },
+        { name: '练习卷', value: '[M01,M02]', type: true, active: false },
+      ],
       yearList: [],
-      reviewMoreLable: ''
+      reviewMoreLable: '',
+
+
+      reviewTypeItem: '',
+      reviewType: '',
+      yearItem: '',
+      changeYearSubject: false,
+      changeMore: false,
+
 
 
     };
   },
   watch: {
-    subjectLabel() {
-      // if (this.tabIndex) {
-      //私人资源
-      // this.activeNames1.forEach(v => {
-      //   if (v == 1) {
-      //     // 微课
-      //     this.getCollectInfoDetailV2('C03')
-      //   } else if (v == '2') {
-      //     //素材
-      //     this.getCollectInfoDetailV2('C04')
-      //   } else if (v == '3') {
-      //     //试卷
-      //     this.getCollectInfoDetailV2('C02')
-      //   }
-      // })
-      // }
-    },
+    subjectType(nv, ov) {
+      console.log("index subjectType nv", nv);
+      console.log("index subjectType ov", ov);
+      if (nv) {
+        this.subjectList.forEach(ele => {
+          ele.active = false
+          if (ele.subjectType == nv) {
+            ele.active = true
+          }
+        })
 
+        // this.onLoad()
+        // // this.getTestPaperInfoList()
+        // this.$emit('update:start', false)
+      }
+    },
   },
-  // beforeRouteLeave(to, from, next) {
-  //   // ...
-  //   console.log(to, "to");
-  //   if (to.path == 'index') {
-  //     this.$store.commit('setFilterSubjectLabel', null)
-  //   }
-  //   next()
-  // },
   methods: {
     changeTab(active) {
       console.log(this.toggleNum2, 'toggleNum2////');
       if (active == 2 && this.toggleNum2 == 0) {
         this.$store.commit('setVanLoading', true)
-
         this.getYearList()
-        Promise.all([this.getMySchoolInfo(), this.getSysDictList()]).then(res => {
+        Promise.all([this.getMySchoolInfo()]).then(res => {
           console.log("???????");
           this.startReviewTest = true
           this.toggleNum2++
-          this.reviewMoreLable = this.yearList[0].name + this.reviewtypeList[0].name
+
           this.$store.commit('setVanLoading', false)
         }).catch(err => {
           //  throw Error(err)
           this.$store.commit('setVanLoading', false)
         })
+      }else if(active == 0){
+   
       }
     },
     async getSysAreaList() {
@@ -500,6 +505,7 @@ export default {
           })
         }
       }
+      this.reviewMoreLable = this.reviewtypeList[0].name + this.yearList[0].name
     },
 
     selectParent(index) {
@@ -574,30 +580,23 @@ export default {
       console.log(item, 'handleFilter item');
       if (this.title === '地区') {
         let area = item.child.find(v => v.check)
-        this.filter.area = item.name + area.name
         this.areaCode = area.areaCode
         this.provinceCode = item.areaCode
         this.checkItem(this.area, item)
       }
     },
     checkItem(arr, item) {
-      if (this.double) {
-        arr.forEach(v => {
-          this.$set(v, 'active', v.name === item.name)
-          if (v.name === item.name) {
-            v.child.forEach((_v, index) => {
-              this.$set(_v, 'check', item.child[index].check)
-              this.areaCode = item.child[index].areaCode
-            })
-          }
-        })
-      } else {
-        arr.forEach(v => {
-          this.$set(v, 'active', v.name === item.name)
-        })
-      }
-
+      arr.forEach(v => {
+        this.$set(v, 'active', v.name === item.name)
+        if (v.name === item.name) {
+          v.child.forEach((_v, index) => {
+            this.$set(_v, 'check', item.child[index].check)
+            this.areaCode = item.child[index].areaCode
+          })
+        }
+      })
     },
+
     handleClose(index, arr) {
       this.gradePop = false;
       this.morePop = false;
@@ -755,7 +754,7 @@ export default {
       } else {
         return 'Y03'
       }
-    },
+    }
   },
   async mounted() {
     // this.gettestbookVersionInfo()
@@ -772,7 +771,9 @@ export default {
     this.getSysAreaList()
     // await this.getMySchoolInfo()
   }
-};
+}
+
+
 </script>
 
 <style lang="less" scoped>
