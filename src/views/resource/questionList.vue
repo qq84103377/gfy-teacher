@@ -189,13 +189,32 @@ export default {
       if (isRemove) {
         // 移除
         const index = this.selectList.findIndex(v => v.examType === item.titleType)
-        if (this.selectList[index].child.length === 1) {
-          //整个this.selectList[index]删除
-          this.selectList.splice(index, 1)
-        } else {
-          // 只删除this.selectList[index].child[childIndex]
-          const childIndex = this.selectList[index].child.findIndex(v => v.examId === item.examId)
-          this.selectList[index].child.splice(childIndex, 1)
+        if(index>-1){
+          if (this.selectList[index].child.length === 1) {
+            //整个this.selectList[index]删除
+            this.selectList.splice(index, 1)
+          } else {
+            // 只删除this.selectList[index].child[childIndex]
+            const childIndex = this.selectList[index].child.findIndex(v => v.examId === item.examId)
+            this.selectList[index].child.splice(childIndex, 1)
+          }
+        }else {
+          //英语题型里面因为sectionType一样时,examType有可能不一样,所以v.examType === item.titleType找不到值
+          let sIndex = 0,cIndex = 0
+          this.selectList.forEach((v,i) => {
+            if(v.child.findIndex(c => c.examId === item.examId)>-1) {
+              cIndex = v.child.findIndex(c => c.examId === item.examId)
+              sIndex = i
+            }
+          })
+
+          if (this.selectList[sIndex].child.length === 1) {
+            //整个this.selectList[index]删除
+            this.selectList.splice(sIndex, 1)
+          } else {
+            // 只删除this.selectList[index].child[childIndex]
+            this.selectList[sIndex].child.splice(cIndex, 1)
+          }
         }
         //移除时添加移除试题ID
         this.removeQuestionList.push(item.examId)
@@ -218,6 +237,7 @@ export default {
           const typeItem = this.tab.questionTypeList[sectionIndex]
           console.log(typeItem, 'typeItem----');
           this.selectList.push({
+            // examTypeName: typeItem.examTypeName, // 增加题型名称(尝试)
             sectionName: typeItem.sectionName,
             examType: typeItem.examType,
             sectionType: typeItem.sectionType,

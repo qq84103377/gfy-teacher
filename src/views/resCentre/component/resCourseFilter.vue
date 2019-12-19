@@ -76,16 +76,8 @@
         },
         set() {
           this.$emit('update:visible', false)
-          eventBus.$emit('hideNav',true)
         }
       },
-    },
-    watch: {
-      visible(v) {
-        if (v) {
-          eventBus.$emit('hideNav',false)
-        }
-      }
     },
     mounted() {
       eventBus.$off("changeVersion")

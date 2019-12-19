@@ -376,6 +376,7 @@
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "index",
@@ -422,6 +423,26 @@
       }
     },
     watch: {
+      subjectFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      versionFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      areaFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      resCourseFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      addCourseShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
       subjectLabel() {
         // if (this.tabIndex) {
           //私人资源
