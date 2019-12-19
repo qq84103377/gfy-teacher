@@ -363,6 +363,7 @@ export default {
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap',schoolMap)
+          eventBus.$emit('checkUpgrade')
           this.getUnFinishCourseTask()
 
           //获取班级学生信息
