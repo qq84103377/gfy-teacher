@@ -1,8 +1,8 @@
 import { parentGetters } from './modules/parent-GFY'
 
 const getters = {
-  schoolId: () => {
-    const schoolMap = JSON.parse(localStorage.getItem("schoolMap"))
+  schoolId: state => {
+    const schoolMap = state.user.schoolMap || JSON.parse(localStorage.getItem("schoolMap"))
     return Object.keys(schoolMap)[0]
   },
   schoolIdList:()=>{

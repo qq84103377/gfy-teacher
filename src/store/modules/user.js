@@ -7,14 +7,18 @@ const user = {
         articleInfo:[],
         articleScroll:[],
         recommentList:[],
-        lastArticle:''
-       
+        lastArticle:'',
+        schoolMap: ''
     },
 
     mutations: {
         setUserInfo: (state, userInfo) => {
             state.userInfo = userInfo
             localStorage.setItem('userInfo', JSON.stringify(userInfo))
+        },
+        setSchoolMap: (state, schoolMap) => {
+            state.schoolMap = schoolMap
+            localStorage.setItem('schoolMap', JSON.stringify(schoolMap))
         },
         seThirdInfo: (state, thirdInfo) => {
             state.thirdInfo = thirdInfo
@@ -45,7 +49,7 @@ const user = {
             localStorage.setItem('lastArticle', JSON.stringify(lastArticle))
         },
         // getUserInfo:
-       
+
     },
     actions: {}
 }

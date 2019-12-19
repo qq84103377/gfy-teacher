@@ -360,7 +360,8 @@ export default {
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
-          localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
+          // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
+          this.$store.commit('setSchoolMap',schoolMap)
           this.getUnFinishCourseTask()
 
           //获取班级学生信息
