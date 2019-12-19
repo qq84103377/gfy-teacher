@@ -37,7 +37,7 @@ import { getSubjectType, getExamSectionTypeRelation } from '@/api/index'
 import eventBus from "@/utils/eventBus";
 
 export default {
-  name: "subjectFilter",
+  name: "yearSubjectFilter",
   props: ['visible', 'label', 'types', 'subjectType'],
   data() {
     return {
@@ -70,8 +70,8 @@ export default {
       }
     },
     subjectType(nv, ov) {
-      console.log("subject subjectType nv", nv);
-      console.log("subject subjectType ov", ov);
+      console.log("year subjectType nv", nv);
+      console.log("year subjectType ov", ov);
 
       // return
 

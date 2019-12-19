@@ -50,7 +50,7 @@ import { getTestPaperInfoList } from '@/api/index'
 
 export default {
   name: "reviewTest",
-  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeYearSubject', 'changeMore','active'],
+  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore','active'],
   data() {
     return {
       testList: [],
@@ -93,12 +93,12 @@ export default {
       this.onLoad()
 
     },
-    changeYearSubject(nv, ov) {
-      console.log("changeYearSubject nv", nv);
-      console.log("changeYearSubject ov", ov);
+    changeGradeSubject(nv, ov) {
+      console.log("changeGradeSubject nv", nv);
+      console.log("changeGradeSubject ov", ov);
       if (nv) {
         console.log("this.$parent", this.$parent);
-        this.$parent.changeYearSubject = false
+        this.$parent.changeGradeSubject = false
         this.currentPage = 0
         this.totalPage = 5
         this.listLoading = false

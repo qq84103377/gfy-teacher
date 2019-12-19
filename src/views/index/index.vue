@@ -95,7 +95,7 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <!--  <div @click="$router.push('/reinforce')">
+        <!-- <div @click="$router.push('/reinforce')">
           <i class="iconGFY icon-res-plus"></i>
           <span>智能补强</span>
         </div>
@@ -103,7 +103,7 @@
           <i class="iconGFY icon-res-plus"></i>
          <span>专项练习</span>
           <span @click="$toast.fail('敬请期待')">专项练习</span>
-        </div>-->
+        </div> -->
       </div>
     </div>
   </section>

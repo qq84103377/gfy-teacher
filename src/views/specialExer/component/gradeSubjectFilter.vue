@@ -3,7 +3,7 @@
   <van-popup v-model="show" :close-on-click-overlay="false" round position="bottom" :style="{ height: '93%' }">
     <div class="grade-pop-wrap">
       <van-icon @click="closePop" class="close" name="close" />
-      <div class="grade-pop-wrap__subject van-hairline--bottom">
+      <div class="grade-pop-wrap__subject van-hairline--bottom" v-if='subjectList.length'>
         <span v-for="(item, index) in subjectList" :key="index" :class="[{ blue: item.active }]" @click="handleSelectSubject(item)">{{ item.name }}</span>
       </div>
       <div class="grade-pop-wrap__body">
@@ -33,14 +33,15 @@
 <script>
 
 export default {
-  name: 'yearSubject',
-  props: ['visible', 'label', 'subjectList', 'termType', 'gradeItem', 'changeYearSubject', 'toggleNum2', 'active','subjectType'],
+  name: 'gradeSubjectFilter',
+  props: ['visible', 'label', 'termType', 'gradeItem', 'changeGradeSubject', 'toggleNum2', 'active', 'subjectType'],
   data() {
     return {
       termList: [
         { name: '上学期', value: 'T01', active: true },
         { name: '下学期', value: 'T02', active: false },
       ],
+      subjectList: [],
       yearSubjectList: [],
 
       tempYearList: [],
@@ -67,106 +68,114 @@ export default {
         this.tempTermList = JSON.parse(JSON.stringify(this.termList))
       }
     },
-    subjectList: {
-      handler(nv, ov) {
-        console.log("year subjectList nv", nv);
-        console.log("year subjectList ov", ov);
+    subjectType(nv, ov) {
+      console.log("grade subjectType nv", nv);
+      console.log("grade subjectType ov", ov);
 
-        const gradeItem = this.yearSubjectList.find(v => v.active)
-        const termItem = this.termList.find(v => v.active)
-        const subject = this.subjectList.find(v => v.active)
+      if (this.active == 2) {
+        return
+      }
 
-        this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
-
-        if (this.active == 2) {
-          return
+      this.subjectList.forEach(v => {
+        if (v.subjectType == nv) {
+          this.$set(v, 'active', true)
+        } else {
+          this.$set(v, 'active', false)
         }
+      })
 
+      const gradeItem = this.yearSubjectList.find(v => v.active)
+      const termItem = this.termList.find(v => v.active)
+      const subject = this.subjectList.find(v => v.active)
 
-        localStorage.setItem("currentSubjectTypeName", subject.name);
-        localStorage.setItem("currentSubjectType", subject.subjectType);
+      this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
+      this.$emit('update:changeGradeSubject', true)
 
-        if (this.toggleNum2 != 0) {
-          this.$emit('update:changeYearSubject', true)
-        }
-
-        this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
-
-        if (this.termType == termItem.value && this.gradeItem == gradeItem.value) {
-
-          return
-        }
-
-        this.$emit('update:gradeItem', gradeItem.value)
-        this.$emit('update:termType', termItem.value)
-
-        // this.$emit('update:changeYearSubject', true)
-
-
-
-      },
-      deep: true
-    }
-
+      this.$emit('update:gradeItem', gradeItem.value)
+      this.$emit('update:termType', termItem.value)
+    },
 
   },
   async created() {
     console.log('yearSubjectfilter created');
-    
-    const classMap = JSON.parse(localStorage.classMap)
-    let classMapArr = Object.values(classMap)
-   
-    let res1 = classMapArr.some(ele => ele.classYearSection == "Y01")
-    if (res1) {
-      let garde1 = ['G01', 'G02', 'G03', 'G04', 'G05', 'G06']
-      for (var i = 0; i < 6; i++) {
-        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde1[i]], value: garde1[i], active: '' })
-      }
-    }
-    let res2 = classMapArr.some(ele => ele.classYearSection == "Y02")
-    if (res2) {
-      let garde2 = ['G07', 'G08', 'G09']
-      for (var i = 0; i < 3; i++) {
-        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde2[i]], value: garde2[i], active: '' })
-      }
-    }
-    let res3 = classMapArr.some(ele => ele.classYearSection == "Y03")
-    if (res3) {
-      let garde3 = ['G10', 'G11', 'G12']
-      for (var i = 0; i < 3; i++) {
-        this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde3[i]], value: garde3[i], active: '' })
-      }
-    }
-    let first = this.yearSubjectList.some((ele, index) => {
-      if (ele.value == classMapArr[0].classGrade) {
-        this.yearSubjectList[index].active = true
-        const termItem = this.termList.find(v => v.active)
-      
-        this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[index].name + termItem.name)
-        this.$emit('update:gradeItem', this.yearSubjectList[index].value)
-        this.$emit('update:termType', termItem.value)
-        return true
-      }
-    })
-    if (!first) {
-      this.yearSubjectList[0].active = true
-      const termItem = this.termList.find(v => v.active)
-
-      this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[0].name + termItem.name)
-      this.$emit('update:gradeItem', this.yearSubjectList[0].value)
-      this.$emit('update:termType', termItem.value)
-    }
-    this.tempYearList = JSON.parse(JSON.stringify(this.yearSubjectList))
-    this.tempTermList = JSON.parse(JSON.stringify(this.termList))
-
-    // this.subjectNow = this.subjectList.find(v => v.active)
+    this.getLists()
 
   },
   methods: {
+    getLists() {
+      const classMap = JSON.parse(localStorage.classMap)
+      let classMapArr = Object.values(classMap)
+
+      console.log('classMapArr', classMapArr);
+
+      classMapArr.forEach(ele => {
+        ele.teacherInfoList.forEach(v => {
+          this.subjectList.push({
+            name: v.subjectName,
+            subjectType: v.subjectType,
+            active: v.subjectType == localStorage.currentSubjectType
+          })
+        })
+      })
+
+      let a = {}
+      this.subjectList = this.subjectList.reduce((cur, next) => {
+        a[next.subjectType] ? "" : a[next.subjectType] = true && cur.push(next);
+        return cur;
+      }, [])
+
+      console.log(this.subjectList, 'this.subjectList');
+      this.tempSubjectList = JSON.parse(JSON.stringify(this.subjectList))
+
+      let res1 = classMapArr.some(ele => ele.classYearSection == "Y01")
+      if (res1) {
+        let garde1 = ['G01', 'G02', 'G03', 'G04', 'G05', 'G06']
+        for (var i = 0; i < 6; i++) {
+          this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde1[i]], value: garde1[i], active: '' })
+        }
+      }
+      let res2 = classMapArr.some(ele => ele.classYearSection == "Y02")
+      if (res2) {
+        let garde2 = ['G07', 'G08', 'G09']
+        for (var i = 0; i < 3; i++) {
+          this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde2[i]], value: garde2[i], active: '' })
+        }
+      }
+      let res3 = classMapArr.some(ele => ele.classYearSection == "Y03")
+      if (res3) {
+        let garde3 = ['G10', 'G11', 'G12']
+        for (var i = 0; i < 3; i++) {
+          this.yearSubjectList.push({ name: this.$store.state.GradeLevel[garde3[i]], value: garde3[i], active: '' })
+        }
+      }
+      let first = this.yearSubjectList.some((ele, index) => {
+        if (ele.value == classMapArr[0].classGrade) {
+          this.yearSubjectList[index].active = true
+          const termItem = this.termList.find(v => v.active)
+
+          this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[index].name + termItem.name)
+          this.$emit('update:gradeItem', this.yearSubjectList[index].value)
+          this.$emit('update:termType', termItem.value)
+          return true
+        }
+      })
+      if (!first) {
+        this.yearSubjectList[0].active = true
+        const termItem = this.termList.find(v => v.active)
+
+        this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[0].name + termItem.name)
+        this.$emit('update:gradeItem', this.yearSubjectList[0].value)
+        this.$emit('update:termType', termItem.value)
+      }
+      this.tempYearList = JSON.parse(JSON.stringify(this.yearSubjectList))
+      this.tempTermList = JSON.parse(JSON.stringify(this.termList))
+
+    },
     closePop() {
       this.yearSubjectList = this.tempYearList
       this.termList = this.tempTermList
-      this.$emit('update:subjectList', this.tempSubjectList)
+      this.subjectList = this.tempSubjectList
+      // this.$emit('update:subjectList', this.tempSubjectList)
 
       // this.subjectList.forEach(v => {
       //   this.$set(v, 'active', false)
@@ -228,7 +237,7 @@ export default {
 
         this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
 
-        this.$emit('update:changeYearSubject', true)
+        this.$emit('update:changeGradeSubject', true)
 
         this.$emit('update:gradeItem', gradeItem.value)
         this.$emit('update:termType', termItem.value)
@@ -250,7 +259,7 @@ export default {
       this.$emit('update:gradeItem', gradeItem.value)
       this.$emit('update:termType', termItem.value)
 
-      this.$emit('update:changeYearSubject', true)
+      this.$emit('update:changeGradeSubject', true)
       this.show = false
     },
 

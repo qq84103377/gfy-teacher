@@ -9,33 +9,27 @@
     <div class="question-type-wrap__body">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999" />
 
-      <van-cell @click="changeList(area,'地区');filterShow=true" title="地区" is-link>
+      <van-cell @click="areaFilterShow=true" title="地区" is-link>
         <div class="blue">{{areaLabel}}</div>
       </van-cell>
 
-      <!-- <van-cell v-if="active != 2" @click="changeList(subject,'科目');filterShow=true" title="科目" is-link>
+      <van-cell v-if="active == 0" @click="typeSubjectFilterShow=true" title="科目" is-link>
         <div class="blue">
-          {{filter.subject}}
-        </div>
-      </van-cell>  -->
-
-      <van-cell v-if="active != 2" @click="subjectFilterShow=true" title="科目" is-link>
-        <div class="blue">
-          {{subjectLabel}}
+          {{typeSubjectLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-else @click="yearSubjectShow=true" title="年级学科" is-link>
+      <van-cell v-if="active == 1" @click="pointSubjectFilterShow=true" title="科目" is-link>
         <div class="blue">
-          {{yearSubjectLabel}}
+          {{pointSubjectLabel}}
         </div>
       </van-cell>
 
-      <!-- <van-cell v-if="active != 2" @click="changeList(testbook,'教材');filterShow=true" title="教材" is-link>
+      <van-cell v-if="active == 2" @click="gradeSubjectShow=true" title="年级学科" is-link>
         <div class="blue">
-          {{filter.testbook}}
+          {{gradeSubjectLabel}}
         </div>
-      </van-cell> -->
+      </van-cell>
 
       <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" is-link>
         <div class="blue">
@@ -48,18 +42,21 @@
       </van-cell>
 
       <question-type v-show="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
+
       <knowledge-point v-show="active == 1"></knowledge-point>
-      <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeYearSubject.sync='changeYearSubject' :changeMore.sync='changeMore'></review-test>
 
+      <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
     </div>
-    <filter-panel :label.sync="areaLabel" :visible.sync="filterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType' ></subject-filter>
+    <filter-panel :label.sync="areaLabel" :visible.sync="areaFilterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='subjectLabel'></version-filter>
+    <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
 
-    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList' 
-  :reviewtypeList.sync='reviewtypeList' :changeYearSubject.sync='changeYearSubject'></year-subject>
+    <point-subject-filter :label.sync="pointSubjectLabel" :visible.sync="pointSubjectFilterShow" :subjectType.sync='subjectType'></point-subject-filter>
+
+    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel'></version-filter>
+
+    <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
 
     <more-Filter :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList' :yearItem.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :changeMore.sync='changeMore'></more-Filter>
 
@@ -83,10 +80,11 @@ import {  getResCourseWareInfo,
 import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
 import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
-import subjectFilter from './component/subjectFilter'
+import pointSubjectFilter from './component/pointSubjectFilter'
 import versionFilter from './component/versionFilter'
-import yearSubject from './component/yearSubject'
+import gradeSubjectFilter from './component/gradeSubjectFilter'
 import moreFilter from './component/moreFilter'
+import yearSubjectFilter from './component/yearSubjectFilter'
 
 export default {
   name: "index",
@@ -95,101 +93,27 @@ export default {
     questionType,
     knowledgePoint,
     filterPanel,
-    subjectFilter,
+    pointSubjectFilter,
+    yearSubjectFilter,
     versionFilter,
-    yearSubject,
+    gradeSubjectFilter,
     moreFilter
   },
   data() {
     return {
       active: 0,
-
-      morePop: false,
-      gradePop: false,
-
-      filterShow: false,
       title: '',
-      filter: {
-        area: '',
-        subject: '',
-        testbook: '',
-        grade: '',
-        more: ''
-      },
       double: true,
-
-      // area: [
-      //   { name: '广东', active: true, child: [{ name: '广州市' }, { name: '清远市' }, { name: '韶关市' }] },
-      //   { name: '广西', child: [{ name: '玉林市' }, { name: '贵港市' }, { name: '南陵市' }] },
-      // ],
-      // subject: [
-      //   { name: '语文', value: 'Y01', active: true, child: [] },
-      //   { name: '数学', value: 'Y02', active: false, child: [] },
-      //   { name: '英语', value: 'Y03', active: false, child: [] },
-      //   { name: '物理', value: 'Y03', active: false, child: [] },
-      //   { name: '化学', value: 'Y03', active: false, child: [] },
-      //   { name: '高中', value: 'Y03', active: false, child: [] },
-      // ],
 
       subject: [],
 
-      testbook: [
-        { name: '粤教沪科版(沪粤版)', active: true, child: [{ name: '亲年级上册' }, { name: '八年级下册' }, { name: '老头教学' }] },
-        { name: '外研版', child: [{ name: 'asdasd' }, { name: '八年级fdfgd下册' }, { name: '老头sdfs教学' }] },
-      ],
-
-      course: [
-        { name: '一单元', child: [{ name: '说和做砂进口的' }, { name: '的境况是假的' }, { name: '健康的时刻纯净水' }] },
-        { name: '五座', child: [{ name: '四渡赤水都吃' }, { name: 'as' }, { name: '的深V是' }] },
-      ],
-      // list: [
-      //   { name: '小学', value: 'Y01', active: true, child: [] },
-      //   { name: '初中', value: 'Y02', active: false, child: [] },
-      //   { name: '高中', value: 'Y03', active: false, child: [] },
-      // ],
-      moreList: [
-        [
-          { name: '小学', value: 'Y01', active: true, child: [] },
-          { name: '初中', value: 'Y02', active: false, child: [] },
-          { name: '高中', value: 'Y03', active: false, child: [] },
-        ],
-        [
-          { name: '小学', value: 'Y01', active: true, child: [] },
-          { name: '初中', value: 'Y02', active: false, child: [] },
-          { name: '高中', value: 'Y03', active: false, child: [] },
-        ]
-      ],
-      moreIndex: '',
-
       label: 'subjectName',
-
-      // areaPop: false,
-      // subjectPop: false,
-      // testbookPop: false,
-
-      gradeSubjectList: [
-        { name: '粤教沪科版(沪粤版)', active: true, child: [{ name: '亲年级上册' }, { name: '八年级下册' }, { name: '老头教学' }] },
-        { name: '外研版', child: [{ name: 'asdasd' }, { name: '八年级fdfgd下册' }, { name: '老头sdfs教学' }] }
-      ],
-      gradeIndex: 0,
-      gradeOldIndex: 0,
-      gradeIndex2: -1,
-
-      classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
-
-      classList: JSON.parse(localStorage.getItem("classMap")),
 
       subjectList: [],
       schoolList: [],
-      classList: [],
-      postList: [],
-      schoolName: '',
-      subjectName: '',
 
-      className: {
-        name: "",
-        stuNum: 0
-      },
+      schoolName: '',
+
 
       area: [],
       areaLabel: '广东省佛山市',
@@ -197,26 +121,27 @@ export default {
       areaCode: '0757',
       provinceCode: '44',
 
-      subjectFilterShow: false,
-      subjectLabel: '',
+      typeSubjectFilterShow: false,
+      typeSubjectLabel: '',
       subjectType: localStorage.currentSubjectType,
 
-      resCourseFilterShow: false,
-      addCourseShow: false,
+      pointSubjectFilterShow: false,
+      pointSubjectLabel: '',
+
       versionFilterShow: false,
       versionLabel: '',
 
       gradeTerm: '', //年级学期
-      typesList: [],
-      courseIds: [],
+      typesList: [], //题型列表
+      courseIds: [], //课程ids
 
-      yearSubjectLabel: '',
-      yearSubjectShow: false,
-      termType: '',
-      gradeItem: '',
+      gradeSubjectLabel: '',
+      gradeSubjectShow: false,
+      termType: '',  // 上下学期type
+      gradeItem: '', // 年级type
 
-      toggleNum2: 0,
-      startReviewTest: false, //是否开始查询
+      toggleNum2: 0, // tab切换到复习套卷的次数
+      startReviewTest: false, //是否开始查询复习套卷
 
       reviewMoreShow: false,
       reviewtypeList: [
@@ -228,18 +153,18 @@ export default {
         { name: '期末', value: '[M04]', type: true, active: false },
         { name: '练习卷', value: '[M01,M02]', type: true, active: false },
       ],
-      yearList: [],
-      reviewMoreLable: '',
+      yearList: [], //复习套卷-年段list
+      reviewMoreLable: '', // 复习套卷-类型list
 
+      reviewTypeItem: '', // 复习套卷-类型type
+      reviewType: '', // 复习套卷-类型查询是试卷模式/试卷类型
+      yearItem: '', // 复习套卷-年份type
 
-      reviewTypeItem: '',
-      reviewType: '',
-      yearItem: '',
-      changeYearSubject: false,
-      changeMore: false,
+      changeGradeSubject: false,//更改了年级学科筛选
+      changeMore: false, //更改了更多筛选
 
-
-
+      toggleNum1: 0, // tab切换到知识点的次数
+      startKnowledge: false, //是否开始查询知识点
     };
   },
   watch: {
@@ -253,33 +178,24 @@ export default {
             ele.active = true
           }
         })
-
-        // this.onLoad()
-        // // this.getTestPaperInfoList()
-        // this.$emit('update:start', false)
       }
     },
   },
   methods: {
     changeTab(active) {
       console.log(this.toggleNum2, 'toggleNum2////');
+      console.log(this.toggleNum1, 'toggleNum1////');
       if (active == 2 && this.toggleNum2 == 0) {
-        this.$store.commit('setVanLoading', true)
         this.getYearList()
-        Promise.all([this.getMySchoolInfo()]).then(res => {
-          this.startReviewTest = true
-          this.toggleNum2++
+        this.startReviewTest = true
+        this.toggleNum2++
 
-          this.$store.commit('setVanLoading', false)
-        }).catch(err => {
-          //  throw Error(err)
-          this.$store.commit('setVanLoading', false)
-        })
-      } else if (active == 0) {
-
+      } else if (active == 1 && this.toggleNum1 == 0) {
+        this.startKnowledge = true
+        this.toggleNum1++
       }
     },
-    
+
     async getSysAreaList() {
       this.$store.commit('setVanLoading', true)
       let obj = {
@@ -390,19 +306,19 @@ export default {
       await getMySchoolInfo(params).then(res => {
         console.log('getMySchoolInfo', res)
         if (res.flag && res.data.length > 0) {
-    
+
           let schoolList = res.data[0].schoolList;
           let length = schoolList.length;
           this.schoolList = schoolList.map(item => {
             return { name: item.schoolName }
           })
           this.schoolName = this.schoolList[0] ? this.schoolList[0].name : '';
-      
+
           // 获取老师科目列表，去重后
           for (let i = 0; i < length; i++) {
             let gradeList = schoolList[i].classGradeList;
             let gradeLen = gradeList.length;
-        
+
             for (let j = 0; j < gradeLen; j++) {
               let subjectList = gradeList[j].subjectList;
               let arr = subjectList.map(item => {
@@ -490,265 +406,10 @@ export default {
       this.reviewMoreLable = this.reviewtypeList[0].name + this.yearList[0].name
     },
 
-    selectParent(index) {
-      // return
-      if (this.title === '科目') {
-        this.getSubjectType(index)
-      } else if (this.title === '地区' || this.title === '教材') {
-        // this.list.forEach(v => {
-        //   this.$set(v, 'active', false)
-        //   v.child.forEach(_v => {
-        //     this.$set(_v, 'check', false)
-        //   });
-        // })
-        // this.$set(this.list[index], 'active', true)
-        // this.$set(this.list[index].child[0], 'check', true)
-        // this.list = JSON.parse(JSON.stringify(this.area))
-      }
-    },
-    getSubjectType(index = 0) {
-      if (this.subject[index].done) return
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        yearSection: this.subject[index].value,
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      getSubjectType(params).then(res => {
-        this.$set(this.subject[index], 'done', true) // 是否已加载了数据
-        if (res.flag) {
-          this.subject[index].child = res.resSubjectTypeInfoList
-          this.list[index].child = res.resSubjectTypeInfoList
-        }
-      })
-    },
-    gettestbookVersionInfo() {
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "yearSection": "Y02",
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      gettestbookVersionInfo(params).then(res => {
-        if (res.flag) {
-          res.testbookVersionList
-        }
-      })
-    },
-    changeList(arr, title) {
-      this.title = title
-      this.double = true
-      // this.$set(arr[0], 'active', true)
-
-      if (title === '科目') {
-        this.label = 'subjectName'
-        this.double = false
-        // this.$set(arr[0], 'check', true)
-      } else {
-        // this.$set(arr[0], 'active', true)
-        // this.$set(arr[0].child[0], 'check', true)
-      }
-      this.list = JSON.parse(JSON.stringify(arr))
-    },
-    handleFilter(item) {
-      // console.log(item, 'handleFilter item');
-      if (this.title === '地区') {
-        let area = item.child.find(v => v.check)
-        this.areaCode = area.areaCode
-        this.provinceCode = item.areaCode
-        this.checkItem(this.area, item)
-      }
-    },
-    checkItem(arr, item) {
-      arr.forEach(v => {
-        this.$set(v, 'active', v.name === item.name)
-        if (v.name === item.name) {
-          v.child.forEach((_v, index) => {
-            this.$set(_v, 'check', item.child[index].check)
-            this.areaCode = item.child[index].areaCode
-          })
-        }
-      })
-    },
-
-    handleClose(index, arr) {
-      this.gradePop = false;
-      this.morePop = false;
-      // console.log(arr);
-      if (index) {
-        arr.forEach(element => {
-          for (let key in element) {
-            this.$set(element[key], "active", false);
-          }
-          // if (element.child.length) {
-          //   element.child.forEach(ele => {
-          //     this.$set(ele, "check", false);
-          //   });
-          // }
-        });
-      } else {
-        arr.forEach(element => {
-          this.$set(element, "active", false)
-          if (element.child.length) {
-            element.child.forEach(ele => {
-              this.$set(ele, "check", false);
-            });
-          }
-        })
-      }
-    },
-    handleSelectChild(s, arr) {
-      let check = !s.active
-      arr.forEach(item => {
-        this.$set(item, 'active', false)
-        if (item.name == s.name) {
-          this.$set(item, 'active', check)
-        }
-      });
-    },
-    handleSelectSubject(item) {
-      // if (item.active) return
-      // this.subject.forEach(v => {
-      //   this.$set(v, 'active', false)
-      // })
-      // this.$set(item, 'active', true)
-    },
-
-    openGradePop() {
-      this.gradePop = true;
-      this.gradeIndex = this.gradeOldIndex
-      this.$set(this.gradeSubjectList[this.gradeIndex], "active", true);
-      if (this.gradeIndex2 >= 0) {
-        this.$set(this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2], "active", true);
-      }
-    },
-
-    openMorePop() {
-      this.morePop = true;
-      this.moreList.forEach(element => {
-        element.forEach(ele => {
-          this.$set(ele, "active", false)
-        });
-      });
-      if (this.moreIndex) {
-
-        this.moreList[0][this.moreIndex[0]] && this.$set(this.moreList[0][this.moreIndex[0]], "active", true)
-        this.moreList[1][this.moreIndex[1]] && this.$set(this.moreList[1][this.moreIndex[1]], "active", true)
-      }
-
-    },
-
-    selectItem(item, index, arr) {
-      if (item.active) return;
-      for (let key in arr) {
-        this.$set(arr[key], "active", false);
-      }
-      item.active = true;
-    },
-    confirm(flag) {
-      if (flag) {
-
-        // this.$dialog
-        //   .confirm({
-        //     title: "提示",
-        //     message: "是否进行科目的切换？科目切换后，首页的科目也将进行切换",
-        //     confirmButtonColor: "#39F0DD",
-        //     className: "change-subject"
-        //   })
-        //   .then(() => {
-        //     // on confirm
-        //     for (let key in this.classList) {
-        //       if (this.classList[key].active) {
-        //         this.classIndex = key * 1;
-        //         break;
-        //       }
-        //     }
-        //     this.subjectPop = false;
-
-        //   })
-        //   .catch(() => {
-        //     // on cancel
-        //   });
-
-        let gradeIndex2 = this.gradeSubjectList[this.gradeIndex].child.findIndex(ele => ele.check)
-
-        if (gradeIndex2 < 0) {
-          this.$toast('请选择')
-          return
-        }
-
-        this.gradePop = false
-        this.gradeIndex2 = gradeIndex2
-        this.gradeOldIndex = this.gradeIndex
-
-        this.filter.grade = this.gradeSubjectList[this.gradeIndex].name + "-" + this.gradeSubjectList[this.gradeIndex].child[this.gradeIndex2].name
-
-      } else {
-        let arr = []
-        let index = ''
-        this.moreList.forEach(ele => {
-          index = ele.findIndex(v => v.active)
-          arr.push(index)
-          // if (index >= 0) {
-          //   arr.push(index)
-          // }
-        })
-        // console.log(arr, 'arr');
-        if (arr.length) {
-          this.moreIndex = arr
-          if (this.moreList[0][this.moreIndex[0]]) {
-            this.filter.more = this.moreList[0][this.moreIndex[0]].name
-          }
-          if (this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = this.moreList[1][this.moreIndex[1]].name
-          }
-          if (this.moreList[0][this.moreIndex[0]] && this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = this.moreList[0][this.moreIndex[0]].name + '，' + this.moreList[1][this.moreIndex[1]].name
-          }
-          if (!this.moreList[0][this.moreIndex[0]] && !this.moreList[1][this.moreIndex[1]]) {
-            this.filter.more = ''
-          }
-
-        } else {
-          this.moreIndex = ''
-        }
-
-        this.morePop = false;
-
-      }
-    },
-
-
-    handleYearSecion() {
-      const year = this.subjectLabel.substr(0, 2)
-      if (year === '小学') {
-        return 'Y01'
-      } else if (year === '初中') {
-        return 'Y02'
-      } else {
-        return 'Y03'
-      }
-    }
   },
   async mounted() {
     // this.gettestbookVersionInfo()
     // this.getSubjectType()
-
-    // this.$store.commit('setVanLoading', true)
-    // Promise.all([this.getSysAreaList(), this.getGradeTermInfo(), this.getPublishByRole(), this.getClassTeacherCourseDeploy()]).then(res => {
-    //   this.$store.commit('setVanLoading', false)
-    // }).catch(err => {
-    //   this.$store.commit('setVanLoading', false)
-    // })
-
 
     this.getSysAreaList()
     // this.getSubjectList()
