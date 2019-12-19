@@ -9,11 +9,11 @@
       </div>
       <div class="res-filter-wrap__body">
         <div class="res-filter-wrap__body-left">
-          <div @click="selectParent(item,index)" v-for="(item,index) in subjectList" :key="index" :class="{active:item.active}">{{item.name}}
+          <div @click="selectParent(item,index)" v-for="(item,index) in subjectList" v-if='subjectList[index].child.length' :key="index" :class="{active:item.active}">{{item.name}}
           </div>
         </div>
         <div class="res-filter-wrap__body-right">
-          <div class="" v-for="(child,ci) in subjectList[index].child" :key="ci">
+          <div class="" v-if='subjectList[index].child.length' v-for="(child,ci) in subjectList[index].child" :key="ci">
             <div @click="handleSelect(child)" class="van-hairline--bottom">
               <div :class="['cell__item',{active:child.check}]">{{child.subjectName}}
                 <van-icon v-show="child.check" class="check blue" name="success" />
@@ -38,7 +38,7 @@ import eventBus from "@/utils/eventBus";
 
 export default {
   name: "subjectFilter",
-  props: ['visible', 'label','types','subjectType'],
+  props: ['visible', 'label', 'types', 'subjectType'],
   data() {
     return {
       index: 0,
@@ -68,10 +68,35 @@ export default {
         this.tempIndex = this.index
         this.tempList = JSON.parse(JSON.stringify(this.subjectList))
       }
+    },
+    subjectType(nv, ov) {
+      console.log("subject subjectType nv", nv);
+      console.log("subject subjectType ov", ov);
+
+      // return
+
+      this.subjectList[this.index].child.forEach((v, i) => {
+        v.check = false
+        if (v.subjectType === nv) {
+          v.check = true
+        }
+      })
+
+      const subjectIndex = this.subjectList[this.index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
+      this.$emit('update:label', this.subjectList[this.index].name + this.subjectList[this.index].child[subjectIndex].subjectName)
+
+      this.$set(this.subjectList[this.index].child[subjectIndex], 'check', true)
+
+      this.$store.commit('setFilterYear', this.subjectList[this.index].value)
+      this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
+
+      this.getExamSectionTypeRelation(this.subjectList[this.index].child[subjectIndex].subjectType)
     }
   },
   created() {
-    this.$store.commit('setFilterSubjectLabel', null)
+    // this.$store.commit('setFilterSubjectLabel', null)
+
+    this.getSubjectList()
     const classMap = JSON.parse(localStorage.classMap)
     let year = ''
     for (let k in classMap) {
@@ -87,56 +112,72 @@ export default {
         v.active = true
         this.index = i
       }
-      this.getSubjectType(i)
     })
+
+    const subjectIndex = this.subjectList[this.index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
+    this.$emit('update:label', this.subjectList[this.index].name + this.subjectList[this.index].child[subjectIndex].subjectName)
+
+    this.$set(this.subjectList[this.index].child[subjectIndex], 'check', true)
+
+    this.$store.commit('setFilterYear', this.subjectList[this.index].value)
+    this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
+
+
+    // this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + this.subjectList[this.index].child[subjectIndex].subjectName)
+
+
+    this.tempIndex = this.index
+    this.tempList = JSON.parse(JSON.stringify(this.subjectList))
+
+    this.getExamSectionTypeRelation(this.subjectList[this.index].child[subjectIndex].subjectType)
+
   },
   methods: {
-    getSubjectType(index = 0) {
-      // if(this.filter.subjectList[index].done) return
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        yearSection: this.subjectList[index].value,
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      getSubjectType(params).then(async res => {
-        // this.$set(this.filter.subjectList[index],'done',true) // 是否已加载了数据
-        if (res.flag) {
-          //由于目前后台还没有做权限控制,所以前台先将年级对应的科目筛选,过滤掉多余的科目
-          this.subjectList[index].child = res.resSubjectTypeInfoList.filter(v => {
-            if (index == 0) {
-              return ['S01', 'S02', 'S03'].includes(v.subjectType)
-            } else if (index == 1 || index == 2) {
-              return ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09'].includes(v.subjectType)
-            }
-          })
-          if (index === this.index) {
-            const subjectIndex = this.subjectList[index].child.findIndex(v => v.subjectType === localStorage.currentSubjectType)
-            this.$emit('update:label', this.subjectList[index].name + this.subjectList[index].child[subjectIndex].subjectName)
-            this.$set(this.subjectList[index].child[subjectIndex], 'check', true)
-            eventBus.$emit('changeYear',this.index, this.subjectList[index].child[subjectIndex].subjectType)
+    getSubjectList() {
+      const classMap = JSON.parse(localStorage.classMap)
+      let list1 = [], list2 = [], list3 = []
+      for (let k in classMap) {
+        classMap[k].teacherInfoList.forEach(ele => {
+          if (classMap[k].classYearSection == "Y01") {
+            list1.push(ele)
+          } else if (classMap[k].classYearSection == "Y02") {
+            list2.push(ele)
 
-            if (this.types) {
-              this.getExamSectionTypeRelation(this.subjectList[index].child[subjectIndex].subjectType)
-
-              this.$store.commit('setVanLoading', true)
-              this.$store.commit('setFilterYear', this.subjectList[this.index].value)
-              this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
-              this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + this.subjectList[index].child[subjectIndex].subjectName)
-
-
-              // await this.getVersionGradeList(this.subjectList[index].value, this.subjectList[index].child[subjectIndex].subjectType)
-
-
-            }
-
+          } else if (classMap[k].classYearSection == "Y02") {
+            list3.push(ele)
           }
-        }
-      })
+        })
+      }
+
+      let newobj1 = {};
+      list1 = list1.reduce((preVal, curVal) => {
+        newobj1[curVal.subjectType] ? '' : newobj1[curVal.subjectType] = preVal.push(curVal);
+        return preVal
+      }, [])
+
+
+      let newobj2 = {};
+      list2 = list2.reduce((preVal, curVal) => {
+        newobj2[curVal.subjectType] ? '' : newobj2[curVal.subjectType] = preVal.push(curVal);
+        return preVal
+      }, [])
+
+      let newobj3 = {};
+      list3 = list3.reduce((preVal, curVal) => {
+        newobj3[curVal.subjectType] ? '' : newobj3[curVal.subjectType] = preVal.push(curVal);
+        return preVal
+      }, [])
+
+
+      // console.log('list1//', list1);
+      // console.log('list2//', list2);
+      // console.log('list3//', list3);
+
+
+      this.subjectList[0].child = list1
+      this.subjectList[1].child = list2
+      this.subjectList[2].child = list3
+
     },
 
     confirm() {
@@ -150,27 +191,29 @@ export default {
             this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterYear', this.subjectList[this.index].value)
             this.$store.commit('setFilterSubject', item.subjectType)
-            this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+            // this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
           }
         } else {
+          if (item.subjectType == localStorage.currentSubjectType) {
+            this.show = false
+            return
+          }
+
           //没有切换学年,只切换学科
-          eventBus.$emit('changeYear',this.index, item ? item.subjectType : '')
-          
-          // localStorage.setItem("currentSubjectTypeName", item.subjectName);
-          // localStorage.setItem("currentSubjectType", item.subjectType);
+          eventBus.$emit('changeYear', this.index, item ? item.subjectType : '')
 
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
           if (this.types) {
             this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterSubject', item.subjectType)
-            this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
+            // this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
             this.$emit('update:subjectType', item.subjectType)
-             this.$emit('update:changeYearSubject', true)
+            this.$emit('update:changeYearSubject', true)
             this.getExamSectionTypeRelation(item.subjectType)
           }
         }
         localStorage.setItem("currentSubjectTypeName", item.subjectName);
-          localStorage.setItem("currentSubjectType", item.subjectType);
+        localStorage.setItem("currentSubjectType", item.subjectType);
       } else {
         return this.$toast('请选择科目')
       }

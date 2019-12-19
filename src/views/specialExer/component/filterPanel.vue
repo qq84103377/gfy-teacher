@@ -48,8 +48,8 @@ export default {
   data() {
     return {
       provinceIndex: 0,
-      tempList:[],
-      tempIndex:''
+      tempList: [],
+      tempIndex: ''
     }
   },
   computed: {
@@ -61,24 +61,20 @@ export default {
         this.$emit('update:visible', false)
       }
     },
-    // childList() {
-    //
-    //   return this.list[this.index] ? this.list[this.index].child : []
-    // },
   },
   watch: {
     visible(v) {
       if (v) {
         console.log(v, 'v////');
         this.provinceIndex = this.list.findIndex(ver => ver.areaCode == this.provinceCode)
-        this.tempIndex=this.provinceIndex
+        this.tempIndex = this.provinceIndex
         this.tempList = JSON.parse(JSON.stringify(this.list))
       }
     }
   },
   methods: {
-     closePop() {
-      this.versionList = this.tempList
+    closePop() {
+      this.$emit('update:list', this.tempList)
       this.index = this.tempIndex
       this.show = false
     },
@@ -97,7 +93,7 @@ export default {
 
         this.$emit('update:label', item.name + _item.name)
         this.$emit('update:areaCode', _item.areaCode)
-        this.$emit('update:provinceCode', item.provinceCode)
+        this.$emit('update:provinceCode', item.areaCode)
 
 
       }

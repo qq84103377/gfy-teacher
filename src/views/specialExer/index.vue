@@ -54,11 +54,12 @@
     </div>
     <filter-panel :label.sync="areaLabel" :visible.sync="filterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></subject-filter>
+    <subject-filter :label.sync="subjectLabel" :visible.sync="subjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType' ></subject-filter>
 
-    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds'></version-filter>
+    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='subjectLabel'></version-filter>
 
-    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList' :reviewtypeList.sync='reviewtypeList' :changeYearSubject.sync='changeYearSubject'></year-subject>
+    <year-subject :label.sync="yearSubjectLabel" :visible.sync="yearSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :subjectList.sync='subjectList' 
+  :reviewtypeList.sync='reviewtypeList' :changeYearSubject.sync='changeYearSubject'></year-subject>
 
     <more-Filter :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList' :yearItem.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :changeMore.sync='changeMore'></more-Filter>
 
@@ -82,7 +83,7 @@ import {  getResCourseWareInfo,
 import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
 import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
-import subjectFilter from '../resCentre/component/subjectFilter'
+import subjectFilter from './component/subjectFilter'
 import versionFilter from './component/versionFilter'
 import yearSubject from './component/yearSubject'
 import moreFilter from './component/moreFilter'
@@ -222,6 +223,7 @@ export default {
         { name: '不限', value: '', active: true },
         { name: '真题', value: 'T01', active: false },
         { name: '模拟题', value: 'T02', active: false },
+        { name: '预测', value: 'T31', active: false },
         { name: '期中', value: '[M03]', type: true, active: false },
         { name: '期末', value: '[M04]', type: true, active: false },
         { name: '练习卷', value: '[M01,M02]', type: true, active: false },
@@ -265,7 +267,6 @@ export default {
         this.$store.commit('setVanLoading', true)
         this.getYearList()
         Promise.all([this.getMySchoolInfo()]).then(res => {
-          console.log("???????");
           this.startReviewTest = true
           this.toggleNum2++
 
@@ -274,10 +275,11 @@ export default {
           //  throw Error(err)
           this.$store.commit('setVanLoading', false)
         })
-      }else if(active == 0){
-   
+      } else if (active == 0) {
+
       }
     },
+    
     async getSysAreaList() {
       this.$store.commit('setVanLoading', true)
       let obj = {
@@ -293,7 +295,7 @@ export default {
       }
       await sysAreaApi.getSysAreaList(params).then(respone => {
         this.$store.commit('setVanLoading', false)
-        console.log(respone, "getSysAreaList respone");
+        // console.log(respone, "getSysAreaList respone");
         if (respone == null) {
         } else {
           if (respone.data[0].sysAreaInfoList) {
@@ -311,7 +313,7 @@ export default {
                     areaList[i].areaName;
                 }
               }
-              console.log(provinceMap);
+              // console.log(provinceMap);
               for (let i = 0; i < areaList.length; i++) {
                 let ai = areaList[i];
                 if (ai.parentCode == 0) {
@@ -361,23 +363,10 @@ export default {
               }
             }
 
-            console.log(list);
-            console.log(respone.data[0].sysAreaInfoList);
+            // console.log(list);
+            // console.log(respone.data[0].sysAreaInfoList);
             this.area = list
-            this.filter.area = "广东省佛山市"
-            //let province = respone.data[0].sysAreaInfoList.pop();
 
-            // this.sysAreaInfoList = list;//////
-
-            // if (that.sysAreaInfoList && that.sysAreaInfoList.length > 0) {
-            //   that.selectCity = that.sysAreaInfoList[0].areaCode;
-            // }
-
-            // this.currentProvince = this.sysAreaInfoList[0];//////
-            // this.selectProvince = this.currentProvince.areaCode;//////
-            // this.selectCity = this.currentProvince.childList[0].areaCode;//////
-
-            //that.selectProvinceName = province.areaName;
           } else {
           }
         }
@@ -401,19 +390,19 @@ export default {
       await getMySchoolInfo(params).then(res => {
         console.log('getMySchoolInfo', res)
         if (res.flag && res.data.length > 0) {
-          console.log("?");
+    
           let schoolList = res.data[0].schoolList;
           let length = schoolList.length;
           this.schoolList = schoolList.map(item => {
             return { name: item.schoolName }
           })
           this.schoolName = this.schoolList[0] ? this.schoolList[0].name : '';
-          console.log("??");
+      
           // 获取老师科目列表，去重后
           for (let i = 0; i < length; i++) {
             let gradeList = schoolList[i].classGradeList;
             let gradeLen = gradeList.length;
-            console.log("???");
+        
             for (let j = 0; j < gradeLen; j++) {
               let subjectList = gradeList[j].subjectList;
               let arr = subjectList.map(item => {
@@ -431,9 +420,6 @@ export default {
               this.subjectList = Array.from(new Set([...this.subjectList, ...arr]));
             }
           }
-          console.log("????");
-
-          console.log(this.subjectList, 'this.subject ');
 
           // 去重
           let a = {}
@@ -441,10 +427,6 @@ export default {
             a[next.subjectType] ? "" : a[next.subjectType] = true && cur.push(next);
             return cur;
           }, [])
-
-          console.log(this.subjectList, 'this.subjectList ');
-
-          // this.filter.subject = localStorage.getItem("currentSubjectTypeName")
 
         }
       }).catch(err => {
@@ -460,7 +442,7 @@ export default {
         })
       }
       await getSysDictList(json).then(res => {
-        console.log(res, 'getSysDictList res');
+        // console.log(res, 'getSysDictList res');
         if (res.flag) {
           this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
             return {
@@ -577,7 +559,7 @@ export default {
       this.list = JSON.parse(JSON.stringify(arr))
     },
     handleFilter(item) {
-      console.log(item, 'handleFilter item');
+      // console.log(item, 'handleFilter item');
       if (this.title === '地区') {
         let area = item.child.find(v => v.check)
         this.areaCode = area.areaCode
@@ -600,7 +582,7 @@ export default {
     handleClose(index, arr) {
       this.gradePop = false;
       this.morePop = false;
-      console.log(arr);
+      // console.log(arr);
       if (index) {
         arr.forEach(element => {
           for (let key in element) {
@@ -719,7 +701,7 @@ export default {
           //   arr.push(index)
           // }
         })
-        console.log(arr, 'arr');
+        // console.log(arr, 'arr');
         if (arr.length) {
           this.moreIndex = arr
           if (this.moreList[0][this.moreIndex[0]]) {
@@ -769,7 +751,9 @@ export default {
 
 
     this.getSysAreaList()
+    // this.getSubjectList()
     // await this.getMySchoolInfo()
+
   }
 }
 

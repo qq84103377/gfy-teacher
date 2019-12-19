@@ -18,7 +18,7 @@
           </template>
         </van-cell>
       </div>
-      <van-cell class="mgt10" style="background: #f5f5f5;color: #999">
+      <van-cell v-if="!testList.length" class="mgt10" style="background: #f5f5f5;color: #999">
         <template slot="title">
           <span class="custom-title">为您推荐</span>
           <span class="red fs10" v-if='totalNumber'>
@@ -26,10 +26,10 @@
           </span>
         </template>
       </van-cell>
-      <div class="null-box" v-if="totalNumber==0">
+      <div class="null-box" v-if="!testList.length&&!recommendList.length">
         <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
       </div>
-      <div v-else>
+      <div v-if="!testList.length&&recommendList.length">
         <van-cell v-for='item in recommendList' :key='item.testPaperId' @click='go(item)'>
           <template slot="title">
             <div class="fs18">{{item.testPaperName}}</div>
@@ -89,6 +89,7 @@ export default {
       this.listLoading = false
       this.finished = false
       this.without = false
+      this.totalNumber = 0
       this.onLoad()
 
     },
@@ -103,6 +104,7 @@ export default {
         this.listLoading = false
         this.finished = false
         this.without = false
+        this.totalNumber = 0
         this.onLoad()
       }
     },
@@ -117,6 +119,7 @@ export default {
         this.listLoading = false
         this.finished = false
         this.without = false
+        this.totalNumber = 0
         this.onLoad()
       }
     },
@@ -180,7 +183,7 @@ export default {
         classGrade: this.classGrade ? this.classGrade : '',
 
         areaCode: this.areaCode ? this.areaCode : '',
-        provinceCode: this.provinceCode ? this.provinceCode : '',
+        // provinceCode: this.provinceCode ? this.provinceCode : '',
         termType: this.termType ? this.termType : '',
         subjectType: localStorage.currentSubjectType,
       }
@@ -204,11 +207,16 @@ export default {
       if (this.currentPage === 1) {
         this.testList = []
       }
-      if (!response.flag || !response.data.length) {
+      if (this.currentPage === 1&&(!response.flag || !response.data.length)) {
         this.testList = []
         this.without = true
         this.currentPage = 0
         this.onLoad()
+      }
+      if (!response.flag || !response.data.length) {
+        // this.testList = []
+        // this.currentPage = 0
+        // this.onLoad()
         return
         let r = await getTestPaperInfoList({
           "interUser": "runLfb",

@@ -40,7 +40,7 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "versionFilter",
-  props: ['visible', 'label', 'gradeTerm', 'courseIds'],
+  props: ['visible', 'label', 'gradeTerm', 'courseIds','subjectLabel'],
   data() {
     return {
       index: 0,
@@ -68,7 +68,7 @@ export default {
     ...(mapState({
       filterYear: state => state.setting.filterYear,
       filterSubject: state => state.setting.filterSubject,
-      filterSubjectLabel: state => state.setting.filterSubjectLabel,
+      // filterSubjectLabel: state => state.setting.filterSubjectLabel,
     })),
     show: {
       get() {
@@ -87,9 +87,9 @@ export default {
         this.tempList = JSON.parse(JSON.stringify(this.versionList))
       }
     },
-    async filterSubjectLabel(nv, ov) {
-      console.log('filterSubjectLabel nv', nv);
-      console.log('filterSubjectLabel ov', ov);
+    async subjectLabel(nv, ov) {
+      console.log('subjectLabel nv', nv);
+      console.log('subjectLabel ov', ov);
       if (!nv) return
       this.index = 0
       this.versionList = { year: '', arr: [], gradeList: [] }
@@ -98,13 +98,7 @@ export default {
     },
   },
   created() {
-    console.log('subjectfilter created');
-    // this.versionList.forEach(async (v, i) => {
-    //   // await this.getGradeTermInfo(v)
-    //   // this.getTextBookVersionInfo(v, i)
-    //   this.getVersionGradeList(v, i)
-
-    // })
+    console.log('versonfilter created');
   },
   mounted() {
     console.log('subjectfilter mounted');
@@ -130,7 +124,7 @@ export default {
 
       getTextBookCourseInfo(params).then(res => {
         this.$store.commit('setVanLoading', false)
-        console.log("课程：", res)
+        // console.log("课程：", res)
         if (res.flag) {
           if (res.resTextbookCourseInfoList && res.resTextbookCourseInfoList.length > 0) {
             let textBookList = res.resTextbookCourseInfoList
@@ -166,16 +160,13 @@ export default {
       }
       getVersionGradeList(params).then(res => {
         this.$store.commit('setVanLoading', false)
-        // this.$set(this.filter.subjectList[index],'versionDone',true) // 是否已加载了年级数据
-        console.log('getVersionGradeList', res);
+        // console.log('getVersionGradeList', res);
         if (res.flag) {
           for (const key in res.data) {
             this.versionList.arr.push(res.data[key])
           }
 
           this.versionList.year = yearSection
-
-          console.log(this.versionList.arr, 'this.versionList.arr');
 
           if (this.versionList.arr.length > 0) {
             
@@ -194,7 +185,6 @@ export default {
               }
             })
 
-            console.log(arr, 'arr///////');
             if (!arr.length) {
               this.textItem = this.versionList.arr[0]
               this.$set(this.versionList.arr[0], 'active', true)
@@ -212,8 +202,6 @@ export default {
             arrItem = arr[0].teacherInfoList.find(ele => {
               return ele.subjectType == subjectType
             })
-
-            console.log(arrItem, 'arrItem///////');
 
             if (!arrItem) {
               this.textItem = this.versionList.arr[0]
@@ -250,9 +238,9 @@ export default {
               return
             }
 
-            console.log(textBookId, 'textBookId');
-            console.log(classGrade, 'classGrade');
-            console.log(termType, 'termType');
+            // console.log(textBookId, 'textBookId');
+            // console.log(classGrade, 'classGrade');
+            // console.log(termType, 'termType');
 
             let a = this.versionList.arr.findIndex(ver => ver.textBookId == textBookId)
             if (a > -1) {
@@ -336,7 +324,7 @@ export default {
       if (item) {
         this.textItem = this.versionList.arr.find(v => v.active)
         this.gradeTermItem = this.versionList.arr[this.index].gradeList.find(v => v.check)
-        console.log(this.textItem, this.gradeTermItem, '....');
+
         // eventBus.$emit('changeVersion',{
         //   textBookId: textItem.textBookId,
         //   gradeTermId: gradeTermItem.gradeTermId})

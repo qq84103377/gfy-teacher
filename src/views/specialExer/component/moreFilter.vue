@@ -39,6 +39,12 @@
 export default {
   name: 'moreFilter',
   props: ['visible', 'label', 'yearList', 'reviewtypeList', 'reviewTypeItem', 'reviewType', 'yearItem', 'changeMore'],
+  data() {
+    return {
+      tempYearList: [],
+      tempTypeList: [],
+    }
+  },
   computed: {
     show: {
       get() {
@@ -49,8 +55,18 @@ export default {
       }
     },
   },
+  watch: {
+    visible(v) {
+      if (v) {
+        this.tempYearList = JSON.parse(JSON.stringify(this.reviewtypeList))
+        this.tempTypeList = JSON.parse(JSON.stringify(this.yearList))
+      }
+    }
+  },
   methods: {
     closePop() {
+      this.$emit('update:yearList', this.tempTypeList)
+      this.$emit('update:reviewtypeList', this.tempYearList)
       this.show = false
     },
     handleSelectChild(item, flag) {
@@ -72,11 +88,6 @@ export default {
     async confirm() {
       const reviewTypeItem = this.reviewtypeList.find(v => v.active)
       const yearItem = this.yearList.find(v => v.active)
-
-      console.log(this.reviewTypeItem);
-      console.log(reviewTypeItem);
-      console.log(this.yearItem);
-      console.log(yearItem);
 
       if (this.reviewTypeItem == reviewTypeItem.value && this.yearItem == yearItem.value) {
         this.show = false

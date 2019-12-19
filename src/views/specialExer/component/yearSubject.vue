@@ -31,19 +31,22 @@
 </template>
 
 <script>
-import { getMySchoolInfo } from '@/api/index'
 
 export default {
   name: 'yearSubject',
-  props: ['visible', 'label', 'subjectList', 'termType', 'gradeItem', 'changeYearSubject', 'toggleNum2'],
+  props: ['visible', 'label', 'subjectList', 'termType', 'gradeItem', 'changeYearSubject', 'toggleNum2', 'active','subjectType'],
   data() {
     return {
       termList: [
-        { name: '上学期', value: 'S01', active: true },
-        { name: '下学期', value: 'S02', active: false },
+        { name: '上学期', value: 'T01', active: true },
+        { name: '下学期', value: 'T02', active: false },
       ],
       yearSubjectList: [],
-      // subject: []
+
+      tempYearList: [],
+      tempTermList: [],
+      tempSubjectList: [],
+      subjectNow: ''
     }
   },
   computed: {
@@ -58,10 +61,11 @@ export default {
   },
   watch: {
     visible(v) {
-      // if (v) {
-      //   this.tempIndex = this.index
-      //   // this.tempList = JSON.parse(JSON.stringify(this.versionList))
-      // }
+      if (v) {
+        this.tempSubjectList = JSON.parse(JSON.stringify(this.subjectList))
+        this.tempYearList = JSON.parse(JSON.stringify(this.yearSubjectList))
+        this.tempTermList = JSON.parse(JSON.stringify(this.termList))
+      }
     },
     subjectList: {
       handler(nv, ov) {
@@ -72,9 +76,14 @@ export default {
         const termItem = this.termList.find(v => v.active)
         const subject = this.subjectList.find(v => v.active)
 
-        console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
+        this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
 
-        localStorage.setItem("currentSubjectTypeName", subject.subjectName);
+        if (this.active == 2) {
+          return
+        }
+
+
+        localStorage.setItem("currentSubjectTypeName", subject.name);
         localStorage.setItem("currentSubjectType", subject.subjectType);
 
         if (this.toggleNum2 != 0) {
@@ -103,10 +112,10 @@ export default {
   },
   async created() {
     console.log('yearSubjectfilter created');
-    // this.getMySchoolInfo()
+    
     const classMap = JSON.parse(localStorage.classMap)
     let classMapArr = Object.values(classMap)
-    console.log(classMapArr, 'classMapArr');
+   
     let res1 = classMapArr.some(ele => ele.classYearSection == "Y01")
     if (res1) {
       let garde1 = ['G01', 'G02', 'G03', 'G04', 'G05', 'G06']
@@ -132,6 +141,7 @@ export default {
       if (ele.value == classMapArr[0].classGrade) {
         this.yearSubjectList[index].active = true
         const termItem = this.termList.find(v => v.active)
+      
         this.$emit('update:label', localStorage.currentSubjectTypeName + this.yearSubjectList[index].name + termItem.name)
         this.$emit('update:gradeItem', this.yearSubjectList[index].value)
         this.$emit('update:termType', termItem.value)
@@ -146,10 +156,24 @@ export default {
       this.$emit('update:gradeItem', this.yearSubjectList[0].value)
       this.$emit('update:termType', termItem.value)
     }
+    this.tempYearList = JSON.parse(JSON.stringify(this.yearSubjectList))
+    this.tempTermList = JSON.parse(JSON.stringify(this.termList))
+
+    // this.subjectNow = this.subjectList.find(v => v.active)
 
   },
   methods: {
     closePop() {
+      this.yearSubjectList = this.tempYearList
+      this.termList = this.tempTermList
+      this.$emit('update:subjectList', this.tempSubjectList)
+
+      // this.subjectList.forEach(v => {
+      //   this.$set(v, 'active', false)
+      //   if (v.name == this.subjectNow) {
+      //     this.$set(v, 'active', true)
+      //   }
+      // })
 
       this.show = false
     },
@@ -170,33 +194,6 @@ export default {
           })
           this.$set(item, 'active', true)
 
-
-          // localStorage.setItem("currentSubjectTypeName", item.name);
-          // localStorage.setItem("currentSubjectType", item.subjectType);
-          // // this.$emit('update:subjectType', item.subjectType)
-
-          // const gradeItem = this.yearSubjectList.find(v => v.active)
-          // const termItem = this.termList.find(v => v.active)
-          // const subject = this.subjectList.find(v => v.active)
-
-          // console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
-
-          // this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
-
-          // // if (this.termType == termItem.value && this.gradeItem == gradeItem.value) {
-          // //   this.show = false
-          // //   return
-          // // }
-
-          // this.$emit('update:gradeItem', gradeItem.value)
-          // this.$emit('update:termType', termItem.value)
-
-          // this.$emit('update:changeYearSubject', true)
-          // this.show = false
-
-          // // this.$emit('update:label', item.name + gradeItem.name + termItem.name)
-
-          // this.$emit('update:subjectList', this.subjectList)
         })
         .catch(() => {
           // on cancel
@@ -225,11 +222,23 @@ export default {
       const termItem = this.termList.find(v => v.active)
       const subject = this.subjectList.find(v => v.active)
 
+      if (subject.subjectType != localStorage.currentSubjectType) {
+        localStorage.setItem("currentSubjectTypeName", subject.name);
+        localStorage.setItem("currentSubjectType", subject.subjectType);
 
-      localStorage.setItem("currentSubjectTypeName", item.name);
-      localStorage.setItem("currentSubjectType", item.subjectType);
+        this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
 
-      console.log(localStorage.currentSubjectTypeName, 'localStorage.currentSubjectTypeName');
+        this.$emit('update:changeYearSubject', true)
+
+        this.$emit('update:gradeItem', gradeItem.value)
+        this.$emit('update:termType', termItem.value)
+
+        this.$emit('update:subjectType', subject.subjectType)
+
+        this.show = false
+        return
+
+      }
 
       this.$emit('update:label', subject.name + gradeItem.name + termItem.name)
 
@@ -244,69 +253,7 @@ export default {
       this.$emit('update:changeYearSubject', true)
       this.show = false
     },
-    //获取学校信息
-    async getMySchoolInfo() {
-      let obj = {
-        interUser: "runLfb",
-        interPwd: "25d55ad283aa400af464c76d713c07ad",
-        operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-        userType: this.$store.getters.getUserInfo.roleType,
-        accountNo: this.$store.getters.getUserInfo.accountNo
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      await getMySchoolInfo(params).then(res => {
-        console.log('getMySchoolInfo', res)
-        if (res.flag && res.data.length > 0) {
-          console.log("?");
-          let schoolList = res.data[0].schoolList;
-          let length = schoolList.length;
-          this.schoolList = schoolList.map(item => {
-            return { name: item.schoolName }
-          })
-          this.schoolName = this.schoolList[0] ? this.schoolList[0].name : '';
-          console.log("??");
-          // 获取老师科目列表，去重后
-          for (let i = 0; i < length; i++) {
-            let gradeList = schoolList[i].classGradeList;
-            let gradeLen = gradeList.length;
-            console.log("???");
-            for (let j = 0; j < gradeLen; j++) {
-              let subjectList = gradeList[j].subjectList;
-              let arr = subjectList.map(item => {
-                let obj = {
-                  name: item.subjectName,
-                  subjectType: item.subjectType
-                }
-                if (item.subjectName == localStorage.getItem("currentSubjectTypeName")) {
-                  obj.active = true
-                } else {
-                  obj.active = false
-                }
-                return obj;
-              })
-              this.subject = Array.from(new Set([...this.subject, ...arr]));
-            }
-          }
-          console.log("????");
 
-          console.log(this.subject, 'this.subject ');
-
-          // 去重
-          let a = {}
-          this.subject = this.subject.reduce((cur, next) => {
-            a[next.subjectType] ? "" : a[next.subjectType] = true && cur.push(next);
-            return cur;
-          }, [])
-
-          console.log(this.subject, 'this.subject 11111');
-
-          // this.filter.subject = localStorage.getItem("currentSubjectTypeName")
-
-        }
-      })
-    },
 
   },
 
