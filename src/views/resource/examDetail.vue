@@ -15,13 +15,13 @@
           <div style="font-weight: bold;">{{numToWord(si + 1)}}.{{section.testPaperSectionInfo.sectionName}}<span>(共{{section.testPaperSectionInfo.sectionScore}}分)</span>
 <!--          <div style="font-weight: bold;">{{numToWord(si + 1)}}.{{section.testPaperSectionInfo.sectionName}}<span>(共{{calSectionScore(section)}}分)</span>-->
           </div>
-          <div class="aic">
+          <div v-if="!$route.query.fromTask" class="aic">
             <div v-if="si>0" class="set-point" @click="updateTestPaperSectonIndex(0,si)">上移</div>
             <div v-if="si<list.length-1" class="set-point" @click="updateTestPaperSectonIndex(1,si)">下移</div>
             <div class="set-point" @click="setSectionPoint(section,si)">设置分数</div>
           </div>
         </div>
-        <question-item :up="ei>0" :down="ei<section.sectionExamList.length-1" :is-send="false"
+        <question-item :up="ei>0" :down="ei<section.sectionExamList.length-1" :is-send="$route.query.fromTask"
                        @add="handleAdd(si,ei,exam)" v-for="(exam,ei) in section.sectionExamList" :key="ei"
                        @setPoint="setPoint($event,exam,si,ei)"
                        @move="handleMove($event,section.sectionExamList,ei,si)" :item="exam.examQuestion"
@@ -32,7 +32,7 @@
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-    <exam-bar @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
+    <exam-bar v-if="!$route.query.fromTask" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
             :canAddCourse="$route.query.flag==1" :can-select="true"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>

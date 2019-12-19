@@ -180,6 +180,7 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: item.tchCourseClassInfo[0].classGrade,
             title: item.tchCourseClassInfo[0].testPaperName,
+            fromTask: 1
           }
         })
       } else if (item.tastType === 'T03') {

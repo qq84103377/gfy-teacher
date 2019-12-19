@@ -172,6 +172,7 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: this.classGrade,
             title: item.testPaperName,
+            fromTask: 1
           }
         })
       } else if (item.taskType === 'T03') {
