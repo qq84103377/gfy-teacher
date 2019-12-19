@@ -1,5 +1,5 @@
 <template>
-  <div class="app-nav">
+  <div class="app-nav" v-show="show">
     <van-divider :style="{margin: '0'}"></van-divider>
     <div class="nav">
       <div
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "AppNav",
@@ -28,8 +29,14 @@
       // console.log(this.$route.meta.isGfy);
       // console.log(this.$route.meta);
     },
+    mounted() {
+      eventBus.$on('hideNav',bol => {
+        this.show = bol
+      })
+    },
     data() {
       return {
+        show: true,
         tabData: [
           {
             title: "课程",

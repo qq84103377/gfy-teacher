@@ -1,5 +1,5 @@
 <template>
-  <van-popup get-container="#app" v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
+  <van-popup v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
     <div class="res-filter-wrap">
       <div class="res-filter-wrap__header van-hairline--bottom">
         <div class="res-filter-wrap__header-tab">
@@ -59,12 +59,14 @@ export default {
       },
       set() {
         this.$emit('update:visible', false)
+        eventBus.$emit('hideNav',true)
       }
     },
   },
   watch: {
     visible(v) {
       if (v) {
+        eventBus.$emit('hideNav',false)
         this.tempIndex = this.index
         this.tempList = JSON.parse(JSON.stringify(this.subjectList))
       }

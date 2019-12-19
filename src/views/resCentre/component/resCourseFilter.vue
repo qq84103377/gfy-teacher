@@ -2,7 +2,6 @@
   <!--    <section class="course-filter-wrap"></section>-->
   <van-popup
     :close-on-click-overlay="false"
-    get-container="#app"
     v-model="show"
     position="bottom"
     :style="{ height:'93%' }">
@@ -77,8 +76,16 @@
         },
         set() {
           this.$emit('update:visible', false)
+          eventBus.$emit('hideNav',true)
         }
       },
+    },
+    watch: {
+      visible(v) {
+        if (v) {
+          eventBus.$emit('hideNav',false)
+        }
+      }
     },
     mounted() {
       eventBus.$off("changeVersion")
