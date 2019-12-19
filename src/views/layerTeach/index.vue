@@ -37,8 +37,11 @@
           <div class="aic jcsb">
             <span>分层情况:</span>
             <div class="layer-btn-group">
-              <div :class="['layer-btn',{active:isEdit}]" @click="isEdit=!isEdit">修改分层情况</div>
-              <div class="layer-btn">使用该分层</div>
+              <div :class="['layer-btn',{active:isEdit}]" @click="editLayer">修改分层情况</div>
+              <div :class="['layer-btn',{active:taskInfo.layerTestPaperNum>0}]" @click="createLayerTestPaper"
+                   v-if="taskInfo.tchCourseUsedLayerId === taskInfo.layerInfo.layerId">生成层级试卷
+              </div>
+              <div class="layer-btn" v-else @click="useLayer">使用该分层</div>
             </div>
           </div>
         </div>
@@ -56,9 +59,14 @@
             </div>
           </div>
         </div>
+        <div class="grey6 fs10" v-show="isEdit"><span class="red">*</span>点击每层的分数可以修改分数范围,选中学生名字可以批量进行层级的移动</div>
       </div>
     </div>
+    <div class="layer-teach__footer" v-show="showMoveBtn">
+      <van-button type="info" class="btn" @click="showMoveDialog">移动</van-button>
+    </div>
 
+    <!--    任务完成情况-->
     <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
       <div class="stat-dialog-wrap">
         <div class="stat-dialog-wrap__header"><span
@@ -70,7 +78,7 @@
         </div>
       </div>
     </van-dialog>
-
+    <!--修改分数段-->
     <van-dialog v-model="scoreEditVisible"
                 :show-confirm-button="false">
       <div class="score-edit-dialog">
@@ -78,9 +86,11 @@
         <div style="display: flex;flex-direction: column;align-items: center;">
           <div v-for="(item,index) in tempLayerList" :key="index" class="score-edit-dialog__layer">
             <div class="score-edit-dialog__layer__label">{{item.layerGroupInfo.subgroupName}}:</div>
-            <input v-model="item.layerGroupInfo.subgroupScoreEnd" @input="handleInput($event,item,'subgroupScoreEnd')" type="tel"/>
+            <input v-model="item.layerGroupInfo.subgroupScoreEnd" @input="handleInput($event,item,'subgroupScoreEnd')"
+                   type="tel"/>
             <div>—</div>
-            <input :disabled="!index"  v-model="item.layerGroupInfo.subgroupScoreStart" @input="handleInput($event,item,'subgroupScoreStart')" type="tel"/>
+            <input :disabled="!index" v-model="item.layerGroupInfo.subgroupScoreStart"
+                   @input="handleInput($event,item,'subgroupScoreStart')" type="tel"/>
             <van-icon @click="delLayer(index)" :class="['del',{blue:tempLayerList.length>2&&index}]" name="clear"/>
           </div>
         </div>
@@ -95,6 +105,32 @@
         </div>
       </div>
     </van-dialog>
+    <!--    人员移动-->
+    <van-dialog v-model="stuMoveVisible"
+                :show-confirm-button="false">
+      <div class="score-edit-dialog">
+        <div class="score-edit-dialog__title">人员移动</div>
+        <div class="score-edit-dialog__content">
+          <div>是否移动到:</div>
+          <div class="dropdown-group__wrapper">
+            <div class="dropdown-group" @click="dropdownShow = !dropdownShow">
+              <div>{{stuMoveLabel}}</div>
+              <div :class="['triangle',{down:dropdownShow}]"></div>
+            </div>
+            <div v-show="dropdownShow" class="dropdown__menu">
+              <div class="dropdown__menu__item" @click="selectStuMoveList(item)"
+                   :class="{blue:item.layerGroupInfo.check}" v-for="(item,index) in tempLayerList" :key="index">
+                {{item.layerGroupInfo.subgroupName}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-group van-hairline--top">
+          <div @click="stuMoveVisible = false;dropdownShow=false">取消</div>
+          <div class="van-hairline--left blue" @click="moveStu">确定</div>
+        </div>
+      </div>
+    </van-dialog>
 
   </section>
 </template>
@@ -103,13 +139,19 @@
   import {mapMutations, mapGetters, mapState} from 'vuex'
   import {getStudentName} from '@/utils/filter'
   import * as calculate from '@/utils/calculate'
-  import {getLayerTaskInfoDetail, updateTchTeachLayerInfo} from '@/api/index'
+  import {
+    getLayerTaskInfoDetail,
+    updateTchTeachLayerInfo,
+    bindLayeringGroupByTchCourse,
+    createLayerTestPaper
+  } from '@/api/index'
   import echarts from "echarts";
 
   export default {
     name: "index",
     data() {
       return {
+        dropdownShow: false,
         taskIndex: 0,
         taskInfo: {layerInfo: {}},
         stuStatInfo: {
@@ -121,10 +163,15 @@
         tchClassTastInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassTastInfo)),
         isEdit: false,
         scoreEditVisible: false,
+        stuMoveVisible: false,
         tempLayerList: []
       }
     },
     computed: {
+      stuMoveLabel() {
+        const item = this.tempLayerList.find(v => v.layerGroupInfo.check)
+        return item ? item.layerGroupInfo.subgroupName : ''
+      },
       classId() {
         const item = this.tchClassTastInfo.find(v => v.active)
         return item ? item.classId : ''
@@ -132,23 +179,153 @@
       calculate() {
         return calculate
       },
+      showMoveBtn() {
+        let flag = false
+        for (let k in this.taskInfo.layerInfo.layerGroupInfoList) {
+          if ((this.taskInfo.layerInfo.layerGroupInfoList[k].layerGroupStudentList || []).some(v => v.active)) {
+            flag = true
+            break
+          }
+        }
+        return flag
+      },
       ...mapState({
         vanLoading: state => state.setting.vanLoading
       }),
     },
     methods: {
+      editLayer() {
+        this.isEdit = !this.isEdit
+        if(!this.isEdit) {
+          this.taskInfo.layerInfo.layerGroupInfoList.forEach(layer => {
+            (layer.layerGroupStudentList||[]).forEach(s => {
+              this.$set(s,'active',false)
+            })
+          })
+        }
+      },
+      createLayerTestPaper() {
+        if (this.taskInfo.layerTestPaperNum > 0) return
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          layerId: this.taskInfo.layerInfo.layerId,
+          tchCourseId: this.$route.query.tchCourseId,
+          classId: this.classId,
+          taskId: this.$route.query.taskId,
+          testPaperId: this.taskInfo.testPaperId,
+          classGrade: this.taskInfo.tchCourseInfo.classGrade,
+          subjectType: this.taskInfo.tchCourseInfo.subjectType,
+          className: this.tchClassTastInfo.find(v => v.active).className
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        createLayerTestPaper(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if (res.flag) {
+            this.taskInfo.layerTestPaperNum = 1
+            const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, classGrade, courseName} = this.taskInfo.tchCourseInfo
+            this.$router.push({
+              path: '/examList',
+              query: {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, classGrade, courseName}
+            })
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      useLayer() {
+        let name = ''
+        this.taskInfo.layerInfo.layerGroupInfoList.every(v => {
+          if ((v.layerGroupStudentList || []).length === 0) {
+            name = v.layerGroupInfo.subgroupName
+          }
+          return (v.layerGroupStudentList || []).length > 0
+        })
+        if (name) {
+          this.$toast(`${name}没有存在学生名单,请手动删除该分层`)
+        } else {
+          this.bindLayeringGroupByTchCourse()
+        }
+      },
+      bindLayeringGroupByTchCourse() {
+        this.$store.commit('setVanLoading', true)
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          layerId: this.taskInfo.layerInfo.layerId,
+          tchCourseId: this.$route.query.tchCourseId,
+          classId: this.classId,
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        bindLayeringGroupByTchCourse(params).then(async res => {
+          if (res.flag) {
+            await this.getLayerTaskInfoDetail()
+            this.$store.commit('setVanLoading', false)
+          } else {
+            this.$toast(res.msg)
+            this.$store.commit('setVanLoading', false)
+          }
+        })
+      },
+      moveStu() {
+        const layerIndex = this.tempLayerList.findIndex(v => v.layerGroupInfo.subgroupName === this.stuMoveLabel)
+        this.tempLayerList.forEach((v, i) => {
+          if (v.layerGroupStudentList) {
+            for (let si = 0; si < v.layerGroupStudentList.length; si++) {
+              //学生选中并且该学生属于非选中的层,先将该学生加入至选中的层,再把这个学生从原本的层删除
+              if (v.layerGroupStudentList[si].active && (i !== layerIndex)) {
+                //layerGroupStudentList有可能为Null
+                if (this.tempLayerList[layerIndex].layerGroupStudentList) {
+                  this.tempLayerList[layerIndex].layerGroupStudentList.push({
+                    ...v.layerGroupStudentList[si],
+                    allotType: 'T02'
+                  })
+                } else {
+                  this.tempLayerList[layerIndex].layerGroupStudentList = [{
+                    ...v.layerGroupStudentList[si],
+                    allotType: 'T02'
+                  }]
+                }
+                v.layerGroupStudentList.splice(si--, 1)
+              }
+            }
+          }
+        })
+        this.updateTchTeachLayerInfo()
+      },
+      selectStuMoveList(item) {
+        this.dropdownShow = false
+        this.tempLayerList.forEach(v => {
+          this.$set(v.layerGroupInfo, 'check', false)
+        })
+        item.layerGroupInfo.check = true
+      },
+      showMoveDialog() {
+        this.tempLayerList = JSON.parse(JSON.stringify(this.taskInfo.layerInfo.layerGroupInfoList))
+        this.$set(this.tempLayerList[0].layerGroupInfo, 'check', true)
+        this.stuMoveVisible = true
+      },
       updateTchTeachLayerInfo() {
         this.$store.commit('setVanLoading', true)
         let layerGroupInfoList = this.tempLayerList.map(v => {
           return {
-            "subgroupName":v.layerGroupInfo.subgroupName,
-            "subgroupScoreStart":v.layerGroupInfo.subgroupScoreStart,
-            "subgroupScoreEnd":v.layerGroupInfo.subgroupScoreEnd,
-            "layerGroupStudentInfoList":(v.layerGroupStudentList||[]).map(s => {
+            "subgroupName": v.layerGroupInfo.subgroupName,
+            "subgroupScoreStart": v.layerGroupInfo.subgroupScoreStart,
+            "subgroupScoreEnd": v.layerGroupInfo.subgroupScoreEnd,
+            "layerGroupStudentInfoList": (v.layerGroupStudentList || []).map(s => {
               return {
-                "accountNo":s.accountNo,
-                "allotType":s.allotType,
-                "subgroupId":s.subgroupId
+                "accountNo": s.accountNo,
+                "allotType": s.allotType,
+                "subgroupId": s.subgroupId
               }
             })
           }
@@ -166,11 +343,14 @@
           requestJson: JSON.stringify(obj)
         }
         updateTchTeachLayerInfo(params).then(async res => {
-          if(res.flag) {
+          if (res.flag) {
             this.scoreEditVisible = false
+            this.isEdit = false
+            this.dropdownShow = false
+            this.stuMoveVisible = false
             await this.getLayerTaskInfoDetail()
             this.$store.commit('setVanLoading', false)
-          }else {
+          } else {
             this.$toast(res.msg)
             this.$store.commit('setVanLoading', false)
           }
@@ -179,29 +359,29 @@
       scoreConfirm() {
         let flag = false
         for (let index in this.tempLayerList) {
-          if(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart === '' || this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd === '') {
+          if (this.tempLayerList[index].layerGroupInfo.subgroupScoreStart === '' || this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd === '') {
             this.$toast('目前分层存在分段为空的情况，请检查分层。')
             flag = true
             break
           }
-          if(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart <= this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd) {
+          if (this.tempLayerList[index].layerGroupInfo.subgroupScoreStart <= this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd) {
             this.$toast(`${this.tempLayerList[index].layerGroupInfo.subgroupName}分数段设置错误，请检查分层。`)
             flag = true
             break
           }
-          if(index*1 > 0) {
-            if(Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart + 1) < Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)){
+          if (index * 1 > 0) {
+            if (Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart + 1) < Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)) {
               console.log(123);
               this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
               flag = true
               break
             }
-            if(Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart) >= Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)){
+            if (Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart) >= Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)) {
               this.$toast(`${this.tempLayerList[index - 1].layerGroupInfo.subgroupName}和${this.tempLayerList[index].layerGroupInfo.subgroupName}的分数重复了，请检查分数。`)
               flag = true
               break
             }
-            if((index*1 === this.tempLayerList.length - 1) && this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd*1>0) {
+            if ((index * 1 === this.tempLayerList.length - 1) && this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd * 1 > 0) {
               console.log(321);
               this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
               flag = true
@@ -209,21 +389,28 @@
             }
           }
         }
-        if(!flag) {
+        if (!flag) {
           this.updateTchTeachLayerInfo()
         }
       },
       delLayer(index) {
-        if(this.tempLayerList.length<=2 || !index) return
-        if(this.tempLayerList[index].layerGroupStudentList&&this.tempLayerList[index].layerGroupStudentList.length) return this.$toast('该分层存在着学生名单，无法删除')
-        this.tempLayerList.splice(index,1)
-        this.tempLayerList.forEach((v,i) => {
+        if (this.tempLayerList.length <= 2 || !index) return
+        if (this.tempLayerList[index].layerGroupStudentList && this.tempLayerList[index].layerGroupStudentList.length) return this.$toast('该分层存在着学生名单，无法删除')
+        this.tempLayerList.splice(index, 1)
+        this.tempLayerList.forEach((v, i) => {
           v.layerGroupInfo.subgroupName = this.handleSubgroupName(i)
         })
       },
       addLayer() {
-        if(this.tempLayerList.length >= 6) return
-        this.tempLayerList.push({layerGroupStudentList:[],layerGroupInfo:{subgroupName:this.handleSubgroupName(this.tempLayerList.length),subgroupScoreEnd:'',subgroupScoreStart:''}})
+        if (this.tempLayerList.length >= 6) return
+        this.tempLayerList.push({
+          layerGroupStudentList: [],
+          layerGroupInfo: {
+            subgroupName: this.handleSubgroupName(this.tempLayerList.length),
+            subgroupScoreEnd: '',
+            subgroupScoreStart: ''
+          }
+        })
       },
       handleSubgroupName(num) {
         let subgroupName = ''
@@ -262,7 +449,7 @@
         const reg = /^[0-9]\d*$/
         if (!reg.test(e.target.value)) {
           e.target.value = e.target.value.substr(0, e.target.value.length - 1)
-          this.$set(item.layerGroupInfo,key,e.target.value)
+          this.$set(item.layerGroupInfo, key, e.target.value)
         }
       },
       goBack() {
@@ -367,8 +554,8 @@
             this.isNull = false
             this.taskInfo = res.data || {layerInfo: {}}
             this.taskInfo.layerInfo.layerGroupInfoList.forEach(v => {
-              (v.layerGroupStudentList||[]).forEach(s => {
-                this.$set(s,'stuName',getStudentName(s.accountNo,this.taskInfo.layerInfo.classId))
+              (v.layerGroupStudentList || []).forEach(s => {
+                this.$set(s, 'stuName', getStudentName(s.accountNo, this.classId))
               })
             })
           } else {
@@ -389,6 +576,7 @@
 </script>
 
 <style lang="less" scoped>
+  @deep: ~'>>>';
   .layer-teach {
     display: flex;
     flex-direction: column;
@@ -559,6 +747,20 @@
       }
     }
 
+    &__footer {
+      flex: 0 0 50px;
+      padding: 0 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+
+      .btn {
+        width: 100%;
+        line-height: 44px;
+        border-radius: 22px;
+      }
+    }
+
     .stat-dialog-wrap {
       display: flex;
       flex-direction: column;
@@ -627,12 +829,31 @@
       width: 100%;
     }
 
+    @{deep} .van-dialog {
+      overflow: initial;
+    }
+
     .score-edit-dialog {
       &__title {
         font-size: 18px;
         font-weight: bold;
         text-align: center;
         line-height: 70px;
+      }
+
+      &__content {
+        margin-bottom: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .triangle {
+          border-width: 0 6px 6px;
+
+          &.down {
+            transform: rotateZ(180deg);
+          }
+        }
       }
 
       &__layer {
@@ -672,9 +893,11 @@
           margin-right: 5px;
         }
       }
+
       .btn-group {
         display: flex;
-        >div{
+
+        > div {
           flex: 1;
           font-size: 18px;
           line-height: 55px;
@@ -682,6 +905,41 @@
           color: #666;
         }
       }
+
+      .dropdown-group__wrapper {
+        width: 134px;
+        position: relative;
+        margin-left: 16px;
+        font-size: 14px;
+
+        .dropdown-group {
+          width: 100%;
+          height: 32px;
+          border-radius: 5px;
+          border: 1px solid #999;
+          padding: 0 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .dropdown__menu {
+          position: absolute;
+          z-index: 10;
+          left: 0;
+          top: 32px;
+          width: 100%;
+          border: 1px solid #999;
+          border-radius: 5px;
+          background: #fff;
+
+          &__item {
+            line-height: 32px;
+            padding: 0 10px;
+          }
+        }
+      }
+
     }
   }
 </style>

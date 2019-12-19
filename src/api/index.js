@@ -497,3 +497,11 @@ export const getTestPaperInfoList =(params)=>{
 export const updateTchTeachLayerInfo =(params)=>{
   return axios.post('teach/updateTchTeachLayerInfo', qs.stringify(params))
 }
+//使用分层
+export const bindLayeringGroupByTchCourse =(params)=>{
+  return axios.post('teach/bindLayeringGroupByTchCourse', qs.stringify(params))
+}
+//生成层级试卷
+export const createLayerTestPaper =(params)=>{
+  return axios.post('teach/createLayerTestPaper', qs.stringify(params))
+}

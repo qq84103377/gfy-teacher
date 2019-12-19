@@ -11,7 +11,7 @@
           <van-collapse-item :title="`课中(${currCourse.resourceCount.find(v => v.resourceType === 'R12').resourceCount})`" name="1">
             <van-cell :title="`讲义(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C01')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C01').resourceCount:0})`" @click="goInClass('/lectureList')" is-link/>
             <van-cell :title="`白板(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C02')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C02').resourceCount:0})`" @click="goInClass('/boardClassList')" is-link/>
-            <van-cell :title="`堂测统计(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C03')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`" @click="goInClass('/classStatList')" is-link/>
+            <van-cell :title="`堂测统计(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C03')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`" @click="goInClass('/classStatSelectList')" is-link/>
           </van-collapse-item>
           <van-collapse-item :title="`资源(${currCourse.resourceCount.find(v => v.resourceType === 'R00').resourceCount})`" name="2">
             <van-cell :title="`微课(${currCourse.resourceCount.find(v => v.resourceType === 'R01').resourceCount})`" @click="gotoResource('/lessonList')" is-link/>
