@@ -14,8 +14,8 @@
             <van-cell :title="`堂测统计(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C03')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`" @click="goInClass('/classStatSelectList')" is-link/>
           </van-collapse-item>
           <van-collapse-item :title="`资源(${currCourse.resourceCount.find(v => v.resourceType === 'R00').resourceCount})`" name="2">
-            <van-cell :title="`微课(${currCourse.resourceCount.find(v => v.resourceType === 'R01').resourceCount})`" @click="gotoResource('/lessonList')" is-link/>
-            <van-cell :title="`素材(${currCourse.resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" @click="gotoResource('/materialList')" is-link/>
+            <van-cell :title="`微课(${currCourse.resourceCount.find(v => v.resourceType === 'R01_1')?currCourse.resourceCount.find(v => v.resourceType === 'R01_1').resourceCount:0})`" @click="gotoResource('/lessonList')" is-link/>
+            <van-cell :title="`素材(${currCourse.resourceCount.find(v => v.resourceType === 'R01_2')?currCourse.resourceCount.find(v => v.resourceType === 'R01_2').resourceCount:0})`" @click="gotoResource('/materialList')" is-link/>
             <van-cell :title="`试卷(${currCourse.resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" @click="gotoResource('/examList')" is-link/>
             <van-cell :title="`试题(${currCourse.resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" @click="gotoResource('/questionList')" is-link/>
             <van-cell :title="`讨论(${currCourse.resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" @click="gotoResource('/discussList')" is-link/>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import {getClassTeachCourseInfo} from '@/api/index'
+  import {getClassTeachCourseInfo,getCourseInfoResourceCount} from '@/api/index'
     export default {
         name: "courseDetail",
       data() {
@@ -37,7 +37,6 @@
             activeNames:[],
             currCourse: {resourceCount:[
               {resourceType: 'R00', resourceCount: 0},
-                {resourceType: 'R01', resourceCount: 0},
                 {resourceType: 'R02', resourceCount: 0},
                 {resourceType: 'R03', resourceCount: 0},
                 {resourceType: 'R04', resourceCount: 0},
@@ -79,7 +78,30 @@
           this.$router.push({path,query: {tchCourseId,sysCourseId,relationCourseId,subjectType,classId:tchClassCourseInfo[0].classId,tchClassCourseInfo,classGrade,courseName}})
 
         },
-        getDetail() {
+        getCourseInfoResourceCount() {
+          this.$store.commit('setVanLoading', true)
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "roleType": "A03",
+           tchCourseInfoList: [{tchCourseId: this.currCourse.tchCourseInfo.tchCourseId,sysCourseId: this.currCourse.tchCourseInfo.sysCourseId}]
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          getCourseInfoResourceCount(params).then(res => {
+            this.$store.commit('setVanLoading', false)
+            if(res.flag) {
+                res.data[0].countViewList.forEach(v => {
+                  if(v.resourceType === 'R01_1'||v.resourceType === 'R01_2') {
+                    this.currCourse.resourceCount.push(v)
+                  }
+                })
+            }
+          })
+        },
+        async getDetail() {
           this.$store.commit('setVanLoading', true)
           let obj = {
             "interUser": "runLfb",
@@ -100,7 +122,7 @@
           let params = {
             requestJson: JSON.stringify(obj)
           }
-          getClassTeachCourseInfo(params).then(res => {
+          await getClassTeachCourseInfo(params).then(res => {
             this.$store.commit('setVanLoading', false)
             if(res.flag) {
               this.currCourse = res.data[0]
@@ -108,8 +130,9 @@
           })
         },
       },
-      activated() {
-          this.getDetail()
+      async activated() {
+          await this.getDetail()
+        this.getCourseInfoResourceCount()
       },
     }
 </script>

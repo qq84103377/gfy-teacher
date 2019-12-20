@@ -505,3 +505,7 @@ export const bindLayeringGroupByTchCourse =(params)=>{
 export const createLayerTestPaper =(params)=>{
   return axios.post('teach/createLayerTestPaper', qs.stringify(params))
 }
+//查询微课和素材数量
+export const getCourseInfoResourceCount =(params)=>{
+  return axios.post('teach/getCourseInfoResourceCount', qs.stringify(params))
+}
