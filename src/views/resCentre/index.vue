@@ -462,6 +462,18 @@
       },
       courseId() {
         if (this.courseId) {
+          for (let i = 1; i < 4; i++) {
+            if(!this.activeNames.includes(i)) {
+              if(i == 1) {
+                this.lessonList = []
+              }else if (i == 2) {
+                this.materialList = []
+              }else if (i == 3) {
+                this.examList = []
+              }
+            }
+
+          }
           this.activeNames.forEach(v => {
             if (v == 1) {
               // 微课
