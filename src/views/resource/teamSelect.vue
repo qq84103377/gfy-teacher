@@ -15,7 +15,7 @@
             {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
           </van-checkbox>
           <div class="team-select-wrap__body__group-wrap">
-            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo| getStudentName(item.classId)}}
+            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]"><span v-if="s.studentNumber>0">{{s.studentNumber}}</span>{{s.accountNo| getStudentName(item.classId)}}
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@
           {{c.className}}
         </van-checkbox>
         <div class="team-select-wrap__body__group-wrap">
-          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">{{s.accountNo|getStudentName(c.classId)}}
+          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]"><span v-if="s.studentNumber>0">{{s.studentNumber}}</span>{{s.accountNo|getStudentName(c.classId)}}
           </div>
         </div>
       </div>
@@ -193,17 +193,19 @@ export default {
         flex-wrap: wrap;
 
         &-item {
-          flex: 0 0 75px;
+          flex: 0 0 98px;
           line-height: 32px;
-          border-radius: 11px;
+          border-radius: 15px;
           font-size: 12px;
-          margin-right: 8px;
+          margin-right: 14px;
           margin-bottom: 10px;
           background: #eee;
           color: #333;
           text-align: center;
-
-          &:nth-child(4n) {
+          >span{
+            margin-right: 7px;
+          }
+          &:nth-child(3n) {
             margin-right: 0;
           }
 
