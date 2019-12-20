@@ -145,6 +145,10 @@
         getTeacherErrorExamDetail(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag && res.data[0]) {
+            //每道题目加上序号
+            res.data[0].examQuestionInfo.forEach((v,i) => {
+              v.title = `<p>${i+1}、</p>${v.title}`
+            })
             this.questionList = res.data[0].examQuestionInfo
            // const selectIds = this.$store.getters.getErrorBookSelected.reduce((t,v) => {
            //     const arr = v.child.map(c => c.examId)

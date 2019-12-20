@@ -1,7 +1,6 @@
 <template>
   <van-popup
     v-model="show"
-    get-container="#app"
     :close-on-click-overlay="false"
     position="bottom"
     :style="{ height: '93%' }">

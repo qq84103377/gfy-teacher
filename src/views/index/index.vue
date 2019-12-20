@@ -43,14 +43,14 @@
           <div class="icon-wrap yellow"><i class="iconGFY icon-res"></i></div>
           <div>资源</div>
         </div>
-        <!--        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">-->
-        <!--          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>-->
-        <!--          <div>分层</div>-->
-        <!--        </div>-->
-        <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">
-          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
-          <div>更多</div>
-        </div>
+                <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">
+                  <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
+                  <div>分层</div>
+                </div>
+<!--        <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">-->
+<!--          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>-->
+<!--          <div>更多</div>-->
+<!--        </div>-->
       </div>
       <div class="jcsb aic mgb10">
         <span class="fs16 black">未结束任务</span>
@@ -180,6 +180,7 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: item.tchCourseClassInfo[0].classGrade,
             title: item.tchCourseClassInfo[0].testPaperName,
+            fromTask: 1
           }
         })
       } else if (item.tastType === 'T03') {
@@ -360,7 +361,9 @@ export default {
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
-          localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
+          // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
+          this.$store.commit('setSchoolMap',schoolMap)
+          eventBus.$emit('checkUpgrade')
           this.getUnFinishCourseTask()
 
           //获取班级学生信息

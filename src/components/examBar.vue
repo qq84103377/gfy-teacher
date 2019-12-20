@@ -139,7 +139,8 @@
         form: {
           name: '',
           difficult: 'D02',
-          share: this.type === 'error' ? 'S01' : 'S02',
+          // share: this.type === 'error' ? 'S01' : 'S02',
+          share: 'S01', //全部共享级别默认都改为个人
           btnLoading: false
         },
         tempList: [],
@@ -154,7 +155,8 @@
           this.form = {
             name: '',
             difficult: 'D02',
-            share: this.type === 'error' ? 'S01' : 'S02',
+            // share: this.type === 'error' ? 'S01' : 'S02',
+            share: 'S01', //全部共享级别默认都改为个人
             btnLoading: false
           }
         }else {

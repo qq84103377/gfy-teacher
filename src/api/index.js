@@ -493,3 +493,19 @@ export const getVersionGradeList =(params)=>{
 export const getTestPaperInfoList =(params)=>{
   return axios.post('resource/getTestPaperInfoList', qs.stringify(params))
 }
+//修改分层情况
+export const updateTchTeachLayerInfo =(params)=>{
+  return axios.post('teach/updateTchTeachLayerInfo', qs.stringify(params))
+}
+//使用分层
+export const bindLayeringGroupByTchCourse =(params)=>{
+  return axios.post('teach/bindLayeringGroupByTchCourse', qs.stringify(params))
+}
+//生成层级试卷
+export const createLayerTestPaper =(params)=>{
+  return axios.post('teach/createLayerTestPaper', qs.stringify(params))
+}
+//查询微课和素材数量
+export const getCourseInfoResourceCount =(params)=>{
+  return axios.post('teach/getCourseInfoResourceCount', qs.stringify(params))
+}

@@ -14,7 +14,7 @@
           </div>
           <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
         </div>
-        <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10"
+        <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10 html-img" @click="previewImg"
              style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
           <div>正确答案及相关解析</div>
           <div>正确答案:</div>
@@ -47,7 +47,7 @@
         </div>
       </div>
     </div>
-    <div v-if="analyseShow" class="question-item-wrap__analyse">
+    <div v-if="analyseShow" class="question-item-wrap__analyse html-img" @click="previewImg">
       <div>试题编号:{{item.examId}}</div>
       <div v-if="item.knowledgePointName">知识点:{{item.knowledgePointName}}</div>
       <div v-if="!item.groupExamList.length">

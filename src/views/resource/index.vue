@@ -21,8 +21,8 @@
         </div>
       </div>
       <div v-if="courseList.length || firstFlag">
-        <van-cell class="fs16" :title="`微课(${resourceCount.find(v => v.resourceType === 'R01').resourceCount})`" is-link @click="goto('/lessonList')" />
-        <van-cell class="fs16" title="素材" is-link @click="goto('/materialList')" />
+        <van-cell class="fs16" :title="`微课(${resourceCount.find(v => v.resourceType === 'R01_1')?resourceCount.find(v => v.resourceType === 'R01_1').resourceCount:0})`" is-link @click="goto('/lessonList')" />
+        <van-cell class="fs16" :title="`素材(${resourceCount.find(v => v.resourceType === 'R01_2')?resourceCount.find(v => v.resourceType === 'R01_2').resourceCount:0})`" is-link @click="goto('/materialList')" />
         <van-cell class="fs16" :title="`试卷(${resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" is-link @click="goto('/examList')" />
         <van-cell class="fs16" :title="`试题(${resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" is-link @click="goto('/questionList')" />
         <van-cell class="fs16" :title="`讨论(${resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" is-link @click="goto('/discussList')" />
@@ -34,7 +34,7 @@
 
 <script>
 import dropdownHeader from '../../components/dropdown-header'
-import { getClassTeachCourseInfo } from '@/api/index'
+import { getClassTeachCourseInfo, getCourseInfoResourceCount } from '@/api/index'
 import editCourse from '../preview/addCourse'
 
 export default {
@@ -80,6 +80,25 @@ export default {
     //   this.courseName = data
     //   this.dropdownRefresh()
     // },
+    getCourseInfoResourceCount() {
+      this.$store.commit('setVanLoading', true)
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "roleType": "A03",
+        tchCourseInfoList: [{tchCourseId: this.tchCourseId,sysCourseId: this.sysCourseId}]
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      getCourseInfoResourceCount(params).then(res => {
+        this.$store.commit('setVanLoading', false)
+        if(res.flag) {
+          this.resourceCount = res.data[0].countViewList
+        }
+      })
+    },
     async changeCourse(type) {
       if (type) {
         //下一题
@@ -93,7 +112,8 @@ export default {
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
             this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
             this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
-            this.resourceCount = this.courseList[this.index].resourceCount
+            // this.resourceCount = this.courseList[this.index].resourceCount
+            this.getCourseInfoResourceCount()
           } else {
             //最后一页
             this.$toast('没有下一课了')
@@ -104,7 +124,8 @@ export default {
           this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
           this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
           this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
-          this.resourceCount = this.courseList[this.index].resourceCount
+          // this.resourceCount = this.courseList[this.index].resourceCount
+          this.getCourseInfoResourceCount()
         }
 
       } else {
@@ -118,7 +139,8 @@ export default {
           this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
           this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
           this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
-          this.resourceCount = this.courseList[this.index].resourceCount
+          // this.resourceCount = this.courseList[this.index].resourceCount
+          this.getCourseInfoResourceCount()
         }
       }
     },
@@ -130,7 +152,7 @@ export default {
     },
     selectCourse(tchCourseInfo, index, resourceCount) {
       this.tchCourseInfo = tchCourseInfo
-      this.resourceCount = resourceCount
+      // this.resourceCount = resourceCount
 
       this.index = index
       this.courseName = tchCourseInfo.courseName
@@ -141,6 +163,7 @@ export default {
       this.classId = tchCourseInfo.tchClassCourseInfo[0].classId
       this.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo
       this.classGrade = tchCourseInfo.classGrade
+      this.getCourseInfoResourceCount()
     },
     async dropdownOnLoad() {
       this.dropdownPage++
@@ -148,12 +171,14 @@ export default {
         return
       }
       await this.getClassTeachCourseInfo()
+      this.getCourseInfoResourceCount()
     },
     async dropdownRefresh() {
       this.dropdownListLoading = false
       this.dropdownFinish = false
       this.dropdownPage = 1
       await this.getClassTeachCourseInfo()
+      this.getCourseInfoResourceCount()
       this.$toast('刷新成功')
     },
     async getClassTeachCourseInfo() {
@@ -186,7 +211,7 @@ export default {
           this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
           if (!this.courseName) {
             this.tchCourseInfo = this.courseList[0].tchCourseInfo
-            this.resourceCount = this.courseList[0].resourceCount
+            // this.resourceCount = this.courseList[0].resourceCount
             //首次取第一条课程的信息
             this.courseName = this.courseList[0].tchCourseInfo.courseName
             this.tchCourseId = this.courseList[0].tchCourseInfo.tchCourseId
@@ -209,35 +234,6 @@ export default {
         this.firstFlag = false
       })
     },
-    getCount(tchCourseIdSelect) {
-      this.$store.commit('setVanLoading', true)
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "operateRoleType": "A02",
-        "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "subjectType": localStorage.getItem("currentSubjectType"),
-        "classGrade": "",
-        "termType": "",
-        "pageSize": "20",
-        "courseType": "C01",
-        "classId": "",
-        "currentPage": 1,
-        tchCourseIdSelect
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      getClassTeachCourseInfo(params).then(res => {
-        this.$store.commit('setVanLoading', false)
-        if (res.flag) {
-          this.resourceCount = res.data[0].resourceCount
-          this.courseList[this.index].resourceCount = this.resourceCount
-        }
-      })
-    },
   },
   created() {
     this.$store.commit('setVanLoading', true)
@@ -245,7 +241,7 @@ export default {
   },
   activated() {
     if (this.tchCourseId) {
-      this.getCount(this.tchCourseId)
+      this.getCourseInfoResourceCount()
     }
   },
 }
