@@ -974,7 +974,7 @@
           };
 
           myChart.setOption(questionOption, true);
-
+          myChart.off('click')
           myChart.on('click', params => {
             console.log(params, '=3=3=');
             const item = objectiveList[params.seriesIndex]

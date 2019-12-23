@@ -58,7 +58,7 @@ export default {
   name: "index",
   data() {
     return {
-      version: "v1.4.8",
+      version: "",
       showUpgrade: false,
       progress: false,
       serverVersion: "1.1.2", //服务器版本号
@@ -78,6 +78,9 @@ export default {
       return "cordova" in window;
     }
   },
+  mounted() {
+    this.getVersion()
+  },
   methods: {
     clearCache() {
       cordova.exec(null, null, "ClearCache", "clearCacheInfo", null);
@@ -90,9 +93,9 @@ export default {
           // 版本号获取
           _this.version = version
         })
-        var platform = device.platform;
-        console.log("deviceready", device.platform);
-        _this.checkUpgrade(platform);
+        // var platform = device.platform;
+        // console.log("deviceready", device.platform);
+        // _this.checkUpgrade(platform);
       }, false)
     },
     checkVersion() {
@@ -104,7 +107,8 @@ export default {
         }
         this.showUpgrade = true; //显示升级弹框
       }else {
-        this.getVersion()
+        let platform = device.platform;
+        this.checkUpgrade(platform);
       }
     },
     //下载安装包

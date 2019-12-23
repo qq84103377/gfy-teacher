@@ -113,6 +113,7 @@
               subjectType: localStorage.currentSubjectType,
               classGrade: this.$route.query.classGrade,
               title: item.testPaperName,
+              fromTask: 1
             }
           })
         }
