@@ -154,7 +154,7 @@
       <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{appraise:{list:appraiseList},taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,info:taskFinishInfo,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
         分享报告
       </van-button>
     </div>

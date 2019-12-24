@@ -1,7 +1,7 @@
 <template>
   <section class="report-all-wrap">
     <van-nav-bar
-      :title="$route.query.stuName+'的家庭报告'"
+      :title="decodeURI($route.query.stuName)+'的家庭报告'"
       @click-left="goBack"
       :left-arrow="isApp"/>
     <div class="report-all-wrap__body">
@@ -102,8 +102,12 @@
     name: "reportAll",
     components: {shareBar},
     computed: {
+      decodeURI() {
+        return decodeURI
+      },
       link() {
-        return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+        const {stuName,accountNo,classId,classGrade,startDate,endDate,operateAccountNo,belongSchoolId} = this.$route.query
+        return `${process.env.VUE_APP_HOST}/#reportAll?stuName=${stuName}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window
@@ -144,7 +148,7 @@
        goBack(){
           this.common.goBack(this)
         },
-        
+
       handleSuggest(currentNum, totalNum, masteryNum) {
         let suggest = ''
         if (calculate.div(currentNum, totalNum) <= 0.8 && totalNum <= 20) {
