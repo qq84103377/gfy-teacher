@@ -281,7 +281,7 @@
               type: 'inside',
               xAxisIndex: [0],
               start: 0,
-              end: xData.length ? Math.ceil(100 / xData.length) : 100
+              end: xData.length>5 ? (5/xData.length)*100:100
             }
           ],
           legend: {

@@ -295,13 +295,16 @@ export default {
           bottom: '1%',
           containLabel: true
         },
-        xAxis: {
+        yAxis: {
           type: 'value',
           boundaryGap: [0, 0.01]
         },
-        yAxis: {
+        xAxis: {
           type: 'category',
-          data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName)
+          data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName),
+          axisLabel: {
+            interval: 0
+          },
         },
         itemStyle: {
           color: '#56F2E3'
@@ -310,15 +313,16 @@ export default {
           {
             name: '知识点分布',
             type: 'bar',
+            barWidth: '50%',
             data: Object.keys(this.examInfo.knowMap).map(v => this.examInfo.knowMap[v])
           }
         ],
         dataZoom: [
           {
             type: 'inside',
-            yAxisIndex: [0],
+            xAxisIndex: [0],
             start: 0,
-            end: 30
+            end: this.examInfo.knowledgePointInfos.length>5?(5/this.examInfo.knowledgePointInfos.length)*100:100,
           }
         ],
       };
@@ -336,7 +340,7 @@ export default {
             type: 'inside',
             xAxisIndex: [0],
             start: 0,
-            end: 30
+            end: this.examInfo.useCount.length>5?(5/this.examInfo.useCount.length)*100:100,
           }
         ],
         grid: {
@@ -395,6 +399,7 @@ export default {
           {
             name: '使用次数',
             type: 'bar',
+            barWidth: '50%',
             data: this.examInfo.useCount.map(v => v.value),
           },
           {
