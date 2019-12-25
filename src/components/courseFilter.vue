@@ -79,7 +79,7 @@
             <van-icon :name="versionDropdown?'arrow-up':'arrow-down'" />
           </div>
           <div v-show="versionDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item" :class="{active: bookIndex== index}" v-for="(item ,index) in bookInfoList" :key="index">{{item.textBookName}}
+            <div class="dropdown-menu-item" @click="changeBook(index)" :class="{active: bookIndex== index}" v-for="(item ,index) in bookInfoList" :key="index">{{item.textBookName}}
               <van-icon v-show="bookIndex== index " class="check blue" name="success" />
             </div>
 
@@ -282,7 +282,7 @@ export default {
     async getTextBookCourseInfo() {
       this.$store.commit('setVanLoading', true)
       this.unitIndex = 0
-      this.bookIndex = 0
+      // this.bookIndex = 0
       // this.unitList = []
       // this.courseList = []
       let obj
@@ -549,6 +549,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
 
     &-left {
       flex: 0 0 125px;
