@@ -12,8 +12,10 @@
       <div class="exam-analyse-wrap__histogram van-hairline--bottom">
         <div class="exam-analyse-wrap__histogram-label divider">知识点分布</div>
         <div id="myChart2" ref="myChart2" class="chart-histogram"></div>
+        <div class="scroll-tip">可在表格内滑动，查看更多内容</div>
       </div>
       <div id="myChart3" ref="myChart3" class="chart-histogram"></div>
+      <div class="scroll-tip">可在表格内滑动，查看更多内容</div>
       <div class="desc">本张试卷包括题型为<span><span v-for="(item,index) in examInfo.titleTypeCount" :key="index">{{item.value}}道{{item.name}},</span></span>难度为<span><span v-for="(item,index) in examInfo.degreeCount" :key="index">{{item.name}}:{{item.value}}%,</span></span>知识点涵盖<span><span v-for="(item,index) in examInfo.knowledgePointInfos" :key="index">{{item.knowledgePointName}}{{index < examInfo.knowledgePointInfos.length-1?'、':'。'}}</span></span>
       </div>
     </div>
@@ -668,6 +670,17 @@ export default {
       background: #f5f6fa;
       padding: 5px 8px;
     }
+  }
+
+  .scroll-tip {
+    margin-top: 10px;
+    margin-left: 20px;
+    display: inline-block;
+    font-size: 10px;
+    color: #999;
+    background: #F5F6FA;
+    border-radius: 2px;
+    padding: 4px 7px;
   }
 
   .backtop {
