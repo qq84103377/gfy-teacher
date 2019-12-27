@@ -1,5 +1,5 @@
 <template>
-  <van-popup get-container="#app" v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
+  <van-popup v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
     <div class="res-filter-wrap">
       <div class="res-filter-wrap__header van-hairline--bottom">
         <div class="res-filter-wrap__header-tab">
@@ -357,6 +357,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
 
     &-left {
       flex: 0 0 95px;

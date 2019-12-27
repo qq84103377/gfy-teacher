@@ -349,6 +349,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
     // overflow-y: auto;
 
     &-left {

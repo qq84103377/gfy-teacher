@@ -204,7 +204,8 @@ export default {
   &__body {
     display: flex;
     flex: 1;
-
+    overflow: hidden;
+    
     &-left {
       flex: 0 0 95px;
       overflow-y: auto;

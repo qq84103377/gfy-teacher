@@ -1,5 +1,5 @@
 <template>
-  <van-popup get-container="#app" v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
+  <van-popup v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
     <div class="grade-pop-wrap">
       <van-icon @click="closePop" class="close" name="close" />
       <div class="grade-pop-wrap__title van-hairline--bottom">科目</div>
@@ -295,7 +295,8 @@ export default {
 
   &__body {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    // overflow-y: auto;
   }
 
   &__footer {

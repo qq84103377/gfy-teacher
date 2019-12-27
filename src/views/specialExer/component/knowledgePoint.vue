@@ -1,19 +1,24 @@
 <template>
   <section class="knowledge-point-wrap">
-    <van-cell title="总复习" style="background: #f5f5f5;color: #999" />
-    <div class="knowledge-point-wrap__tab">
-      <div class="knowledge-point-wrap__tab__wrap">
-        <span v-for='item in list' :key='item.name' class='mglt10 mgr10' :class="{knowledgeActive:item.active}" @click="toggleTab(item)">{{item.name}}</span>
-      </div>
+    <van-cell title="总复习" class="fs16" style="background: #f5f5f5;color: #999" />
+    <div class="null-box" v-if="isRecomment&&list.length">
+      <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+      <p class="fs12" style="text-align: center;color: #999999">本地区无相关知识点，推荐使用以下知识点</p>
     </div>
-    <div class="knowledge-point-wrap__content">
-      <div v-for="item in list2" :key="item">
-        <van-cell v-if='item<6666' :title="item" is-link @click="go(item)" />
-        <van-collapse v-model="activeNames">
-          <van-collapse-item v-if='item>=6666' :title="item" :name="item">
-            <van-cell v-for="(i,index) in list2" :key='index' :title="item" is-link style="background: #f5f5f5" @click="go(item)" />
-          </van-collapse-item>
-        </van-collapse>
+    <div class="null-box" v-if="isRecomment&&!list.length">
+      <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+      <p class="fs12" style="text-align: center;color: #999999">本地区无相关知识点</p>
+    </div>
+    <div class="knowledge-point-wrap__tab" v-if='list.length'>
+      <div class="knowledge-point-wrap__tab__wrap">
+        <span v-for='(item,index) in list' :key='item.nodeName' class='mglt10 mgr10' :class="{knowledgeActive:item.active}" @click="toggleTab(item,index)">{{item.nodeName}}</span>
+      </div>
+      <div class="knowledge-point-wrapp__tab__content">
+        <myCollapse v-if='list[listIndex].child.length' :data.sync='list[listIndex]' @goPage='go'></myCollapse>
+        <div class="null-box" v-else>
+          <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+          <p class="fs12" style="text-align: center;color: #999999">本知识点，暂无分知识点</p>
+        </div>
       </div>
     </div>
 
@@ -21,37 +26,164 @@
 </template>
 
 <script>
+import { getKnowledgeCatalogInfo } from '@/api/index'
+import myCollapse from './myCollapse'
+
 export default {
   name: "knowledgePoint",
+  props: ['start', 'classGrade', 'areaCode', 'courseIds', 'active', 'textBookId', 'gradeTermId'],
   data() {
     return {
-      list: [
-        { name: '数学方程', value: 'Y01', active: true, child: [] },
-        { name: '几何', value: 'Y02', active: false, child: [] },
-        { name: '图像化', value: 'Y03', active: false, child: [] },
-      ],
-      list2: [111, 2222, 3333, 6444, 4555, 5666, 87777, 9888],
-      activeNames: ['1']
+      list: [],
+      listIndex: 0,
+      classList: ['row1', 'row2', 'row3', 'row4', 'row5'],
+      classIndex: -1,
+      toggleFirst: false,
+      isRecomment: false
     }
   },
+  components: {
+    myCollapse
+  },
+  watch: {
+    start(nv, ov) {
+      console.log("start nv", nv);
+      console.log("start ov", ov);
+      if (nv) {
+        this.toggleFirst = true
+        this.getKnowledgeCatalogInfo()
+
+        this.$emit('update:start', false)
+      }
+    },
+    courseIds(nv, ov) {
+      console.log("courseIds nv", nv);
+      console.log("courseIds ov", ov);
+      if (nv) {
+        if (!this.toggleFirst) return
+        console.log("this.$parent", this.$parent);
+        this.list = []
+        this.listIndex = 0
+        this.isRecomment = false
+        this.classIndex = -1
+        this.getKnowledgeCatalogInfo()
+
+        // this.onLoad()
+      }
+    },
+
+  },
   methods: {
-    toggleTab(item) {
+    async getKnowledgeCatalogInfo() {
+      this.$store.commit('setVanLoading', true)
+      this.unitIndex = 0
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "textbookId": this.textBookId,
+        "gradeTermId": this.gradeTermId,
+        "subjectType": localStorage.currentSubjectType,
+      }
+
+      // let obj = {
+      //   "interUser": "runLfb",
+      //   "interPwd": "25d55ad283aa400af464c76d713c07ad",
+      //   "operateAccountNo": '12134',
+      //   "belongSchoolId": '24',
+      //   "textbookId": '998',
+      //   "gradeTermId": '1995',
+      //   "subjectType": 'S01',
+      // }
+
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+
+      getKnowledgeCatalogInfo(params).then(res => {
+        this.$store.commit('setVanLoading', false)
+        console.log("知识点目录：", res)
+        if (res.flag) {
+          this.isRecomment = res.data[0].recommend
+
+          if (!res.data.length||!res.data[0].resultList.length) {
+            return
+          }
+
+          function filterArray(data, parentId) {
+            var tree = [];
+            var temp;
+            for (var i = 0; i < data.length; i++) {
+              if (data[i].parentId == parentId) {
+                var obj = data[i];
+                temp = filterArray(data, data[i].nodeId);
+                if (temp.length > 0) {
+                  obj.child = temp;
+                } else {
+                  obj.child = []
+                }
+                tree.push(obj);
+              }
+            }
+            return tree;
+          }
+
+          let result = filterArray(res.data[0].resultList, '-1')
+          console.log(result, 'result');
+
+
+          this.list = result[0].child
+          this.list[0].active = true
+
+          const that = this
+          function addClass(data, cIndex) {
+            if (data.child) {
+              cIndex++
+              data.child.forEach((element, index) => {
+                element.cName = that.classList[cIndex]
+                addClass(element, cIndex)
+              })
+            }
+          }
+
+          addClass(this.list[0], this.classIndex)
+
+          return
+
+        } else {
+
+        }
+
+      }).catch(err => {
+        this.$store.commit('setVanLoading', false)
+      })
+    },
+    toggleTab(item, index) {
       if (item.active) return
       this.list.forEach(v => {
         this.$set(v, 'active', false)
       })
       this.$set(item, 'active', true)
+      this.listIndex = index
     },
-    go(item) {
-      this.$router.push({        path: `/questionList`, query: {
-          "tchCourseId": this.$route.query.tchCourseId,
-          "sysCourseId": this.$route.query.sysCourseId,
-          "relationSeqId": this.$route.query.relationCourseId,
-          "courseName": this.$route.query.courseName,
-          from: 'examList'
-        }      })
-    }
+    go(item, index) {
+      console.log("?????");
+      this.$router.push({
+        path: `/questionList`,
+        query: {
+          'item': item,
+          'areaCode': this.areaCode,
+          subjectType: localStorage.currentSubjectType,
+          isKnowledgePoint: true,
+          'courseIds': this.courseIds,
+          'classGrade': this.classGrade ? this.classGrade.split('|')[0] : '',
+          gradeTermId: this.gradeTermId,
+          from: 'knowledgePoint'
 
+        }
+      })
+    }
   },
 
 }
@@ -64,14 +196,15 @@ export default {
     width: 100%;
     position: relative;
     overflow-x: scroll;
-    height: 40px;
-    line-height: 40px;
 
     &__wrap {
       height: 100%;
       overflow-x: scroll;
       white-space: nowrap;
       display: flex;
+      height: 35px;
+      line-height: 35px;
+      margin-top: 5px;
 
       > span {
         height: 24px;
@@ -88,11 +221,25 @@ export default {
       background-color: @blue;
       color: #fff;
     }
+
+    &__content {
+      @{deep} .van-collapse-item__content {
+        padding: 0;
+      }
+    }
   }
 
-  &__content {
-    @{deep} .van-collapse-item__content {
-      padding: 0;
+  .null-box {
+    padding: 30px 0;
+    text-align: center;
+    color: #999999;
+    background: #fff;
+    margin-bottom: 20px;  
+    .null-tips {
+      // margin-top: 350px;
+      // margin-left: 50%;
+      // transform: translateX(-50%);
+      width: 60%;
     }
   }
 }

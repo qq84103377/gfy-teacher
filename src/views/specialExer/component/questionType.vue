@@ -1,7 +1,7 @@
 <template>
   <section class="task-stat-wrap">
-    <van-cell title="题型" style="background: #f5f5f5;color: #999" />
-    <van-cell v-for="(item,index) in list" :key="index" :title="item.examTypeName" is-link @click="go(item)" />
+    <van-cell title="题型" class="fs16" style="background: #f5f5f5;color: #999" />
+    <van-cell class="fs16" v-for="(item,index) in list" :key="index" :title="item.examTypeName" is-link @click="go(item)" />
     <!-- <van-cell title="单选题" is-link @click="go(item)" />
     <van-cell title="完形填空" is-link @click="go(item)" /> -->
   </section>

@@ -1,7 +1,7 @@
 <template>
   <section class="review-test-wrap">
     <van-list v-model="listLoading" :finished="finished" @load="onLoad" :finished-text="testList.length>0?'没有更多了':'本地区无相关套卷'" :offset='80'>
-      <van-cell title="试卷" style="background: #f5f5f5;color: #999" />
+      <van-cell title="试卷" class="fs16" style="background: #f5f5f5;color: #999" />
       <div class="null-box" v-if="!testList || testList.length==0">
         <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
         <p class="fs12" style="text-align: center;color: #999999">本地区无相关套卷</p>
@@ -20,8 +20,9 @@
       </div>
       <van-cell v-if="!testList.length" class="mgt10" style="background: #f5f5f5;color: #999">
         <template slot="title">
-          <span class="custom-title">为您推荐</span>
-          <span class="red fs10" v-if='totalNumber'>
+          <span class="fs16">为您推荐</span>
+          <img class="light" src="../../../assets/img/icon-light.png" alt="">
+          <span class="red fs12" v-if='totalNumber'>
             已推荐<span>{{totalNumber}}</span>套同教材复习套卷
           </span>
         </template>
@@ -61,7 +62,8 @@ export default {
       finished: false,
       without: false,
       reviewTestType: this.$store.state.reviewTestType,
-      totalNumber: 0
+      totalNumber: 0,
+      toggleFirst:false
     }
   },
   filters: {
@@ -74,6 +76,8 @@ export default {
       console.log("start nv", nv);
       console.log("start ov", ov);
       if (nv) {
+        this.toggleFirst=true
+
         this.onLoad()
         // this.getTestPaperInfoList()
         this.$emit('update:start', false)
@@ -82,6 +86,7 @@ export default {
     areaCode(nv, ov) {
       console.log("areaCode nv", nv);
       console.log("areaCode ov", ov);
+      if (!this.toggleFirst) return
       // this.testList= []
       // this.recommendList= []
       this.currentPage = 0
@@ -97,6 +102,7 @@ export default {
       console.log("changeGradeSubject nv", nv);
       console.log("changeGradeSubject ov", ov);
       if (nv) {
+        if (!this.toggleFirst) return
         console.log("this.$parent", this.$parent);
         this.$parent.changeGradeSubject = false
         this.currentPage = 0
@@ -112,6 +118,7 @@ export default {
       console.log("changeMore nv", nv);
       console.log("changeMore ov", ov);
       if (nv) {
+        if (!this.toggleFirst) return
         console.log("this.$parent", this.$parent);
         this.$parent.changeMore = false
         this.currentPage = 0
@@ -285,6 +292,11 @@ export default {
 .fs14 {
   height: 30px;
   line-height: 30px;
+}
+.light{
+  width: 12px;
+  height: 15px;
+  margin-left: 5px;
 }
 .null-box {
   padding: 30px 0;

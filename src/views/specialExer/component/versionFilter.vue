@@ -40,7 +40,7 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "versionFilter",
-  props: ['visible', 'label', 'gradeTerm', 'courseIds','subjectLabel'],
+  props: ['visible', 'label', 'gradeTerm', 'courseIds','subjectLabel','textBookId','gradeTermId'],
   data() {
     return {
       index: 0,
@@ -54,8 +54,7 @@ export default {
       tempList: [],
       tempIndex: 0,
 
-      textBookId: '',
-      gradeTermId: '',
+      // gradeTermId: '',
       subjectType: '',
 
       textItem: '',
@@ -113,7 +112,8 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        "textBookId": this.textItem ? this.textItem.textBookId : '',
+        // "textBookId": this.textItem ? this.textItem.textBookId : '',
+        "textBookId": this.textBookId,
         "gradeTermId": this.gradeTermItem ? this.gradeTermItem.gradeTermId : '',
         "subjectType": localStorage.currentSubjectType,
         'nodeType': 'N00'
@@ -124,7 +124,7 @@ export default {
 
       getTextBookCourseInfo(params).then(res => {
         this.$store.commit('setVanLoading', false)
-        // console.log("课程：", res)
+        console.log("课程：", res)
         if (res.flag) {
           if (res.resTextbookCourseInfoList && res.resTextbookCourseInfoList.length > 0) {
             let textBookList = res.resTextbookCourseInfoList
@@ -137,6 +137,8 @@ export default {
             this.$emit('update:courseIds', newArr)
           }
 
+        }else{
+          this.$emit('update:courseIds', [])
         }
         return
       })
@@ -195,6 +197,9 @@ export default {
               this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
               this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
 
+              this.$emit('update:textBookId', this.textItem.textBookId)
+              this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
+
               this.getTextBookCourseInfo()
               return
             }
@@ -212,6 +217,9 @@ export default {
 
               this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
               this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
+
+              this.$emit('update:textBookId', this.textItem.textBookId)
+              this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
               this.getTextBookCourseInfo()
 
@@ -232,6 +240,8 @@ export default {
 
               this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
               this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
+              this.$emit('update:textBookId', textItem.textBookId)
+              this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
               this.getTextBookCourseInfo()
 
@@ -257,6 +267,7 @@ export default {
 
                 this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
                 this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
+                this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
                 this.getTextBookCourseInfo()
               } else {
@@ -265,9 +276,12 @@ export default {
 
                 this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
                 this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
+                this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
                 this.getTextBookCourseInfo()
               }
+
+              this.$emit('update:textBookId', this.textItem.textBookId)
             } else {
               this.textItem = this.versionList.arr[0]
               this.$set(this.versionList.arr[0], 'active', true)
@@ -277,6 +291,9 @@ export default {
 
               this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
               this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
+
+              this.$emit('update:textBookId', this.textItem.textBookId)
+              this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
               this.getTextBookCourseInfo()
 
@@ -297,7 +314,9 @@ export default {
                 this.$emit('update:gradeTerm', this.versionList.arr[0].gradeList[0].grade + '|' + this.versionList.arr[0].gradeList[0].term)
 
                 this.gradeTermItem = this.versionList.arr[0].gradeList[0]
-                // eventBus.$emit('changeVersion',{textBookId:ver.textBookId,gradeTermId:v.gradeList[0].gradeTermId})
+                
+                this.$emit('update:textBookId', this.textItem.textBookId)
+                this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 
                 this.getTextBookCourseInfo()
               }
@@ -308,6 +327,9 @@ export default {
 
             this.$emit('update:label', "")
             this.$emit('update:gradeTerm', '')
+
+            this.$emit('update:textBookId', '')
+            this.$emit('update:gradeTermId', '')
 
             this.gradeTermItem = ''
             this.getTextBookCourseInfo()
@@ -337,6 +359,8 @@ export default {
         this.$emit('update:label', this.textItem.textBookName + this.gradeTermItem.gradeTermName)
         this.$emit('update:gradeTerm', this.gradeTermItem.grade + '|' + this.gradeTermItem.term)
         this.getTextBookCourseInfo()
+        this.$emit('update:textBookId', this.textItem.textBookId)
+        this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
         this.show = false
       } else {
         return this.$toast('请选择年级')
@@ -432,6 +456,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
 
     &-left {
       flex: 0 0 95px;

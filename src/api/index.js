@@ -493,3 +493,7 @@ export const getVersionGradeList =(params)=>{
 export const getTestPaperInfoList =(params)=>{
   return axios.post('resource/getTestPaperInfoList', qs.stringify(params))
 }
+//获取知识点目录列表
+export const getKnowledgeCatalogInfo =(params)=>{
+  return axios.post('resource/getKnowledgeCatalogInfo', qs.stringify(params))
+}
