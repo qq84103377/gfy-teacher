@@ -52,8 +52,6 @@
 
     <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
 
-    <!-- <point-subject-filter :label.sync="pointSubjectLabel" :visible.sync="pointSubjectFilterShow" :subjectType.sync='subjectType'></point-subject-filter> -->
-
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></version-filter>
 
     <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
@@ -80,7 +78,6 @@ import {  getResCourseWareInfo,
 import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
 import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
-import pointSubjectFilter from './component/pointSubjectFilter'
 import versionFilter from './component/versionFilter'
 import gradeSubjectFilter from './component/gradeSubjectFilter'
 import moreFilter from './component/moreFilter'
@@ -93,7 +90,6 @@ export default {
     questionType,
     knowledgePoint,
     filterPanel,
-    pointSubjectFilter,
     yearSubjectFilter,
     versionFilter,
     gradeSubjectFilter,
@@ -198,6 +194,7 @@ export default {
       }
     },
 
+    // 获取地区列表
     async getSysAreaList() {
       this.$store.commit('setVanLoading', true)
       let obj = {
@@ -293,6 +290,7 @@ export default {
 
       )
     },
+
     //获取学校信息
     async getMySchoolInfo() {
       let obj = {
@@ -351,36 +349,40 @@ export default {
         this.toggleNum2 = 0
       })
     },
-    async getSysDictList() {
-      const json = {
-        requestJson: JSON.stringify({
-          interUser: "123",
-          interPwd: "123",
-          dictCode: "Domain_Exam_Belong_Type"
-        })
-      }
-      await getSysDictList(json).then(res => {
-        // console.log(res, 'getSysDictList res');
-        if (res.flag) {
-          this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
-            return {
-              name: item.dictValue,
-              value: item.dictKey,
-              active: false
-            };
-          });
-          var temp = {
-            name: "不限",
-            value: "",
-            active: true
-          };
-          this.reviewtypeList.unshift(temp);
-          this.reviewMoreLable = this.reviewtypeList[0].value;
-        }
-      }).catch(err => {
-        this.toggleNum2 = 0
-      })
-    },
+
+    // // 获取地区列表
+    // async getSysDictList() {
+    //   const json = {
+    //     requestJson: JSON.stringify({
+    //       interUser: "123",
+    //       interPwd: "123",
+    //       dictCode: "Domain_Exam_Belong_Type"
+    //     })
+    //   }
+    //   await getSysDictList(json).then(res => {
+    //     // console.log(res, 'getSysDictList res');
+    //     if (res.flag) {
+    //       this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
+    //         return {
+    //           name: item.dictValue,
+    //           value: item.dictKey,
+    //           active: false
+    //         };
+    //       });
+    //       var temp = {
+    //         name: "不限",
+    //         value: "",
+    //         active: true
+    //       };
+    //       this.reviewtypeList.unshift(temp);
+    //       this.reviewMoreLable = this.reviewtypeList[0].value;
+    //     }
+    //   }).catch(err => {
+    //     this.toggleNum2 = 0
+    //   })
+    // },
+
+    // 获取更多年份列表
     getYearList() {
       let d = new Date()
       let nowYear = +d.getFullYear() + 2;
@@ -410,13 +412,7 @@ export default {
 
   },
   async mounted() {
-    // this.gettestbookVersionInfo()
-    // this.getSubjectType()
-
     this.getSysAreaList()
-    // this.getSubjectList()
-    // await this.getMySchoolInfo()
-
   }
 }
 

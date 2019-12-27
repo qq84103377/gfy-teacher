@@ -74,6 +74,7 @@ export default {
 
   },
   methods: {
+    // 获取知识点目录信息
     async getKnowledgeCatalogInfo() {
       this.$store.commit('setVanLoading', true)
       this.unitIndex = 0

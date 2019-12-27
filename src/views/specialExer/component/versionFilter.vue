@@ -40,7 +40,7 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "versionFilter",
-  props: ['visible', 'label', 'gradeTerm', 'courseIds','subjectLabel','textBookId','gradeTermId'],
+  props: ['visible', 'label', 'gradeTerm', 'courseIds', 'subjectLabel', 'textBookId', 'gradeTermId'],
   data() {
     return {
       index: 0,
@@ -104,6 +104,7 @@ export default {
   },
 
   methods: {
+    // 获取教材信息courseId
     async getTextBookCourseInfo() {
       this.$store.commit('setVanLoading', true)
       this.unitIndex = 0
@@ -137,13 +138,14 @@ export default {
             this.$emit('update:courseIds', newArr)
           }
 
-        }else{
+        } else {
           this.$emit('update:courseIds', [])
         }
         return
       })
     },
 
+    // 获取教材版本信息
     getVersionGradeList(yearSection, subjectType) {
       this.$store.commit('setVanLoading', true)
       // if(this.filter.subjectList[index].versionDone) return
@@ -171,7 +173,7 @@ export default {
           this.versionList.year = yearSection
 
           if (this.versionList.arr.length > 0) {
-            
+
             const classMap = JSON.parse(localStorage.classMap)
             let arr = []
             let arrItem, textBookId, classGrade, termType
@@ -314,7 +316,7 @@ export default {
                 this.$emit('update:gradeTerm', this.versionList.arr[0].gradeList[0].grade + '|' + this.versionList.arr[0].gradeList[0].term)
 
                 this.gradeTermItem = this.versionList.arr[0].gradeList[0]
-                
+
                 this.$emit('update:textBookId', this.textItem.textBookId)
                 this.$emit('update:gradeTermId', this.gradeTermItem.gradeTermId)
 

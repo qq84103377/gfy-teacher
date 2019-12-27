@@ -133,6 +133,7 @@ export default {
 
   },
   methods: {
+    // 获取该老师学科列表
     getSubjectList() {
       const classMap = JSON.parse(localStorage.classMap)
       let list1 = [], list2 = [], list3 = []
@@ -281,6 +282,7 @@ export default {
       // this.$emit('selectParent', index)
     },
 
+    // 获取题型列表
     getExamSectionTypeRelation(currentSubjectType) {
       let obj = {
         "interUser": "runLfb",

@@ -21,7 +21,7 @@
       <van-cell v-if="!testList.length" class="mgt10" style="background: #f5f5f5;color: #999">
         <template slot="title">
           <span class="fs16">为您推荐</span>
-          <img class="light" src="../../../assets/img/icon-light.png" alt="">
+          <img class="light" v-if='totalNumber' src="../../../assets/img/icon-light.png" alt="">
           <span class="red fs12" v-if='totalNumber'>
             已推荐<span>{{totalNumber}}</span>套同教材复习套卷
           </span>
@@ -178,6 +178,8 @@ export default {
       }
 
     },
+
+    // 获取试卷列表信息
     async getTestPaperInfoList() {
       console.log('getTestPaperInfoList');
       let params = {
@@ -245,6 +247,8 @@ export default {
         this.testList = this.testList.concat(response.data)
       }
     },
+
+    // 获取试卷推荐列表信息
     async getTestPaperInfoList2() {
       console.log('getTestPaperInfoList2');
       let params = {
