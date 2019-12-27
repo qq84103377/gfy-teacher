@@ -345,7 +345,7 @@
         updateTchTeachLayerInfo(params).then(async res => {
           if (res.flag) {
             this.scoreEditVisible = false
-            this.isEdit = false
+            this.isEdit = true
             this.dropdownShow = false
             this.stuMoveVisible = false
             await this.getLayerTaskInfoDetail()
