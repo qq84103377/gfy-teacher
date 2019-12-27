@@ -201,6 +201,7 @@ export default {
         } else {
           this.termIndex = 0
         }
+        this.$emit('init',this.classGradeList[this.gradeIndex].classGrade,this.termTypeList[this.termIndex])
         this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
@@ -432,7 +433,7 @@ export default {
       if (this.type === 'myCourse') {
         this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
       } else {
-        this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade)
+        this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
       }
     },
 
