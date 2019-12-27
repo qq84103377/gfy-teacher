@@ -102,6 +102,7 @@ export default {
 
   },
   methods: {
+    // 重构 获取科目 年级 学期列表
     getLists() {
       const classMap = JSON.parse(localStorage.classMap)
       let classMapArr = Object.values(classMap)
@@ -175,14 +176,6 @@ export default {
       this.yearSubjectList = this.tempYearList
       this.termList = this.tempTermList
       this.subjectList = this.tempSubjectList
-      // this.$emit('update:subjectList', this.tempSubjectList)
-
-      // this.subjectList.forEach(v => {
-      //   this.$set(v, 'active', false)
-      //   if (v.name == this.subjectNow) {
-      //     this.$set(v, 'active', true)
-      //   }
-      // })
 
       this.show = false
     },
@@ -349,6 +342,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
     // overflow-y: auto;
 
     &-left {

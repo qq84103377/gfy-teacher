@@ -80,7 +80,7 @@
             </van-radio-group>
           </div>
         </van-cell>
-        <van-cell v-if="(canAddCourse && !isRevert)||(qesTypeName)" class="add-exam-wrap__cell">
+        <van-cell v-if="(canAddCourse && !isRevert)||(qesTypeName)||(knowledgePoint)" class="add-exam-wrap__cell">
           <div slot="title">
             <div style="display: flex;">
               <div class="fs15 mgr10"><span class="red">*</span>添加到课程: </div>
@@ -110,7 +110,7 @@
   import { mapMutations, mapGetters, mapState } from 'vuex'
 
   export default {
-    props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length','qesTypeName'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务. qesTypeName题型专项进来的题型名字
+    props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length','qesTypeName','knowledgePoint'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务. qesTypeName题型专项进来的题型名字
     name: "examBar",
     components: {filterPanel},
     model: {
@@ -147,6 +147,7 @@
         selectCourse: '',
         courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
         // isRevert: false, //是否显示返回按钮
+        knowledgePointIndex:1
       }
     },
     watch: {
@@ -180,6 +181,11 @@
             if(this.qesTypeName) {
               this.getClassTeachCourseInfo()
               this.form.name = `《${this.qesTypeName}》复习卷`
+            }
+
+            if(this.knowledgePoint) {
+              this.getClassTeachCourseInfo()
+              this.form.name = `《${this.knowledgePoint+this.knowledgePointIndex}》`
             }
 
           }else if (this.$route.path === '/examDetail') {
@@ -294,7 +300,7 @@
           console.log(this.canAddCourse);
           if (res.flag) {
             //先判断canAddCourse能否选择加入课
-            if((this.canAddCourse && !this.isRevert)||this.qesTypeName){
+            if((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint){
               if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId) {
                 // 有选择加入的课程
                 this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
@@ -306,6 +312,8 @@
               //不能选择课程,即有默认课程
               this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }
+
+            this.knowledgePointIndex++
           } else {
             this.$toast(res.msg)
           }
@@ -319,9 +327,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
-          "sysCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName) ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
-          "relationSeqId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName) ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
+          "tchCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
+          "sysCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
+          "relationSeqId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -428,7 +436,7 @@
                 }
               })
             }else {
-              if((this.canAddCourse && !this.isRevert)||this.qesTypeName) {
+              if((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) {
                 if(this.$route.path === '/examDetail') {
                   this.$emit('addDone',name)
                 }else {

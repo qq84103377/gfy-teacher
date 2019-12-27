@@ -2,48 +2,48 @@
   <section class="question-type-wrap">
     <van-row class="question-type-wrap__tit">
       <van-col span="8" :class="{ active: active == 0 }" @click="active = 0">题型专项</van-col>
-      <van-col span="8" :class="{ active: active == 1 }" @click="active = 1">知识点专项</van-col>
+      <van-col span="8" :class="{ active: active == 1 }" @click="active = 1;changeTab(1)">知识点专项</van-col>
       <van-col span="8" :class="{ active: active == 2 }" @click="active = 2;changeTab(2)">复习套卷</van-col>
     </van-row>
 
     <div class="question-type-wrap__body">
-      <van-cell title="筛选" style="background: #f5f5f5;color: #999" />
+      <van-cell title="筛选" style="background: #f5f5f5;color: #999" class="fs16"/>
 
-      <van-cell @click="areaFilterShow=true" title="地区" is-link>
+      <van-cell @click="areaFilterShow=true" title="地区" class="fs16" is-link>
         <div class="blue">{{areaLabel}}</div>
       </van-cell>
 
-      <van-cell v-if="active == 0" @click="typeSubjectFilterShow=true" title="科目" is-link>
+      <van-cell v-if="active!=2" @click="typeSubjectFilterShow=true" title="科目" class="fs16" is-link>
         <div class="blue">
           {{typeSubjectLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-if="active == 1" @click="pointSubjectFilterShow=true" title="科目" is-link>
+      <!-- <van-cell v-if="active == 1" @click="pointSubjectFilterShow=true" title="科目" is-link>
         <div class="blue">
           {{pointSubjectLabel}}
         </div>
-      </van-cell>
+      </van-cell> -->
 
-      <van-cell v-if="active == 2" @click="gradeSubjectShow=true" title="年级学科" is-link>
+      <van-cell v-if="active == 2" @click="gradeSubjectShow=true" title="年级学科" class="fs16" is-link>
         <div class="blue">
           {{gradeSubjectLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" is-link>
+      <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" class="fs16" is-link>
         <div class="blue">
           {{versionLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-else @click="reviewMoreShow=true" title="更多" is-link>
+      <van-cell v-else @click="reviewMoreShow=true" title="更多" class="fs16" is-link>
         <div class="blue">{{reviewMoreLable}}</div>
       </van-cell>
 
       <question-type v-show="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
 
-      <knowledge-point v-show="active == 1"></knowledge-point>
+      <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
 
       <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
     </div>
@@ -52,9 +52,7 @@
 
     <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
 
-    <point-subject-filter :label.sync="pointSubjectLabel" :visible.sync="pointSubjectFilterShow" :subjectType.sync='subjectType'></point-subject-filter>
-
-    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel'></version-filter>
+    <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></version-filter>
 
     <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
 
@@ -80,7 +78,6 @@ import {  getResCourseWareInfo,
 import { sysAreaApi, teachApi, pubApi } from '@/api/parent-GFY'
 import { getGradeName, getSubjectName, toHump } from "../../utils/filter";
 
-import pointSubjectFilter from './component/pointSubjectFilter'
 import versionFilter from './component/versionFilter'
 import gradeSubjectFilter from './component/gradeSubjectFilter'
 import moreFilter from './component/moreFilter'
@@ -93,7 +90,6 @@ export default {
     questionType,
     knowledgePoint,
     filterPanel,
-    pointSubjectFilter,
     yearSubjectFilter,
     versionFilter,
     gradeSubjectFilter,
@@ -131,9 +127,11 @@ export default {
       versionFilterShow: false,
       versionLabel: '',
 
+      textBookId: '',//教材id
       gradeTerm: '', //年级学期
-      typesList: [], //题型列表
+      gradeTermId: '',//学期id
       courseIds: [], //课程ids
+      typesList: [], //题型列表
 
       gradeSubjectLabel: '',
       gradeSubjectShow: false,
@@ -196,6 +194,7 @@ export default {
       }
     },
 
+    // 获取地区列表
     async getSysAreaList() {
       this.$store.commit('setVanLoading', true)
       let obj = {
@@ -291,6 +290,7 @@ export default {
 
       )
     },
+
     //获取学校信息
     async getMySchoolInfo() {
       let obj = {
@@ -349,36 +349,40 @@ export default {
         this.toggleNum2 = 0
       })
     },
-    async getSysDictList() {
-      const json = {
-        requestJson: JSON.stringify({
-          interUser: "123",
-          interPwd: "123",
-          dictCode: "Domain_Exam_Belong_Type"
-        })
-      }
-      await getSysDictList(json).then(res => {
-        // console.log(res, 'getSysDictList res');
-        if (res.flag) {
-          this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
-            return {
-              name: item.dictValue,
-              value: item.dictKey,
-              active: false
-            };
-          });
-          var temp = {
-            name: "不限",
-            value: "",
-            active: true
-          };
-          this.reviewtypeList.unshift(temp);
-          this.reviewMoreLable = this.reviewtypeList[0].value;
-        }
-      }).catch(err => {
-        this.toggleNum2 = 0
-      })
-    },
+
+    // // 获取地区列表
+    // async getSysDictList() {
+    //   const json = {
+    //     requestJson: JSON.stringify({
+    //       interUser: "123",
+    //       interPwd: "123",
+    //       dictCode: "Domain_Exam_Belong_Type"
+    //     })
+    //   }
+    //   await getSysDictList(json).then(res => {
+    //     // console.log(res, 'getSysDictList res');
+    //     if (res.flag) {
+    //       this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
+    //         return {
+    //           name: item.dictValue,
+    //           value: item.dictKey,
+    //           active: false
+    //         };
+    //       });
+    //       var temp = {
+    //         name: "不限",
+    //         value: "",
+    //         active: true
+    //       };
+    //       this.reviewtypeList.unshift(temp);
+    //       this.reviewMoreLable = this.reviewtypeList[0].value;
+    //     }
+    //   }).catch(err => {
+    //     this.toggleNum2 = 0
+    //   })
+    // },
+
+    // 获取更多年份列表
     getYearList() {
       let d = new Date()
       let nowYear = +d.getFullYear() + 2;
@@ -408,13 +412,7 @@ export default {
 
   },
   async mounted() {
-    // this.gettestbookVersionInfo()
-    // this.getSubjectType()
-
     this.getSysAreaList()
-    // this.getSubjectList()
-    // await this.getMySchoolInfo()
-
   }
 }
 

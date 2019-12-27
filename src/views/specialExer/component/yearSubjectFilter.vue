@@ -1,5 +1,5 @@
 <template>
-  <van-popup get-container="#app" v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
+  <van-popup v-model="show" :close-on-click-overlay="false" position="bottom" :style="{ height: '93%' }">
     <div class="res-filter-wrap">
       <div class="res-filter-wrap__header van-hairline--bottom">
         <div class="res-filter-wrap__header-tab">
@@ -133,6 +133,7 @@ export default {
 
   },
   methods: {
+    // 获取该老师学科列表
     getSubjectList() {
       const classMap = JSON.parse(localStorage.classMap)
       let list1 = [], list2 = [], list3 = []
@@ -281,6 +282,7 @@ export default {
       // this.$emit('selectParent', index)
     },
 
+    // 获取题型列表
     getExamSectionTypeRelation(currentSubjectType) {
       let obj = {
         "interUser": "runLfb",
@@ -357,6 +359,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
 
     &-left {
       flex: 0 0 95px;

@@ -70,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName'></exam-bar>
+    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName' :knowledgePoint='knowledgePoint'></exam-bar>
   </section>
 </template>
 
@@ -89,7 +89,9 @@ export default {
       title: '试题',
       isRes: this.$route.query.isRes,
       isQuestionType: this.$route.query.isQuestionType,
+      isKnowledgePoint: this.$route.query.isKnowledgePoint,
       qesTypeName: this.$route.query.item?this.$route.query.item.examTypeName:'',
+      knowledgePoint:'知识点专项训练测试卷',
       selectList: [], //添加的试题列表
       addInfo: {},
       correctInfo: {},
@@ -475,6 +477,66 @@ export default {
           'areaCode': this.$route.query.areaCode,
           "sysCourseIdList": this.$route.query.courseIds,
           // "sysCourseIdList": [0, 6450],
+          "pageSize": "10",
+          "currentPage": page,
+
+          "filterParam": {
+            "keyWord": '',
+            "titleType": this.filterParam.titleType,
+            "titleDegree": this.filterParam.titleDegree,
+            "belongType": this.filterParam.belongType,
+            titleTypeList: null,
+            belongAreaCode: null,
+            createYear: null,
+            shareType: null
+          }
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        getResExamInfo(params).then(res => {
+          console.log(res, '题型专项getResExamInfo res');
+          if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
+          this.listLoading = false
+          this.refLoading = false
+          this.total = res.total
+          if (res.flag && res.examQuestionList) {
+            this.list = page === 1 ? res.examQuestionList : this.list.concat(res.examQuestionList)
+            if (page >= res.total) {
+              this.finished = true
+            }
+          } else {
+            this.list = page === 1 ? [] : this.list.concat([])
+            this.finished = true
+          }
+          this.list.forEach(v => {
+            v.groupExamList = v.groupExamList || []
+          })
+          // 加载列表时需要对已添加的试题修改状态
+          this.selectList.forEach(s => {
+            s.child.forEach(c => {
+              this.list.forEach(v => {
+                if (c.examId === v.examId) {
+                  this.$set(v, 'isRemove', true)
+                }
+              })
+            })
+          })
+        })
+      }else if (this.$route.query.isKnowledgePoint) {
+        console.log("来自知识点专项");
+        //知识点专项过来的
+       
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "orderByType": this.filterParam.orderByType,
+          'areaCode': this.$route.query.areaCode,
+          // "sysCourseIdList": this.$route.query.courseIds,
+          "sysCourseIdList": [0, 6450],
           "pageSize": "10",
           "currentPage": page,
 

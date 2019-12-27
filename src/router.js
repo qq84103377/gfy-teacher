@@ -609,6 +609,7 @@ export default new Router({
         },
         {
           path: "/specialExer",
+          name: 'specialExer',
           component: () => import("./views/specialExer/index.vue"),
           meta: {
             isShowHeader: true,

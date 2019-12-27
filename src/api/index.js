@@ -509,3 +509,7 @@ export const createLayerTestPaper =(params)=>{
 export const getCourseInfoResourceCount =(params)=>{
   return axios.post('teach/getCourseInfoResourceCount', qs.stringify(params))
 }
+//获取知识点目录列表
+export const getKnowledgeCatalogInfo =(params)=>{
+  return axios.post('resource/getKnowledgeCatalogInfo', qs.stringify(params))
+}
