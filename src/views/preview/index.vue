@@ -172,6 +172,7 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: this.classGrade,
             title: item.testPaperName,
+            fromTask: 1
           }
         })
       } else if (item.taskType === 'T03') {
@@ -347,6 +348,7 @@ export default {
             } else {
               this.courseList = this.courseList.concat(res.data)
             }
+            this.tchCourseInfo = this.courseList[0].tchCourseInfo
             // this.courseList = page === 1 ? res.data.unshift(...this.$route.query.currCourse) : this.courseList.concat(res.data)
 
           } else {

@@ -1,7 +1,7 @@
 <template>
   <section class="report-all-wrap">
     <van-nav-bar
-      :title="$route.query.stuName+'的家庭报告'"
+      :title="decodeURI($route.query.stuName)+'的家庭报告'"
       @click-left="goBack"
       :left-arrow="isApp"/>
     <div class="report-all-wrap__body">
@@ -11,6 +11,7 @@
           <div class="fs15 mgt10">{{index+1}}.{{item.subjectName}}</div>
           <div style="position: relative;">
             <div :id="'knowledge'+index" class="histogram-chart mgt10"></div>
+            <div class="tip">可在表格内滑动，查看更多内容</div>
             <div class="empty-tip" v-if="!item.kngArr.length">当前无数据~</div>
           </div>
           <div class="stat-table">
@@ -50,6 +51,7 @@
           <div class="fs15 mgt10">{{index+1}}.{{item.subjectName}}</div>
           <div style="position: relative;">
             <div :id="'task'+index" class="histogram-chart mgt10"></div>
+            <div class="tip">可在表格内滑动，查看更多内容</div>
             <div class="empty-tip" v-if="!item.statInfo.arrLength">当前无数据~</div>
           </div>
           <div class="data-analyse fs12">
@@ -68,6 +70,7 @@
           <div class="fs15 mgt10">{{index+1}}.{{item.subjectName}}</div>
           <div style="position: relative;">
             <div :id="'score'+index" class="histogram-chart mgt10"></div>
+            <div class="tip">可在表格内滑动，查看更多内容</div>
             <div class="empty-tip" v-if="!item.scoreInfo.minDate">当前无数据~</div>
           </div>
           <div class="data-analyse fs12">
@@ -102,8 +105,12 @@
     name: "reportAll",
     components: {shareBar},
     computed: {
+      decodeURI() {
+        return decodeURI
+      },
       link() {
-        return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+        const {stuName,accountNo,classId,classGrade,startDate,endDate,operateAccountNo,belongSchoolId} = this.$route.query
+        return `${process.env.VUE_APP_HOST}/#reportAll?stuName=${stuName}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window
@@ -144,7 +151,7 @@
        goBack(){
           this.common.goBack(this)
         },
-        
+
       handleSuggest(currentNum, totalNum, masteryNum) {
         let suggest = ''
         if (calculate.div(currentNum, totalNum) <= 0.8 && totalNum <= 20) {

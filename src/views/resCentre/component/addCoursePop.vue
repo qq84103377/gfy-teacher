@@ -1,7 +1,6 @@
 <template>
   <van-popup
     v-model="show"
-    get-container="#app"
     :closeable="true"
     close-icon="close"
     :close-on-click-overlay="false"
@@ -33,6 +32,7 @@
 
 <script>
   import {addTeachCourseRes} from '@/api/index'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "addCoursePop",

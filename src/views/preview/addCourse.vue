@@ -121,7 +121,7 @@
     </div>
     <!--<div class="mask"  v-show="showMask"></div>-->
 
-    <course-filter :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+    <course-filter @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
   </section>
 </template>
 
@@ -164,8 +164,9 @@ export default {
       timeType: {},
       currentClassId: '',
       selectCourseName: '',
-      isSelect: true
-
+      isSelect: true,
+      term: '',
+      shareFlag: false,
     }
   },
   computed: {
@@ -250,6 +251,17 @@ export default {
         }
       },
     },
+    'form.name'(v) {
+      if(!v.length) {
+        this.shareCourseList = []
+        this.form.course = 0;
+        this.result = []
+        this.shareFlag = false
+        this.showMask = false
+        this.isSelect = true
+        this.currentShareCourse.courseId = ''
+      }
+    }
   },
   components: { courseFilter },
   mounted() {
@@ -333,6 +345,10 @@ export default {
     //this.getClassTeacherCourseDeploy()
   },
   methods: {
+    initData(classGrade,term) {
+      this.currentShareCourse.classGrade = classGrade
+      this.term = term
+    },
     resetData() {
       this.loadingEdit = false
       this.loadingSubmit = false
@@ -441,13 +457,16 @@ export default {
       this.currentShareCourse = this.sysCourseList[index]
 
       this.form.name = this.sysCourseList[index].nodeName
+      this.shareFlag = false
+      this.isSelect = true
+
       this.getShareCourseDetailV2()
       this.showMask = false
       console.log(this.currentShareCourse)
     },
     getShareCourseDetailV2() {
       this.isSelect = !this.isSelect
-      if (this.shareCourseList.length) {
+      if (this.shareFlag) {
         return
       }
       let obj = {
@@ -461,18 +480,19 @@ export default {
         "subjectType": localStorage.getItem("currentSubjectType"),
         "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
         "pageSize": "100",
-        //"termType": "T01",
+        "termType": this.term,
         "currentPage": "1"
       };
       let params = {
         requestJson: JSON.stringify(obj)
       }
       getShareCourseDetailV2(params).then(res => {
+        this.shareFlag = true
         if (res.flag) {
           this.shareCourseList = res.shareCourseDetailList
           this.form.course = 0;
           this.result = []
-          if (this.shareCourseList) {
+          if (this.shareCourseList.length) {
             this.sysCourseId = this.shareCourseList[0].sysCourseId
             let classGrade = this.shareCourseList[0].classGrade
             if (classGrade) {
@@ -484,6 +504,8 @@ export default {
               }
             }
 
+          }else {
+            this.$toast('没有共享课程')
           }
         } else {
           this.$toast(res.msg);
@@ -688,11 +710,15 @@ export default {
         }
       });
     },
-    handleSysCourse(name, id, grade) {
+    handleSysCourse(name, id, grade, term) {
       console.log(name, id, grade)
       this.form.name = name
       this.currentShareCourse['courseId'] = id
       this.currentShareCourse['classGrade'] = grade
+      this.term = term
+      this.shareFlag = false
+      this.isSelect = true
+
       this.getShareCourseDetailV2()
     },
     openSysCourse() {

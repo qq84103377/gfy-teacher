@@ -1,7 +1,6 @@
 <template>
   <van-popup
     v-model="show"
-    get-container="#app"
     :close-on-click-overlay="false"
     position="bottom"
     :style="{ height: '93%' }">
@@ -93,6 +92,7 @@
           // this.$set(this.filter.subjectList[index],'done',true) // 是否已加载了数据
           if(res.flag) {
             v.arr = res.resAreaInfoList
+            v.arr.unshift({areaName:'全部',areaCode:''})
             this.$set(v.arr[0],'active',true)
             if(!index) {
               this.$emit('update:label',v.arr[0].areaName)

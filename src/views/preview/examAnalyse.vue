@@ -12,8 +12,10 @@
       <div class="exam-analyse-wrap__histogram van-hairline--bottom">
         <div class="exam-analyse-wrap__histogram-label divider">知识点分布</div>
         <div id="myChart2" ref="myChart2" class="chart-histogram"></div>
+        <div class="scroll-tip">可在表格内滑动，查看更多内容</div>
       </div>
       <div id="myChart3" ref="myChart3" class="chart-histogram"></div>
+      <div class="scroll-tip">可在表格内滑动，查看更多内容</div>
       <div class="desc">本张试卷包括题型为<span><span v-for="(item,index) in examInfo.titleTypeCount" :key="index">{{item.value}}道{{item.name}},</span></span>难度为<span><span v-for="(item,index) in examInfo.degreeCount" :key="index">{{item.name}}:{{item.value}}%,</span></span>知识点涵盖<span><span v-for="(item,index) in examInfo.knowledgePointInfos" :key="index">{{item.knowledgePointName}}{{index < examInfo.knowledgePointInfos.length-1?'、':'。'}}</span></span>
       </div>
     </div>
@@ -293,13 +295,16 @@ export default {
           bottom: '1%',
           containLabel: true
         },
-        xAxis: {
+        yAxis: {
           type: 'value',
           boundaryGap: [0, 0.01]
         },
-        yAxis: {
+        xAxis: {
           type: 'category',
-          data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName)
+          data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName),
+          axisLabel: {
+            interval: 0
+          },
         },
         itemStyle: {
           color: '#56F2E3'
@@ -308,15 +313,16 @@ export default {
           {
             name: '知识点分布',
             type: 'bar',
+            barWidth: '50%',
             data: Object.keys(this.examInfo.knowMap).map(v => this.examInfo.knowMap[v])
           }
         ],
         dataZoom: [
           {
             type: 'inside',
-            yAxisIndex: [0],
+            xAxisIndex: [0],
             start: 0,
-            end: 30
+            end: this.examInfo.knowledgePointInfos.length>5?(5/this.examInfo.knowledgePointInfos.length)*100:100,
           }
         ],
       };
@@ -334,7 +340,7 @@ export default {
             type: 'inside',
             xAxisIndex: [0],
             start: 0,
-            end: 30
+            end: this.examInfo.useCount.length>5?(5/this.examInfo.useCount.length)*100:100,
           }
         ],
         grid: {
@@ -393,6 +399,7 @@ export default {
           {
             name: '使用次数',
             type: 'bar',
+            barWidth: '50%',
             data: this.examInfo.useCount.map(v => v.value),
           },
           {
@@ -668,6 +675,17 @@ export default {
       background: #f5f6fa;
       padding: 5px 8px;
     }
+  }
+
+  .scroll-tip {
+    margin-top: 10px;
+    margin-left: 20px;
+    display: inline-block;
+    font-size: 10px;
+    color: #999;
+    background: #F5F6FA;
+    border-radius: 2px;
+    padding: 4px 7px;
   }
 
   .backtop {

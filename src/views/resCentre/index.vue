@@ -376,6 +376,7 @@
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
+  import eventBus from "@/utils/eventBus";
 
   export default {
     name: "index",
@@ -422,6 +423,26 @@
       }
     },
     watch: {
+      subjectFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      versionFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      areaFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      resCourseFilterShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
+      addCourseShow(v) {
+        if(this.canBack) return
+        eventBus.$emit('hideNav',!v)
+      },
       subjectLabel() {
         // if (this.tabIndex) {
           //私人资源
@@ -441,6 +462,51 @@
       },
       courseId() {
         if (this.courseId) {
+          for (let i = 1; i < 4; i++) {
+            if(!this.activeNames.includes(i)) {
+              if(i == 1) {
+                this.lessonList = []
+              }else if (i == 2) {
+                this.materialList = []
+              }else if (i == 3) {
+                this.examList = []
+              }
+            }
+
+          }
+          this.activeNames.forEach(v => {
+            if (v == 1) {
+              // 微课
+              this.getResCourseWareInfo('C01')
+            } else if (v == '2') {
+              //素材
+              this.getResCourseWareInfo('C02')
+            } else if (v == '3') {
+              //试卷
+              this.getSysCourseTestPaperList()
+            }
+          })
+        } else {
+          this.lessonList = []
+          this.materialList = []
+          this.examList = []
+        }
+        this.courseList = []
+      },
+      areaCode() {
+        if (this.courseId) {
+          for (let i = 1; i < 4; i++) {
+            if(!this.activeNames.includes(i)) {
+              if(i == 1) {
+                this.lessonList = []
+              }else if (i == 2) {
+                this.materialList = []
+              }else if (i == 3) {
+                this.examList = []
+              }
+            }
+
+          }
           this.activeNames.forEach(v => {
             if (v == 1) {
               // 微课
@@ -613,7 +679,7 @@
           "filterParam": {
             "titleDegree": "",
             "belongType": "",
-            "belongAreaCode": "",
+            "belongAreaCode": '',
             "keyWord": "",
             "createYear": "",
             "courseWareType": ""

@@ -34,6 +34,7 @@
 
 <script>
 import { getLatestModuleVerion } from "@/api/index";
+import eventBus from "@/utils/eventBus";
 
 export default {
   data() {
@@ -121,8 +122,8 @@ export default {
         interUser: "control_app",
         interPwd: "E10ADC3949BA59ABBE56E057F20F883E",
         moduleType: "T09",
-        schoolId: -1,
-        classId: -1
+        schoolId: this.$store.getters.schoolId,
+        classId: Object.keys(JSON.parse(localStorage.classMap))[0]
       };
       // if (platformType == "Android") {
       //   param["moduleType"] = "T06";
@@ -229,9 +230,10 @@ export default {
             _this.version = version;
           });
 
-          var platform = device.platform;
-          console.log("deviceready", device.platform);
-          _this.checkUpgrade(platform);
+          eventBus.$on('checkUpgrade',() => {
+            var platform = device.platform;
+            _this.checkUpgrade(platform);
+          })
         }
       },
       false

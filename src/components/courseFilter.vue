@@ -79,7 +79,7 @@
             <van-icon :name="versionDropdown?'arrow-up':'arrow-down'" />
           </div>
           <div v-show="versionDropdown" class="dropdown-menu">
-            <div class="dropdown-menu-item" :class="{active: bookIndex== index}" v-for="(item ,index) in bookInfoList" :key="index">{{item.textBookName}}
+            <div class="dropdown-menu-item" @click="changeBook(index)" :class="{active: bookIndex== index}" v-for="(item ,index) in bookInfoList" :key="index">{{item.textBookName}}
               <van-icon v-show="bookIndex== index " class="check blue" name="success" />
             </div>
 
@@ -201,6 +201,7 @@ export default {
         } else {
           this.termIndex = 0
         }
+        this.$emit('init',this.classGradeList[this.gradeIndex].classGrade,this.termTypeList[this.termIndex])
         this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
@@ -282,7 +283,7 @@ export default {
     async getTextBookCourseInfo() {
       this.$store.commit('setVanLoading', true)
       this.unitIndex = 0
-      this.bookIndex = 0
+      // this.bookIndex = 0
       // this.unitList = []
       // this.courseList = []
       let obj
@@ -432,7 +433,7 @@ export default {
       if (this.type === 'myCourse') {
         this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
       } else {
-        this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade)
+        this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
       }
     },
 
@@ -549,6 +550,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
+    overflow: hidden;
 
     &-left {
       flex: 0 0 125px;

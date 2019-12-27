@@ -7,7 +7,7 @@
     </van-nav-bar>
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
-        <div class="fs18" style="color: #000">{{$route.query.subjectTypeName}}练习《{{$route.query.title}}》{{new
+        <div class="fs18" style="color: #000">{{decodeURI($route.query.subjectTypeName)}}练习《{{decodeURI($route.query.title)}}》{{new
           Date()|generateTimeReqestNumber('MMdd')}}完成情况简报
         </div>
         <div class="info-wrap" v-if="$route.query.testPaperId>0 || $route.query.taskType === 'T13'">
@@ -33,7 +33,7 @@
 <script>
   import shareBar from '../../components/shareBar'
   import {getStudentName} from '@/utils/filter'
-  import {statTaskStat, getAppraiseV2, getClassStudent} from '@/api/index'
+  import {statTaskStat, getAppraiseV2, getClassStudent, statTaskStatV2} from '@/api/index'
   import * as calculator from '@/utils/calculate'
 
   export default {
@@ -43,14 +43,18 @@
       return {
         shareBarShow: false,
         scoreSpan: [],
-        info: this.$route.query.info,
-        appraiseList: this.$route.query.appraise.list,
+        info: {},
+        appraiseList: [],
         classStudentList: []
       }
     },
     computed: {
+      decodeURI() {
+       return decodeURI
+      },
       link() {
-        return `${process.env.VUE_APP_HOST}/#${this.$route.fullPath}`
+        const {taskType,resourceType,testPaperId,subjectTypeName,title,taskId,classId,operateAccountNo,belongSchoolId} = this.$route.query
+        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${subjectTypeName}&title=${title}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window
@@ -133,7 +137,14 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        await statTaskStat(params).then(res => {
+        let api
+        if (['T10'].includes(this.$route.query.taskType)) {
+          //从堂测统计进入
+          api = statTaskStatV2
+        } else {
+          api = statTaskStat
+        }
+        await api(params).then(res => {
           if (res.flag) {
             if (this.$route.query.taskType === 'T13') {
               res.data[0].studentStatList = res.data[0].examstat

@@ -7,7 +7,7 @@
         <!-- <van-cell v-else class="account-safety" title="手机号" :value="$store.getters.getUserInfo.phoneNo" is-link to="bindPhoneNo"></van-cell> -->
         <van-cell title="修改密码" is-link to="/modifyPassword" />
         <van-cell title="清除缓存" @click="clearCache()" is-link />
-        <van-cell title="版本更新" is-link @click="checkVersion()">
+        <van-cell v-if="isApp" title="版本更新" is-link @click="checkVersion()">
           <template slot="default">
             <span>{{version}}/</span>
             <span v-show="hasNew" class="red">{{tips}}</span>
@@ -58,7 +58,7 @@ export default {
   name: "index",
   data() {
     return {
-      version: "v1.4.8",
+      version: "",
       showUpgrade: false,
       progress: false,
       serverVersion: "1.1.2", //服务器版本号
@@ -69,8 +69,17 @@ export default {
       releasePath: "", //安装包路径
       force: false,//是否为强制更新
       tips: '已是最新版本',
-      hasNew: false
+      hasNew: false,
+      checkDone: false,
     }
+  },
+  computed: {
+    isApp() {
+      return "cordova" in window;
+    }
+  },
+  mounted() {
+    this.getVersion()
   },
   methods: {
     clearCache() {
@@ -84,19 +93,23 @@ export default {
           // 版本号获取
           _this.version = version
         })
-        var platform = device.platform;
-        console.log("deviceready", device.platform);
-        _this.checkUpgrade(platform);
+        // var platform = device.platform;
+        // console.log("deviceready", device.platform);
+        // _this.checkUpgrade(platform);
       }, false)
     },
     checkVersion() {
-      if (!this.hasNew) {
-        // 没有新版本
-        this.$toast.fail("当前已是最新版本哦");
-        return;
+      if(this.checkDone) {
+        if (!this.hasNew) {
+          // 没有新版本
+          this.$toast.fail("当前已是最新版本哦");
+          return;
+        }
+        this.showUpgrade = true; //显示升级弹框
+      }else {
+        let platform = device.platform;
+        this.checkUpgrade(platform);
       }
-      this.showUpgrade = true; //显示升级弹框
-
     },
     //下载安装包
     upgradeForAndroid() {
@@ -160,6 +173,7 @@ export default {
      * 检测升级方法
      */
     checkUpgrade(platformType) {
+      this.$store.commit('setVanLoading',true)
       var _this = this;
       console.log("设备类型：" + platformType);
       var appName = "教师app";
@@ -173,8 +187,8 @@ export default {
         interUser: "control_app",
         interPwd: "E10ADC3949BA59ABBE56E057F20F883E",
         moduleType: "T09",
-        schoolId: -1,
-        classId: -1
+        schoolId: this.$store.getters.schoolId,
+        classId: Object.keys(JSON.parse(localStorage.classMap))[0]
       };
       // Domain_Module_Type  模块类型
       // if (platformType == "Android") {
@@ -186,6 +200,8 @@ export default {
         .getLatestModuleVerion({ requestJson: JSON.stringify(param) })
         .then(
           response => {
+            this.$store.commit('setVanLoading',false)
+            _this.checkDone = true
             if (response != null && response.flag) {
               _this.releasePath = response.data[0].versionRecord.downloadUrl;
               var serverVersion = response.data[0].versionRecord.versionCode;
@@ -206,6 +222,7 @@ export default {
                     // _this.showUpgrade = true; //显示升级弹框
                     _this.tips = serverVersion;
                     _this.hasNew = true;
+                    _this.showUpgrade = true; //显示升级弹框
                   } else if (platformType == "iOS") {
                     // _this.$dialog.confirm({
                     //   title: response.data[0].versionRecord.uploadTitle,
@@ -219,6 +236,8 @@ export default {
                     //   //_this.$toast.fail("取消升级");
                     // });
                   }
+                }else {
+                  _this.$toast.fail("当前已是最新版本哦");
                 }
               });
             }
@@ -278,9 +297,6 @@ export default {
       }
     }
   },
-  mounted() {
-    this.getVersion()
-  }
 }
 </script>
 

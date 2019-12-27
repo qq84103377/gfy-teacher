@@ -136,13 +136,13 @@
     methods: {
       read(file, detail) {
         console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
-          if (['.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
+          if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             this.wareFile = file;
             this.form.name = file.name.split('.')[0]
             this.wareSize = file.size
             this.uploadWare(file);
           } else {
-            this.$toast('请上传MP4、WMV、AVI格式的视频文件')
+            this.$toast('请上传MP3、MP4、WMV、AVI格式的音视频文件')
           }
       },
       previewImg(startPosition) {

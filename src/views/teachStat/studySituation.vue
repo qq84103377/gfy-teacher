@@ -23,6 +23,7 @@
           <div :class="['rein-btn',{active:barIndexArr.length}]" v-if="isReinforce" @click="showSelectKnw">智能补强</div>
         </div>
         <div v-show="!kwgNotEnough" id="myChart2" ref="myChart2" class="histogram-chart mgt10"></div>
+        <div v-show="!kwgNotEnough" class="tip">可在表格内滑动，查看更多内容</div>
         <div v-if="kwgNotEnough" class="empty-page mgb20">
           <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
           <div class="grey9 fs12">知识点数据不足~</div>
@@ -57,6 +58,7 @@
                 <div :class="['rein-btn',{active:item.barIndexArr&&item.barIndexArr.length}]"  v-if="isReinforce" @click="showSelectKnw(item)">智能补强</div>
               </div>
               <div v-show="!item.kwgNotEnough" :id="'his-stu'+index" class="histogram-chart mgt10"></div>
+              <div v-show="!item.kwgNotEnough" class="tip">可在表格内滑动，查看更多内容</div>
               <div v-if="item.kwgNotEnough" class="empty-page">
                 <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
                 <div class="grey9 fs12">知识点数据不足~</div>
@@ -279,7 +281,7 @@
               type: 'inside',
               xAxisIndex: [0],
               start: 0,
-              end: xData.length ? Math.ceil(100 / xData.length) : 100
+              end: xData.length>5 ? (5/xData.length)*100:100
             }
           ],
           legend: {
@@ -684,6 +686,16 @@
         background: @blue;
         color: #fff;
       }
+    }
+
+    .tip {
+      margin-top: 10px;
+      display: inline-block;
+      font-size: 10px;
+      color: #999;
+      background: #F5F6FA;
+      border-radius: 2px;
+      padding: 4px 7px;
     }
   }
 </style>

@@ -113,6 +113,7 @@
               subjectType: localStorage.currentSubjectType,
               classGrade: this.$route.query.classGrade,
               title: item.testPaperName,
+              fromTask: 1
             }
           })
         }
@@ -166,7 +167,7 @@
           "taskType": 'T10',
           "pageSize": 10,
           "currentPage": this.currentPage,
-          // classId: this.$route.query.classId
+          classId: this.$route.query.classId
         }
         let params = {
           requestJson: JSON.stringify(obj)
