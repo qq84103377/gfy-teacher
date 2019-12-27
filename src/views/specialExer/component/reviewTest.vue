@@ -163,7 +163,10 @@ export default {
         console.log("onLoad1");
         this.currentPage++
         if (this.currentPage > this.totalPage && this.currentPage > 1) {
-          return
+          this.listLoading = false
+          this.finished = true
+          return false
+        
         }
         console.log("onLoad11");
         this.getTestPaperInfoList()
@@ -171,7 +174,10 @@ export default {
         console.log("onLoad2");
         this.currentPage++
         if (this.currentPage > this.totalPage && this.currentPage > 1) {
-          return
+          this.listLoading = false
+          this.finished = true
+          return false
+          
         }
         console.log("onLoad22");
         this.getTestPaperInfoList2()
@@ -223,25 +229,8 @@ export default {
         this.onLoad()
       }
       if (!response.flag || !response.data.length) {
-        // this.testList = []
-        // this.currentPage = 0
-        // this.onLoad()
-        return
-        let r = await getTestPaperInfoList({
-          "interUser": "runLfb",
-          "interPwd": "25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          pageSize: 10,
-          currentPage: page,
-          subjectType: localStorage.currentSubjectType,
-        })
 
-        if (r.flag) {
-          console.log(r, 'getTestPaperInfoList r');
-        } else {
-          this.$toast(r.msg)
-        }
+        return
       } else {
         this.totalPage = response.total
         this.testList = this.testList.concat(response.data)
