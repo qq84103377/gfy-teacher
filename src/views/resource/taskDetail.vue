@@ -92,7 +92,7 @@ export default {
   components: { shareBar },
   data() {
     return {
-      remark: '',
+      remark: this.$route.query.remark?decodeURI(this.$route.query.remark): '',
       shareBarShow: false,
       taskList: [],
       taskTypeList: this.$store.state.taskTypeList,
@@ -110,7 +110,7 @@ export default {
   computed: {
     link() {
       const {tchCourseId,taskId,accountNo,subjectTypeName} = this.$route.query
-      return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${subjectTypeName}`
+      return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${subjectTypeName}&remark=${this.remark}`
     },
     isApp() {
       return 'cordova' in window
