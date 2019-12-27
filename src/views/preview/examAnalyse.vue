@@ -92,7 +92,7 @@ export default {
         return t
       }, 0)
       if (this.scoreInfo.length) {
-        return (hasPoint / this.scoreInfo.length).toFixed(4) * 100 + '%'
+        return ((hasPoint / this.scoreInfo.length).toFixed(4) * 100).toFixed(2) + '%'
       } else {
         return 0 + '%'
       }
