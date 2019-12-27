@@ -77,7 +77,9 @@
     },
     methods: {
       viewStat(item) {
-        this.$store.commit("setTchCourseInfo", this.courseList[this.index].tchCourseInfo)
+        if(!this.$route.query.tchCourseId) {
+          this.$store.commit("setTchCourseInfo", this.courseList[this.index].tchCourseInfo)
+        }
         this.$store.commit('setVanLoading', true)
         this.$router.push({
           path: '/layerTeach',
