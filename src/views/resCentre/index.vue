@@ -1114,7 +1114,7 @@
           "belongSchoolId": this.$store.getters.schoolId,
           queryType, //C01 微课 C02 素材
           "sysCourseIdList": [this.courseId],
-          "areaCode": this.areaCode,
+          "areaCode": this.areaCode || null,
           "orderByType": "T05",
           "pageSize": "9999",
           "currentPage": 1,
