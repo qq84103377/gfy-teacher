@@ -2,6 +2,7 @@
   <section class="question-item-wrap">
     <i class="iconGFY icon-auto" v-if="item.autoScoring == 1&&!item.groupExamList.length"></i>
     <i class="iconGFY icon-excellent" v-if="item.qualityType == 'Q01'"></i>
+    <i class="iconGFY icon-boutique-badge" v-if="item.qualityType == 'Q02'"></i>
     <div class="question-item-wrap__ctn">
       <slot name="num"></slot>
       <div ref="title" v-html="item.title" class="html-img" @click="previewImg"></div>

@@ -12,7 +12,7 @@
             <div slot="desc">
               <div class="desc-top">
                 <i class="iconGFY" :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
-                <i class="iconGFY" :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
+                <i class="iconGFY" :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique-purple':item.qualityType === 'Q02'}"></i>
               </div>
               <div class="desc-bottom">
                 <div><i class="iconGFY icon-difficult"></i>{{item.testPaperDegree==='D01'?'容易':item.testPaperDegree==='D02'?'中等':'困难'}}
