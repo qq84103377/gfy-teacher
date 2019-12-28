@@ -42,7 +42,7 @@
         <van-collapse v-model="activeName3" accordion>
           <van-collapse-item title="什么是朗币？" name="31">
            <div class="content">
-             朗币是教师、学生在使用高分云平台郭恒中获得的虚拟奖励，可以用来在积分商城换取相应价值的礼品，不可转增、兑现。
+             朗币是教师、学生在使用高分云平台过程中获得的虚拟奖励，可以用来在积分商城换取相应价值的礼品，不可转增、兑现。
            </div>
           </van-collapse-item>
           <van-collapse-item title="如何获得朗币？" name="32">
