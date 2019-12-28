@@ -2,7 +2,7 @@
   <section class="task-detail">
     <van-nav-bar class="task-detail__header" title="任务详情" :left-arrow="isApp" @click-left="goBack" />
     <div class="task-detail__body">
-      <div class="task-detail__body__top">
+      <div class="task-detail__body__top" v-if="isApp">
         <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
         <div class="red fs10">您可以把练习分享给家长，督促学生及时完成练习</div>
       </div>
