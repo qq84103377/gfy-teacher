@@ -78,7 +78,7 @@
       <van-button type="info" class="btn" @click="shareBarShow = true">分享给家长</van-button>
       <van-button type="info" class="btn" @click="$router.go(-2)">完成</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="`${$route.query.subjectTypeName}练习--《${taskDetail.tastName}》`" desc="我布置了一份练习,请家长督促学生完成" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${taskDetail.tastName}》`" desc="我布置了一份练习,请家长督促学生完成" :link="link"></share-bar>
   </section>
 </template>
 
@@ -108,9 +108,12 @@ export default {
     this.initTaskDetail()
   },
   computed: {
+    decodeURI() {
+      return decodeURI
+    },
     link() {
       const {tchCourseId,taskId,accountNo,subjectTypeName} = this.$route.query
-      return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${subjectTypeName}&remark=${this.remark}`
+      return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${encodeURI(subjectTypeName)}&remark=${encodeURI(this.remark)}`
     },
     isApp() {
       return 'cordova' in window
