@@ -88,16 +88,19 @@
       </van-cell>
       <van-cell class="add-task__body__cell">
         <div slot="title">
-          <div class="add-task__body__cell-ctn mgl5">
-            <span class="mgr10"><span class="red">*</span>对象:</span>
-            <van-radio-group style="display: flex;" v-model="form.object" @change="changeObject">
-              <van-radio name="1" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-                班
-              </van-radio>
-              <van-radio v-if="!$route.query.isResend" name="2" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-                组
-              </van-radio>
-            </van-radio-group>
+          <div class="add-task__body__cell-ctn jcsb mgl5">
+            <div class="aic">
+              <span class="mgr10"><span class="red">*</span>对象:</span>
+              <van-radio-group style="display: flex;" v-model="form.object" @change="changeObject">
+                <van-radio name="1" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                  班
+                </van-radio>
+                <van-radio v-if="!$route.query.isResend" name="2" class="mgr10"><i slot="icon" slot-scope="props" :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
+                  组
+                </van-radio>
+              </van-radio-group>
+            </div>
+            <div class="aic" v-show="form.object == '1'"><span class="mgr10 fs12">按学号排序</span><van-switch @change="switchChange" active-color="#39F0DD" size="16px" v-model="numSort" /></div>
           </div>
           <div class="mgt15">
             <div class="select-wrap" v-for="(item,index) in classList" :key="item.classId">
@@ -221,6 +224,7 @@ export default {
       currentDate: new Date(),
       tchCourseInfo: {},
       resourceInfo: '',
+      numSort: false,
       form: {
         name: '',
         duration: this.$route.query.isEdit ? "" : '10',
@@ -374,6 +378,37 @@ export default {
   },
 
   methods: {
+    //冒泡排序
+    bubbleSort(arr,key) {
+
+      for (let i = 0; i < arr.length - 1; i++) {
+
+        for (let j = 0; j < arr.length - 1 - i; j++) {
+          if (((arr[j][key] > arr[j + 1][key]) && arr[j + 1][key] !== null) || ((arr[j][key] === null)  && (arr[j + 1][key] > 0))) {
+
+            let tem = arr[j];
+
+            arr[j] = arr[j + 1];
+
+            arr[j + 1] = tem;
+
+          }
+
+        }
+
+      }
+      return arr
+
+    },
+    switchChange(bol) {
+      this.classList.forEach(v => {
+        v.classStudent = Object.keys(v.classStudent).map(s => {
+          return {...v.classStudent[s]}
+        })
+        v.classStudent = this.bubbleSort(v.classStudent,bol?'studentNumber':'accountNo')
+      })
+      console.log(this.classList);
+    },
      goBack(){
           this.common.goBack(this)
         },
@@ -436,7 +471,6 @@ export default {
         }
         // }
         console.log(this.form.time2, 'this.form.time2');
-
         let taskClass = this.$store.getters.getTaskClassInfo
         if (taskClass) {
           this.classList = JSON.parse(taskClass)
