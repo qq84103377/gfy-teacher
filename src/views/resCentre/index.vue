@@ -45,6 +45,66 @@
         </div>
       </van-cell>
       <div class="res-centre-wrap__body__title">资源类型</div>
+
+<!--      <div class="res-centre-wrap__body__tab">-->
+<!--        <div class="res-centre-wrap__body__tab-item">微课</div>-->
+<!--        <div class="res-centre-wrap__body__tab-item">素材</div>-->
+<!--        <div class="res-centre-wrap__body__tab-item">试卷</div>-->
+<!--        <div class="res-centre-wrap__body__tab-item">试题</div>-->
+<!--      </div>-->
+
+<!--      <van-pull-refresh v-model="refLoading" @refresh="onRefresh">-->
+<!--        <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">-->
+<!--          <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />-->
+<!--        </div>-->
+<!--        <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有素材，快去上传吧！'" @load="onLoad" :offset='80'>-->
+<!--                      <list-item class="mgt10" style="background: #fff;"-->
+<!--                                 v-for="(item,index) in lessonList" :key="index"-->
+<!--                                 :itemTitle="item.resCourseWareInfo.coursewareName"-->
+<!--                                 @clickTo="goVideoPage(item)">-->
+<!--                        <div slot="cover" class="cover" :style="{'background':item.resCourseWareInfo.imageUrl?'none':'#67E0A3'}">-->
+<!--                          <img-->
+<!--                            v-if="item.resCourseWareInfo.imageUrl" :src="item.resCourseWareInfo.imageUrl" alt=""><i v-else-->
+<!--                                                                                                                    class="iconGFY icon-video"></i>-->
+<!--                        </div>-->
+<!--                        <div slot="desc">-->
+<!--                          <div class="desc-top">-->
+<!--                            <i class="iconGFY"-->
+<!--                               :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>-->
+<!--                            <i class="iconGFY"-->
+<!--                               :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>-->
+<!--                          </div>-->
+<!--                          <div class="desc-bottom">-->
+<!--                            <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>-->
+<!--                            <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>-->
+<!--                            <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                        <div slot="btn" class="btn-group van-hairline&#45;&#45;top">-->
+<!--                          <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">-->
+<!--                            <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>-->
+<!--                            <span>{{item.collectId?'取消':''}}收藏</span>-->
+<!--                          </div>-->
+<!--                          <div-->
+<!--                            @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','lessonList')">-->
+<!--                            <i class="iconGFY icon-circle-plus-yellow"></i>-->
+<!--                            <span>添加</span>-->
+<!--                          </div>-->
+<!--                          <div @click="sendTask(item,'lesson')">-->
+<!--                            <i class="iconGFY icon-plane"></i>-->
+<!--                            <span>发任务</span>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                        <div slot="remark" class="remark" v-if="item.record">-->
+<!--                          <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>-->
+<!--                          <div>-->
+<!--                            <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </list-item>-->
+<!--        </van-list>-->
+<!--      </van-pull-refresh>-->
+
       <van-collapse class="res-centre-wrap__body__collapse" @change="handleChange" v-show="!tabIndex"
                     v-model="activeNames">
         <van-collapse-item title="微课" name="1">
@@ -384,7 +444,11 @@
     components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter, addCoursePop},
     data() {
       return {
-        arr: [{}, {}],
+        listLoading: false,
+        refLoading: false,
+        finished: false,
+        currentPage: 0,
+        total: 0,
         tabIndex: 0,
         activeNames: [],
         activeNames1: [],
@@ -534,6 +598,11 @@
       }
     },
     methods: {
+      async onRefresh() {
+        this.finished = false
+        this.currentPage = 0
+        this.onLoad()
+      },
        goBack(){
           this.common.goBack(this)
         },
@@ -1240,13 +1309,31 @@
 
     &__body {
       flex: 1;
-      overflow-y: auto;
 
       &__title {
         line-height: 44px;
         padding: 0 15px;
         font-size: 16px;
         color: #999;
+      }
+
+      &__tab {
+        display: flex;
+        align-items: center;
+        &-item {
+          width: 70px;
+          line-height: 24px;
+          border-radius: 12px;
+          text-align: center;
+          background: #fff;
+          font-size: 16px;
+          color: #333;
+          margin-right: 10px;
+          &.active{
+            background: @blue;
+            color: #fff;
+          }
+        }
       }
 
       &__collapse {

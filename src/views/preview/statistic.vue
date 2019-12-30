@@ -323,7 +323,10 @@
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           "objectId": this.$route.query.taskId,
           "objectType": 'T01',
-          accountNoList: this.taskFinishInfo.studentUnfinishList[0].accountNoList
+          accountNoList: this.taskFinishInfo.studentUnfinishList.reduce((t,v) => {
+           t.push(...v.accountNoList)
+            return t
+          },[])
         }
         let params = {
           requestJson: JSON.stringify(obj)
