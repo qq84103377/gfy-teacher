@@ -5,7 +5,7 @@
       <van-nav-bar :title='title' left-arrow @click-left="full" class="title-full" v-show='isShowControl' v-if='isFullscreen'>
       </van-nav-bar>
 
-      <video v-if='!isMp3' class="video" controlsList="nodownload" ref="video" webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
+      <video v-if='!isMp3' class="video" controlsList="nodownload" ref="video"  webkit-playsinline playsinline x5-playsinline="" :src="initVideo.url" @pause="handPlay(2,2)" @play="handPlay(2,1)" @loadedmetadata="getAudioLength(2)" @timeupdate="videoTimeUpdate" @click="clickVideo">
       </video>
 
       <img v-else src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="">
@@ -177,6 +177,10 @@ export default {
   },
   mounted() {
     console.log(this.$route.query.src, 'this.$route.query.src');
+    console.log(this.initVideo.url,'////')
+    console.log('////')
+    console.log('////')
+    console.log('////')
     setTimeout(() => {
       if (this.$refs.video) {
         this.$refs.video.play()
