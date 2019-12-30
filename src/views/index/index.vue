@@ -44,7 +44,7 @@
           <div>资源</div>
         </div>
         <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">
-          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>
+          <div class="icon-wrap orange"><i class="iconGFY icon-layer"></i></div>
           <div>分层</div>
         </div>
         <!--        <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">-->

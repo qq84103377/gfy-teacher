@@ -18,7 +18,7 @@
       </van-cell-group>
     </div>
     <div class="account-footer">
-      高分云{{version}}
+      高分云V{{version}}
     </div>
     <div class="upgrade">
       <van-dialog v-model="showUpgrade" @confirm="downLoad()" title="高分云教师APP更新啦" show-cancel-button confirmButtonText="立即更新" confirmButtonColor="#39F0DD" cancelButtonText="下次再说">

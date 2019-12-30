@@ -54,7 +54,7 @@
       },
       link() {
         const {taskType,resourceType,testPaperId,subjectTypeName,title,taskId,classId,operateAccountNo,belongSchoolId} = this.$route.query
-        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${subjectTypeName}&title=${title}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/#briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${subjectTypeName}&title=${title}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window

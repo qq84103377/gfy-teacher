@@ -8,7 +8,7 @@
         v-for="(item,index) in tabData"
         :key="index"
       >
-        <img class="icon" :src="active == item.path ? item.active : item.normal"/>
+        <img class="icon" :class="{home:item.path==='/index',resCentre:item.path==='/resCentre',teachStat:item.path==='/teachStat/',mine:item.path==='/mine'}" :src="active == item.path ? item.active : item.normal"/>
         <div :class="{actived: active == item.path}">{{item.title}}</div>
       </div>
     </div>
@@ -91,19 +91,16 @@
     .nav {
       height: 48px;
       display: flex;
-
+      padding: 6px 0 3px;
       &-item {
         flex: 1;
         font-size: 12px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
 
-        img {
-          width: 24px;
-          height: 22px;
-        }
+
 
         .actived {
           color: @blue;
@@ -111,9 +108,21 @@
       }
     }
 
-    .icon {
-      width: 23.5px;
-      height: 22.5px;
+    .home{
+      width: 22px;
+      height: 22px;
+    }
+    .resCentre{
+      width: 19px;
+      height: 22px;
+    }
+    .teachStat{
+      width: 21px;
+      height: 17.5px;
+    }
+    .mine{
+      width: 22px;
+      height: 22px;
     }
   }
 </style>

@@ -22,7 +22,7 @@
             <van-cell v-if="currentSubjectType === 'S03'" :title="`口语(${currCourse.resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" @click="gotoResource('/spokenList')" is-link/>
           </van-collapse-item>
         </van-collapse>
-        <van-cell class="fs16" @click="$router.push(`/layerTaskList?tchCourseId=${$route.query.tchCourseId}&courseName=${currCourse.tchCourseInfo.courseName}&classGrade=${currCourse.tchCourseInfo.classGrade}&sysCourseId=${currCourse.tchCourseInfo.sysCourseId}&relationCourseId=${currCourse.tchCourseInfo.relationCourseId}`)"
+        <van-cell class="fs16" @click="viewLayer"
                   :title="`分层(${currCourse.resourceCount.find(v => v.resourceType === 'R13').resourceCount})`" is-link/>
       </div>
     </section>
@@ -53,6 +53,10 @@
         }
       },
       methods: {
+          viewLayer() {
+            this.$store.commit("setTchCourseInfo", this.currCourse.tchCourseInfo)
+            this.$router.push(`/layerTaskList?tchCourseId=${this.$route.query.tchCourseId}&courseName=${this.currCourse.tchCourseInfo.courseName}&classGrade=${this.currCourse.tchCourseInfo.classGrade}&sysCourseId=${this.currCourse.tchCourseInfo.sysCourseId}&relationCourseId=${this.currCourse.tchCourseInfo.relationCourseId}`)
+          },
          goBack(){
           this.common.goBack(this)
         },
