@@ -69,6 +69,14 @@
           this.$emit('update:visible', false)
         }
       },
+      defaultTextBookId() {
+        const classMap = JSON.parse(localStorage.classMap)
+        return classMap[Object.keys(classMap)[0]].teacherInfoList[0].textBookId
+      },
+      defaultClassGrade() {
+        const classMap = JSON.parse(localStorage.classMap)
+        return classMap[Object.keys(classMap)[0]].classGrade
+      },
     },
     watch: {
       visible(v) {
@@ -122,13 +130,23 @@
             this.versionList = Object.keys(res.data).map(v => {
               return {...res.data[v]}
             })
-            this.$set(this.versionList[0],'active',true)
-            this.$set(this.versionList[0].gradeList[0],'check',true)
-            this.$emit('update:label',this.versionList[0].textBookName + this.versionList[0].gradeList[0].gradeTermName)
-            this.$emit('update:gradeTerm',this.versionList[0].gradeList[0].grade + '|' + this.versionList[0].gradeList[0].term)
+
+            let index = this.versionList.findIndex(v => v.textBookId === this.defaultTextBookId)
+            const termType = ((new Date().getMonth() + 1) >= 2 && (new Date().getMonth() + 1) <= 7) ? 'T02' : 'T01'
+            let gradeIndex = 0
+            if(index >=0) {
+              gradeIndex = this.versionList[index].gradeList.findIndex(v => v.grade === this.defaultClassGrade && v.term === termType)
+            }
+            if(index < 0) index = 0
+            if(gradeIndex < 0) gradeIndex = 0
+            this.index = index
+            this.$set(this.versionList[index],'active',true)
+            this.$set(this.versionList[index].gradeList[gradeIndex],'check',true)
+            this.$emit('update:label',this.versionList[index].textBookName + this.versionList[index].gradeList[gradeIndex].gradeTermName)
+            this.$emit('update:gradeTerm',this.versionList[index].gradeList[gradeIndex].grade + '|' + this.versionList[index].gradeList[gradeIndex].term)
             eventBus.$emit('changeVersion',{
-              textBookId: this.versionList[0].textBookId,
-              gradeTermId: this.versionList[0].gradeList[0].gradeTermId},{subjectType:this.subjectType})
+              textBookId: this.versionList[index].textBookId,
+              gradeTermId: this.versionList[index].gradeList[gradeIndex].gradeTermId},{subjectType:this.subjectType})
           }
         })
       },
