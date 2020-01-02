@@ -6,8 +6,8 @@
       <van-col span="8" :class="{ active: active == 2 }" @click="active = 2;changeTab(2)">复习套卷</van-col>
     </van-row>
 
-    <div class="question-type-wrap__body">
-      <van-cell title="筛选" style="background: #f5f5f5;color: #999" class="fs16"/>
+    <div class="question-type-wrap__body" ref="body">
+      <van-cell title="筛选" style="background: #f5f5f5;color: #999" class="fs16" />
 
       <van-cell @click="areaFilterShow=true" title="地区" class="fs16" is-link>
         <div class="blue">{{areaLabel}}</div>
@@ -163,6 +163,8 @@ export default {
 
       toggleNum1: 0, // tab切换到知识点的次数
       startKnowledge: false, //是否开始查询知识点
+
+      scrollTop:''
     };
   },
   watch: {
@@ -179,8 +181,20 @@ export default {
       }
     },
   },
+  beforeRouteLeave(to, from, next) {
+    this.scrollTop = this.$refs['body'].scrollTop
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.$nextTick(() => {
+        vm.$refs["body"].scrollTop = vm.scrollTop
+      });
+    });
+  },
   methods: {
     changeTab(active) {
+      this.$refs["body"].scrollTop = 0
       console.log(this.toggleNum2, 'toggleNum2////');
       console.log(this.toggleNum1, 'toggleNum1////');
       if (active == 2 && this.toggleNum2 == 0) {
