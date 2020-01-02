@@ -756,7 +756,7 @@
           this.drawObjectivePie()
         }
 
-        if (this.$route.query.taskType === 'T04') {
+        if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
           //如果是学资源则把tab设置为激活
           // this.wareActive = true
           if (!this.isTestPaper) {

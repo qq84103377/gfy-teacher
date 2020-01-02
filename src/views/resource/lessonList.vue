@@ -1,12 +1,6 @@
 <template>
   <section class="lesson-list">
     <div class="lesson-list__body" ref="body">
-      <div style="background: red;height: 200px;"></div>
-      <van-sticky :offset-top="44">
-        <van-nav-bar title="积分商城" left-arrow @click-left="$router.replace('/mine')">
-          <div slot="right" class="tips" @click="$router.push('/convertRule')">兑换说明</div>
-        </van-nav-bar>
-      </van-sticky>
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/resource/micro_empty.png" alt />
