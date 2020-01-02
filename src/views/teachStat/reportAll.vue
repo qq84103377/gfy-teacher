@@ -90,7 +90,7 @@
     <div v-if="isApp" class="report-all-wrap__footer">
       <van-button class="btn" type="info" @click="shareBarShow=true">分享给家长</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="$route.query.stuName+'的家庭报告'" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="decodeURI($route.query.stuName)+'的家庭报告'" :link="link"></share-bar>
   </section>
 </template>
 
@@ -110,7 +110,7 @@
       },
       link() {
         const {stuName,accountNo,classId,classGrade,startDate,endDate,operateAccountNo,belongSchoolId} = this.$route.query
-        return `${process.env.VUE_APP_HOST}/#reportAll?stuName=${stuName}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/#/reportAll?stuName=${encodeURI(stuName)}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window

@@ -89,6 +89,7 @@ export default {
           this.visible = false
         });
       } else {
+        console.log("分享地址：",this.link)
         var args = {}
         args.client = QQSDK.ClientType.QQ//QQSDK.ClientType.QQ,QQSDK.ClientType.TIM;
         args.scene = item.type === 'qq' ? QQSDK.Scene.QQ : QQSDK.Scene.QQZone//QQSDK.Scene.QQZone,QQSDK.Scene.Favorite
@@ -100,6 +101,8 @@ export default {
           this.$toast.success('分享成功')
           this.visible = false
         }, (failReason) => {
+          console.log("分享失败：")
+          console.log(failReason)
           this.$toast('取消分享')
         }, args)
       }
