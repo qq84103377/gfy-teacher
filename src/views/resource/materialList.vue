@@ -1,6 +1,11 @@
 <template>
   <section class="material-list-wrap">
     <div class="material-list-wrap__body" ref="body">
+      <div style="height: 300px;background: red;"></div>
+      <div style="position: sticky;position: -webkit-sticky; top: 44px;height: 44px;background: yellow;z-index:10">123</div>
+<!--      <van-sticky :offset-top="50">-->
+<!--              <div style="height: 44px;background: yellow;">123</div>-->
+<!--      </van-sticky>-->
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
@@ -96,7 +101,26 @@ export default {
       })
     }
   },
+  created() {
+    console.log(this.isSupportSticky(),'=======');
+  },
   methods: {
+    isSupportSticky() {
+      var prefixTestList = ['', '-webkit-', '-ms-', '-moz-', '-o-'];
+      var stickyText = '';
+      for (var i = 0; i < prefixTestList.length; i++ ) {
+        stickyText += 'position:' + prefixTestList[i] + 'sticky;';
+      }
+      // 创建一个dom来检查
+      var div = document.createElement('div');
+      var body = document.body;
+      div.style.cssText = 'display:none;' + stickyText;
+      body.appendChild(div);
+      var isSupport = /sticky/i.test(window.getComputedStyle(div).position);
+      body.removeChild(div);
+      div = null;
+      return isSupport;
+    },
     async download(item) {
       let url = item.srcUrl;
       if (url.indexOf("pubquanlang") > -1) {
@@ -312,7 +336,7 @@ export default {
   background: #f5f5f5;
   &__body {
     flex: 1;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
     .cover {
       background: #f3d233;
       display: flex;
