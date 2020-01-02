@@ -1,11 +1,6 @@
 <template>
   <section class="material-list-wrap">
     <div class="material-list-wrap__body" ref="body">
-      <div style="height: 300px;background: red;"></div>
-      <div style="position: sticky;position: -webkit-sticky; top: 44px;height: 44px;background: yellow;z-index:10">123</div>
-<!--      <van-sticky :offset-top="50">-->
-<!--              <div style="height: 44px;background: yellow;">123</div>-->
-<!--      </van-sticky>-->
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
           <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
@@ -54,345 +49,326 @@
 </template>
 
 <script>
-import listItem from '../../components/list-item'
-import { teachApi, pubApi } from '@/api/parent-GFY'
-import { modifyTeachCourseRes } from '@/api/index'
-import store from '../../store/store'
-export default {
-  name: "materialList",
-  components: { listItem },
-  data() {
-    return {
-      list: [],
-      listLoading: false,
-      refLoading: false,
-      finished: false,
-      currentPage: 0,
-      total: 0,
-      accessUrl: ''
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
-    next();
-  },
-  beforeRouteEnter(to, from, next) {
-    if ((from.path === '/uploadWare' || from.path === '/uploadImg') && store.getters.getIsAddWare) {
-      // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
-      next(vm => {
-        vm.listLoading = false
-        vm.refLoading = false
-        vm.finished = false
-        vm.currentPage = 0
-        vm.total = 0
-        vm.$store.commit('setIsAddWare', false)
-        vm.onLoad()
-        vm.$nextTick(() => {
-          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
-          vm.$refs["body"].scrollTop = vm.scrollTop
-        });
-      })
-    } else {
-      next(vm => {
-        vm.$nextTick(() => {
-          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
-          vm.$refs["body"].scrollTop = vm.scrollTop
-        });
-      })
-    }
-  },
-  created() {
-    console.log(this.isSupportSticky(),'=======');
-  },
-  methods: {
-    isSupportSticky() {
-      var prefixTestList = ['', '-webkit-', '-ms-', '-moz-', '-o-'];
-      var stickyText = '';
-      for (var i = 0; i < prefixTestList.length; i++ ) {
-        stickyText += 'position:' + prefixTestList[i] + 'sticky;';
+  import listItem from '../../components/list-item'
+  import { teachApi, pubApi } from '@/api/parent-GFY'
+  import { modifyTeachCourseRes } from '@/api/index'
+  import store from '../../store/store'
+  export default {
+    name: "materialList",
+    components: { listItem },
+    data() {
+      return {
+        list: [],
+        listLoading: false,
+        refLoading: false,
+        finished: false,
+        currentPage: 0,
+        total: 0,
+        accessUrl: ''
       }
-      // 创建一个dom来检查
-      var div = document.createElement('div');
-      var body = document.body;
-      div.style.cssText = 'display:none;' + stickyText;
-      body.appendChild(div);
-      var isSupport = /sticky/i.test(window.getComputedStyle(div).position);
-      body.removeChild(div);
-      div = null;
-      return isSupport;
     },
-    async download(item) {
-      let url = item.srcUrl;
-      if (url.indexOf("pubquanlang") > -1) {
-        this.accessUrl = url;
-      } else {
-        let json = {
-          requestJson: JSON.stringify({
-            interUser: "runLfb",
-            interPwd: "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            url: url,
-            sysTypeCd: "S03"
-          })
-        };
-        await pubApi.checkUrlPermission(json).then(data => {
-          console.log(data, "checkUrlPermission");
-          if (data.flag) {
-            this.accessUrl = data.data[0].accessUrl;
-          }
-        });
-      }
-      this.downLoadToOpen(item);
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
     },
-    downLoadToOpen(item) {
-
-      var _this = this;
-      // 文件后缀
-      var type = item.srcUrl
-        .substring(item.srcUrl.lastIndexOf(".") + 1)
-        .toLowerCase();
-      var fileName = item.coursewareName + "." + type;
-      var url = _this.accessUrl; //课件路径
-      var targetPath = cordova.file.dataDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
-      var trustHosts = true;
-
-      console.log("url:" + url);
-      console.log("targetPah:" + targetPath);
-      console.log("trustHost:" + trustHosts);
-
-      // 初始化FileTransfer对象
-      var fileTransfer = new FileTransfer();
-      // 下载进度
-      fileTransfer.onprogress = function (progressEvent) {
-        if (progressEvent.lengthComputable) {
-          let downloadProgress =
-            ((progressEvent.loaded / progressEvent.total).toFixed(2) * 100).toFixed(2);
-          console.log(downloadProgress, progressEvent);
-          _this.$toast.loading({
-            mask: true,
-            duration: 0, // 持续展示 toast
-            forbidClick: true, // 禁用背景点击
-            message: "文件下载中..." + downloadProgress + "%"
+    beforeRouteEnter(to, from, next) {
+      if ((from.path === '/uploadWare' || from.path === '/uploadImg') && store.getters.getIsAddWare) {
+        // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
+        next(vm => {
+          vm.listLoading = false
+          vm.refLoading = false
+          vm.finished = false
+          vm.currentPage = 0
+          vm.total = 0
+          vm.$store.commit('setIsAddWare', false)
+          vm.onLoad()
+          vm.$nextTick(() => {
+            // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+            vm.$refs["body"].scrollTop = vm.scrollTop
           });
+        })
+      } else {
+        next(vm => {
+          vm.$nextTick(() => {
+            // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+            vm.$refs["body"].scrollTop = vm.scrollTop
+          });
+        })
+      }
+    },
+    methods: {
+      async download(item) {
+        let url = item.srcUrl;
+        if (url.indexOf("pubquanlang") > -1) {
+          this.accessUrl = url;
         } else {
-          _this.$toast.clear();
-          _this.$toast('下载完成');
+          let json = {
+            requestJson: JSON.stringify({
+              interUser: "runLfb",
+              interPwd: "25d55ad283aa400af464c76d713c07ad",
+              "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+              "belongSchoolId": this.$store.getters.schoolId,
+              url: url,
+              sysTypeCd: "S03"
+            })
+          };
+          await pubApi.checkUrlPermission(json).then(data => {
+            console.log(data, "checkUrlPermission");
+            if (data.flag) {
+              this.accessUrl = data.data[0].accessUrl;
+            }
+          });
         }
-      };
-      // 调用download方法
-      fileTransfer.download(
-        url, //url网络下载路径
-        targetPath, //url本地存储路径
-        function (entry) {
-          console.log("download complete: " + entry.toURL());
-          entry.file(data => {
+        this.downLoadToOpen(item);
+      },
+      downLoadToOpen(item) {
+
+        var _this = this;
+        // 文件后缀
+        var type = item.srcUrl
+          .substring(item.srcUrl.lastIndexOf(".") + 1)
+          .toLowerCase();
+        var fileName = item.coursewareName + "." + type;
+        var url = _this.accessUrl; //课件路径
+        var targetPath = cordova.file.dataDirectory + "Download/gaofenyun/" + fileName; //要下载的目标路径及文件名
+        var trustHosts = true;
+
+        console.log("url:" + url);
+        console.log("targetPah:" + targetPath);
+        console.log("trustHost:" + trustHosts);
+
+        // 初始化FileTransfer对象
+        var fileTransfer = new FileTransfer();
+        // 下载进度
+        fileTransfer.onprogress = function (progressEvent) {
+          if (progressEvent.lengthComputable) {
+            let downloadProgress =
+              ((progressEvent.loaded / progressEvent.total).toFixed(2) * 100).toFixed(2);
+            console.log(downloadProgress, progressEvent);
+            _this.$toast.loading({
+              mask: true,
+              duration: 0, // 持续展示 toast
+              forbidClick: true, // 禁用背景点击
+              message: "文件下载中..." + downloadProgress + "%"
+            });
+          } else {
             _this.$toast.clear();
             _this.$toast('下载完成');
-            console.log("showOpenWithDialog data", data);
-            // showOpenWithDialog使用手机上安装的程序打开下载的文件
-            cordova.plugins.fileOpener2.showOpenWithDialog(
-              targetPath,
-              data.type,
-              function onSuccess(data) {
-                console.log("成功预览:" + targetPath);
-              },
-              function onError(error) {
-                console.log(
-                  "出错！请在" +
-                  cordova.file.externalDataDirectory +
-                  "目录下查看"
-                );
-              }
-            );
-          });
-        },
-        function (error) {
-          _this.$toast.clear();
-          _this.$toast.fail("下载失败");
-          console.log("download error source " + error.source);
-          console.log("download error target " + error.target);
-          console.log("upload error code" + error.code);
-        }
-      );
-    },
-    handleIcon(item) {
-      var t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
-      if (t == 'ppt' || t == 'pptx') {
-        t = 'icon-ppt'
-      } else if (t == 'doc' || t == 'docx') {
-        t = 'icon-doc'
-      } else if (t == 'xls' || t == 'xlsx') {
-        t = 'icon-xls'
-      } else if (t == 'zip' || t == 'rar' || t == '7z') {
-        // t = 'icon'
-      } else if (t == 'pdf') {
-        t = 'icon-pdf'
-      } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
-        t = 'icon-img'
-      } else if (t == 'mp4' || t == 'mp3') {
-        t = 'icon-video'
-      } else {
-        // t = 'unkown'
-      }
-      return t
-    },
-    goto(item) {
-      this.$router.push({ path: '/materialDetail', query: { data: item } })
-    },
-    modifyTeachCourseRes(item, index, type) {
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "operateRoleType": 'A02',
-        "tchCourseId": this.$route.query.tchCourseId,
-        "sysCourseId": this.$route.query.sysCourseId,
-        "relationSeqId": this.$route.query.relationCourseId,
-        "resourceType": 'R01',
-        "resourceId": item.coursewareId,
-        "statusCd": type ? (item.statusCd == 'S02' ? 'S01' : 'S02') : 'S03'
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      modifyTeachCourseRes(params).then(res => {
-        if (res.flag) {
-          if (type) {
-            item.statusCd = item.statusCd == 'S02' ? 'S01' : 'S02'
-          } else {
-            this.list.splice(index, 1)
-            this.$toast('删除成功')
           }
+        };
+        // 调用download方法
+        fileTransfer.download(
+          url, //url网络下载路径
+          targetPath, //url本地存储路径
+          function (entry) {
+            console.log("download complete: " + entry.toURL());
+            entry.file(data => {
+              _this.$toast.clear();
+              _this.$toast('下载完成');
+              console.log("showOpenWithDialog data", data);
+              // showOpenWithDialog使用手机上安装的程序打开下载的文件
+              cordova.plugins.fileOpener2.showOpenWithDialog(
+                targetPath,
+                data.type,
+                function onSuccess(data) {
+                  console.log("成功预览:" + targetPath);
+                },
+                function onError(error) {
+                  console.log(
+                    "出错！请在" +
+                    cordova.file.externalDataDirectory +
+                    "目录下查看"
+                  );
+                }
+              );
+            });
+          },
+          function (error) {
+            _this.$toast.clear();
+            _this.$toast.fail("下载失败");
+            console.log("download error source " + error.source);
+            console.log("download error target " + error.target);
+            console.log("upload error code" + error.code);
+          }
+        );
+      },
+      handleIcon(item) {
+        var t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
+        if (t == 'ppt' || t == 'pptx') {
+          t = 'icon-ppt'
+        } else if (t == 'doc' || t == 'docx') {
+          t = 'icon-doc'
+        } else if (t == 'xls' || t == 'xlsx') {
+          t = 'icon-xls'
+        } else if (t == 'zip' || t == 'rar' || t == '7z') {
+          // t = 'icon'
+        } else if (t == 'pdf') {
+          t = 'icon-pdf'
+        } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
+          t = 'icon-img'
+        } else if (t == 'mp4' || t == 'mp3') {
+          t = 'icon-video'
         } else {
-          this.$toast(res.msg)
+          // t = 'unkown'
         }
-      })
-    },
-    async onLoad() {
-      this.currentPage++
-      if (this.currentPage > this.total && this.currentPage > 1) {
-        return
-      }
-      this.getList()
-    },
-    async onRefresh() {
-      this.finished = false
-      this.currentPage = 0
-      this.onLoad()
-    },
-    getList() {
-      const page = this.currentPage
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "operateRoleType": "A02",
-        "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "tchCourseId": this.$route.query.tchCourseId,
-        "sysCourseId": this.$route.query.sysCourseId,
-        "relationSeqId": this.$route.query.relationCourseId,
-        "resourceType": 'R01',
-        "shareType": '',
-        "sourceName": "",
-        "pageSize": "10",
-        "coursewareClassify": 'C03',
-        "currentPage": page
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      teachApi.getTeachCourseResDetail(params).then(res => {
-        this.listLoading = false
-        this.refLoading = false
-        this.total = res.total
-        if (res.flag && res.data && res.data[0] && res.data[0].courseware && res.data[0].courseware.length) {
-          this.list = page === 1 ? res.data[0].courseware : this.list.concat(res.data[0].courseware)
-          if (page >= res.total) {
+        return t
+      },
+      goto(item) {
+        this.$router.push({ path: '/materialDetail', query: { data: item } })
+      },
+      modifyTeachCourseRes(item, index, type) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": 'A02',
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": 'R01',
+          "resourceId": item.coursewareId,
+          "statusCd": type ? (item.statusCd == 'S02' ? 'S01' : 'S02') : 'S03'
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        modifyTeachCourseRes(params).then(res => {
+          if (res.flag) {
+            if (type) {
+              item.statusCd = item.statusCd == 'S02' ? 'S01' : 'S02'
+            } else {
+              this.list.splice(index, 1)
+              this.$toast('删除成功')
+            }
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      },
+      async onLoad() {
+        this.currentPage++
+        if (this.currentPage > this.total && this.currentPage > 1) {
+          return
+        }
+        this.getList()
+      },
+      async onRefresh() {
+        this.finished = false
+        this.currentPage = 0
+        this.onLoad()
+      },
+      getList() {
+        const page = this.currentPage
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "tchCourseId": this.$route.query.tchCourseId,
+          "sysCourseId": this.$route.query.sysCourseId,
+          "relationSeqId": this.$route.query.relationCourseId,
+          "resourceType": 'R01',
+          "shareType": '',
+          "sourceName": "",
+          "pageSize": "10",
+          "coursewareClassify": 'C03',
+          "currentPage": page
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        teachApi.getTeachCourseResDetail(params).then(res => {
+          this.listLoading = false
+          this.refLoading = false
+          this.total = res.total
+          if (res.flag && res.data && res.data[0] && res.data[0].courseware && res.data[0].courseware.length) {
+            this.list = page === 1 ? res.data[0].courseware : this.list.concat(res.data[0].courseware)
+            if (page >= res.total) {
+              this.finished = true
+            }
+          } else {
+            this.list = page === 1 ? [] : this.list.concat([])
             this.finished = true
           }
-        } else {
-          this.list = page === 1 ? [] : this.list.concat([])
-          this.finished = true
-        }
-      })
-    },
-    sendTask(obj) {
-      console.log("发任务：", obj.coursewareName)
-      this.$store.commit('setResourceInfo', obj)
-      this.$store.commit("setTaskClassInfo", '')
-      this.$router.push(`/addTask?type=material&_t=new`)
-    },
+        })
+      },
+      sendTask(obj) {
+        console.log("发任务：", obj.coursewareName)
+        this.$store.commit('setResourceInfo', obj)
+        this.$store.commit("setTaskClassInfo", '')
+        this.$router.push(`/addTask?type=material&_t=new`)
+      },
+    }
   }
-}
 </script>
 
 <style lang="less" scoped>
-.material-list-wrap {
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-  &__body {
-    flex: 1;
-    /*overflow-y: auto;*/
-    .cover {
-      background: #f3d233;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      border-radius: 5px;
-      img {
-        width: 100%;
-        height: 100%;
-      }
-    }
-    .desc-top {
-      display: flex;
-      margin-bottom: 10px;
-      .iconGFY {
-        margin-right: 5px;
-      }
-    }
-    .desc-bottom {
-      display: flex;
-      font-size: 12px;
-      color: #666;
-      .iconGFY {
-        margin-right: 3px;
-      }
-      > div {
-        margin-right: 18px;
+  .material-list-wrap {
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    &__body {
+      flex: 1;
+      overflow-y: auto;
+      .cover {
+        background: #f3d233;
         display: flex;
         align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .desc-top {
+        display: flex;
+        margin-bottom: 10px;
+        .iconGFY {
+          margin-right: 5px;
+        }
+      }
+      .desc-bottom {
+        display: flex;
+        font-size: 12px;
+        color: #666;
+        .iconGFY {
+          margin-right: 3px;
+        }
+        > div {
+          margin-right: 18px;
+          display: flex;
+          align-items: center;
+        }
+      }
+      .eye {
+        color: #f89451;
       }
     }
-    .eye {
-      color: #f89451;
-    }
-  }
-  &__footer {
-    flex: 0 0 55px;
-    padding: 5px 10px;
-    display: flex;
-    .btn {
-      flex: 1;
-      border-radius: 22px;
-      font-size: 16px;
-      margin-right: 23px;
-      &:last-child {
-        margin-right: 0;
+    &__footer {
+      flex: 0 0 55px;
+      padding: 5px 10px;
+      display: flex;
+      .btn {
+        flex: 1;
+        border-radius: 22px;
+        font-size: 16px;
+        margin-right: 23px;
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
   }
-}
-.null-tips {
-  margin-top: 50px;
-  margin-left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-}
+  .null-tips {
+    margin-top: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+  }
 </style>

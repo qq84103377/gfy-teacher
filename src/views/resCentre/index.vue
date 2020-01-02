@@ -45,26 +45,57 @@
           <van-icon class="fs15" name="arrow"/>
         </div>
       </van-cell>
-      <van-sticky>
+
+      <div class="sticky-wrap" ref="sticky-wrap" v-if="isIOS">
+        <div class="res-centre-wrap__body__title">资源类型</div>
+        <div class="res-centre-wrap__body__tab" v-show="tabIndex == 0">
+          <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===1}" @click="selectResource(1)">微课
+          </div>
+          <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===2}" @click="selectResource(2)">素材
+          </div>
+          <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===3}" @click="selectResource(3)">试卷
+          </div>
+          <div class="res-centre-wrap__body__tab-item" @click="viewQuestion">试题</div>
+        </div>
+        <div class="res-centre-wrap__body__tab" v-show="tabIndex == 1">
+          <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===1}" @click="selectResource(1)">
+            微课
+          </div>
+          <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===2}" @click="selectResource(2)">
+            素材
+          </div>
+          <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===3}" @click="selectResource(3)">
+            试卷
+          </div>
+          <div class="res-centre-wrap__body__tab-item" @click="viewQuestion">试题</div>
+        </div>
+      </div>
+      <van-sticky v-else>
         <div style="background: #f5f5f5;">
           <div class="res-centre-wrap__body__title">资源类型</div>
           <div class="res-centre-wrap__body__tab" v-show="tabIndex == 0">
-            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===1}" @click="selectResource(1)">微课
+            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===1}" @click="selectResource(1)">
+              微课
             </div>
-            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===2}" @click="selectResource(2)">素材
+            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===2}" @click="selectResource(2)">
+              素材
             </div>
-            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===3}" @click="selectResource(3)">试卷
+            <div class="res-centre-wrap__body__tab-item" :class="{active:resourceIndex===3}" @click="selectResource(3)">
+              试卷
             </div>
             <div class="res-centre-wrap__body__tab-item" @click="viewQuestion">试题</div>
           </div>
           <div class="res-centre-wrap__body__tab" v-show="tabIndex == 1">
-            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===1}" @click="selectResource(1)">
+            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===1}"
+                 @click="selectResource(1)">
               微课
             </div>
-            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===2}" @click="selectResource(2)">
+            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===2}"
+                 @click="selectResource(2)">
               素材
             </div>
-            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===3}" @click="selectResource(3)">
+            <div class="res-centre-wrap__body__tab-item" :class="{active:priSourceIndex===3}"
+                 @click="selectResource(3)">
               试卷
             </div>
             <div class="res-centre-wrap__body__tab-item" @click="viewQuestion">试题</div>
@@ -413,6 +444,7 @@
         isSendTask: false,
         accessUrl: '',
         firstClickPri: false,
+        isIOS: false,
       }
     },
     computed: {
@@ -551,12 +583,40 @@
       },
     },
     created() {
+      this.checkPlatform()
       this.$store.commit('setErrorBookQuestionCourse', [])
       if (this.$route.path === '/resCentre') {
         this.$store.commit('setTchCourseInfo', {})
       }
     },
+    mounted() {
+      if (this.isIOS) {
+        this.$refs['sticky-wrap'].style.position = this.isSupportSticky()
+      }
+    },
     methods: {
+      checkPlatform() {
+        let u = navigator.userAgent;
+
+        let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+
+        this.isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      },
+      isSupportSticky() {
+        let prefixTestList = ['', '-webkit-', '-ms-', '-moz-', '-o-'];
+        let element = document.createElement('div');
+        let name
+        for (let i = 0; i < prefixTestList.length; i++) {
+          if ('position' in element.style) {
+            element.style['position'] = prefixTestList[i] + 'sticky';
+            if (element.style['position'] === (prefixTestList[i] + 'sticky')) {
+              name = prefixTestList[i] + 'sticky'
+              break
+            }
+          }
+        }
+        return name
+      },
       selectResource(num) {
         if (this.tabIndex) {
           this.priSourceIndex = num
@@ -1297,6 +1357,13 @@
 
     &__body {
       flex: 1;
+
+      .sticky-wrap {
+        top: 0;
+        z-index: 10;
+        background: #f5f5f5;
+      }
+
 
       &__title {
         line-height: 44px;
