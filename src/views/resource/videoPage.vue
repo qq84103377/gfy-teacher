@@ -177,10 +177,10 @@ export default {
   },
   mounted() {
     console.log(this.$route.query.src, 'this.$route.query.src');
-    console.log(this.initVideo.url,'////')
-    console.log('////')
-    console.log('////')
-    console.log('////')
+    // console.log(this.initVideo.url,'////')
+    // console.log('////')
+    // console.log('////')
+    // console.log('////')
     setTimeout(() => {
       if (this.$refs.video) {
         this.$refs.video.play()

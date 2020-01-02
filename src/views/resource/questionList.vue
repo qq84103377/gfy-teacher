@@ -522,6 +522,8 @@ export default {
               })
             })
           })
+        }).catch(err=>{
+          this.$store.commit('setVanLoading', false)
         })
       }else if (this.$route.query.isKnowledgePoint) {
         console.log("来自知识点专项");
@@ -535,10 +537,11 @@ export default {
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "orderByType": this.filterParam.orderByType,
           'areaCode': this.$route.query.areaCode,
-          // "sysCourseIdList": this.$route.query.courseIds,
-          "sysCourseIdList": [0, 6450],
+          "sysCourseIdList": this.$route.query.courseIds,
+          // "sysCourseIdList": [0, 6450],
           "pageSize": "10",
           "currentPage": page,
+          queryType:'T02',
 
           "filterParam": {
             "keyWord": '',
@@ -555,7 +558,7 @@ export default {
           requestJson: JSON.stringify(obj)
         }
         getResExamInfo(params).then(res => {
-          console.log(res, '题型专项getResExamInfo res');
+          console.log(res, '知识点专项getResExamInfo res');
           if (this.tab.questionTypeList.length > 1) this.$store.commit('setVanLoading', false)
           this.listLoading = false
           this.refLoading = false
@@ -582,6 +585,8 @@ export default {
               })
             })
           })
+        }).catch(err=>{
+          this.$store.commit('setVanLoading', false)
         })
       } else {
         let obj = {
