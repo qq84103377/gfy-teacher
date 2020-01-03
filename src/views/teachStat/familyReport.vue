@@ -113,8 +113,8 @@
     data() {
       return {
         rangeList: [
-          {name: '近一周', mtd1: 'getDate', mtd2: 'setDate', num: 7, active: true},
-          {name: '近一个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 1, active: false},
+          {name: '近一周', mtd1: 'getDate', mtd2: 'setDate', num: 7, active: false},
+          {name: '近一个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 1, active: true},
           {name: '近三个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 3, active: false},
         ],
         gradePop: false,
@@ -242,7 +242,7 @@
     created() {
       this.gradeSubjectList = JSON.parse(localStorage.gradeList).filter(v => !(v.teacherInfoList.some(t => t.subjectType === 'S20') && v.teacherInfoList.length === 1))
       let time = new Date()
-      time.setDate(time.getDate() - 7)
+      time.setMonth(time.getMonth()-1)
       this.filterTime.start = generateTimeReqestNumber(time)
       this.currentDate = new Date(this.filterTime.start)
       console.log(this.classList, '=3=3=3=');
