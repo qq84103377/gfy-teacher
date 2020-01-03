@@ -342,7 +342,7 @@ export default {
         subjectType: localStorage.currentSubjectType,
         yearSection: this.$route.query.year,
         "pageSize": "10",
-        "currentPage": 1,
+        "currentPage": page,
         "orderByType": this.filterParam.orderByType,
         "resCollectInfo": {
           objectTypeCd: 'C01',
@@ -528,7 +528,7 @@ export default {
       }else if (this.$route.query.isKnowledgePoint) {
         console.log("来自知识点专项");
         //知识点专项过来的
-       
+
         let obj = {
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
