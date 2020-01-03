@@ -77,7 +77,8 @@ export default {
         useCount: [],
         accuracy: [],
       },
-      scoreInfo: []
+      scoreInfo: [],
+      finishStudent: this.$route.query.finishStudent.split(',')
     }
   },
   created() {
@@ -126,7 +127,8 @@ export default {
       getTestPaperScoreAnalysis(params).then(res => {
         this.$store.commit('setVanLoading', false)
         if (res.flag) {
-          this.scoreInfo = Object.keys(res.data[0].student).map(v => {
+          const finishStu = Object.keys(res.data[0].student).filter(v => this.finishStudent.includes(v) )
+          this.scoreInfo = finishStu.map(v => {
             return {
               name: getStudentName(v, this.$route.query.classId),
               total: res.data[0].student[v].reduce((t, value, i) => {
