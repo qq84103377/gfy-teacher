@@ -759,8 +759,8 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           subjectTypeNot: 'S20',
-          startDate: this.$parent.filterTime.start,
-          endDate: this.$parent.filterTime.end,
+          startDate: this.$parent.filterTime.start + ' 00:00:00',
+          endDate: this.$parent.filterTime.end + ' 23:59:59',
           ...this.filterParams
         };
         let params = {
