@@ -43,7 +43,7 @@
         <div @click="handleScore(item,'T02')"><i class="iconGFY icon-circle-sub"></i>减分</div>
         <div @click="$set(item,'showComment',!item.showComment)"><i class="iconGFY icon-talk"></i>评论</div>
       </div>
-      <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active"></i><span
+      <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active mgr10"></i><span
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
       <div class="comment-wrap" v-if="item.showComment" >
@@ -235,6 +235,7 @@
         padding: 4px 10px;
         background: #E0FFFC;
         border-top: 1px solid #eee;
+        word-break: break-all;
       }
     }
 

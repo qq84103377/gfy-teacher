@@ -565,8 +565,12 @@
         })
       },
       rewardScore(accountNo) {
-        const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
-        return score > 0 ? '+' + score : score
+         try {
+           const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
+           return score > 0 ? '+' + score : score
+         }catch {
+           console.log(accountNo,'有错啊');
+         }
       },
       getReply(appraiseId) {
         let obj = {
