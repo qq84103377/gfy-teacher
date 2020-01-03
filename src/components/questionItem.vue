@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="icon-group">
-        <span v-if="isQuestion"><i class="iconGFY icon-accuracy"></i>{{item.correctRate}}</span>
+        <span v-if="isQuestion"><i class="iconGFY icon-accuracy"></i>{{item.correctRate || item.correntRate}}</span>
         <span><i class="iconGFY icon-points"></i>{{item.useCount||0}}</span>
         <span><i class="iconGFY icon-star"></i>{{item.collectCount||0}}</span>
         <span><i class="iconGFY icon-difficult"></i>{{item.titleDegree==='D01'?'容易':item.titleDegree==='D02'?'中等':'困难'}}</span>

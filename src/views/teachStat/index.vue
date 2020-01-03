@@ -5,8 +5,8 @@
       title="教学统计">
     </van-nav-bar>
     <div>
-      <div>{{aa}}</div>
-      <div @click="aa++">增加</div>
+<!--      <div>{{aa}}</div>-->
+<!--      <div @click="aa++">增加</div>-->
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
       <van-cell @click="openGradePop" title="年级学科" is-link>
         <div class="blue">{{gradeSubjectList[gradeIndex].name}}</div>
