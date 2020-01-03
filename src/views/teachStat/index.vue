@@ -5,6 +5,8 @@
       title="教学统计">
     </van-nav-bar>
     <div>
+      <div>{{aa}}</div>
+      <div @click="aa++">增加</div>
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
       <van-cell @click="openGradePop" title="年级学科" is-link>
         <div class="blue">{{gradeSubjectList[gradeIndex].name}}</div>
@@ -110,9 +112,10 @@
     name: "index",
     data() {
       return {
+        aa: 123,
         rangeList: [
-          {name: '近一周', mtd1:'getDate',mtd2:'setDate',num:7,active:true},
-          {name: '近一个月',mtd1:'getMonth',mtd2:'setMonth',num:1,active:false},
+          {name: '近一周', mtd1:'getDate',mtd2:'setDate',num:7,active:false},
+          {name: '近一个月',mtd1:'getMonth',mtd2:'setMonth',num:1,active:true},
           {name: '近三个月',mtd1:'getMonth',mtd2:'setMonth',num:3,active:false},
         ],
         gradePop: false,
@@ -230,7 +233,6 @@
       }
     },
     created() {
-
       let arr = []
       let flag = true
       JSON.parse(localStorage.gradeList).forEach(v => {
@@ -245,7 +247,7 @@
       })
       this.gradeSubjectList.push(...arr)
       let time = new Date()
-      time.setDate(time.getDate()-7)
+      time.setMonth(time.getMonth()-1)
       this.filterTime.start = generateTimeReqestNumber(time)
       this.currentDate = new Date(this.filterTime.start)
 
