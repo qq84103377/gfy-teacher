@@ -138,7 +138,7 @@
               "collectType": "C01",
               "accountNo": this.$store.getters.getUserInfo.accountNo,
               "statusCd": this.item.statusCd,
-              "subjectType": this.$route.query.subjectType
+              "subjectType": localStorage.currentSubjectType
             },
             "sysTypeCd": "S04"   //web传S02 app传S04
           }
