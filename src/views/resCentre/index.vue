@@ -637,6 +637,7 @@
     mounted() {
       if (this.isIOS) {
         this.$refs['sticky-wrap'].style.position = this.isSupportSticky()
+        this.$refs['sticky-wrap'].style.zIndex = '20'
       }
     },
     methods: {
@@ -675,7 +676,6 @@
       },
       async onLoad() {
         // if (!this.courseId&&!this.tabIndex) return
-        debugger
         this[`${this.curKey}Page`]++
         if (this[`${this.curKey}Page`] > this[`${this.curKey}Total`] && this[`${this.curKey}Page`] > 1) {
           //这里的Page-1是因为第一次(切换tab时this.curFinish变化,导致分页组件自动触发onLoad事件),导致page+1,
