@@ -121,7 +121,7 @@
     </div>
     <!--<div class="mask"  v-show="showMask"></div>-->
 
-    <course-filter @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+    <course-filter v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
   </section>
 </template>
 
