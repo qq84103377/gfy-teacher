@@ -12,7 +12,7 @@
       <p>全朗高分云为您服务</p>
       <van-button @click="handelClick" type="info">拨打</van-button>
     </div>
-    <a href="tel:18566860844" ref="telBox" v-show="false"></a>
+    <a :href="`tel:${instructorInfo.contactNumber}`" ref="telBox" v-show="false"></a>
   </section>
 </template>
 
@@ -65,6 +65,7 @@
       },
       //获取学校信息
       getMySchoolInfo() {
+        this.$store.commit('setVanLoading',true)
         let obj = {
           interUser: "runLfb",
           interPwd: "25d55ad283aa400af464c76d713c07ad",
@@ -76,6 +77,7 @@
           requestJson: JSON.stringify(obj)
         }
         getMySchoolInfo(params).then(res => {
+          this.$store.commit('setVanLoading',false)
           if (res.flag && res.data.length > 0) {
             let mySchoolInfo = res.data[0].mySchoolInfo;
             if (mySchoolInfo && mySchoolInfo.length > 0) {
