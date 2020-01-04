@@ -551,19 +551,15 @@ export default {
         this.$toast("请选择班级")
         return
       }
-      if (this.form.course === '') {
-        this.$toast("请选择课程")
-        return
-      }
 
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        "relationSeqId": this.shareCourseList[this.form.course].sysCourseId,
-        "sysCourseId": this.shareCourseList[this.form.course].sysCourseId,
-        "shareTchCourseId": this.shareCourseList[this.form.course].tchCourseId,
+        "relationSeqId": this.form.course ? this.shareCourseList[this.form.course].sysCourseId : 0,
+        "sysCourseId": this.form.course ? this.shareCourseList[this.form.course].sysCourseId : 0,
+        "shareTchCourseId": this.form.course ? this.shareCourseList[this.form.course].tchCourseId : 0,
         "courseName": this.form.name,
         "subjectType": localStorage.currentSubjectType,
         "courseType": "C01",
