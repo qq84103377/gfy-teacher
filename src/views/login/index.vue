@@ -112,7 +112,7 @@ export default {
       mobile: '',
       vailcode: '',
       timer: null,
-      second: 60,
+      second: 180,
       disabled: false,
       loginDisabled: true,
       isLanding: false,// 是否登录ing

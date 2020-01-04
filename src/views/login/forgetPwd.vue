@@ -48,7 +48,7 @@
             codeBtnLoading: false,
             timer: null,
             disabled: false,
-            second: 60,
+            second: 180,
           }
       },
       methods: {

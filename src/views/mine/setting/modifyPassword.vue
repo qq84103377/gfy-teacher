@@ -75,7 +75,7 @@
         timer: null,
         phoneNo: "",
         vailcode: "",
-        second: 60,
+        second: 180,
         codeBtnLoading: false,
         mobileNo: ''
       };

@@ -45,7 +45,7 @@ export default {
       mobile: "",
       newTel: "",
       vailcode: "",
-      second: 60,
+      second: 180,
       codeBtnLoading: false,
       mobileNo: ''
     };
@@ -144,7 +144,7 @@ export default {
 
   },
   created: function () {
-    
+
   }
 };
 </script>
