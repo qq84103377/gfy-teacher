@@ -119,9 +119,9 @@
               <div class="row" v-for="(item,index) in classDetailList" :key="index">
                 <div>{{item.courseName}}</div>
                 <div>{{item.className}}</div>
-                <div>{{item.beginDate|formatTime}}</div>
-                <div>{{item.endDate|formatTime}}</div>
-                <div>{{item.duration|formathms}}</div>
+                <div v-if="item.beginDate">{{item.beginDate|formatTime}}</div>
+                <div v-if="item.endDate">{{item.endDate|formatTime}}</div>
+                <div v-if="item.duration">{{item.duration|formathms}}</div>
               </div>
             </div>
             <div class="col bg fixed-right">
