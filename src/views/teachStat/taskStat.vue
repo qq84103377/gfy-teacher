@@ -1,8 +1,15 @@
 <template>
   <section class="task-stat-wrap">
-    <van-cell title="资源类型" style="background: #f5f5f5;color: #999"/>
-    <van-collapse v-model="activeNames">
-      <van-collapse-item title="学生任务统计" name="1">
+    <van-cell :border="false" title="统计类型" style="background: #f5f5f5;color: #999"/>
+    <div class="task-tab">
+      <div class="task-tab__item" :class="{active:tabIndex==1}" @click="tabIndex=1">学生统计</div>
+      <div class="task-tab__item" :class="{active:tabIndex==2}" @click="tabIndex=2">教师统计</div>
+      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==3}" @click="tabIndex=3">班级统计</div>
+      <div class="task-tab__item" :class="{active:tabIndex==4}" @click="tabIndex=4">个人统计</div>
+    </div>
+
+    <div class="task-stat-wrap__body">
+      <div v-show="tabIndex==1">
         <div class="van-hairline--bottom">
           <div class="echart-label">各类任务数分布情况:</div>
           <div id="myChart1" ref="myChart1" class="pie-chart"></div>
@@ -61,9 +68,9 @@
             <div class="grey9 fs12">当前没有数据~</div>
           </div>
         </div>
+      </div>
 
-      </van-collapse-item>
-      <van-collapse-item title="教师统计" name="2">
+      <div v-show="tabIndex==2">
         <div>
           <div class="stat-table">
             <div class="col bg">
@@ -146,7 +153,6 @@
         <div class="van-hairline--top mgt10 pdt10" v-show="showMutual">
           <div class="echart-label">交互详情</div>
           <div class="stat-table">
-            <!--    <div class="row-wrap">-->
             <div class="row" style="font-weight: bold;">
               <div style="flex: 0 0 22%;background: #E0FFFC;">操作类型</div>
               <div style="flex: 0 0 39%">时间</div>
@@ -159,12 +165,11 @@
               <div class="mh44" style="flex: 0 0 39%;height: auto;">{{item.operateDate|formatTime}}</div>
               <div class="mh44" style="flex: 0 0 39%;height: auto;">{{item.remark}}</div>
             </div>
-            <!--    </div>-->
           </div>
-
         </div>
-      </van-collapse-item>
-      <van-collapse-item v-if="handleShowItem()" title="班级统计" name="3">
+      </div>
+
+      <div v-show="tabIndex==3">
         <div class="stat-table">
           <div class="row-wrap" style="margin-left: 0;border-left: 1px solid #eee;">
             <div class="row" style="font-weight: bold;">
@@ -190,9 +195,9 @@
           </div>
         </div>
         <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
+      </div>
 
-      </van-collapse-item>
-      <van-collapse-item title="个人统计" name="4">
+      <div v-show="tabIndex==4">
         <div class="stat-table">
           <div class="row-wrap" style="margin-left: 0;border-left: 1px solid #eee;">
             <div class="row" style="font-weight: bold;">
@@ -218,8 +223,9 @@
           </div>
         </div>
         <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
-      </van-collapse-item>
-    </van-collapse>
+      </div>
+    </div>
+
   </section>
 </template>
 
@@ -241,7 +247,7 @@
     name: "taskStat",
     data() {
       return {
-        activeNames: ['1'],
+        tabIndex: 1,
         gradeSubjectList: JSON.parse(JSON.stringify(this.$parent.gradeSubjectList)),
         stuStatInfo: {taskTypeCount: [], finishStat: {}, statAccountList: []},
         tchStatInfo: [],
@@ -783,6 +789,32 @@
 
 <style lang="less" scoped>
   .task-stat-wrap {
+    .task-tab {
+      margin: 10px 5px 20px;
+      display: flex;
+      justify-content: space-between;
+      &__item{
+        color: #333;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 14px;
+        line-height: 24px;
+        text-align: center;
+        flex: 1;
+        margin-right: 10px;
+        &:last-child{
+          margin-right: 0;
+        }
+        &.active{
+          color: #fff;
+          background: @blue;
+        }
+      }
+    }
+    &__body {
+      padding: 10px;
+      background: #fff;
+    }
     .echart-label {
       font-size: 15px;
       color: #333;
