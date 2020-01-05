@@ -27,44 +27,63 @@
                   <div class="empty-tip" v-if="!item.kngArr.length">当前无数据~</div>
                 </div>
                 <div class="stat-table">
-                  <div class="col">
-                    <div style="font-weight: bold;">知识点名称</div>
-                    <div class="regular-height" v-for="(kng,kngIndex) in item.kngArr" :key="kngIndex">{{kng.name}}</div>
-                  </div>
-                  <div class="row-wrap">
+<!--                  <div class="col">-->
+<!--                    <div style="font-weight: bold;">知识点名称</div>-->
+<!--                    <div class="regular-height" v-for="(kng,kngIndex) in item.kngArr" :key="kngIndex">{{kng.name}}</div>-->
+<!--                  </div>-->
+<!--                  <div class="row-wrap">-->
                     <div class="row row-header" style="font-weight: bold;">
-                      <div style="flex: 0 0 33%">正确数</div>
-                      <div style="flex: 0 0 33%">总题数</div>
-                      <div style="flex: 0 0 33%">掌握程度</div>
-                      <div style="flex: 0 0 33%">班级平均掌握程度</div>
-                      <div style="flex: 0 0 33%">建议</div>
+                      <div style="flex: 0 0 28%">知识点名称</div>
+                      <div style="flex: 0 0 16%">正确数</div>
+                      <div style="flex: 0 0 16%">总题数</div>
+                      <div style="flex: 0 0 20%">掌握程度</div>
+                      <div style="flex: 0 0 20%;line-height: initial">班级平均掌握程度</div>
+<!--                      <div style="flex: 0 0 33%">建议</div>-->
                     </div>
                     <div class="row" v-for="(kng,kngIndex) in item.kngArr" :key="kngIndex">
-                      <div style="flex: 0 0 33%">{{kng.currentNum}}</div>
-                      <div style="flex: 0 0 33%">{{kng.totalNum}}</div>
-                      <div style="flex: 0 0 33%">{{kng.masteryNum}}</div>
-                      <div style="flex: 0 0 33%">{{kng.sdadsa}}</div>
-                      <div v-html="handleSuggest(kng.currentNum,kng.totalNum,kng.masteryNum)" class="regular-height"
-                           style="flex: 0 0 33%;flex-direction: column;text-align: left">
-                      </div>
+                      <div style="flex: 0 0 28%">{{kng.name}}</div>
+                      <div style="flex: 0 0 16%">{{kng.currentNum}}</div>
+                      <div style="flex: 0 0 16%">{{kng.totalNum}}</div>
+                      <div style="flex: 0 0 20%">{{kng.masteryNum}}</div>
+                      <div style="flex: 0 0 20%">{{kng.sdadsa}}</div>
+<!--                      <div v-html="handleSuggest(kng.currentNum,kng.totalNum,kng.masteryNum)" class="regular-height"-->
+<!--                           style="flex: 0 0 33%;flex-direction: column;text-align: left">-->
+<!--                      </div>-->
                     </div>
+<!--                  </div>-->
+                </div>
+                <div v-if="item.kngArr.length" class="tip">
+                  <div>数据分析:</div>
+                  <div v-html="handleSuggest(item)">
                   </div>
                 </div>
                 <div v-if="!item.kngArr.length" class="empty-page">
                   <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
                   <div class="grey9 fs12">当前没有数据~</div>
                 </div>
-                <div class="tip">可在表格内滑动，查看学生更多任务情况</div>
               </div>
               <div v-show="tabIndex===1">
-                <div style="position: relative;">
-                  <div :id="'task'+index" class="histogram-chart mgt10"></div>
-                  <div class="tip">可在表格内滑动，查看更多内容</div>
-                  <div class="empty-tip" v-if="!item.statInfo.arrLength">当前无数据~</div>
+<!--                <div style="position: relative;">-->
+<!--                  <div :id="'task'+index" class="histogram-chart mgt10"></div>-->
+<!--                  <div class="tip">可在表格内滑动，查看更多内容</div>-->
+<!--                  <div class="empty-tip" v-if="!item.statInfo.arrLength">当前无数据~</div>-->
+<!--                </div>-->
+
+                <div class="stat-table">
+                  <div class="row row-header" style="font-weight: bold;">
+                    <div style="flex: 0 0 34%">任务类型</div>
+                    <div style="flex: 0 0 33%">任务数</div>
+                    <div style="flex: 0 0 33%">已完成任务数</div>
+                  </div>
+                  <div class="row" v-for="(task,taskIndex) in item.statInfo.taskArr" :key="taskIndex">
+                    <div style="flex: 0 0 34%">{{task.name}}</div>
+                    <div style="flex: 0 0 33%">{{task.total_count||0}}</div>
+                    <div style="flex: 0 0 33%">{{task.total_finish||0}}</div>
+                  </div>
                 </div>
                 <div class="data-analyse fs12">
                   <div style="font-weight: bold;">数据分析:</div>
-                  <div class="grey9" v-if="item.statInfo.arrLength">
+                  <div class="grey9" v-if="item.statInfo.taskArr.length">
                     <div>总任务数为{{item.statInfo.total}}个，已完成任务数为{{item.statInfo.finish}}个；</div>
                     <div>完成任务占比为：{{item.statInfo.percent|mul(100,0)}}%。</div>
                     <div class="red">完成情况表现:{{item.statInfo.suggest}}</div>
@@ -238,12 +257,13 @@
           if (res.flag) {
             const tchCourseTaskCount = res.data[0] ? res.data[0].tchCourseTaskCount : []
             let info = tchCourseTaskCount.reduce((t, v) => {
+              this.$set(v,'name',getTaskTypeName(v.tast_type))
               t.total += v.total_count
               t.finish += v.total_finish
               return t
             }, {total: 0, finish: 0})
             info.percent = calculate.div(info.finish, info.total)
-            info.arrLength = tchCourseTaskCount.length
+            info.taskArr = tchCourseTaskCount
             if (info.percent < 0.6) {
               info.suggest = '较差，需要继续加强任务的完成率，积极完成老师布置的任务，加强监督。'
             } else if (info.percent >= 0.6 && info.percent < 0.8) {
@@ -254,7 +274,7 @@
               info.suggest = '优秀，请继续保持，同时继续完成任务的占比，做到百分百完成。'
             }
             this.$set(item, 'statInfo', info)
-            this.drawHistogram2(tchCourseTaskCount, index)
+            // this.drawHistogram2(tchCourseTaskCount, index)
             this.$set(item, 'statDone', true)  // 标记该科目的任务完成情况已加载完毕,下次无需再加载
             this.$store.commit('setVanLoading', false)
           } else {
@@ -263,23 +283,32 @@
           }
         })
       },
-      handleSuggest(currentNum, totalNum, masteryNum) {
-        let suggest = ''
+      handleSuggest(item) {
+         let currentNum = 0, totalNum = 0, masteryNum = 0, suggest = ''
+         item.kngArr.forEach(v => {
+           currentNum = calculate.add(currentNum,v.currentNum)
+           totalNum = calculate.add(totalNum,v.totalNum)
+           masteryNum = calculate.add(masteryNum,v.masteryNum)
+         })
+        currentNum = calculate.div(currentNum,item.kngArr.length)
+        totalNum = calculate.div(totalNum,item.kngArr.length)
+        masteryNum = calculate.div(masteryNum,item.kngArr.length)
+
         if (calculate.div(currentNum, totalNum) <= 0.8 && totalNum <= 20) {
           //正确数<=总题数的80% && 总题数<=20题
-          suggest = `<div>①该知识点的练习过少，建议使用<span class="blue">“自主学习--测试---练”</span>功能加强练习。</div>`
+          suggest = `<div>①总正确数低于等于总题数的80%，练习量较少，建议使用<span class="blue">“自主学习--测试---练”</span>功能加强练习。</div>`
         } else if (calculate.div(currentNum, totalNum) > 0.8 && totalNum <= 20) {
           //正确数>总题数的80% && 总题数<=20题
-          suggest = `<div>①该知识点的练习量一般，建议使用<span class="blue">“自主学习--测试---测试”</span>功能进行深入检测。</div>`
+          suggest = `<div>①总正确数高于总题数的80%，但总题数不高，练习量一般，建议使用<span class="blue">“自主学习--测试---测试”</span>功能进行深入检测。</div>`
         }
 
         if (masteryNum <= 90) {
-          suggest += `<div>${totalNum <= 20 ? '②' : '①'}该知识点的掌握程度较低，建议使用<span class="blue">“自主学习--学习--微课”</span>功能重新梳理知识点；使用<span class="blue">“自主学习--学习--素材”</span>功能，
+          suggest += `<div>${totalNum <= 20 ? '②' : '①'}总掌握程度低于等于90%，掌握程度较低，建议使用<span class="blue">“自主学习--学习--微课”</span>功能重新梳理知识点；使用<span class="blue">“自主学习--学习--素材”</span>功能，
 巩固老师课堂所讲知识点。</div>`
         } else if (masteryNum > 90 && masteryNum < 95) {
-          suggest += `<div>${totalNum <= 20 ? '②' : '①'}该知识点的掌握程度一般，建议使用<span class="blue">“自主学习--学习--素材”</span>功能进一步梳理知识点，深入巩固知识点。</div>`
+          suggest += `<div>${totalNum <= 20 ? '②' : '①'}总掌握程度90%-95%，掌握程度一般，建议使用<span class="blue">“自主学习--学习--素材”</span>功能进一步梳理知识点，深入巩固知识点。</div>`
         } else if (masteryNum >= 95) {
-          suggest += `<div>${totalNum <= 20 ? '②' : '①'}该知识点的掌握程度良好，建议使用<span class="blue">“自主学习--学习--测试”</span>功能进一步练习举一反三的题目。</div>`
+          suggest += `<div>${totalNum <= 20 ? '②' : '①'}总掌握程度大于等于95%以上，掌握程度良好，建议使用<span class="blue">“自主学习--学习--测试”</span>功能进一步练习举一反三的题目。</div>`
         }
         return suggest
       },
@@ -773,7 +802,7 @@
               subjectName: getSubjectName(v),
               subjectType: v,
               kngArr: [],
-              statInfo: {total: 0, finish: 0, percent: 0, arrLength: 0},
+              statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
               scoreInfo: {total: 0, maxDate:'',maxScore:0,maxAvg:0,minDate:'',minScore:0,minAvg:0, suggest:''},
               kngFold: false,
               taskFold: false,
@@ -815,7 +844,8 @@
       overflow-y: auto;
 
       .data-analyse {
-        padding: 0 28px;
+        /*padding: 0 28px;*/
+        margin-top: 10px;
 
         > div:last-child {
           padding-left: 20px;
@@ -831,6 +861,7 @@
         margin-top: 15px;
         font-size: 12px;
         border-top: 1.5px solid @blue;
+        border-left: 1px solid #eee;
         width: 100%;
         /*overflow-x: auto;*/
         position: relative;
@@ -853,7 +884,7 @@
           }
 
           > div {
-            padding: 0 10px;
+            padding: 0 6px;
             color: #333;
             flex: 0 0 50%;
             min-height: 44px;
