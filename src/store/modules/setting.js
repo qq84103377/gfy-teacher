@@ -21,7 +21,8 @@ const state = {
 
   filterYear: '', //筛选年段
   filterSubject: '', //筛选科目
-  filterSubjectLabel:''
+  filterSubjectLabel:'',
+  teachStatFilterTime: '', //教学统计时间筛选
 }
 
 const mutations = {
@@ -101,7 +102,10 @@ const mutations = {
   setFilterSubjectLabel(state,data) {
     state.filterSubjectLabel = data
     localStorage.setItem('filterSubjectLabel', JSON.stringify(data))
-  }
+  },
+  setTeachStatFilterTime(state,data) {
+    state.teachStatFilterTime = data
+  },
 }
 
 const actions = {
@@ -133,6 +137,7 @@ const getters = {
   getRemoveQuestionList: state => state.removeQuestionList,
   getIsRevert: state => state.isRevert,
   getIsStuBoard: state => state.isStuBoard,
+  getTeachStatFilterTime: state => state.teachStatFilterTime,
 
   getFilterYear: state => state.filterYear || localStorage.getItem('filterYear') ? JSON.parse(localStorage.getItem('filterYear')) : '',
   getFilterSubject: state => state.filterSubject ||  localStorage.getItem('filterSubject') ?JSON.parse(localStorage.getItem('filterSubject')):'',

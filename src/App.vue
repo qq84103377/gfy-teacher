@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <navigation>
+<!--    由于用了vue-navigation插件,所以如果有页面使用了子路由嵌套,当进入子路由时,父路由会重新触发created,相当于新渲染了一个父页面
+    暂时先根据有子路由嵌套的路径判断不使用页面缓存(有时间再改),vue-navigation也没有指定页面不缓存的功能-->
+    <router-view v-if="includes()"></router-view>
+    <navigation v-else>
       <router-view></router-view>
     </navigation>
     <upgrade></upgrade>
@@ -23,6 +26,9 @@ export default {
     this.mql.addListener(this.onMatchMeidaChange);
   },
   methods: {
+      includes() {
+       return ['/teachStat/','/taskStat','/studySituation'].includes(this.$route.path)
+      },
     onMatchMeidaChange(mql) {
       if (mql.matches) {
         // 竖屏

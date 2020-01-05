@@ -233,6 +233,7 @@
         if (time2.getTime() - time1.getTime() > 15552000000) {
           return this.$toast('时间范围不能超过6个月')
         }
+        this.$store.commit('setTeachStatFilterTime', {start: this.filterTime.start, end: this.filterTime.end})
         // if(this.$route.path === '/taskStat') {
         // this.$refs['routerView'].init()
         // }
@@ -241,11 +242,16 @@
     },
     created() {
       this.gradeSubjectList = JSON.parse(localStorage.gradeList).filter(v => !(v.teacherInfoList.some(t => t.subjectType === 'S20') && v.teacherInfoList.length === 1))
-      let time = new Date()
-      time.setMonth(time.getMonth()-1)
-      this.filterTime.start = generateTimeReqestNumber(time)
+
+      this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
+      this.filterTime.end = this.$store.getters.getTeachStatFilterTime.end
       this.currentDate = new Date(this.filterTime.start)
-      console.log(this.classList, '=3=3=3=');
+
+      // let time = new Date()
+      // time.setMonth(time.getMonth()-1)
+      // this.filterTime.start = generateTimeReqestNumber(time)
+      // this.currentDate = new Date(this.filterTime.start)
+      // console.log(this.classList, '=3=3=3=');
     },
   }
 </script>
