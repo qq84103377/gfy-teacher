@@ -336,6 +336,7 @@
               name: '总题数',
               type: 'bar',
               data: total,
+              barWidth: xData.length>5?'25%':`${xData.length*5}%`,
               itemStyle: {
                 normal: {
                   color: '#56F2E3'
@@ -346,6 +347,7 @@
               name: '正确数',
               type: 'bar',
               data: right,
+              barWidth: xData.length>5?'25%':`${xData.length*5}%`,
               itemStyle: {
                 normal: {
                   color: '#FEB524'

@@ -459,7 +459,7 @@
               type: 'inside',
               xAxisIndex: [0],
               start: 0,
-              end: xData.length ? Math.ceil(100 / xData.length) : 100
+              end: xData.length>5 ? (5/xData.length)*100:100
             }
           ],
           legend: {
@@ -510,11 +510,13 @@
             {
               name: '总题数',
               type: 'bar',
+              barWidth: xData.length>5?'25%':`${xData.length*5}%`,
               data: total
             },
             {
               name: '正确数',
               type: 'bar',
+              barWidth: xData.length>5?'25%':`${xData.length*5}%`,
               data: right
             },
             {

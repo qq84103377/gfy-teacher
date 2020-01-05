@@ -315,7 +315,7 @@ export default {
           {
             name: '知识点分布',
             type: 'bar',
-            barWidth: '50%',
+            barWidth: this.examInfo.knowledgePointInfos.length>5?'50%':`${this.examInfo.knowledgePointInfos.length}0%`,
             data: Object.keys(this.examInfo.knowMap).map(v => this.examInfo.knowMap[v])
           }
         ],
@@ -401,7 +401,7 @@ export default {
           {
             name: '使用次数',
             type: 'bar',
-            barWidth: '50%',
+            barWidth: this.examInfo.useCount.length>5?'50%':`${this.examInfo.useCount.length}0%`,
             data: this.examInfo.useCount.map(v => v.value),
           },
           {
@@ -429,7 +429,7 @@ export default {
             type: 'inside',
             xAxisIndex: [0],
             start: 0,
-            end: 25
+            end: scoreArr.length>5?(5/scoreArr.length)*100:100,
           }
         ],
         itemStyle: {
@@ -495,14 +495,13 @@ export default {
           {
             name: '得分',
             type: 'bar',
-            // data:socre
+            barWidth: scoreArr.length>5?'50%':`${scoreArr.length}0%`,
             data: scoreArr,
           },
           {
             name: '平均分',
             type: 'line',
             yAxisIndex: 1,
-            // data:theAverageScore
             data: averageArr,
             itemStyle: {
               color: '#F2C760'
