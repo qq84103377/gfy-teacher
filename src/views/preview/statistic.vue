@@ -28,11 +28,11 @@
           </div>
           <div>
             <span>班级最高分</span>
-            <span class="red">{{taskFinishInfo.maxScore}}分</span>
+            <span class="red">{{taskFinishInfo.maxScore||0}}分</span>
           </div>
           <div>
             <span>班级最低分</span>
-            <span class="red">{{taskFinishInfo.minScore}}分</span>
+            <span class="red">{{taskFinishInfo.minScore||0}}分</span>
           </div>
         </div>
       </div>
@@ -789,7 +789,7 @@
               {
                 name: '文言文全章复习与巩固',
                 type: 'pie',
-                radius: [0, 53],
+                radius: [0, '60%'],
                 // center: ['50%', '60%'],
                 label: {
                   // normal: {
