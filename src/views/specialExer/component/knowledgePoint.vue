@@ -31,7 +31,7 @@ import myCollapse from './myCollapse'
 
 export default {
   name: "knowledgePoint",
-  props: ['start', 'classGrade', 'areaCode', 'courseIds', 'active', 'textBookId', 'gradeTermId'],
+  props: ['start', 'classGrade', 'areaCode', 'courseIds', 'active', 'textBookId', 'gradeTermId', 'toggleNum', 'onRefresh'],
   data() {
     return {
       list: [],
@@ -39,7 +39,8 @@ export default {
       classList: ['row1', 'row2', 'row3', 'row4', 'row5'],
       classIndex: -1,
       toggleFirst: false,
-      isRecomment: false
+      isRecomment: false,
+      isChange: false
     }
   },
   components: {
@@ -50,25 +51,51 @@ export default {
       console.log("start nv", nv);
       console.log("start ov", ov);
       if (nv) {
-        this.toggleFirst = true
-        this.getKnowledgeCatalogInfo()
 
-        this.$emit('update:start', false)
+        if (this.toggleNum == 1) {
+          this.toggleFirst = true
+          this.isChange = false
+
+          this.toggleFirst = true
+          this.getKnowledgeCatalogInfo()
+
+          this.$emit('update:start', false)
+        } else {
+          if (this.isChange) {
+            this.isChange = false
+            this.list = []
+            this.listIndex = 0
+            this.isRecomment = false
+            this.classIndex = -1
+            this.getKnowledgeCatalogInfo()
+          }
+          this.$emit('update:start', false)
+          this.$parent.startKnowledge = false
+        }
+
+      }
+    },
+    async onRefresh(nv, ov) {
+      console.log("onRefresh2 nv", nv);
+      console.log("onRefresh2 ov", ov);
+      if (nv) {
+        this.isChange = false
+        await this.getKnowledgeCatalogInfo()
+        this.$emit('update:onRefresh', false)
+        this.$parent.$parent.isLoading = false
       }
     },
     courseIds(nv, ov) {
       console.log("courseIds nv", nv);
       console.log("courseIds ov", ov);
       if (nv) {
-        if (!this.toggleFirst) return
-        console.log("this.$parent", this.$parent);
+        this.isChange = true
+        if (this.active != 1) return
         this.list = []
         this.listIndex = 0
         this.isRecomment = false
         this.classIndex = -1
         this.getKnowledgeCatalogInfo()
-
-        // this.onLoad()
       }
     },
 
@@ -106,11 +133,18 @@ export default {
         this.$store.commit('setVanLoading', false)
         console.log("知识点目录：", res)
         if (res.flag) {
-          this.isRecomment = res.data[0].recommend
-
-          if (!res.data.length||!res.data[0].resultList.length) {
+          // this.$parent.isLoading = false
+          console.log(this.$parent, 'this.$parent')
+          if (!res.data) {
+            this.isRecomment = true
             return
           }
+          if (!res.data.length || !res.data[0].resultList.length) {
+            this.isRecomment = true
+            return
+          }
+          this.isRecomment = res.data[0].recommend
+
 
           function filterArray(data, parentId) {
             var tree = [];
@@ -133,7 +167,6 @@ export default {
           let result = filterArray(res.data[0].resultList, '-1')
           console.log(result, 'result');
 
-
           this.list = result[0].child
           this.list[0].active = true
 
@@ -150,14 +183,14 @@ export default {
 
           addClass(this.list[0], this.classIndex)
 
-          return
 
         } else {
-
+          this.isRecomment = true
         }
 
       }).catch(err => {
         this.$store.commit('setVanLoading', false)
+        // this.$parent.isLoading = false
       })
     },
     toggleTab(item, index) {
@@ -169,7 +202,6 @@ export default {
       this.listIndex = index
     },
     go(item, index) {
-      console.log("?????");
       this.$router.push({
         path: `/questionList`,
         query: {
@@ -235,7 +267,7 @@ export default {
     text-align: center;
     color: #999999;
     background: #fff;
-    margin-bottom: 20px;  
+    margin-bottom: 20px;
     .null-tips {
       // margin-top: 350px;
       // margin-left: 50%;

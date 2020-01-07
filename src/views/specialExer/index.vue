@@ -1,7 +1,7 @@
 <template>
   <section class="question-type-wrap">
     <van-row class="question-type-wrap__tit">
-      <van-col span="8" :class="{ active: active == 0 }" @click="active = 0">题型专项</van-col>
+      <van-col span="8" :class="{ active: active == 0 }" @click="active = 0;changeTab(0)">题型专项</van-col>
       <van-col span="8" :class="{ active: active == 1 }" @click="active = 1;changeTab(1)">知识点专项</van-col>
       <van-col span="8" :class="{ active: active == 2 }" @click="active = 2;changeTab(2)">复习套卷</van-col>
     </van-row>
@@ -41,20 +41,23 @@
         <div class="blue">{{reviewMoreLable}}</div>
       </van-cell>
 
-      <question-type v-show="active == 0" :list='typesList' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
 
-      <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
+        <question-type v-show="active == 0" :list='typesList' :active='active' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
 
-      <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
+        <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :active='active' :toggleNum='toggleNum2' :onRefresh.sync='onRefresh2' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
+
+        <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :toggleNum='toggleNum3' :onRefresh.sync='onRefresh3' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
+      </van-pull-refresh>
     </div>
 
     <filter-panel :label.sync="areaLabel" :visible.sync="areaFilterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
+    <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :active='active' :toggleNum='toggleNum1' :start.sync='startTypes' :onRefresh.sync='onRefresh1' :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></version-filter>
 
-    <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum2='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
+    <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
 
     <more-Filter :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList' :yearItem.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :changeMore.sync='changeMore'></more-Filter>
 
@@ -117,6 +120,8 @@ export default {
       areaCode: '0757',
       provinceCode: '44',
 
+      toggleNum1: 1,
+      startTypes: false,
       typeSubjectFilterShow: false,
       typeSubjectLabel: '',
       subjectType: localStorage.currentSubjectType,
@@ -138,7 +143,7 @@ export default {
       termType: '',  // 上下学期type
       gradeItem: '', // 年级type
 
-      toggleNum2: 0, // tab切换到复习套卷的次数
+      toggleNum3: 0, // tab切换到复习套卷的次数
       startReviewTest: false, //是否开始查询复习套卷
 
       reviewMoreShow: false,
@@ -161,10 +166,14 @@ export default {
       changeGradeSubject: false,//更改了年级学科筛选
       changeMore: false, //更改了更多筛选
 
-      toggleNum1: 0, // tab切换到知识点的次数
+      toggleNum2: 0, // tab切换到知识点的次数
       startKnowledge: false, //是否开始查询知识点
 
-      scrollTop:''
+      scrollTop: '',
+      isLoading: false,
+      onRefresh1: false,
+      onRefresh2: false,
+      onRefresh3: false,
     };
   },
   watch: {
@@ -193,17 +202,29 @@ export default {
     });
   },
   methods: {
+    onRefresh() {
+      if (this.active == 0) {
+        this.onRefresh1 = true
+      } else if (this.active == 1) {
+        this.onRefresh2 = true
+      } else if (this.active == 2) {
+        this.onRefresh3 = true
+      }
+    },
     changeTab(active) {
       this.$refs["body"].scrollTop = 0
-      console.log(this.toggleNum2, 'toggleNum2////');
-      console.log(this.toggleNum1, 'toggleNum1////');
-      if (active == 2 && this.toggleNum2 == 0) {
+      this.isLoading=false
+
+      if (active == 2) {
         this.getYearList()
         this.startReviewTest = true
-        this.toggleNum2++
+        this.toggleNum3++
 
-      } else if (active == 1 && this.toggleNum1 == 0) {
+      } else if (active == 1) {
         this.startKnowledge = true
+        this.toggleNum2++
+      } else {
+        this.startTypes = true
         this.toggleNum1++
       }
     },
@@ -363,38 +384,6 @@ export default {
         this.toggleNum2 = 0
       })
     },
-
-    // // 获取地区列表
-    // async getSysDictList() {
-    //   const json = {
-    //     requestJson: JSON.stringify({
-    //       interUser: "123",
-    //       interPwd: "123",
-    //       dictCode: "Domain_Exam_Belong_Type"
-    //     })
-    //   }
-    //   await getSysDictList(json).then(res => {
-    //     // console.log(res, 'getSysDictList res');
-    //     if (res.flag) {
-    //       this.reviewtypeList = res.data[0].sysDictInfoList.map(function (item) {
-    //         return {
-    //           name: item.dictValue,
-    //           value: item.dictKey,
-    //           active: false
-    //         };
-    //       });
-    //       var temp = {
-    //         name: "不限",
-    //         value: "",
-    //         active: true
-    //       };
-    //       this.reviewtypeList.unshift(temp);
-    //       this.reviewMoreLable = this.reviewtypeList[0].value;
-    //     }
-    //   }).catch(err => {
-    //     this.toggleNum2 = 0
-    //   })
-    // },
 
     // 获取更多年份列表
     getYearList() {

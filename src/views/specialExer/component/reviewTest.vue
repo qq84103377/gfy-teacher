@@ -51,19 +51,20 @@ import { getTestPaperInfoList } from '@/api/index'
 
 export default {
   name: "reviewTest",
-  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore','active'],
+  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore', 'active', 'toggleNum','onRefresh'],
   data() {
     return {
       testList: [],
       recommendList: [],
       currentPage: 0,
-      totalPage:5,
+      totalPage: 5,
       listLoading: false,
       finished: false,
       without: false,
       reviewTestType: this.$store.state.reviewTestType,
       totalNumber: 0,
-      toggleFirst:false
+      toggleFirst: false,
+      isChange: false
     }
   },
   filters: {
@@ -76,17 +77,55 @@ export default {
       console.log("start nv", nv);
       console.log("start ov", ov);
       if (nv) {
-        this.toggleFirst=true
 
+        if (this.toggleNum == 1) {
+          this.toggleFirst = true
+          this.isChange = false
+
+          this.onLoad()
+          this.$parent.startReviewTest = false
+          this.$emit('update:start', false)
+        } else {
+
+          if (this.isChange) {
+            this.isChange = false
+            this.currentPage = 0
+            this.totalPage = 5
+            this.listLoading = false
+            this.finished = false
+            this.without = false
+            this.totalNumber = 0
+            this.onLoad()
+          }
+          this.$emit('update:start', false)
+          this.$parent.startReviewTest = false
+        }
+
+      }
+    },
+    async onRefresh(nv, ov) {
+      console.log("onRefresh3 nv", nv);
+      console.log("onRefresh3 ov", ov);
+      if (nv) {
+        this.isChange = false
+        this.currentPage = 0
+        this.totalPage = 5
+        this.listLoading = false
+        this.finished = false
+        this.without = false
+        this.totalNumber = 0
         this.onLoad()
-        // this.getTestPaperInfoList()
-        this.$emit('update:start', false)
+        this.$emit('update:onRefresh', false)
+        this.$parent.$parent.isLoading = false
       }
     },
     areaCode(nv, ov) {
       console.log("areaCode nv", nv);
       console.log("areaCode ov", ov);
-      if (!this.toggleFirst) return
+      this.isChange = true
+      if (this.active != 2) return
+      // if (!this.toggleFirst) return
+
       // this.testList= []
       // this.recommendList= []
       this.currentPage = 0
@@ -102,9 +141,9 @@ export default {
       console.log("changeGradeSubject nv", nv);
       console.log("changeGradeSubject ov", ov);
       if (nv) {
-        if (!this.toggleFirst) return
-        console.log("this.$parent", this.$parent);
-        this.$parent.changeGradeSubject = false
+        this.isChange = true
+        if (this.active != 2) return
+        this.$parent.$parent.changeGradeSubject = false
         this.currentPage = 0
         this.totalPage = 5
         this.listLoading = false
@@ -118,9 +157,9 @@ export default {
       console.log("changeMore nv", nv);
       console.log("changeMore ov", ov);
       if (nv) {
-        if (!this.toggleFirst) return
-        console.log("this.$parent", this.$parent);
-        this.$parent.changeMore = false
+        this.isChange = true
+        if (this.active != 2) return
+        this.$parent.$parent.changeMore = false
         this.currentPage = 0
         this.totalPage = 5
         this.listLoading = false
@@ -131,19 +170,12 @@ export default {
       }
     },
   },
-  // computed: {
-  //   subjectType() {
-  //     return localStorage.currentSubjectType
-  //   }
-  // },
+
   methods: {
     go(item) {
       this.$router.push({
         path: `/examDetail`, query: {
-          // "tchCourseId": this.$route.query.tchCourseId,
-          // "sysCourseId": this.$route.query.sysCourseId,
-          // "relationCourseId": this.$route.query.relationCourseId,
-          flag:1,
+          flag: 1,
           type: item.stateName ? 1 : 0,
           testPaperId: item.testPaperId,
           subjectType: localStorage.currentSubjectType,
@@ -151,14 +183,10 @@ export default {
           title: item.testPaperName,
         }
       })
-
-      // this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)
     },
     onLoad() {
       console.log("onLoad");
-      // if (!this.start) {
-      //   return
-      // }
+
       if (!this.without) {
         console.log("onLoad1");
         this.currentPage++
@@ -166,7 +194,7 @@ export default {
           this.listLoading = false
           this.finished = true
           return false
-        
+
         }
         console.log("onLoad11");
         this.getTestPaperInfoList()
@@ -177,7 +205,7 @@ export default {
           this.listLoading = false
           this.finished = true
           return false
-          
+
         }
         console.log("onLoad22");
         this.getTestPaperInfoList2()
@@ -222,7 +250,7 @@ export default {
       if (this.currentPage === 1) {
         this.testList = []
       }
-      if (this.currentPage === 1&&(!response.flag || !response.data.length)) {
+      if (this.currentPage === 1 && (!response.flag || !response.data.length)) {
         this.testList = []
         this.without = true
         this.currentPage = 0
@@ -262,7 +290,7 @@ export default {
         this.recommendList = this.recommendList.concat(r.data)
         console.log(r, 'getTestPaperInfoList r');
 
-        if (this.currentPage >= res.total) {
+        if (this.currentPage >= r.total) {
           this.finished = true
         }
 
@@ -286,7 +314,7 @@ export default {
   height: 30px;
   line-height: 30px;
 }
-.light{
+.light {
   width: 12px;
   height: 15px;
   margin-left: 5px;

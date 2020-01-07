@@ -38,7 +38,7 @@ import eventBus from "@/utils/eventBus";
 
 export default {
   name: "yearSubjectFilter",
-  props: ['visible', 'label', 'types', 'subjectType'],
+  props: ['visible', 'label', 'types', 'subjectType', 'active', 'start', 'toggleNum', 'onRefresh'],
   data() {
     return {
       index: 0,
@@ -49,7 +49,7 @@ export default {
       ],
       tempList: [],
       tempIndex: 0,
-
+      isChange: false
     }
   },
   computed: {
@@ -67,6 +67,28 @@ export default {
       if (v) {
         this.tempIndex = this.index
         this.tempList = JSON.parse(JSON.stringify(this.subjectList))
+      }
+    },
+    start(nv, ov) {
+      console.log("start nv", nv);
+      console.log("start ov", ov);
+      if (nv) {
+        if (this.isChange) {
+          this.isChange = false
+          this.getExamSectionTypeRelation(this.subjectType)
+        }
+        this.$emit('update:start', false)
+        this.$parent.startTypes = false
+      }
+    },
+    async onRefresh(nv, ov) {
+      console.log("onRefresh1 nv", nv);
+      console.log("onRefresh1 ov", ov);
+      if (nv) {
+        this.isChange = false
+        await this.getExamSectionTypeRelation(this.subjectType)
+        this.$emit('update:onRefresh', false)
+        this.$parent.isLoading = false
       }
     },
     subjectType(nv, ov) {
@@ -90,11 +112,15 @@ export default {
       this.$store.commit('setFilterYear', this.subjectList[this.index].value)
       this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
 
+      this.isChange = true
+
+      if (this.active != 0) return
+
       this.getExamSectionTypeRelation(this.subjectList[this.index].child[subjectIndex].subjectType)
     }
   },
   created() {
-    // this.$store.commit('setFilterSubjectLabel', null)
+    console.log('year subjectType   create')
 
     this.getSubjectList()
     const classMap = JSON.parse(localStorage.classMap)
@@ -123,11 +149,10 @@ export default {
     this.$store.commit('setFilterSubject', this.subjectList[this.index].child[subjectIndex].subjectType)
 
 
-    // this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + this.subjectList[this.index].child[subjectIndex].subjectName)
-
-
     this.tempIndex = this.index
     this.tempList = JSON.parse(JSON.stringify(this.subjectList))
+
+    if (this.active != 0) return
 
     this.getExamSectionTypeRelation(this.subjectList[this.index].child[subjectIndex].subjectType)
 
@@ -186,7 +211,7 @@ export default {
       if (item) {
         if (this.index !== this.tempIndex) {
           //切换过学年
-          eventBus.$emit('changeYear', this.index, item ? item.subjectType : '')
+
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
           if (this.types) {
             this.$store.commit('setVanLoading', true)
@@ -201,16 +226,21 @@ export default {
           }
 
           //没有切换学年,只切换学科
-          eventBus.$emit('changeYear', this.index, item ? item.subjectType : '')
+
 
           this.$emit('update:label', this.subjectList[this.index].name + (item ? item.subjectName : ''))
           if (this.types) {
-            this.$store.commit('setVanLoading', true)
+
+            // this.$store.commit('setVanLoading', true)
             this.$store.commit('setFilterSubject', item.subjectType)
             // this.$store.commit('setFilterSubjectLabel', this.subjectList[this.index].name + (item ? item.subjectName : ''))
             this.$emit('update:subjectType', item.subjectType)
-            this.$emit('update:changeYearSubject', true)
-            this.getExamSectionTypeRelation(item.subjectType)
+
+
+            if (this.active == 0) {
+              this.getExamSectionTypeRelation(item.subjectType)
+
+            }
           }
         }
         localStorage.setItem("currentSubjectTypeName", item.subjectName);
@@ -245,7 +275,7 @@ export default {
 
           // if (this.types) {
           //   this.$emit('update:subjectType', item.subjectType)
-          //   this.$emit('update:changeYearSubject', true)
+
           //   this.getExamSectionTypeRelation(item.subjectType)
           // }
         }).catch(() => {

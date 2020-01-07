@@ -7,22 +7,22 @@
 
         <div class="stu-answer">
           <div v-html="item.text"></div>
-          <div style="width: 100%;" v-if="item.audioArr.length">
-<!--            <video-player class="video-player-box"-->
-<!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
-<!--                          ref="videoPlayer"-->
-<!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
-<!--                          :playsinline="true"-->
-<!--                          customEventName="customstatechangedeventname">-->
-<!--            </video-player>-->
+          <div style="width: 100%;" v-if="item.audioArr&&item.audioArr.length">
+            <!--            <video-player class="video-player-box"-->
+            <!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
+            <!--                          ref="videoPlayer"-->
+            <!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
+            <!--                          :playsinline="true"-->
+            <!--                          customEventName="customstatechangedeventname">-->
+            <!--            </video-player>-->
             <audio controls controlsList="nodownload" v-for="(audio,index) in item.audioArr" :key="index" :src="audio"></audio>
           </div>
-          <div style="width: 100%;" v-if="item.videoArr.length">
-            <video poster="../assets/img/video-poster.png" class="video-wrap" v-for="(video,index) in item.videoArr" :key="index" style="width: 100%;" controls
-                   controlsList="nodownload" :src="video"></video>
+          <div style="width: 100%;" v-if="item.videoArr&&item.videoArr.length">
+          
+            <video class="video-wrap" v-for="(s,index) in item.videoArr" webkit-playsinline playsinline x5-playsinline=""  poster="../assets/img/video-poster.png" @click='goVideoPage(s)' :src="s">
+            </video>
           </div>
-          <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]"
-               v-if="item.imgArr.length">
+          <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]" v-if="item.imgArr&&item.imgArr.length">
             <div @click="imgCorrect(img,i,index)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
@@ -30,23 +30,18 @@
 
       </div>
       <div class="stu-exp-wrap__item__btn-group">
-        <div @click="handlePraise(item)" :class="{blue:item.good}"><i class="iconGFY icon-good"
-                                                                      :class="{'icon-good-active':item.good}"></i>赞
+        <div @click="handlePraise(item)" :class="{blue:item.good}"><i class="iconGFY icon-good" :class="{'icon-good-active':item.good}"></i>赞
         </div>
-        <div @click="handleTop(item)" :class="{blue:item.topFlag === '1'}"><i class="iconGFY icon-top"
-                                                                             :class="{'icon-top-active':item.topFlag === '1'}"></i>置顶
+        <div @click="handleTop(item)" :class="{blue:item.topFlag === '1'}"><i class="iconGFY icon-top" :class="{'icon-top-active':item.topFlag === '1'}"></i>置顶
         </div>
-        <div @click="handleEss(item)" :class="{red:item.essFlag === '1'}"><i class="iconGFY icon-essence"
-                                                                                        :class="{'icon-essence-active':item.essFlag === '1'}"></i>精华
+        <div @click="handleEss(item)" :class="{red:item.essFlag === '1'}"><i class="iconGFY icon-essence" :class="{'icon-essence-active':item.essFlag === '1'}"></i>精华
         </div>
         <div @click="handleScore(item,'T01')"><i class="iconGFY icon-circle-plus"></i>加分</div>
         <div @click="handleScore(item,'T02')"><i class="iconGFY icon-circle-sub"></i>减分</div>
         <div @click="$set(item,'showComment',!item.showComment)"><i class="iconGFY icon-talk"></i>评论</div>
       </div>
-      <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active"></i><span
-        class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
-        v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
-      <div class="comment-wrap" v-if="item.showComment" >
+      <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active"></i><span class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
+      <div class="comment-wrap" v-if="item.showComment">
         <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
         <van-button @click="$emit('comment',item.comment,item)" class="submit-btn" type="info">发表</van-button>
       </div>
@@ -62,249 +57,234 @@
 </template>
 
 <script>
-  import 'video.js/dist/video-js.css'
-  import {videoPlayer} from 'vue-video-player'
-  import {getStudentName} from '@/utils/filter'
+import 'video.js/dist/video-js.css'
+import { videoPlayer } from 'vue-video-player'
+import { getStudentName } from '@/utils/filter'
 
-  export default {
-    name: "stuExp",
-    components: {videoPlayer},
-    props: ['list', 'classId'],
-    computed: {
-      getStudentName() {
-        return getStudentName
-      }
-    },
-    data() {
-      return {
-        comment: '',
-      }
-    },
-    methods: {
-      imgCorrect(item,imgIndex,stuIndex) {
-        this.$router.push({name:'imgCorrect',params: {
-            list:this.list,
-            imgIndex,
-            stuIndex,
-            classId:this.classId,
-            taskId: this.$route.query.taskId,
-            termType: this.$route.query.termType
-          }})
-      },
-      handlePraise(item) {
-        this.$emit('praise',item)
-      },
-      handleTop(item) {
-        this.$emit('top',item)
-      },
-      handleEss(item) {
-        this.$emit('ess',item)
-      },
-      handleScore(item,type) {
-        this.$emit('score',item,type)
-      },
+export default {
+  name: "stuExp",
+  components: { videoPlayer },
+  props: ['list', 'classId'],
+  computed: {
+    getStudentName() {
+      return getStudentName
     }
+  },
+  data() {
+    return {
+      comment: '',
+    }
+  },
+  methods: {
+    goVideoPage(url) {
+      if (!url) return
+      this.$router.push({ name: 'videoPage', query: { src: url } })
+    },
+    imgCorrect(item, imgIndex, stuIndex) {
+      this.$router.push({        name: 'imgCorrect', params: {
+          list: this.list,
+          imgIndex,
+          stuIndex,
+          classId: this.classId,
+          taskId: this.$route.query.taskId,
+          termType: this.$route.query.termType
+        }      })
+    },
+    handlePraise(item) {
+      this.$emit('praise', item)
+    },
+    handleTop(item) {
+      this.$emit('top', item)
+    },
+    handleEss(item) {
+      this.$emit('ess', item)
+    },
+    handleScore(item, type) {
+      this.$emit('score', item, type)
+    },
   }
+}
 </script>
 
 <style lang="less" scoped>
-  @deep: ~">>>";
-  .stu-exp-wrap {
-    overflow-x: hidden;
-    &__item {
-      border: 1px solid #eee;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      .comment-wrap {
-        display: flex;
-        align-items: center;
-        .submit-btn {
-          flex: 0 0 70px;
-          border-radius: 5px;
-          margin: 0 8px;
-          line-height: 35px;
-          height: 35px;
-        }
-      }
-
-      &__content-wrap {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
-        font-size: 10px;
-
-        .stu-name {
-          flex: 0 0 76px;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .stu-answer {
-
-          flex: 1;
-          margin-left: 10px;
-          /*display: flex;*/
-          overflow: hidden;
-          /*align-items: center;*/
-          /*justify-content: center;*/
-
-          .img-wrap {
-            width: 100%;
-            display: flex;
-
-            > div {
-              flex: 1;
-              height: 56px;
-              margin-right: 5px;
-
-              &:last-child {
-                margin-right: 0;
-              }
-            }
-
-            img {
-              width: 100%;
-              height: 100%;
-            }
-
-            &.img4 {
-              flex-wrap: wrap;
-
-              > div {
-                flex: 0 0 48%;
-                height: 25px;
-                margin-bottom: 5px;
-
-                &:nth-child(2n) {
-                  margin-right: 0;
-                }
-              }
-            }
-
-            &.img56 {
-              flex-wrap: wrap;
-
-              > div {
-                flex: 0 0 31%;
-                height: 25px;
-                margin-bottom: 5px;
-
-                &:nth-child(3n) {
-                  margin-right: 0;
-                }
-              }
-            }
-          }
-          .video-wrap {
-            height: 150px;
-          }
-        }
-
-
-      }
-
-      &__btn-group {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-top: 1px solid #eee;
-
-        > div {
-          flex: 1;
-          color: #666;
-          font-size: 14px;
-          line-height: 34px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          .iconGFY {
-            margin-right: 3px;
-          }
-
-          .icon-good, .icon-good-active {
-            width: 15px;
-            height: 15px;
-          }
-        }
-      }
-
-      &__good-group {
-        padding: 4px 10px;
-        background: #E0FFFC;
-        border-top: 1px solid #eee;
+@deep: ~">>>";
+.stu-exp-wrap {
+  overflow-x: hidden;
+  &__item {
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    .comment-wrap {
+      display: flex;
+      align-items: center;
+      .submit-btn {
+        flex: 0 0 70px;
+        border-radius: 5px;
+        margin: 0 8px;
+        line-height: 35px;
+        height: 35px;
       }
     }
 
-    @{deep} .video-js {
-      height: 30px !important;
-      width: 100% !important;
-      background: #fff;
-      .vjs-error-display {
-        display: none !important;
+    &__content-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      font-size: 10px;
+
+      .stu-name {
+        flex: 0 0 76px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
       }
 
-      .vjs-loading-spinner {
-        display: none !important;
-      }
-      .vjs-control-bar {
-        display: flex !important;
-        height: 30px !important;
-        background: #fff;
-        transition: none !important;
-        opacity: 1 !important;
+      .stu-answer {
+        flex: 1;
+        margin-left: 10px;
+        /*display: flex;*/
+        overflow: hidden;
+        /*align-items: center;*/
+        /*justify-content: center;*/
 
-        .vjs-current-time {
-          display: block !important;
-          color: #000;
-          line-height: 30px;
-          padding-right: 0;
+        .img-wrap {
+          width: 100%;
+          display: flex;
 
-          &::after {
-            content: '/';
-          }
-        }
+          > div {
+            flex: 1;
+            height: 56px;
+            margin-right: 5px;
 
-        .vjs-duration {
-          display: block !important;
-          padding-left: 0;
-          color: #000;
-          line-height: 30px;
-        }
-
-        .vjs-volume-panel {
-          display: none;
-        }
-
-        .vjs-fullscreen-control {
-          display: none;
-        }
-
-        .vjs-play-control {
-          width: 15px;
-
-          &.vjs-playing {
-            .vjs-icon-placeholder:before {
-              content: '\F103';
-              color: #fff;
-              background: @blue;
-              border-radius: 50%;
-              width: 15px;
-              height: 15px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 10px;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
+            &:last-child {
+              margin-right: 0;
             }
           }
 
+          img {
+            width: 100%;
+            height: 100%;
+          }
+
+          &.img4 {
+            flex-wrap: wrap;
+
+            > div {
+              flex: 0 0 48%;
+              height: 25px;
+              margin-bottom: 5px;
+
+              &:nth-child(2n) {
+                margin-right: 0;
+              }
+            }
+          }
+
+          &.img56 {
+            flex-wrap: wrap;
+
+            > div {
+              flex: 0 0 31%;
+              height: 25px;
+              margin-bottom: 5px;
+
+              &:nth-child(3n) {
+                margin-right: 0;
+              }
+            }
+          }
+        }
+        .video-wrap {
+          height: 150px;
+        }
+      }
+    }
+
+    &__btn-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #eee;
+
+      > div {
+        flex: 1;
+        color: #666;
+        font-size: 14px;
+        line-height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .iconGFY {
+          margin-right: 3px;
+        }
+
+        .icon-good,
+        .icon-good-active {
+          width: 15px;
+          height: 15px;
+        }
+      }
+    }
+
+    &__good-group {
+      padding: 4px 10px;
+      background: #e0fffc;
+      border-top: 1px solid #eee;
+    }
+  }
+
+  @{deep} .video-js {
+    height: 30px !important;
+    width: 100% !important;
+    background: #fff;
+    .vjs-error-display {
+      display: none !important;
+    }
+
+    .vjs-loading-spinner {
+      display: none !important;
+    }
+    .vjs-control-bar {
+      display: flex !important;
+      height: 30px !important;
+      background: #fff;
+      transition: none !important;
+      opacity: 1 !important;
+
+      .vjs-current-time {
+        display: block !important;
+        color: #000;
+        line-height: 30px;
+        padding-right: 0;
+
+        &::after {
+          content: "/";
+        }
+      }
+
+      .vjs-duration {
+        display: block !important;
+        padding-left: 0;
+        color: #000;
+        line-height: 30px;
+      }
+
+      .vjs-volume-panel {
+        display: none;
+      }
+
+      .vjs-fullscreen-control {
+        display: none;
+      }
+
+      .vjs-play-control {
+        width: 15px;
+
+        &.vjs-playing {
           .vjs-icon-placeholder:before {
-            content: '\F101';
+            content: "\F103";
             color: #fff;
             background: @blue;
             border-radius: 50%;
@@ -320,24 +300,40 @@
           }
         }
 
-        .vjs-play-progress {
+        .vjs-icon-placeholder:before {
+          content: "\F101";
+          color: #fff;
           background: @blue;
-
-          &::before {
-            content: '\F111';
-            color: @blue;
-          }
-        }
-
-        .vjs-load-progress {
-          background: #D2F0E9;
+          border-radius: 50%;
+          width: 15px;
+          height: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
         }
       }
 
-      .vjs-big-play-button {
-        display: none;
+      .vjs-play-progress {
+        background: @blue;
+
+        &::before {
+          content: "\F111";
+          color: @blue;
+        }
+      }
+
+      .vjs-load-progress {
+        background: #d2f0e9;
       }
     }
 
+    .vjs-big-play-button {
+      display: none;
+    }
   }
+}
 </style>

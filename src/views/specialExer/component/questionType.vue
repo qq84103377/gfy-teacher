@@ -11,9 +11,6 @@ export default {
   name: "questionType",
   props: ['list','areaCode','courseIds','classGrade'],
 
-  mounted() {
-    console.log("题型 mounted");
-  },
   methods: {
 
     go(item) {

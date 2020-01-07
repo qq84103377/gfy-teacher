@@ -34,7 +34,7 @@
 
 export default {
   name: 'gradeSubjectFilter',
-  props: ['visible', 'label', 'termType', 'gradeItem', 'changeGradeSubject', 'toggleNum2', 'active', 'subjectType'],
+  props: ['visible', 'label', 'termType', 'gradeItem', 'changeGradeSubject', 'toggleNum', 'active', 'subjectType'],
   data() {
     return {
       termList: [
