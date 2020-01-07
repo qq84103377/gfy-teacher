@@ -21,7 +21,7 @@ export const doUpLoad = (url, data) => {
       method: 'post',
       data: data,
       headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    },{timeout: 99999})
       .then((res) => {
         resolve(res)
       })

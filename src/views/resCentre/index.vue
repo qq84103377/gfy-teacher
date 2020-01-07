@@ -108,9 +108,9 @@
         </div>
         <van-list v-model="listLoading" :finished="curFinish" :finished-text="curListLength>0?'没有更多了':'当前没有资源！'"
                   @load="onLoad" :offset='80'>
-          <!--    平台资源      微课&&&素材-->
-          <list-item class="mgt10" style="background: #fff;" v-if="(resourceIndex==1||resourceIndex==2)&&tabIndex == 0"
-                     v-for="(item,index) in (resourceIndex==1?lessonList:materialList)" :key="index"
+          <!--    平台资源      微课-->
+          <list-item class="mgt10" style="background: #fff;" v-if="resourceIndex==1&&tabIndex == 0"
+                     v-for="(item,index) in lessonList" :key="index"
                      :itemTitle="item.resCourseWareInfo.coursewareName"
                      @clickTo="goVideoPage(item)">
             <div slot="cover" class="cover" :style="{'background':item.resCourseWareInfo.imageUrl?'none':'#67E0A3'}">
@@ -142,6 +142,50 @@
                 <span>添加</span>
               </div>
               <div @click="sendTask(item,'lesson')">
+                <i class="iconGFY icon-plane"></i>
+                <span>发任务</span>
+              </div>
+            </div>
+            <div slot="remark" class="remark" v-if="item.record">
+              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+              <div>
+                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+              </div>
+            </div>
+          </list-item>
+          <!--    平台资源      素材-->
+          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" v-if="resourceIndex==2&&tabIndex == 0"
+                     v-for="(item,index) in materialList" :key="index"
+                     :itemTitle="item.resCourseWareInfo.coursewareName">
+            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.resCourseWareInfo)"></i></div>
+            <div slot="desc">
+              <div class="desc-top">
+                <i class="iconGFY"
+                   :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
+                <i class="iconGFY"
+                   :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+              </div>
+              <div class="desc-bottom">
+                <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
+                <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+              </div>
+            </div>
+            <div slot="btn" class="btn-group van-hairline--top">
+              <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
+                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                <span>{{item.collectId?'取消':''}}收藏</span>
+              </div>
+              <div
+                @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','materialList')">
+                <i class="iconGFY icon-circle-plus-yellow"></i>
+                <span>添加</span>
+              </div>
+              <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName)">
+                <i class="iconGFY icon-download-orange"></i>
+                <span>下载</span>
+              </div>
+              <div @click="sendTask(item,'material')">
                 <i class="iconGFY icon-plane"></i>
                 <span>发任务</span>
               </div>
@@ -369,7 +413,7 @@
     getCollectInfoDetailV2,
     delTestPaper,
   } from '@/api/index'
-  import {getGradeName, getSubjectName, toHump} from "../../utils/filter";
+  import {getGradeName, getSubjectName, toHump, formatTime} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
   import eventBus from "@/utils/eventBus";
 
@@ -563,6 +607,7 @@
         this.examListInit = false
         this.examListPage = 0
         this.examListTotal = 0
+        this[`${this.curKey}Init`] = true
         if (!this.tabIndex) this.onRefresh()
 
         this.courseList = []
@@ -592,6 +637,7 @@
     mounted() {
       if (this.isIOS) {
         this.$refs['sticky-wrap'].style.position = this.isSupportSticky()
+        this.$refs['sticky-wrap'].style.zIndex = '20'
       }
     },
     methods: {
@@ -632,6 +678,8 @@
         // if (!this.courseId&&!this.tabIndex) return
         this[`${this.curKey}Page`]++
         if (this[`${this.curKey}Page`] > this[`${this.curKey}Total`] && this[`${this.curKey}Page`] > 1) {
+          //这里的Page-1是因为第一次(切换tab时this.curFinish变化,导致分页组件自动触发onLoad事件),导致page+1,
+          this[`${this.curKey}Page`]--
           return
         }
         if (this.tabIndex) {
@@ -912,6 +960,8 @@
             const humpKey = toHump(k)
             humpObj[humpKey] = item[k]
           }
+          //私人资源素材的时间需要转格式
+          humpObj.createDate = formatTime(humpObj.createDate)
           this.$router.push({path: '/materialDetail', query: {data: humpObj}})
         } else {
           this.$router.push({path: '/materialDetail', query: {data: item.resCourseWareInfo}})

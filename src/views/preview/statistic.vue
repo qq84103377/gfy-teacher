@@ -28,11 +28,11 @@
           </div>
           <div>
             <span>班级最高分</span>
-            <span class="red">{{taskFinishInfo.maxScore}}分</span>
+            <span class="red">{{taskFinishInfo.maxScore||0}}分</span>
           </div>
           <div>
             <span>班级最低分</span>
-            <span class="red">{{taskFinishInfo.minScore}}分</span>
+            <span class="red">{{taskFinishInfo.minScore||0}}分</span>
           </div>
         </div>
       </div>
@@ -565,8 +565,12 @@
         })
       },
       rewardScore(accountNo) {
-        const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
-        return score > 0 ? '+' + score : score
+         try {
+           const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
+           return score > 0 ? '+' + score : score
+         }catch {
+           console.log(accountNo,'有错啊');
+         }
       },
       getReply(appraiseId) {
         let obj = {
@@ -705,7 +709,7 @@
         })
       },
       viewAnalyse() {
-        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}`)
+        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
         let obj = {
@@ -785,7 +789,7 @@
               {
                 name: '文言文全章复习与巩固',
                 type: 'pie',
-                radius: [0, 53],
+                radius: [0, '60%'],
                 // center: ['50%', '60%'],
                 label: {
                   // normal: {

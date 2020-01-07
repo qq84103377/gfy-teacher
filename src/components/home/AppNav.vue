@@ -68,7 +68,8 @@
     methods: {
       handleChange(item) {
         if (item.path) {
-            this.$router.replace(item.path);
+          this.$store.commit('setTeachStatFilterTime', '')
+          this.$router.replace(item.path);
         } else {
           this.$toast.fail('敬请期待')
         }

@@ -478,9 +478,9 @@ export default {
       if (!obj.objectiveItemNum && !obj.subjectiveItemNum) {
         return this.$toast('该试卷不含试题')
       }
-      if (obj.stateName) {
-        return this.$toast('该试卷已发任务,不能重复发任务')
-      }
+      // if (obj.stateName) {
+      //   return this.$toast('该试卷已发任务,不能重复发任务')
+      // }
       console.log("发任务：", obj.testPaperName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')

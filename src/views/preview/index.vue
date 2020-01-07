@@ -317,7 +317,7 @@ export default {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
+        // "belongSchoolId": this.$store.getters.schoolId,
         "operateRoleType": "A02",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
         "subjectType": localStorage.getItem("currentSubjectType"),
