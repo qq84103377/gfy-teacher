@@ -38,7 +38,7 @@
             <span>分层情况:</span>
             <div class="layer-btn-group">
               <div :class="['layer-btn',{active:isEdit}]" @click="editLayer">修改分层情况</div>
-              <div :class="['layer-btn',{active:taskInfo.layerTestPaperNum>0}]" @click="createLayerTestPaper"
+              <div :class="['layer-btn']" :style="{color: taskInfo.layerTestPaperNum>0?'#ccc':'#666'}" @click="createLayerTestPaper"
                    v-if="taskInfo.tchCourseUsedLayerId === taskInfo.layerInfo.layerId">生成层级试卷
               </div>
               <div class="layer-btn" v-else @click="useLayer">使用该分层</div>
@@ -370,8 +370,8 @@
             break
           }
           if (index * 1 > 0) {
-            if (Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart + 1) < Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)) {
-              console.log(123);
+            if (calculate.sub(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd,this.tempLayerList[index].layerGroupInfo.subgroupScoreStart)>1) {
+            // if (Number(this.tempLayerList[index].layerGroupInfo.subgroupScoreStart + 1) < Number(this.tempLayerList[index - 1].layerGroupInfo.subgroupScoreEnd)) {
               this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
               flag = true
               break
@@ -382,7 +382,6 @@
               break
             }
             if ((index * 1 === this.tempLayerList.length - 1) && this.tempLayerList[index].layerGroupInfo.subgroupScoreEnd * 1 > 0) {
-              console.log(321);
               this.$toast('目前的分层存在分数遗漏的情况，请检查分层的分数。')
               flag = true
               break
@@ -437,6 +436,7 @@
         return subgroupName
       },
       selectScore() {
+        if(!this.isEdit) return
         this.tempLayerList = JSON.parse(JSON.stringify(this.taskInfo.layerInfo.layerGroupInfoList))
         this.scoreEditVisible = true
       },
