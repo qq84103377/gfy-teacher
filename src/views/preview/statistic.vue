@@ -12,7 +12,7 @@
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">重发任务
           </van-button>
-          <van-button class="notice-btn" v-else :class="{remind: remind}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          <van-button class="notice-btn" v-else :class="{remind: remind || taskFinishInfo.studentUnfinishList.length===0}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
         </div>
         <div class="statistic-wrap__pie-chart-label divider" v-else>任务完成情况:
@@ -313,7 +313,7 @@
         // }
       },
       saveDailyReminder() {
-        if (this.remind) return
+        if (this.remind || this.taskFinishInfo.studentUnfinishList.length===0) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",

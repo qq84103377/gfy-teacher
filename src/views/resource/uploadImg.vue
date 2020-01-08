@@ -1,13 +1,14 @@
 <template>
   <section class="upload-img">
     <div class="upload-img__body">
-
       <van-cell>
         <div slot="title" class="upload-img__body__cell">
           <div class="aic">
             <div class="fs15"><span class="red">*</span>图片:</div>
-            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
-            <van-icon @click="showSheet" class="add" name="add"/>
+<!--            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>-->
+<!--            <van-icon @click="showSheet" class="add" name="add"/>-->
+            <div class="pdlt10 fz10 grey9" @click="getPic" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
+            <van-icon @click="getPic" class="add" name="add"/>
 
             <!--            <input-->
             <!--              type="file"-->
@@ -69,13 +70,13 @@
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
 
-    <van-action-sheet
-      v-model="showActionSheet"
-      :actions="actions"
-      cancel-text="取消"
-      @select="handleSelect"
-      @cancel="showActionSheet=false"
-    />
+<!--    <van-action-sheet-->
+<!--      v-model="showActionSheet"-->
+<!--      :actions="actions"-->
+<!--      cancel-text="取消"-->
+<!--      @select="handleSelect"-->
+<!--      @cancel="showActionSheet=false"-->
+<!--    />-->
   </section>
 </template>
 
@@ -85,9 +86,10 @@
   import * as uploadApi from "@/api/upload";
   import {addCourseWare, createCourseSummitInfo, createCourseSummitInfoList, addTeachCourseResList} from '@/api/index'
   import { ImagePreview } from "vant";
-
+  import uploadMixin from '@/utils/uploadMixin';
   export default {
     name: "uploadImg",
+    mixins: [uploadMixin],
     components: {
       draggable,
     },
@@ -110,8 +112,8 @@
           relate: '2',
           btnLoading: false
         },
-        showActionSheet: false,
-        actions: [{name: "从相册选取"}, {name: "拍照"}],
+        // showActionSheet: false,
+        // actions: [{name: "从相册选取"}, {name: "拍照"}],
         photoList: [],
         curFile: null,
         oSSObject: null,
@@ -122,6 +124,16 @@
       this.getOSSKey();
     },
     methods: {
+      getPic() {
+          ImagePicker.getPictures((result) => {
+            if(this.imgList.length + result.images.length > 9) {
+              return this.$toast('不能超过9张图片')
+            }
+            this.multipleUpload(result)
+          }, (err) => {
+            // alert(err);
+          });
+      },
       previewImg(startPosition) {
         ImagePreview({
           images: this.imgList.map(v => v.src),
@@ -132,13 +144,13 @@
           }
         });
       },
-      showSheet() {
-        if (this.imgList.length >= 9) {
-          this.$toast('最多上传9张图片!')
-          return
-        }
-        this.showActionSheet = !this.showActionSheet
-      },
+      // showSheet() {
+      //   if (this.imgList.length >= 9) {
+      //     this.$toast('最多上传9张图片!')
+      //     return
+      //   }
+      //   this.showActionSheet = !this.showActionSheet
+      // },
       changeName(item) {
         this.$set(item, 'edit', true)
       },
@@ -174,7 +186,7 @@
       uploadIMG(curFile) {
         console.log("开始上传")
         console.log(this.oSSObject)
-        this.$store.commit('setVanLoading', true)
+        // this.$store.commit('setVanLoading', true)
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
@@ -182,14 +194,14 @@
           filetime +
           randomStr + ".jpeg"
         );
-        console.log(123);
         formData.append('policy', this.oSSObject.policyBase64)
         formData.append('OSSAccessKeyId', this.oSSObject.accessid)
         formData.append('signature', this.oSSObject.signature)
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
-        uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
-          this.$store.commit('setVanLoading', false)
+        return uploadApi.doUpLoad(this.oSSObject.host, formData)
+          .then(data => {
+          // this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
           var imgUrl =
             this.oSSObject.host +

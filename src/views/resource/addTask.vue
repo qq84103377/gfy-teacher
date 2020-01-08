@@ -340,7 +340,7 @@
 
           this.form.duration = this.resourceInfo.duration
           this.form.layer = this.resourceInfo.layerStatus === 'L02'
-          this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M02" ? true : false
+          this.form.allowEdit = this.resourceInfo.modifyAfterSubmit == "M01" ? true : false
           this.form.allowFast = this.resourceInfo.isDrag == "I01" ? true : false
           if (this.resourceInfo.description) {
             this.form.desc = this.resourceInfo.description
@@ -1072,9 +1072,9 @@
         let modifyAfterSubmit = ""
         if (this.testPaperId) {
           if (this.form.allowEdit) {
-            modifyAfterSubmit = "M02"
-          } else {
             modifyAfterSubmit = "M01"
+          } else {
+            modifyAfterSubmit = "M02"
           }
         }
 
@@ -1286,9 +1286,9 @@
         let modifyAfterSubmit = ""
         if (this.testPaperId) {
           if (this.form.allowEdit) {
-            modifyAfterSubmit = "M02"
-          } else {
             modifyAfterSubmit = "M01"
+          } else {
+            modifyAfterSubmit = "M02"
           }
         }
 
