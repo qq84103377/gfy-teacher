@@ -71,13 +71,13 @@
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
 
-    <van-action-sheet
-      v-model="showActionSheet"
-      :actions="actions"
-      cancel-text="取消"
-      @select="handleSelect"
-      @cancel="showActionSheet=false"
-    />
+<!--    <van-action-sheet-->
+<!--      v-model="showActionSheet"-->
+<!--      :actions="actions"-->
+<!--      cancel-text="取消"-->
+<!--      @select="handleSelect"-->
+<!--      @cancel="showActionSheet=false"-->
+<!--    />-->
   </section>
 </template>
 
@@ -112,8 +112,8 @@
           relate: '2',
           btnLoading: false
         },
-        showActionSheet: false,
-        actions: [{name: "从相册选取"}, {name: "拍照"}],
+        // showActionSheet: false,
+        // actions: [{name: "从相册选取"}, {name: "拍照"}],
         photoList: [],
         curFile: null,
         oSSObject: null,
@@ -124,31 +124,56 @@
       this.getOSSKey();
     },
     methods: {
+      base64toFile(imgBase) {
+        try {
+          var arr = imgBase.split(","),
+            mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            n = bstr.length,
+            u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          let curFile = new Blob([u8arr], {type: mime});
+          // if (this.oSSObject == null) {
+          //   this.getOSSKey();
+          // }
+          console.log("file");
+
+          console.log(curFile);
+          this.uploadIMG(curFile);
+        } catch (e) {
+          console.log(e)
+        }
+      },
+      imgToBase64(url) {
+        var canvas = document.createElement('canvas'),
+          ctx = canvas.getContext('2d'),
+          img = new Image;
+        img.crossOrigin = 'Anonymous';
+        img.onload =  () => {
+          canvas.height = img.height;
+          canvas.width = img.width;
+          ctx.drawImage(img, 0, 0);
+          var dataURL = canvas.toDataURL('image/png');
+          console.log(dataURL,'dddddd');
+          this.base64toFile(dataURL);
+          img = null
+          canvas = null;
+        };
+        img.src = url;
+      },
       getPic() {
-        // if(bol) {
-          // ImagePicker.takePhoto(function(result) {
-          //   alert(JSON.stringify(result));
-          // }, function(err) {
-          //   alert(err);
-          // });
-        // }else {
           ImagePicker.getPictures((result) => {
-            // alert(JSON.stringify(result));
-            this.imgList = result.images.map(v => {
-              return {name: v.path.substring(v.path.lastIndexOf('/') + 1), src: v.path,size:v.size}
+            if(this.imgList.length + result.images.length > 9) {
+              return this.$toast('不能超过9张图片')
+            }
+            result.images.forEach(v => {
+              this.imgToBase64(v.path)
             })
           }, (err) => {
-            alert(err);
+            // alert(err);
           });
-        // }
-
-        // , {
-        //   maximumImagesCount : 9,
-        //   width : 1920,
-        //   height : 1440,
-        //   quality : 100
-        // }
-
       },
       previewImg(startPosition) {
         ImagePreview({
@@ -160,13 +185,13 @@
           }
         });
       },
-      showSheet() {
-        if (this.imgList.length >= 9) {
-          this.$toast('最多上传9张图片!')
-          return
-        }
-        this.showActionSheet = !this.showActionSheet
-      },
+      // showSheet() {
+      //   if (this.imgList.length >= 9) {
+      //     this.$toast('最多上传9张图片!')
+      //     return
+      //   }
+      //   this.showActionSheet = !this.showActionSheet
+      // },
       changeName(item) {
         this.$set(item, 'edit', true)
       },
@@ -202,7 +227,7 @@
       uploadIMG(curFile) {
         console.log("开始上传")
         console.log(this.oSSObject)
-        this.$store.commit('setVanLoading', true)
+        // this.$store.commit('setVanLoading', true)
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
@@ -217,7 +242,7 @@
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
-          this.$store.commit('setVanLoading', false)
+          // this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
           var imgUrl =
             this.oSSObject.host +
