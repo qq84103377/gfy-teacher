@@ -1,7 +1,6 @@
 <template>
   <section class="upload-img">
     <div class="upload-img__body">
-
       <van-cell>
         <div slot="title" class="upload-img__body__cell">
           <div class="aic">
@@ -87,9 +86,10 @@
   import * as uploadApi from "@/api/upload";
   import {addCourseWare, createCourseSummitInfo, createCourseSummitInfoList, addTeachCourseResList} from '@/api/index'
   import { ImagePreview } from "vant";
-
+  import uploadMixin from '@/utils/uploadMixin';
   export default {
     name: "uploadImg",
+    mixins: [uploadMixin],
     components: {
       draggable,
     },
@@ -124,53 +124,12 @@
       this.getOSSKey();
     },
     methods: {
-      base64toFile(imgBase) {
-        try {
-          var arr = imgBase.split(","),
-            mime = arr[0].match(/:(.*?);/)[1],
-            bstr = atob(arr[1]),
-            n = bstr.length,
-            u8arr = new Uint8Array(n);
-          while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
-          }
-          let curFile = new Blob([u8arr], {type: mime});
-          // if (this.oSSObject == null) {
-          //   this.getOSSKey();
-          // }
-          console.log("file");
-
-          console.log(curFile);
-          this.uploadIMG(curFile);
-        } catch (e) {
-          console.log(e)
-        }
-      },
-      imgToBase64(url) {
-        var canvas = document.createElement('canvas'),
-          ctx = canvas.getContext('2d'),
-          img = new Image;
-        img.crossOrigin = 'Anonymous';
-        img.onload =  () => {
-          canvas.height = img.height;
-          canvas.width = img.width;
-          ctx.drawImage(img, 0, 0);
-          var dataURL = canvas.toDataURL('image/png');
-          console.log(dataURL,'dddddd');
-          this.base64toFile(dataURL);
-          img = null
-          canvas = null;
-        };
-        img.src = url;
-      },
       getPic() {
           ImagePicker.getPictures((result) => {
             if(this.imgList.length + result.images.length > 9) {
               return this.$toast('不能超过9张图片')
             }
-            result.images.forEach(v => {
-              this.imgToBase64(v.path)
-            })
+            this.multipleUpload(result)
           }, (err) => {
             // alert(err);
           });
@@ -235,13 +194,13 @@
           filetime +
           randomStr + ".jpeg"
         );
-        console.log(123);
         formData.append('policy', this.oSSObject.policyBase64)
         formData.append('OSSAccessKeyId', this.oSSObject.accessid)
         formData.append('signature', this.oSSObject.signature)
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
-        uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+        return uploadApi.doUpLoad(this.oSSObject.host, formData)
+          .then(data => {
           // this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
           var imgUrl =

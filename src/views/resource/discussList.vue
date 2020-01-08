@@ -66,7 +66,7 @@
           </van-cell>
           <van-cell class="save-pop__cell">
             <div slot="title">
-              <div class="aic" @click="showSheet">
+              <div class="aic" @click="getPic">
                 <div class="fs15">图片:</div>
                 <div class="pdlt10 fz10 grey9" style="flex:1">轻触此可添加多张图片</div>
                 <van-icon @click="" class="add" name="add" />
@@ -92,7 +92,7 @@
       </div>
     </van-popup>
 
-    <van-action-sheet v-model="showActionSheet" :actions="actions" cancel-text="取消" @select="handleSelect" @cancel="showActionSheet=false" />
+<!--    <van-action-sheet v-model="showActionSheet" :actions="actions" cancel-text="取消" @select="handleSelect" @cancel="showActionSheet=false" />-->
   </section>
 </template>
 
@@ -104,9 +104,11 @@ import { modifyTeachCourseRes, addDiscussInfo, addTeachCourseRes, modifyDiscussI
 import { generateTimeReqestNumber, randomString } from "@/utils/filter";
 import * as uploadApi from "@/api/upload";
 import { ImagePreview } from "vant";
+import uploadMixin from '@/utils/uploadMixin';
 
 export default {
   name: "discussList",
+  mixins: [uploadMixin],
   components: { listItem, draggable },
   data() {
     return {
@@ -164,6 +166,16 @@ export default {
     });
   },
   methods: {
+    getPic() {
+      ImagePicker.getPictures((result) => {
+        if(this.imgList.length + result.images.length > 9) {
+          return this.$toast('不能超过9张图片')
+        }
+        this.multipleUpload(result)
+      }, (err) => {
+        // alert(err);
+      });
+    },
     previewImg(startPosition) {
       ImagePreview({
         images: this.imgList.map(v => v.url),
@@ -429,7 +441,7 @@ export default {
       formData.append('signature', this.oSSObject.signature)
       formData.append('file', curFile)
       formData.append('success_action_status', '200')
-      uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
+      return uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
         console.log('doUpLoad', data);
         var imgUrl =
           this.oSSObject.host +
