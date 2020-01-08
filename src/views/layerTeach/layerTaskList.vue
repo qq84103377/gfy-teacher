@@ -103,6 +103,7 @@
               subjectType: localStorage.currentSubjectType,
               classGrade: this.classGrade,
               title: item.testPaperName, //需要接口返回这个字段
+              fromTask: 1
             }
           })
         } else if (item.taskType === 'T03') {
