@@ -116,7 +116,7 @@
             <div slot="cover" class="cover" :style="{'background':item.resCourseWareInfo.imageUrl?'none':'#67E0A3'}">
               <img
                 v-if="item.resCourseWareInfo.imageUrl" :src="item.resCourseWareInfo.imageUrl" alt=""><i v-else
-                                                                                                        class="iconGFY icon-video"></i>
+                                                                                                        :class="['iconGFY', handleMediaIcon(item.resCourseWareInfo.srcUrl)]"></i>
             </div>
             <div slot="desc">
               <div class="desc-top">
@@ -247,7 +247,7 @@
                      :itemTitle="item.courseware_name"
                      @clickTo="goVideoPage(item)">
             <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
-              <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else class="iconGFY icon-video"></i>
+              <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else :class="['iconGFY', handleMediaIcon(item.src_url)]"></i>
             </div>
             <div slot="desc">
               <div class="desc-top">
@@ -641,6 +641,19 @@
       }
     },
     methods: {
+      handleMediaIcon(srcUrl) {
+        try{
+          let t = srcUrl.substring(srcUrl.lastIndexOf('.') + 1).toLowerCase()
+          if (t == 'mp3') {
+            t = 'icon-audio'
+          } else {
+            t = 'icon-video'
+          }
+          return t
+        }catch{
+
+        }
+      },
       checkPlatform() {
         let u = navigator.userAgent;
 
