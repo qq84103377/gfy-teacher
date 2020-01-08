@@ -6,8 +6,10 @@
         <div slot="title" class="upload-img__body__cell">
           <div class="aic">
             <div class="fs15"><span class="red">*</span>图片:</div>
-            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
-            <van-icon @click="showSheet" class="add" name="add"/>
+<!--            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>-->
+<!--            <van-icon @click="showSheet" class="add" name="add"/>-->
+            <div class="pdlt10 fz10 grey9" @click="getPic" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
+            <van-icon @click="getPic" class="add" name="add"/>
 
             <!--            <input-->
             <!--              type="file"-->
@@ -122,6 +124,32 @@
       this.getOSSKey();
     },
     methods: {
+      getPic() {
+        // if(bol) {
+          // ImagePicker.takePhoto(function(result) {
+          //   alert(JSON.stringify(result));
+          // }, function(err) {
+          //   alert(err);
+          // });
+        // }else {
+          ImagePicker.getPictures((result) => {
+            // alert(JSON.stringify(result));
+            this.imgList = result.images.map(v => {
+              return {name: v.path.substring(v.path.lastIndexOf('/') + 1), src: v.path,size:v.size}
+            })
+          }, (err) => {
+            alert(err);
+          });
+        // }
+
+        // , {
+        //   maximumImagesCount : 9,
+        //   width : 1920,
+        //   height : 1440,
+        //   quality : 100
+        // }
+
+      },
       previewImg(startPosition) {
         ImagePreview({
           images: this.imgList.map(v => v.src),
