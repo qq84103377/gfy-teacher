@@ -3,7 +3,7 @@
     <div class="readAll" @click="readAll">
       <van-button type="primary" plain color="#39F0DD">全标已读</van-button>
     </div>
-    <van-tabs v-model="active" @click="handleTab">
+    <van-tabs class="tabs" v-model="active" @click="handleTab">
       <van-tab title="未读">
         <van-list
           v-model="loading"
@@ -239,7 +239,9 @@
   @deep: ~'>>>';
   .notice {
     background-color: #F5F6FA;
-    position: relative;
+     overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
     .readAll {
       position: absolute;
@@ -257,11 +259,17 @@
       }
     }
 
-    @{deep} .van-tabs {
+    @{deep} .van-tabs.tabs {
+      display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden; 
+
       .van-tabs__wrap {
         width: 50%;
         margin: 10px 0;
         height: 25px;
+         flex: 0 0 25px;
 
         .van-tabs__nav {
           background-color: transparent;
@@ -285,6 +293,18 @@
           display: none;
         }
       }
+       .van-tabs__content {
+      overflow: auto;
+      flex: 1;
+
+      .van-tab__pane {
+        height: 100%;
+
+        .van-list {
+          height: 100%;
+        }
+      }
+    }
 
       .van-hairline--top-bottom:after, .van-hairline-unset--top-bottom:after {
         border: none;
