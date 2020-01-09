@@ -3,7 +3,7 @@
     <van-cell :border="false" title="统计类型" style="background: #f5f5f5;color: #999"/>
     <div class="task-tab">
       <div class="task-tab__item" :class="{active:tabIndex==1}" @click="tabIndex=1">学生统计</div>
-      <div class="task-tab__item" :class="{active:tabIndex==2}" @click="tabIndex=2">教师统计</div>
+      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==2}" @click="tabIndex=2">教师统计</div>
       <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==3}" @click="tabIndex=3">班级统计</div>
       <div class="task-tab__item" :class="{active:tabIndex==4}" @click="tabIndex=4">个人统计</div>
     </div>

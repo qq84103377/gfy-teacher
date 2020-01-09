@@ -269,12 +269,19 @@ export default {
       }
     } else {
       this.form.radio = "2"
+      let defaultGrade = ''
       for (let m in this.classMap) {
+        if(!defaultGrade) {
+          defaultGrade = this.classMap[m].classGrade
+        }
+
         this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
         let now = new Date()
         now.setDate(now.getDate() + 3)
         this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
-        this.result.push(m*1)
+        if(defaultGrade === this.classMap[m].classGrade) {
+          this.result.push(m*1)
+        }
       }
       let date = new Date()
       this.form.time1 = generateTimeReqestNumber(date);
