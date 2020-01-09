@@ -7,8 +7,8 @@
       <div v-if="$route.query.from==='course'" slot="right" class="fs14" style="color: #16AAB7" @click="changeCourse(1)">下一课</div>
       <div v-else slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
-          <van-dropdown-item title="编辑" ref="dropdown">
-            <edit-course :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
+          <van-dropdown-item title="编辑" ref="dropdown" @open="open">
+            <edit-course ref="editCourse" :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
       </div>
@@ -106,6 +106,13 @@ export default {
       console.log("previewEditTask eventbus");
       this.onRefresh()
     })
+    eventBus.$off("courseListRefresh")
+    eventBus.$on("courseListRefresh", (data) => {
+      this.currentPage = 0
+      this.total = 0
+      this.firstFlag = true
+      this.onLoad()
+    })
   },
 
   beforeRouteLeave(to, from, next) {
@@ -121,6 +128,11 @@ export default {
     });
   },
   methods: {
+    open() {
+      this.$nextTick(() => {
+        this.$refs['editCourse'].courseChange()
+      })
+    },
     async toggle(data, cancle) {
       this.$refs.dropdown.toggle()
       if (cancle) return

@@ -915,7 +915,7 @@
             this.minDate = new Date()
             this.currentDate = new Date(this.form.time1.replace(/-/g, "/"))
           } else if (type == "end") {
-            let date = new Date(this.form.time1.replace(/-/g, "/"))
+            let date = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
             date.setDate(date.getDate() + 1)
             this.minDate = date
             this.currentDate = new Date(this.form.time2.replace(/-/g, "/"))
