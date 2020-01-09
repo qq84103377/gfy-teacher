@@ -376,9 +376,9 @@
           }
           this.form.resourceId = this.resourceInfo.resourceId
 
-          if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
+          if (this.$route.query.taskType === 'T02' ) { //lesson  material
 
-          } else if (this.$route.query.taskType === 'T03' && (this.$route.query.resourceType === 'R02' || this.$route.query.resourceType === 'R03')) {//试卷或试题exam
+          } else if ((this.$route.query.taskType === 'T01'&&this.resourceInfo.testPaperId>0)||(this.$route.query.taskType === 'T04'&&this.resourceInfo.testPaperId>0)||(this.$route.query.taskType === 'T03' && (this.$route.query.resourceType === 'R02' || this.$route.query.resourceType === 'R03'))) {//试卷或试题exam
             this.testPaperId = this.resourceInfo.testPaperId
             this.testPaperName = this.resourceInfo.testPaperName
             this.form.exam = true
