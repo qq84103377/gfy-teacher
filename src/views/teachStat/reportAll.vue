@@ -105,6 +105,16 @@
       <van-button class="btn" type="info" @click="shareBarShow=true">分享给家长</van-button>
     </div>
     <share-bar :show.sync="shareBarShow" :title="decodeURI($route.query.stuName)+'的家庭报告'" :link="link"></share-bar>
+
+
+<!--    <div v-if="!isApp" class="report-all-wrap__open-app">-->
+<!--      <img src="http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/feedback/information/201907/icon-48-mdpi.png" alt="">-->
+<!--      <div class="report-all-wrap__open-app__ctn">-->
+<!--        <div class="fs15 mgb10">全朗e家</div>-->
+<!--        <div class="fs10">查看孩子更多的学习情况</div>-->
+<!--      </div>-->
+<!--      <a class="report-all-wrap__open-app__btn">打开</a>-->
+<!--    </div>-->
   </section>
 </template>
 
@@ -162,10 +172,63 @@
       })
     },
     methods: {
-       goBack(){
+      checkOutApp() {
+
+        var isBlur = false;
+
+        // 通过URL scheme来调起APP
+
+        location.href = 'gfy://test:8080/index';
+
+        setTimeout(() => {
+
+          if (!isBlur) {
+
+            //跳转APP下载页
+            // location.href = 'http://www.baidu.com';
+
+          }
+
+        }, 2000);
+
+        // window 每次失去焦點
+
+        window.onblur = () => {
+
+          console.log('失去焦點');
+
+          isBlur = true;
+
+        };
+
+        var hiddenProperty = 'hidden' in document ? 'hidden' :
+
+          'webkitHidden' in document ? 'webkitHidden' :
+
+            'mozHidden' in document ? 'mozHidden' :
+
+              null;
+
+        var visibilityChangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange');
+
+        var onVisibilityChange = () => {
+
+          if (document[hiddenProperty]) {
+
+            console.log('失去焦點');
+
+            isBlur = true;
+
+          }
+
+        }
+
+        document.addEventListener(visibilityChangeEvent, onVisibilityChange);
+
+      },
+      goBack(){
           this.common.goBack(this)
         },
-
       handleSuggest(item) {
         let currentNum = 0, totalNum = 0, masteryNum = 0, suggest = ''
         item.kngArr.forEach(v => {
@@ -824,6 +887,30 @@
         border-radius: 20px;
         flex: 1;
         font-size: 18px;
+      }
+    }
+
+    &__open-app{
+      flex: 0 0 75px;
+      background: #eee;
+      align-items: center;
+      padding: 0 10px;
+      display: flex;
+      img {
+        flex: 0 0 50px;
+        height: 50px;
+        margin-right: 10px;
+      }
+      &__ctn{
+        flex: 1;
+      }
+      &__btn{
+        flex: 0 0 60px;
+        line-height: 25px;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 12px;
+        text-align: center;
       }
     }
 
