@@ -127,8 +127,11 @@
                 <div>{{item.courseName}}</div>
                 <div>{{item.className}}</div>
                 <div v-if="item.beginDate">{{item.beginDate|formatTime}}</div>
+                <div v-else></div>
                 <div v-if="item.endDate">{{item.endDate|formatTime}}</div>
+                <div v-else></div>
                 <div v-if="item.duration">{{item.duration|formathms}}</div>
+                <div v-else>00:00:00</div>
               </div>
             </div>
             <div class="col bg fixed-right">
