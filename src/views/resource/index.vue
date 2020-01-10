@@ -67,6 +67,7 @@ export default {
       firstFlag: true,
       currentTchCourseInfo: {},
       index: 0, //选中的课程index
+      currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //预习跳过来才有的
     }
   },
   computed: {
@@ -188,7 +189,7 @@ export default {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
+        // "belongSchoolId": this.$store.getters.schoolId,
         "operateRoleType": "A02",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
         "subjectType": localStorage.getItem("currentSubjectType"),
@@ -208,7 +209,21 @@ export default {
         this.dropdownRefLoading = false
         this.dropdownTotal = res.total
         if (res.flag && res.data && res.data[0]) {
-          this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+          if (this.$route.query.from === 'preview') {
+            const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.currCourse.tchCourseId && v.tchCourseInfo.sysCourseId == this.currCourse.sysCourseId)
+            if (index > -1) {
+              res.data.splice(index, 1)
+            }
+            if (page === 1) {
+              res.data.unshift({ ...this.currCourse })
+              this.courseList = res.data
+            } else {
+              this.courseList = this.courseList.concat(res.data)
+            }
+          }else {
+            this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
+          }
+
           if (!this.courseName) {
             this.tchCourseInfo = this.courseList[0].tchCourseInfo
             // this.resourceCount = this.courseList[0].resourceCount
