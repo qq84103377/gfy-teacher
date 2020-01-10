@@ -173,7 +173,7 @@ export default {
         "shareType": code,
         "pageSize": this.pageSize,
         "currentPage": pageNo,
-        "schoolIdList": this.$store.getters.schoolIdList
+        // "schoolIdList": this.$store.getters.schoolIdList
       }
       let params = {
         requestJson: JSON.stringify(obj)

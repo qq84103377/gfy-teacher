@@ -13,8 +13,8 @@
         <div class="info-wrap" v-if="$route.query.testPaperId>0 || $route.query.taskType === 'T13'">
           <div>本次练习班级平均分为<span class="orange">{{info.finshCount>0?parseFloat((info.totalScore / info.finshCount).toFixed(2)):0}}分</span>
           </div>
-          <div>最高分为<span class="orange">{{info.maxScore}}分</span></div>
-          <div>最低分为<span class="orange">{{info.minScore}}分</span></div>
+          <div>最高分为<span class="orange">{{info.maxScore||0}}分</span></div>
+          <div>最低分为<span class="orange">{{info.minScore||0}}分</span></div>
         </div>
         <div class="fs10 red">请家长及时关注孩子的完成情况，未提交练习的提醒补做</div>
       </div>
@@ -207,15 +207,15 @@
               //有人点赞
               this.scoreSpan[1].stu.push(v.appraiseAccountNo)
             }
-            this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t, v) => {
-              t.push(...v.accountNoList)
-              return t
-            }, [])
-            this.info.studentStatList.forEach(v => {
-              if (v.redoTimes > 0) {
-                this.scoreSpan[3].stu.push(v.accountNo)
-              }
-            })
+          })
+          this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t, value) => {
+            t.push(...value.accountNoList)
+            return t
+          }, [])
+          this.info.studentStatList.forEach(v => {
+            if (v.redoTimes > 0) {
+              this.scoreSpan[3].stu.push(v.accountNo)
+            }
           })
         }
       },
