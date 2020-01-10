@@ -163,7 +163,7 @@
             </div>
             <div class="row" v-for="(item,index) in mutualInfoList" :key="index">
               <div class="mh44" style="flex: 0 0 22%;background: #E0FFFC;height: auto;">
-                {{item.operateType|mutualType}}
+                {{handleOperateName(item.operateType)}}
               </div>
               <div class="mh44" style="flex: 0 0 39%;height: auto;">{{item.operateDate|formatTime}}</div>
               <div class="mh44" style="flex: 0 0 39%;height: auto;">{{item.remark}}</div>
@@ -239,7 +239,8 @@
     getClassroomInfoByTeacher,
     getClassroomDetailInfo,
     statByClass,
-    statByPersonal
+    statByPersonal,
+    getSysDictList
   } from '@/api/index'
   import echarts from "echarts";
   import {mutualType, getStudentName} from '@/utils/filter'
@@ -260,6 +261,7 @@
         mutualInfoList: [],
         classStatList: [],
         personStatList: [],
+        operateType: [],
       }
     },
     computed: {
@@ -534,7 +536,7 @@
           }
         })
       },
-      selectMutual(item) {
+      async selectMutual(item) {
         if (item.detailCount <= 0) return this.$toast('此课堂无交互详情')
         if (item.active) return
         this.showMutual = true
@@ -542,7 +544,18 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
+        if(!this.operateType.length) {
+         await this.getOperateType()
+        }
         this.getClassroomDetailInfo(item.appClassroomId)
+      },
+      async getOperateType() {
+       await getSysDictList({requestJson: JSON.stringify({"interUser":"123","interPwd":"123","dictCode":"Domain_Attend_Class_Operate_Type"})}).then(res => {
+          if(res.flag) {
+            console.log(res.data);
+            this.operateType = res.data[0].sysDictInfoList
+          }
+        })
       },
       selectClassCount(item) {
         if (item.classroomCount <= 0) return this.$toast('此老师未上课,暂无详情')
@@ -618,6 +631,15 @@
         this.drawPie()
         this.drawHistogram()
       },
+      handleOperateName(operateType) {
+        let name = ''
+        try{
+          name = this.operateType.find(t => operateType === t.dictKey).dictValue
+        }catch{
+
+        }
+        return name
+      },
       drawMutualHistogram() {
         var myChart = echarts.init(document.getElementById('myChart3'));
         // 指定图表的配置项和数据
@@ -627,7 +649,7 @@
           if (index > -1) {
             arr[index].count++
           } else {
-            arr.push({name: mutualType(v.operateType), count: 1, operateType: v.operateType})
+            arr.push({name: this.handleOperateName(v.operateType), count: 1, operateType: v.operateType})
           }
         })
         var paperOption = {
@@ -637,7 +659,7 @@
               type: 'inside',
               xAxisIndex: [0],
               start: 0,
-              end: 30
+              end: arr.length>5?(5/arr.length)*100:100,
             }
           ],
           grid: {
@@ -659,6 +681,7 @@
             {
               name: '次数',
               type: 'bar',
+              barWidth: arr.length>5?'50%':`${arr.length}0%`,
               data: arr.map(v => v.count),
               itemStyle: {
                 normal: {
@@ -713,15 +736,18 @@
           color: ['#B3E850', '#67E0A3', '#F792F3', '#FCA361', '#FBDD31', '#74F8E1', '#f00', '#2736F7'],
           series: [
             {
+              legendHoverLink: false,
+              hoverAnimation: false,
               name: '文言文全章复习与巩固',
               type: 'pie',
               radius: [0, '60%'],
               label: {
-                emphasis: {
-                  show: true
-                },
+                // emphasis: {
+                //   show: true
+                // },
                 position: 'outside',
-                formatter: `{b}`,
+                // formatter: `{b}`,
+                formatter: `{b}\n({d}%,{c}个)`,
                 align: 'left'
               },
               labelLine: {
@@ -732,12 +758,12 @@
                   show: true
                 }
               },
-              itemStyle: {
-                emphasis: {
-                  shadowBlur: 10,
-                  shadowColor: '#ccc',
-                }
-              },
+              // itemStyle: {
+                // emphasis: {
+                //   shadowBlur: 10,
+                //   shadowColor: '#ccc',
+                // }
+              // },
               data: this.stuStatInfo.taskTypeCount.length ? this.stuStatInfo.taskTypeCount.map(v => {
                 return {value: v.taskTypeCount, name: v.taskTypeName}
               }) : [{value: 0, name: '无数据'}]

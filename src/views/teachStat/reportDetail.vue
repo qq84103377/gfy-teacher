@@ -23,7 +23,7 @@
               <div v-show="tabIndex===0">
                 <div style="position: relative;">
                   <div :id="'knowledge'+index" class="histogram-chart mgt10"></div>
-                  <div class="tip">可在表格内滑动，查看更多内容</div>
+                  <div class="tip">可在图表内滑动，查看更多内容</div>
                   <div class="empty-tip" v-if="!item.kngArr.length">当前无数据~</div>
                 </div>
                 <div class="stat-table">
@@ -93,7 +93,7 @@
               <div v-show="tabIndex===2">
                 <div style="position: relative;">
                   <div :id="'score'+index" class="histogram-chart mgt10"></div>
-                  <div class="tip">可在表格内滑动，查看更多内容</div>
+                  <div class="tip">可在图表内滑动，查看更多内容</div>
                   <div class="empty-tip" v-if="!item.scoreInfo.minDate">当前无数据~</div>
                 </div>
                 <div class="data-analyse fs12">

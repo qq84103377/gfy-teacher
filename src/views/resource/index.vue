@@ -113,6 +113,7 @@ export default {
             this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
             this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
             this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+            this.tchCourseInfo = this.courseList[this.index].tchCourseInfo
             // this.resourceCount = this.courseList[this.index].resourceCount
             this.getCourseInfoResourceCount()
           } else {
@@ -125,6 +126,7 @@ export default {
           this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
           this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
           this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+          this.tchCourseInfo = this.courseList[this.index].tchCourseInfo
           // this.resourceCount = this.courseList[this.index].resourceCount
           this.getCourseInfoResourceCount()
         }
@@ -140,6 +142,7 @@ export default {
           this.tchCourseId = this.courseList[this.index].tchCourseInfo.tchCourseId
           this.sysCourseId = this.courseList[this.index].tchCourseInfo.sysCourseId
           this.relationCourseId = this.courseList[this.index].tchCourseInfo.relationCourseId
+          this.tchCourseInfo = this.courseList[this.index].tchCourseInfo
           // this.resourceCount = this.courseList[this.index].resourceCount
           this.getCourseInfoResourceCount()
         }
