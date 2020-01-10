@@ -212,7 +212,7 @@ export default {
             }, 1000)
           }
         } else {
-          this.$toast('请稍后获取！')
+          this.$toast(res.msg)
         }
       })
     },
