@@ -129,6 +129,7 @@
 import { generateTimeReqestNumber } from '@/utils/filter'
 import courseFilter from '../../components/courseFilter'
 import { getTextBookCourseByParam, getShareCourseDetailV2, createTeachCourse, getClassTeacherCourseDeploy, modifyTeachCourse } from '@/api/index'
+import eventBus from "../../utils/eventBus";
 
 export default {
   name: "addCourse",
@@ -186,69 +187,8 @@ export default {
       deep: true,
       handler(newV, oldV) {
         console.log(newV, "------change");
+        this.courseChange()
 
-        this.resetData()
-
-        if (this.isEdit) {
-          console.log("编辑课程信息", this.editCourseInfo);
-          this.form.name = this.editCourseInfo.courseName
-          this.form.desc = this.editCourseInfo.desc
-          this.form.share = this.editCourseInfo.shareType
-
-          let tchClassCourseInfo = this.editCourseInfo.tchClassCourseInfo
-          let classStart = {}
-          let classEnd = {}
-
-          //判断是分班设置还是统一设置
-          let flag = false
-          let start = tchClassCourseInfo[0].startDate
-          let end = tchClassCourseInfo[0].endDate
-          tchClassCourseInfo.forEach(item => {
-            classStart[item.classId] = item.startDate
-            classEnd[item.classId] = item.endDate
-            this.result.push(item.classId)
-            if (start != item.startDate || end != item.endDate) {
-              flag = true
-            }
-
-          });
-
-          if (flag) {
-            this.form.radio = "1"
-            //分班
-            for (let m in this.classMap) {
-              if (classStart[this.classMap[m].classId]) {
-                this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date(classStart[this.classMap[m].classId]))
-              } else {
-                this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
-              }
-              if (classEnd[this.classMap[m].classId]) {
-                this.classMap[m]['endDate'] = generateTimeReqestNumber(new Date(classEnd[this.classMap[m].classId]))
-              } else {
-                let now = new Date()
-                now.setDate(now.getDate() + 3)
-                this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
-              }
-            }
-
-            let date = new Date()
-            this.form.time1 = generateTimeReqestNumber(date);
-            date.setDate(date.getDate() + 3)
-            this.form.time2 = generateTimeReqestNumber(date)
-          } else {
-            //统一
-            this.form.radio = "2"
-            for (let m in this.classMap) {
-              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
-              let now = new Date()
-              now.setDate(now.getDate() + 3)
-              this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
-            }
-            this.form.time1 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].startDate))
-            this.form.time2 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].endDate))
-          }
-        } else {
-        }
       },
     },
     'form.name'(v) {
@@ -293,7 +233,6 @@ export default {
         }
 
       });
-
       if (flag) {
         this.form.radio = "1"
         //分班
@@ -330,11 +269,19 @@ export default {
       }
     } else {
       this.form.radio = "2"
+      let defaultGrade = ''
       for (let m in this.classMap) {
+        if(!defaultGrade) {
+          defaultGrade = this.classMap[m].classGrade
+        }
+
         this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
         let now = new Date()
         now.setDate(now.getDate() + 3)
         this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+        if(defaultGrade === this.classMap[m].classGrade) {
+          this.result.push(m*1)
+        }
       }
       let date = new Date()
       this.form.time1 = generateTimeReqestNumber(date);
@@ -345,6 +292,69 @@ export default {
     //this.getClassTeacherCourseDeploy()
   },
   methods: {
+    courseChange() {
+      this.resetData()
+      if (this.isEdit) {
+        console.log("编辑课程信息", this.editCourseInfo);
+        this.form.name = this.editCourseInfo.courseName
+        this.form.desc = this.editCourseInfo.desc
+        this.form.share = this.editCourseInfo.shareType
+
+        let tchClassCourseInfo = this.editCourseInfo.tchClassCourseInfo
+        let classStart = {}
+        let classEnd = {}
+
+        //判断是分班设置还是统一设置
+        let flag = false
+        let start = tchClassCourseInfo[0].startDate
+        let end = tchClassCourseInfo[0].endDate
+        tchClassCourseInfo.forEach(item => {
+          classStart[item.classId] = item.startDate
+          classEnd[item.classId] = item.endDate
+          this.result.push(item.classId)
+          if (start != item.startDate || end != item.endDate) {
+            flag = true
+          }
+
+        });
+
+        if (flag) {
+          this.form.radio = "1"
+          //分班
+          for (let m in this.classMap) {
+            if (classStart[this.classMap[m].classId]) {
+              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date(classStart[this.classMap[m].classId]))
+            } else {
+              this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+            }
+            if (classEnd[this.classMap[m].classId]) {
+              this.classMap[m]['endDate'] = generateTimeReqestNumber(new Date(classEnd[this.classMap[m].classId]))
+            } else {
+              let now = new Date()
+              now.setDate(now.getDate() + 3)
+              this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+            }
+          }
+
+          let date = new Date()
+          this.form.time1 = generateTimeReqestNumber(date);
+          date.setDate(date.getDate() + 3)
+          this.form.time2 = generateTimeReqestNumber(date)
+        } else {
+          //统一
+          this.form.radio = "2"
+          for (let m in this.classMap) {
+            this.classMap[m]['beginDate'] = generateTimeReqestNumber(new Date())
+            let now = new Date()
+            now.setDate(now.getDate() + 3)
+            this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
+          }
+          this.form.time1 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].startDate))
+          this.form.time2 = generateTimeReqestNumber(new Date(tchClassCourseInfo[0].endDate))
+        }
+      } else {
+      }
+    },
     initData(classGrade,term) {
       this.currentShareCourse.classGrade = classGrade
       this.term = term
@@ -591,7 +601,8 @@ export default {
           this.$toast("创建成功")
           setTimeout(() => {
             this.loadingSubmit = false
-            this.$router.push(`/preview`)
+            eventBus.$emit('courseListRefresh')
+            this.$router.back()
           }, 200);
 
         } else {

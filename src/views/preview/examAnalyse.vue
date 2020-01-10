@@ -305,7 +305,8 @@ export default {
           type: 'category',
           data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName),
           axisLabel: {
-            interval: 0
+            interval: 0,
+            rotate: 30,//倾斜度 -90 至 90 默认为0
           },
         },
         itemStyle: {

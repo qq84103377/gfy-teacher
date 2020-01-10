@@ -2,12 +2,12 @@ import { parentGetters } from './modules/parent-GFY'
 
 const getters = {
   schoolId: state => {
-    const schoolMap = state.user.schoolMap || JSON.parse(localStorage.getItem("schoolMap"))
-    return Object.keys(schoolMap)[0]
+    const schoolMap = state.user.schoolMap || (localStorage.getItem("schoolMap") ? JSON.parse(localStorage.getItem("schoolMap")) : '')
+    return schoolMap ? Object.keys(schoolMap)[0] : ''
   },
   schoolIdList:()=>{
-    const schoolMap = JSON.parse(localStorage.getItem("schoolMap"))
-    return Object.keys(schoolMap).join()
+    const schoolMap = (localStorage.getItem("schoolMap") ? JSON.parse(localStorage.getItem("schoolMap")) : '')
+    return schoolMap ? Object.keys(schoolMap).join() : ''
   },
   vanLoading: state => state.setting.vanLoading,
   getUserInfo: state => state.user.userInfo || JSON.parse(localStorage.getItem('userInfo')),

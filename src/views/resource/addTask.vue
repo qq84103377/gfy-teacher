@@ -44,29 +44,31 @@
         </div>
       </van-cell>
       <van-cell class="add-task__body__cell"
-                v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||($route.query.taskType=='T03'&& $route.query.resourceType==='R02')||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
+                v-if="['lesson','material','exam'].includes($route.query.type)||($route.query.taskType=='T01'||($route.query.taskType=='T03'&& ($route.query.resourceType==='R02'||$route.query.resourceType==='R03'))||($route.query.taskType=='T04'&&$route.query.testPaperId!=0))">
         <div slot="title">
-          <div v-if="isReinforce" class="add-task__body__cell-ctn mgl5">
-            <div><span class="red">*</span>试卷:</div>
-            <!--            <div class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}</div>-->
-            <input class="pdlt10" style="flex:1" v-model="form.exam" type="text">
-            <span class="red">{{64 - form.exam.length}}</span>
-            <van-icon v-show="form.exam.length" @click="form.exam = ''" class="close" name="clear"/>
-          </div>
-          <div v-else class="add-task__body__cell-ctn"
-               :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
-            <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
+          <div v-if="$route.query.resourceType!=='R03'">
+            <div v-if="isReinforce" class="add-task__body__cell-ctn mgl5">
+              <div><span class="red">*</span>试卷:</div>
+              <!--            <div class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}</div>-->
+              <input class="pdlt10" style="flex:1" v-model="form.exam" type="text">
+              <span class="red">{{64 - form.exam.length}}</span>
+              <van-icon v-show="form.exam.length" @click="form.exam = ''" class="close" name="clear"/>
             </div>
-            <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
-            </div>
-            <div v-if='isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span>
-            </div>
+            <div v-else class="add-task__body__cell-ctn"
+                 :class="{ccc:form.comment&&!isEdit,grey9:isEdit,mgl5:$route.query.taskType=='T03'}">
+              <div v-if='!isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷:
+              </div>
+              <div v-if='!isEdit' class="pdlt10" style="flex:1">{{testPaperName || '未选择试卷'}}
+              </div>
+              <div v-if='isEdit'><span class="red" v-if="$route.query.taskType==='T03'">*</span>试卷: <span class="pdlt10">{{testPaperName}}</span>
+              </div>
 
-            <van-icon v-if="testPaperName&&$route.query.type != 'exam'&&!isEdit"
-                      @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}"
-                      name="clear"/>
-            <van-icon v-if="$route.query.type != 'exam'&&!isEdit" @click="selectTestPaper" class="add"
-                      :class="{ccc:form.comment}" name="add"/>
+              <van-icon v-if="testPaperName&&$route.query.type != 'exam'&&!isEdit"
+                        @click="testPaperName = '';testPaperId=''" class="close" :class="{ccc:form.comment}"
+                        name="clear"/>
+              <van-icon v-if="$route.query.type != 'exam'&&!isEdit" @click="selectTestPaper" class="add"
+                        :class="{ccc:form.comment}" name="add"/>
+            </div>
           </div>
           <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="form.exam||isReinforce"
                         :name="form.allowEdit">
@@ -374,14 +376,14 @@
           }
           this.form.resourceId = this.resourceInfo.resourceId
 
-          if (this.$route.query.taskType === 'T01' || this.$route.query.taskType === 'T02' || this.$route.query.taskType === 'T04') { //lesson  material
+          if (this.$route.query.taskType === 'T02' ) { //lesson  material
 
-          } else if (this.$route.query.taskType === 'T03' && this.$route.query.resourceType === 'R02') {//试卷exam
-
+          } else if ((this.$route.query.taskType === 'T01'&&this.resourceInfo.testPaperId>0)||(this.$route.query.taskType === 'T04'&&this.resourceInfo.testPaperId>0)||(this.$route.query.taskType === 'T03' && (this.$route.query.resourceType === 'R02' || this.$route.query.resourceType === 'R03'))) {//试卷或试题exam
             this.testPaperId = this.resourceInfo.testPaperId
             this.testPaperName = this.resourceInfo.testPaperName
-            this.form.exam = this.resourceInfo.testPaperName
-            this.form.resourceId = this.resourceInfo.testPaperId
+            this.form.exam = true
+            //单道试题的时候取this.resourceInfo.resourceId
+            this.form.resourceId = this.resourceInfo.testPaperId || this.resourceInfo.resourceId
             // this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
           } else if (this.$route.query.taskType === 'T06') {//discuss
 
@@ -913,7 +915,7 @@
             this.minDate = new Date()
             this.currentDate = new Date(this.form.time1.replace(/-/g, "/"))
           } else if (type == "end") {
-            let date = new Date(this.form.time1.replace(/-/g, "/"))
+            let date = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
             date.setDate(date.getDate() + 1)
             this.minDate = date
             this.currentDate = new Date(this.form.time2.replace(/-/g, "/"))
@@ -1284,7 +1286,7 @@
 
         //是否允许修改答案
         let modifyAfterSubmit = ""
-        if (this.testPaperId) {
+        if (this.testPaperId || (this.$route.query.taskType=='T03'&&this.$route.query.resourceType==='R03')) {
           if (this.form.allowEdit) {
             modifyAfterSubmit = "M01"
           } else {
