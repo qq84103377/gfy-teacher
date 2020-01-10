@@ -81,6 +81,10 @@
       }
     },
     methods: {
+      goVideoPage(url) {
+        if (!url) return
+        this.$router.push({ name: 'videoPage', query: { src: url} })
+      },
       imgCorrect(item,imgIndex,stuIndex) {
         this.$router.push({name:'imgCorrect',params: {
             list:this.list,
