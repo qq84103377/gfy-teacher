@@ -96,7 +96,7 @@ export default {
         args.url = this.link
         args.title = this.title
         args.description = this.desc || ''
-        args.image = this.pic || 'https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/share_icon/teacher_share.png'
+        args.image = this.pic ? encodeURI(this.pic) : 'https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/share_icon/teacher_share.png'
         QQSDK.shareNews(() => {
           this.$toast.success('分享成功')
           this.visible = false
