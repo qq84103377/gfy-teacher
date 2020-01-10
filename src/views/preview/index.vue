@@ -44,7 +44,7 @@
 
     </div>
     <div class="preview-wrap__footer van-hairline--top" v-if="courseList.length || firstFlag">
-      <van-button class="add-mission" type="info" @click="$router.push(`/resource`)">新建任务</van-button>
+      <van-button class="add-mission" type="info" @click="viewResource">新建任务</van-button>
     </div>
 
     <!--    <edit-course></edit-course>-->
@@ -128,6 +128,12 @@ export default {
     });
   },
   methods: {
+    viewResource() {
+      this.$router.push({path:`/resource`,query: {
+          from: 'preview',
+          currCourse: this.courseList[this.courseIndex]
+        }})
+    },
     open() {
       this.$nextTick(() => {
         this.$refs['editCourse'].courseChange()
@@ -349,7 +355,7 @@ export default {
         this.dropdownRefLoading = false
         if (res.flag && res.data && res.data[0]) {
           if (this.$route.query.from === 'course') {
-            const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.$route.query.tchCourseId)
+            const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.$route.query.tchCourseId && v.tchCourseInfo.sysCourseId == this.$route.query.sysCourseId)
             if (index > -1) {
               res.data.splice(index, 1)
             }
@@ -360,14 +366,13 @@ export default {
             } else {
               this.courseList = this.courseList.concat(res.data)
             }
-            this.tchCourseInfo = this.courseList[0].tchCourseInfo
             // this.courseList = page === 1 ? res.data.unshift(...this.$route.query.currCourse) : this.courseList.concat(res.data)
 
           } else {
             this.courseList = page === 1 ? res.data : this.courseList.concat(res.data)
-            this.tchCourseInfo = this.courseList[0].tchCourseInfo
             console.log(this.tchCourseInfo, 'this.tchCourseInfo!!!!');
           }
+          this.tchCourseInfo = this.courseList[0].tchCourseInfo
 
           if (!isEdit) {
             this.currentTchCourseInfo = this.courseList[0].tchCourseInfo
