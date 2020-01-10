@@ -150,6 +150,7 @@ export default {
       isNowTerm: 0,
       gradeTermMap: '',
       gradeList: JSON.parse(localStorage.getItem("gradeList")),
+      // gradeList: JSON.parse(localStorage.getItem("gradeList")).filter(v => v.teacherInfoList.some(s => s.subjectype === localStorage.currentSubjectType)),
       termList: [{ name: '上学期', value: 'T01' }, { name: '下学期', value: 'T02' }],
       classList: JSON.parse(localStorage.getItem("classMap")),
       classDropdown: false,
@@ -181,7 +182,18 @@ export default {
       }
       //学科信息获取
       if (localStorage.getItem("deployList")) {
-        this.classGradeList = JSON.parse(localStorage.getItem("deployList"))
+        //先查出当前学科有哪些年级
+        let gradeArr = []
+        for (let k in JSON.parse(localStorage.getItem("classMap"))) {
+          if(JSON.parse(localStorage.getItem("classMap"))[k].teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)) {
+            if(!gradeArr.includes(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)) {
+              gradeArr.push(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)
+            }
+          }
+        }
+        //筛选对应的年级
+        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade) )
+
         this.bookInfoList = this.classGradeList[this.gradeIndex].bookInfo
         this.termTypeList = this.classGradeList[this.gradeIndex].termInfo
         if (this.termTypeList && this.termTypeList.length > 1) {

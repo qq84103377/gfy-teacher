@@ -208,7 +208,11 @@ export default {
     //班级信息
     let cl = localStorage.getItem("classMap")
     if (cl) {
-      this.classMap = JSON.parse(cl);
+      for (let k in JSON.parse(cl)) {
+        if(JSON.parse(cl)[k].teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
+          this.classMap[k] = JSON.parse(cl)[k]
+        }
+      }
     }
     if (this.isEdit) {
       console.log("编辑课程信息", this.editCourseInfo);
@@ -810,14 +814,14 @@ export default {
           if (res.flag) {
             this.$toast('修改成功')
             this.$emit('onFinish', this.form.name)
+            res.data[0].tchSubjectCourse.shareType = this.form.share
+            this.$emit('update:editCourseInfo',res.data[0].tchSubjectCourse)
           } else {
             this.$toast(res.flag)
           }
         } else {
           this.$toast("修改失败")
-          return
         }
-
       })
     }
 
