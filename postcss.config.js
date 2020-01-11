@@ -17,11 +17,11 @@ module.exports = {
       minPixelValue: 1,       // (Number) Set the minimum pixel value to replace.
       mediaQuery: false,       // (Boolean) Allow px to be converted in media queries.
       // propList:['!font*'],
-      landscape: true,
-      // // 横屏时使用的单位
-      landscapeUnit: 'vw',
-      // // 横屏时使用的视口宽度
-      landscapeWidth: 667
+      // landscape: true,
+      // // // 横屏时使用的单位
+      // landscapeUnit: 'vw',
+      // // // 横屏时使用的视口宽度
+      // landscapeWidth: 667
     },
     "postcss-viewport-units":{
       filterRule: rule => rule.selector.indexOf('::after') === -1 && rule.selector.indexOf('::before') === -1 && rule.selector.indexOf(':after') === -1 && rule.selector.indexOf(':before') === -1

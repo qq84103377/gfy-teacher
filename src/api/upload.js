@@ -20,8 +20,12 @@ export const doUpLoad = (url, data) => {
       url: url,
       method: 'post',
       data: data,
-      headers: { 'Content-Type': 'multipart/form-data' }
-    },{timeout: 99999})
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 0,
+      // onUploadProgress(e) {
+      //   console.log(e.loaded,'======');
+      // }
+    })
       .then((res) => {
         resolve(res)
       })

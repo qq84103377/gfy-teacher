@@ -795,6 +795,7 @@ export default {
   },
   mounted() {
     console.log('mounted()');
+    window.addEventListener('resize', this.handleResize)
 
     let _this = this
     this.offCanvas = document.getElementsByClassName('offCanvas')[0] //$('.offCanvas')[0]; // 用于更换背景图
@@ -839,7 +840,6 @@ export default {
     this.rotate = 0
     this.swordEle.rotateZ = 0
 
-    window.addEventListener('resize', this.handleResize)
 
 
 
