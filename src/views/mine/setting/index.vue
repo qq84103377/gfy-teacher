@@ -14,7 +14,8 @@
             <span v-show="!hasNew">{{tips}}</span>
           </template>
         </van-cell>
-        <van-cell title="服务条款" is-link to="/serviceSheet"></van-cell>
+        <van-cell title="用户协议" is-link to="/serviceSheet"></van-cell>
+        <van-cell title="隐私政策" is-link to="/privateSheet"></van-cell>
       </van-cell-group>
     </div>
     <div class="account-footer">

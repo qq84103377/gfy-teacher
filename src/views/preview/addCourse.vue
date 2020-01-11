@@ -655,7 +655,8 @@ export default {
                   bookMap[item.textBookId] = item.textBookName
                   bookList.push({
                     textBookId: item.textBookId,
-                    textBookName: item.textBookName
+                    textBookName: item.textBookName,
+                    subjectType:item.subjectType
                   })
                 }
                 if (!termMap[item.gradeTermInfo.term]) {

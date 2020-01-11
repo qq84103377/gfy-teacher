@@ -47,10 +47,7 @@
           <div class="icon-wrap orange"><i class="iconGFY icon-layer"></i></div>
           <div>分层</div>
         </div>
-        <!--        <div class="index-content-wrap__body__main-icon-item" @click="$toast('敬请期待')">-->
-        <!--          <div class="icon-wrap orange"><i class="iconGFY icon-plus"></i></div>-->
-        <!--          <div>更多</div>-->
-        <!--        </div>-->
+
       </div>
       <div class="jcsb aic mgb10">
         <span class="fs16 black">未结束任务</span>
@@ -95,15 +92,7 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <!--  <div @click="$router.push('/reinforce')">
-          <i class="iconGFY icon-res-plus"></i>
-          <span>智能补强</span>
-        </div>
-        <div @click="$router.push(`/specialExer`)">
-          <i class="iconGFY icon-res-plus"></i>
-         <span>专项练习</span>
-<span @click="$toast.fail('敬请期待')">专项练习</span>
-        </div> -->
+
       </div>
     </div>
   </section>
@@ -521,7 +510,8 @@ export default {
                     bookMap[item.textBookId] = item.textBookName
                     bookList.push({
                       textBookId: item.textBookId,
-                      textBookName: item.textBookName
+                      textBookName: item.textBookName,
+                      subjectType:item.subjectType
                     })
                   }
                   if (!termMap[item.gradeTermInfo.term]) {

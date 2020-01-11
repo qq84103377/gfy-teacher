@@ -193,8 +193,14 @@ export default {
         }
         //筛选对应的年级
         this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade) )
-
-        this.bookInfoList = this.classGradeList[this.gradeIndex].bookInfo
+        let tempList = this.classGradeList[this.gradeIndex].bookInfo
+        let sub =localStorage.getItem("currentSubjectType")
+        this.bookInfoList = []
+        tempList.forEach((item) => {
+          if (item.subjectType == sub){
+            this.bookInfoList.push(item)
+          }
+        });
         this.termTypeList = this.classGradeList[this.gradeIndex].termInfo
         if (this.termTypeList && this.termTypeList.length > 1) {
           if (this.isNowTerm === 1) {
@@ -408,7 +414,15 @@ export default {
         // this.getTextBookCourseInfo()
       } else {
         this.gradeIndex = index
-        this.bookInfoList = this.classGradeList[index].bookInfo
+
+        let tempList = this.classGradeList[index].bookInfo
+        let sub =localStorage.getItem("currentSubjectType")
+        this.bookInfoList = []
+        tempList.forEach((item) => {
+          if (item.subjectType == sub){
+            this.bookInfoList.push(item)
+          }
+        });
         this.termTypeList = this.classGradeList[index].termInfo
         if (this.termTypeList && this.termTypeList.length > 1) {
           if (this.isNowTerm === 1) {

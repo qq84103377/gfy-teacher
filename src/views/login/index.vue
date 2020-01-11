@@ -24,6 +24,7 @@
           </div>
           <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled" @click="login">登录
           </van-button>
+          <span class="service-text">注册表示同意相关《<i @click="$router.push('/serviceSheet')">用户协议</i>》和《<i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-detail" v-else>
           <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入用户名" />
@@ -38,6 +39,7 @@
           </div>
           <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled2" @click="userLogin">登录
           </van-button>
+          <span class="service-text">注册表示同意相关《<i @click="$router.push('/serviceSheet')">用户协议</i>》和《<i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-footer fs10">
           <span @click="$toast.fail('敬请期待')">注册帮助</span>
@@ -212,7 +214,7 @@ export default {
             }, 1000)
           }
         } else {
-          this.$toast('请稍后获取！')
+          this.$toast(res.msg)
         }
       })
     },
@@ -597,14 +599,16 @@ export default {
         font-size: 18px;
         // margin-top: 45px;
         margin-top: 6.75vh;
+        
       }
+
 
       .service-text {
         color: #999;
         font-size: 12px;
 
         i {
-          color: @blue;
+          color: #39f0dd;
         }
       }
     }
