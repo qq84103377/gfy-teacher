@@ -472,6 +472,15 @@ export default new Router({
           }
         },
         {
+          path: "/privateSheet",
+          name: "privateSheet",
+          component: () => import("./views/mine/setting/privateSheet.vue"),
+          meta: {
+            isShowHeader: true,
+            title: "用户隐私保护政策"
+          }
+        },
+        {
           path: '/serviceSheet',
           name: 'serviceSheet',
           component: () => import('./views/mine/setting/serviceSheet.vue'),
