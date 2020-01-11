@@ -243,8 +243,8 @@
           </list-item>
           <!--私人资源  微课-->
           <list-item class="mgt10" style="background: #fff;" v-if="priSourceIndex==1&&tabIndex == 1"
-                     v-for="(item,index) in priLessonList" :key="index"
-                     :itemTitle="item.courseware_name"
+                     v-for="(item,index) in priLessonList" :key="index" :can-slide="true"
+                     :itemTitle="item.courseware_name" @del="delRes(item,index)"
                      @clickTo="goVideoPage(item)">
             <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
               <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else :class="['iconGFY', handleMediaIcon(item.src_url)]"></i>
@@ -287,8 +287,8 @@
           </list-item>
           <!--私人资源 素材-->
           <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
-                     v-if="priSourceIndex==2&&tabIndex == 1"
-                     v-for="(item,index) in priMaterialList" :key="index"
+                     v-if="priSourceIndex==2&&tabIndex == 1" :can-slide="true"
+                     v-for="(item,index) in priMaterialList" :key="index" @del="delRes(item,index)"
                      :itemTitle="item.courseware_name">
             <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
             <div slot="desc">
@@ -306,7 +306,7 @@
             </div>
             <div slot="btn" class="btn-group van-hairline--top">
               <div v-if="item.collect_type === 'C01'"
-                   @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd)">
+                   @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd,index)">
                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                 <span>取消收藏</span>
               </div>
@@ -357,7 +357,7 @@
             </div>
             <div slot="btn" class="btn-group van-hairline--top">
               <div v-if="item.collect_type === 'C01'"
-                   @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd)">
+                   @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd,index)">
                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                 <span>取消收藏</span>
               </div>
@@ -412,6 +412,7 @@
     getSysCourseTestPaperList,
     getCollectInfoDetailV2,
     delTestPaper,
+    delCourseWare,
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump, formatTime} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
@@ -641,6 +642,28 @@
       }
     },
     methods: {
+      async delRes(item,index) {
+        if(item.collect_type === 'C01') {
+          //这是别人的资源,不能删除
+          return this.$toast('非本账号的资源无法删除')
+        }
+        await this.delCourseWare(item.courseware_id)
+        this.collect(item, item.object_id, item.status_cd, index, true)
+        },
+      async delCourseWare(coursewareId) {
+        let obj = {
+          "courseWareList":[{coursewareId}]
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await delCourseWare(params)
+        //   .then(res => {
+        //   if(res.flag) {
+        //
+        //   }
+        // })
+      },
       handleMediaIcon(srcUrl) {
         try{
           let t = srcUrl.substring(srcUrl.lastIndexOf('.') + 1).toLowerCase()
@@ -1190,7 +1213,7 @@
         }
         return t
       },
-      collect(item, objectId, statusCd, index) {
+      collect(item, objectId, statusCd, index, bol) {
         this.$store.commit('setVanLoading', true)
         if (this.tabIndex ? item.collect_id : item.collectId) {
           let obj = {
@@ -1213,9 +1236,10 @@
           delCollectInfo(params).then(res => {
             this.$store.commit('setVanLoading', false)
             if (res.flag) {
-              this.$toast('取消收藏')
+              this.$toast(bol?'删除成功':'取消收藏')
+              console.log(this.priListKey,this[this.priListKey],'=d=d=d=d');
               this.tabIndex ?
-                this[this.priListKey].splice(index, 1)
+                this[this.curKey].splice(index, 1)
                 : item.collectId = 0
             } else {
               this.$toast(res.msg)
