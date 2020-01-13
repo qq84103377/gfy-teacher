@@ -384,6 +384,9 @@ export default {
           }
         } else {
           this.$toast(res.msg)
+          this.courseList = []
+          this.unitList = []
+          this.unitIndex = 0
         }
 
       })

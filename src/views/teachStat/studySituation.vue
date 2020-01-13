@@ -104,8 +104,8 @@
     computed: {
       filterParams() {
         return {
-          classGrade: this.gradeSubjectList[this.$parent.gradeIndex].classGrade,
-          subjectType: this.gradeSubjectList[this.$parent.gradeIndex].subjectType,
+          classGrade: this.gradeSubjectList[this.$parent.tempGradeIndex].classGrade,
+          subjectType: this.gradeSubjectList[this.$parent.tempGradeIndex].teacherInfoList[this.$parent.tempSubjectIndex].subjectType,
           classId: this.$parent.classIndex || ''
         }
       }

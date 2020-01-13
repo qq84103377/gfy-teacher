@@ -5,15 +5,21 @@
       title="教学统计">
     </van-nav-bar>
     <div>
-      <!--      <div>{{aa}}</div>-->
-      <!--      <div @click="aa++">增加</div>-->
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
-      <van-cell @click="openGradePop" title="年级学科" is-link>
-        <div class="blue">{{gradeSubjectList[gradeIndex].name}}</div>
+      <van-cell v-if="!isMaster" @click="openGradePop" title="年级学科" is-link>
+        <div class="blue">{{gradeSubjectList[gradeIndex].gradeName}}{{gradeSubjectList[gradeIndex].teacherInfoList[subjectIndex].subjectName}}</div>
       </van-cell>
-      <van-cell @click="openClassPop" title="班级" is-link>
+      <van-cell v-else @click="openGradePop" title="年级学科" is-link>
+        <div class="blue">{{masterGradeSubjectList[masterGradeIndex].gradeName}}{{masterGradeSubjectList[masterGradeIndex].teacherInfoList[masterSubjectIndex].subjectName}}</div>
+      </van-cell>
+      <van-cell v-if="!isMaster" @click="openClassPop" title="班级" is-link>
         <div class="blue">{{classList[classIndex].schoolYear + classList[classIndex].gradeName +
           classList[classIndex].className}}
+        </div>
+      </van-cell>
+      <van-cell v-else @click="openClassPop" title="班级" is-link>
+        <div class="blue">{{masterClassList[masterClassIndex].schoolYear + masterClassList[masterClassIndex].gradeName +
+          masterClassList[masterClassIndex].className}}
         </div>
       </van-cell>
       <van-cell @click="openDatePicker" is-link>
@@ -24,7 +30,7 @@
       </van-cell>
     </div>
 
-    <router-view ref="routerView"></router-view>
+    <router-view ref="routerView" @changeFilter="changeFilter"></router-view>
 
     <slot name="reinforce" ref="reinforce"></slot>
 
@@ -39,13 +45,31 @@
       <div class="grade-pop-wrap">
         <van-icon @click="handleClose(gradeSubjectList)" class="close" name="close"/>
         <div class="grade-pop-wrap__title van-hairline--bottom">年级学科</div>
-        <div class="grade-pop-wrap__body">
-          <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList"
-                    :key="index">
-            <div slot="title" class="aic jcsb"><span>{{item.name}}</span>
-              <van-icon v-if="item.active" class="blue" name="success"/>
+        <div class="grade-pop-wrap__body" style="overflow: hidden;display: flex">
+
+
+
+<!--          <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList"-->
+<!--                    :key="index">-->
+<!--            <div slot="title" class="aic jcsb"><span>{{item.name}}</span>-->
+<!--              <van-icon v-if="item.active" class="blue" name="success"/>-->
+<!--            </div>-->
+<!--          </van-cell>-->
+
+
+          <div class="grade-pop-wrap__body-left">
+            <div @click="selectParent(item,index)" v-for="(item,index) in gradeSubjectList" :key="index" :class="{active:item.active}">{{item.gradeName}}
             </div>
-          </van-cell>
+          </div>
+          <div class="grade-pop-wrap__body-right">
+            <div class="" v-for="(child,ci) in gradeSubjectList[gradeIndex].teacherInfoList" :key="ci">
+              <div @click="selectChild(child)" class="van-hairline--bottom">
+                <div :class="['cell__item',{active:child.check}]">{{child.subjectName}}
+                  <van-icon v-show="child.check" class="check blue" name="success" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="grade-pop-wrap__footer">
           <van-button class="btn" type="info" @click="confirm()">确定</van-button>
@@ -60,10 +84,12 @@
       position="bottom"
       :style="{ height: '90%' }">
       <div class="grade-pop-wrap">
-        <van-icon @click="handleClose(classList)" class="close" name="close"/>
+        <van-icon @click="handleClose(classList,1)" class="close" name="close"/>
         <div class="grade-pop-wrap__title van-hairline--bottom">班级</div>
         <div class="grade-pop-wrap__body">
-          <van-cell @click="selectItem(value,key,classList)" v-for="(value,key) in classList" :key="key">
+          <van-cell @click="selectItem(value,key,classList)" v-for="(value,key) in classList"
+                    v-if="value.classGrade === gradeSubjectList[gradeIndex].classGrade && value.teacherInfoList.some(s => s.subjectType === gradeSubjectList[gradeIndex].teacherInfoList[subjectIndex].subjectType)"
+                    :key="key">
             <div slot="title" class="aic jcsb"><span>{{value.schoolYear + value.gradeName + value.className}}</span>
               <van-icon v-if="value.active" class="blue" name="success"/>
             </div>
@@ -110,7 +136,61 @@
       </div>
     </van-popup>
 
-
+    <!--   班主任 年级学科(需要展示全部学科)-->
+    <van-popup
+      get-container="#app"
+      v-model="masterGradePop"
+      :close-on-click-overlay="false"
+      round
+      position="bottom"
+      :style="{ height: '90%' }">
+      <div class="grade-pop-wrap">
+        <van-icon @click="handleClose(masterGradeSubjectList)" class="close" name="close"/>
+        <div class="grade-pop-wrap__title van-hairline--bottom">年级学科</div>
+        <div class="grade-pop-wrap__body" style="overflow: hidden;display: flex">
+          <div class="grade-pop-wrap__body-left">
+            <div @click="selectParent(item,index)" v-for="(item,index) in masterGradeSubjectList" :key="index" :class="{active:item.active}">{{item.gradeName}}
+            </div>
+          </div>
+          <div class="grade-pop-wrap__body-right">
+            <div class="" v-for="(child,ci) in masterGradeSubjectList[masterGradeIndex].teacherInfoList" :key="ci">
+              <div @click="selectChild(child)" class="van-hairline--bottom">
+                <div :class="['cell__item',{active:child.check}]">{{child.subjectName}}
+                  <van-icon v-show="child.check" class="check blue" name="success" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grade-pop-wrap__footer">
+          <van-button class="btn" type="info" @click="confirm()">确定</van-button>
+        </div>
+      </div>
+    </van-popup>
+    <!--   班主任 班级-->
+    <van-popup
+      get-container="#app"
+      v-model="masterClassPop"
+      round
+      position="bottom"
+      :style="{ height: '90%' }">
+      <div class="grade-pop-wrap">
+        <van-icon @click="handleClose(masterClassList,1)" class="close" name="close"/>
+        <div class="grade-pop-wrap__title van-hairline--bottom">班级</div>
+        <div class="grade-pop-wrap__body">
+          <van-cell @click="selectItem(value,key,masterClassList)" v-for="(value,key) in masterClassList"
+                    v-if="value.classGrade === masterGradeSubjectList[masterGradeIndex].classGrade"
+                    :key="key">
+            <div slot="title" class="aic jcsb"><span>{{value.schoolYear + value.gradeName + value.className}}</span>
+              <van-icon v-if="value.active" class="blue" name="success"/>
+            </div>
+          </van-cell>
+        </div>
+        <div class="grade-pop-wrap__footer">
+          <van-button class="btn" type="info" @click="confirm(1)">确定</van-button>
+        </div>
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -121,7 +201,16 @@
     name: "index",
     data() {
       return {
-        aa: 123,
+        isMaster: false, //是否切换到班主任的模块
+        masterGradePop: false,
+        masterGradeSubjectList: [], //班主任的年级学科筛选条件
+        masterGradeIndex: 0,
+        tempMasterGradeIndex: 0,
+        masterSubjectIndex: 0,
+        tempMasterSubjectIndex: 0,
+        masterClassPop: false,
+        masterClassList: {},
+        masterClassIndex: 0,
         rangeList: [
           {name: '近一周', mtd1: 'getDate', mtd2: 'setDate', num: 7, active: false},
           {name: '近一个月', mtd1: 'getMonth', mtd2: 'setMonth', num: 1, active: true},
@@ -134,6 +223,9 @@
         maxDate: new Date(),
         gradeSubjectList: [],
         gradeIndex: 0,
+        tempGradeIndex: 0,
+        subjectIndex: 0,
+        tempSubjectIndex: 0,
         classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
         // classList: {0:{gradeName:'全部',schoolYear:'',className:'',classId:'',active:true},...JSON.parse(localStorage.getItem("classMap"))},
         classList: JSON.parse(localStorage.getItem("classMap")),
@@ -145,6 +237,49 @@
       }
     },
     methods: {
+      changeFilter(isMaster) {
+        this.isMaster = isMaster
+      },
+      selectChild(child) {
+        if(child.check) return
+        if(this.isMaster) {
+          this.masterGradeSubjectList[this.masterGradeIndex].teacherInfoList.forEach(v => {
+            this.$set(v,'check',false)
+          })
+        }else {
+          this.gradeSubjectList[this.gradeIndex].teacherInfoList.forEach(v => {
+            this.$set(v,'check',false)
+          })
+        }
+
+        this.$set(child,'check',true)
+      },
+      selectParent(item,index) {
+        if(item.active) return
+        if(this.isMaster) {
+          this.masterGradeIndex = index
+          this.masterGradeSubjectList.forEach(g => {
+            this.$set(g,'active',false)
+            g.teacherInfoList.forEach(s => {
+              this.$set(s,'check',false)
+            })
+          })
+          this.$set(item,'active',true)
+          this.$set(item.teacherInfoList[0],'check',true)
+          this.masterSubjectIndex = 0
+        }else {
+          this.gradeIndex = index
+          this.gradeSubjectList.forEach(g => {
+            this.$set(g,'active',false)
+            g.teacherInfoList.forEach(s => {
+              this.$set(s,'check',false)
+            })
+          })
+          this.$set(item,'active',true)
+          this.$set(item.teacherInfoList[0],'check',true)
+          this.subjectIndex = 0
+        }
+      },
       dateRange(methodName1, methodName2, num, index) {
         let time1 = new Date()
         time1[methodName2](time1[methodName1]() - num)
@@ -200,67 +335,228 @@
         }
         return value;
       },
-      handleClose(arr) {
-        this.gradePop = false
-        this.classPop = false
-        for (let key in arr) {
-          this.$set(arr[key], 'active', false)
+      handleClose(arr,type) {
+        if(type) {
+          if(this.isMaster) {
+            this.masterClassPop = false
+          }else {
+            this.classPop = false
+          }
+          for (let key in arr) {
+            this.$set(arr[key], 'active', false)
+          }
+        }else {
+          if(this.isMaster) {
+            this.masterGradeIndex = this.tempMasterGradeIndex
+            this.masterSubjectIndex = this.tempMasterSubjectIndex
+            this.masterGradePop = false
+          }else {
+            this.gradeIndex = this.tempGradeIndex
+            this.subjectIndex = this.tempSubjectIndex
+            this.gradePop = false
+          }
+          for (let key in arr) {
+            this.$set(arr[key], 'active', false)
+            arr[key].teacherInfoList.forEach(v => {
+              this.$set(v,'check',false)
+            })
+          }
         }
       },
       openDatePicker() {
         this.showTime = true
       },
       openGradePop() {
-        this.gradePop = true
-        this.$set(this.gradeSubjectList[this.gradeIndex], 'active', true)
+        if(this.isMaster) {
+          this.masterGradePop = true
+          this.tempMasterGradeIndex = this.masterGradeIndex
+          this.tempMasterSubjectIndex = this.masterSubjectIndex
+          this.$set(this.masterGradeSubjectList[this.masterGradeIndex], 'active', true)
+          this.$set(this.masterGradeSubjectList[this.masterGradeIndex].teacherInfoList[this.masterSubjectIndex], 'check', true)
+        }else {
+          this.gradePop = true
+          this.tempGradeIndex = this.gradeIndex
+          this.tempSubjectIndex = this.subjectIndex
+          this.$set(this.gradeSubjectList[this.gradeIndex], 'active', true)
+          this.$set(this.gradeSubjectList[this.gradeIndex].teacherInfoList[this.subjectIndex], 'check', true)
+        }
       },
       openClassPop() {
-        this.classPop = true
-        this.$set(this.classList[this.classIndex], 'active', true)
+        if(this.isMaster) {
+          this.masterClassPop = true
+          this.$set(this.masterClassList[this.masterClassIndex], 'active', true)
+        }else {
+          this.classPop = true
+          this.$set(this.classList[this.classIndex], 'active', true)
+        }
       },
       selectItem(item, index, arr) {
         if (item.active) return
         for (let key in arr) {
           this.$set(arr[key], 'active', false)
         }
-        item.active = true
+        this.$set(item,'active',true)
+        // item.active = true
       },
       confirm(flag) {
         if (flag) {
-          for (let key in this.classList) {
-            if (this.classList[key].active) {
-              this.classIndex = key * 1
-              break
+          if(this.isMaster) {
+            for (let key in this.masterClassList) {
+              if (this.masterClassList[key].active) {
+                this.masterClassIndex = key * 1
+                break
+              }
             }
+            this.masterClassPop = false
+          }else {
+            for (let key in this.classList) {
+              if (this.classList[key].active) {
+                this.classIndex = key * 1
+                break
+              }
+            }
+            this.classPop = false
           }
-          this.classPop = false
         } else {
-          const index = this.gradeSubjectList.findIndex(v => v.active)
-          // this.filterText.grade = index > -1 ? this.gradeSubjectList[index].name : ''
-          this.gradeIndex = index > -1 ? index : 0
-          this.gradePop = false
+          if(this.isMaster) {
+            const index = this.masterGradeSubjectList.findIndex(v => v.active)
+            // this.filterText.grade = index > -1 ? this.gradeSubjectList[index].name : ''
+            this.masterGradeIndex = index > -1 ? index : 0
+            this.masterSubjectIndex = this.masterGradeSubjectList[this.masterGradeIndex].teacherInfoList.findIndex(v => v.check)
+            this.masterGradePop = false
+            //班级需要联动
+            let flag = false
+            for (let key in this.masterClassList) {
+              if(this.masterClassList[key].classGrade === this.masterGradeSubjectList[this.masterGradeIndex].classGrade) {
+                this.$set(this.masterClassList[key],'active',!flag)
+                if(!flag) this.masterClassIndex = key
+                flag = true
+              }
+            }
+            this.tempMasterGradeIndex = this.masterGradeIndex
+            this.tempMasterSubjectIndex = this.masterSubjectIndex
+          }else {
+            const index = this.gradeSubjectList.findIndex(v => v.active)
+            // this.filterText.grade = index > -1 ? this.gradeSubjectList[index].name : ''
+            this.gradeIndex = index > -1 ? index : 0
+            this.subjectIndex = this.gradeSubjectList[this.gradeIndex].teacherInfoList.findIndex(v => v.check)
+            this.gradePop = false
+            //班级需要联动
+            let flag = false
+            for (let key in this.classList) {
+              if(this.classList[key].classGrade === this.gradeSubjectList[this.gradeIndex].classGrade && this.classList[key].teacherInfoList.some(s => s.subjectType === this.gradeSubjectList[this.gradeIndex].teacherInfoList[this.subjectIndex].subjectType)) {
+                this.$set(this.classList[key],'active',!flag)
+                if(!flag) this.classIndex = key
+                flag = true
+              }
+            }
+            this.tempGradeIndex = this.gradeIndex
+            this.tempSubjectIndex = this.subjectIndex
+          }
         }
+      },
+      handleGradeSubject(classGrade) {
+        let arr = []
+        if(['G01','G02','G03','G04','G05','G06'].includes(classGrade)) {
+          arr = [
+            {subjectType: '',subjectName: '全部', check: true},
+            {subjectType: 'S01',subjectName: '语文', check: false},
+            {subjectType: 'S02',subjectName: '数学', check: false},
+            {subjectType: 'S03',subjectName: '英语', check: false},
+          ]
+        }else if (['G07'].includes(classGrade)) {
+          arr = [
+            {subjectType: '',subjectName: '全部', check: true},
+            {subjectType: 'S01',subjectName: '语文', check: false},
+            {subjectType: 'S02',subjectName: '数学', check: false},
+            {subjectType: 'S03',subjectName: '英语', check: false},
+            {subjectType: 'S06',subjectName: '政治', check: false},
+            {subjectType: 'S07',subjectName: '历史', check: false},
+            {subjectType: 'S08',subjectName: '生物', check: false},
+            {subjectType: 'S09',subjectName: '地理', check: false},
+          ]
+        } else if (['G08'].includes(classGrade)) {
+          arr = [
+            {subjectType: '',subjectName: '全部', check: true},
+            {subjectType: 'S01',subjectName: '语文', check: false},
+            {subjectType: 'S02',subjectName: '数学', check: false},
+            {subjectType: 'S03',subjectName: '英语', check: false},
+            {subjectType: 'S04',subjectName: '物理', check: false},
+            {subjectType: 'S06',subjectName: '政治', check: false},
+            {subjectType: 'S07',subjectName: '历史', check: false},
+            {subjectType: 'S08',subjectName: '生物', check: false},
+            {subjectType: 'S09',subjectName: '地理', check: false},
+          ]
+        } else if (['G09'].includes(classGrade)) {
+          arr = [
+            {subjectType: '',subjectName: '全部', check: true},
+            {subjectType: 'S01',subjectName: '语文', check: false},
+            {subjectType: 'S02',subjectName: '数学', check: false},
+            {subjectType: 'S03',subjectName: '英语', check: false},
+            {subjectType: 'S04',subjectName: '物理', check: false},
+            {subjectType: 'S05',subjectName: '化学', check: false},
+            {subjectType: 'S06',subjectName: '政治', check: false},
+            {subjectType: 'S07',subjectName: '历史', check: false},
+          ]
+        } else if (['G10','G11','G12'].includes(classGrade)) {
+          arr = [
+            {subjectType: '',subjectName: '全部', check: true},
+            {subjectType: 'S01',subjectName: '语文', check: false},
+            {subjectType: 'S02',subjectName: '数学', check: false},
+            {subjectType: 'S03',subjectName: '英语', check: false},
+            {subjectType: 'S04',subjectName: '物理', check: false},
+            {subjectType: 'S05',subjectName: '化学', check: false},
+            {subjectType: 'S06',subjectName: '政治', check: false},
+            {subjectType: 'S07',subjectName: '历史', check: false},
+            {subjectType: 'S08',subjectName: '生物', check: false},
+            {subjectType: 'S09',subjectName: '地理', check: false},
+          ]
+        }
+        return arr
       }
     },
     created() {
       let arr = []
       let flag = true
       JSON.parse(localStorage.gradeList).forEach(v => {
-        v.teacherInfoList.forEach(t => {
-          if (t.subjectType !== 'S20') {
-            arr.push({
-              name: v.gradeName + t.subjectName,
-              classGrade: v.classGrade,
-              subjectType: t.subjectType,
-              active: localStorage.currentSubjectType === t.subjectType && flag
-            })
-            if (localStorage.currentSubjectType === t.subjectType && flag) {
-              flag = false
+        //如果该年级只有一科家庭教育,则不显示该年级
+        if(v.teacherInfoList.length === 1 && v.teacherInfoList.some(s => s.subjectType === 'S20')) return
+        v.active = flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)
+        if(v.active) {
+          v.teacherInfoList = v.teacherInfoList.filter((t,i) => {
+              t.check = t.subjectType === localStorage.currentSubjectType
+            if(t.check) {
+              this.subjectIndex = i
             }
-          }
-        })
+            return t.subjectType !== 'S20'
+          })
+        }
+        arr.push(v)
+
+        if(flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)){
+          flag = false
+        }
+
       })
-      this.gradeSubjectList.push(...arr)
+      this.gradeSubjectList = arr
+
+      //先找出哪个年级有班主任
+      this.gradeSubjectList.forEach(g => {
+        if(g.teacherInfoList.some(s => s.teacherType === 'T01')) {
+          this.masterGradeSubjectList.push({active: !this.masterGradeSubjectList.length, classGrade:g.classGrade,gradeName:g.gradeName,teacherInfoList:this.handleGradeSubject(g.classGrade)})
+        }
+      })
+
+      //再找出哪个班级有班主任
+      for(let key in JSON.parse(localStorage.getItem("classMap"))) {
+        if(JSON.parse(localStorage.getItem("classMap"))[key].teacherInfoList.some(s => s.subjectType !== 'S20' && s.teacherType === 'T01')) {
+          this.$set(this.masterClassList,key,JSON.parse(localStorage.getItem("classMap"))[key])
+          // this.masterClassList[key] = JSON.parse(localStorage.getItem("classMap"))[key]
+          if(Object.keys(this.masterClassList).length === 1) {
+            this.masterClassIndex = key
+          }
+        }
+      }
 
       if (this.$store.getters.getTeachStatFilterTime) {
         //有设置过时间
@@ -318,6 +614,55 @@
     &__body {
       flex: 1;
       overflow-y: auto;
+
+      &-left {
+        flex: 0 0 95px;
+        overflow-y: auto;
+
+        > div {
+          height: 44px;
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          align-items: center;
+          font-size: 15px;
+          border-left: 2.5px solid transparent;
+
+          &.active {
+            color: @blue;
+            border-left: 2.5px solid #16aab7;
+          }
+        }
+      }
+
+      &-right {
+        flex: 1;
+        overflow-y: auto;
+
+        .tip {
+          padding: 0 20px 10px;
+        }
+
+        .cell__item {
+          justify-content: space-between;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          color: #666;
+          font-size: 14px;
+          word-break: break-all;
+          padding: 0 20px;
+
+          .check {
+            flex: 0 0 20px;
+            text-align: right;
+          }
+
+          &.active {
+            color: @blue;
+          }
+        }
+      }
     }
 
     &__footer {
