@@ -100,9 +100,13 @@ export default {
   },
   created() {
     screen.orientation.lock('landscape')
+
+  },
+  mounted() {
+    console.log(this.imgArr, 'imgArrimgArr');
   },
   beforeDestroy() {
-    screen.orientation.unlock()
+    screen.orientation.lock('portrait')
   },
   computed: {
     ...mapState({
@@ -311,9 +315,6 @@ export default {
       this.stuIndex = this.list.findIndex(v => v.appraiseAccountNo === item.accountNo)
     }
   },
-  mounted() {
-    console.log(this.imgArr, 'imgArrimgArr');
-  },
   components: { drawBoard },
 }
 </script>
@@ -401,8 +402,8 @@ export default {
       height: 10px;
       display: flex;
       align-items: center;
-      
-      img{
+
+      img {
         width: 10px;
         height: 10px;
       }
