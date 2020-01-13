@@ -86,6 +86,7 @@
         this.$router.push({ name: 'videoPage', query: { src: url} })
       },
       imgCorrect(item,imgIndex,stuIndex) {
+        screen.orientation.lock('landscape')
         this.$router.push({name:'imgCorrect',params: {
             list:this.list,
             imgIndex,
