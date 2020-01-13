@@ -7,7 +7,7 @@
     </van-nav-bar>
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
-        <div class="fs18" style="color: #000">{{decodeURI($route.query.subjectTypeName)}}练习《{{decodeURI($route.query.title)}}》{{new
+        <div class="fs18" style="color: #000">{{decodeURI($route.query.subjectTypeName)}}练习《{{info.taskName}}》{{new
           Date()|generateTimeReqestNumber('MMdd')}}完成情况简报
         </div>
         <div class="info-wrap" v-if="$route.query.testPaperId>0 || $route.query.taskType === 'T13'">
@@ -27,7 +27,7 @@
     <div v-if="isApp" class="briefing-wrap__footer">
       <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${decodeURI($route.query.title)}》完成情况简报--请家长及时查看`" desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
   </section>
 </template>
 <script>
@@ -54,7 +54,7 @@
       },
       link() {
         const {taskType,resourceType,testPaperId,subjectTypeName,title,taskId,classId,operateAccountNo,belongSchoolId} = this.$route.query
-        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&title=${encodeURI(title)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window
