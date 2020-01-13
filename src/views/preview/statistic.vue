@@ -842,6 +842,7 @@
             // }
           };
           myChart.setOption(_option, true)
+          myChart.off('click')
           myChart.on('click', params => {
             this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name

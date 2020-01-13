@@ -467,7 +467,7 @@
               {
                 name: '文言文全章复习与巩固',
                 type: 'pie',
-                radius: [0, 53],
+                radius: [0, '60%'],
                 label: {
                   emphasis: {
                     show: true
@@ -503,6 +503,7 @@
             ],
           };
           myChart.setOption(_option, true)
+          myChart.off('click')
           myChart.on('click', params => {
             this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name

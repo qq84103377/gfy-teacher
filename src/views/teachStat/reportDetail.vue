@@ -17,16 +17,16 @@
           <div slot="title">
             <div @click="selectItem(item,index)" class="aic jcsb">
               <span>{{item.subjectName}}</span>
-              <van-icon :name="item[keyFlod]?'arrow-up':'arrow-down'"/>
+              <van-icon :name="item[keyFold]?'arrow-up':'arrow-down'"/>
             </div>
-            <div v-show="item[keyFlod]">
+            <div v-show="item[keyFold]">
               <div v-show="tabIndex===0">
-                <div style="position: relative;">
+                <div v-show="item.kngChartShow" style="position: relative;">
                   <div :id="'knowledge'+index" class="histogram-chart mgt10"></div>
                   <div class="tip">可在图表内滑动，查看更多内容</div>
-                  <div class="empty-tip" v-if="!item.kngArr.length">当前无数据~</div>
+<!--                  <div class="empty-tip" v-if="!item.kngArr.length">当前无数据~</div>-->
                 </div>
-                <div class="stat-table">
+                <div v-if="item.kngArr.length" class="stat-table">
 <!--                  <div class="col">-->
 <!--                    <div style="font-weight: bold;">知识点名称</div>-->
 <!--                    <div class="regular-height" v-for="(kng,kngIndex) in item.kngArr" :key="kngIndex">{{kng.name}}</div>-->
@@ -69,7 +69,7 @@
 <!--                  <div class="empty-tip" v-if="!item.statInfo.arrLength">当前无数据~</div>-->
 <!--                </div>-->
 
-                <div class="stat-table">
+                <div v-if="item.statInfo.taskArr.length" class="stat-table">
                   <div class="row row-header" style="font-weight: bold;">
                     <div style="flex: 0 0 34%">任务类型</div>
                     <div style="flex: 0 0 33%">任务数</div>
@@ -81,28 +81,36 @@
                     <div style="flex: 0 0 33%">{{task.total_finish||0}}</div>
                   </div>
                 </div>
-                <div class="data-analyse fs12">
+                <div v-if="item.statInfo.taskArr.length" class="data-analyse fs12">
                   <div style="font-weight: bold;">数据分析:</div>
-                  <div class="grey9" v-if="item.statInfo.taskArr.length">
+                  <div class="grey9">
                     <div>总任务数为{{item.statInfo.total}}个，已完成任务数为{{item.statInfo.finish}}个；</div>
                     <div>完成任务占比为：{{item.statInfo.percent|mul(100,0)}}%。</div>
                     <div class="red">完成情况表现:{{item.statInfo.suggest}}</div>
                   </div>
                 </div>
+                <div v-if="!item.statInfo.taskArr.length" class="empty-page">
+                  <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+                  <div class="grey9 fs12">当前没有数据~</div>
+                </div>
               </div>
               <div v-show="tabIndex===2">
-                <div style="position: relative;">
+                <div v-show="item.showScoreChart" style="position: relative;">
                   <div :id="'score'+index" class="histogram-chart mgt10"></div>
                   <div class="tip">可在图表内滑动，查看更多内容</div>
-                  <div class="empty-tip" v-if="!item.scoreInfo.minDate">当前无数据~</div>
+<!--                  <div class="empty-tip" v-if="!item.scoreInfo.minDate">当前无数据~</div>-->
                 </div>
-                <div class="data-analyse fs12">
+                <div v-if="item.scoreInfo.total" class="data-analyse fs12">
                   <div style="font-weight: bold;">数据分析:</div>
-                  <div class="grey9" v-if="item.scoreInfo.minDate">
+                  <div class="grey9">
                     <div>当前科目记录成绩的任务总共有{{item.scoreInfo.total}}个，其中成绩最高的为{{item.scoreInfo.maxDate}},成绩为：{{item.scoreInfo.maxScore}},班级平均成绩为：{{item.scoreInfo.maxAvg}}。</div>
                     <div>成绩最低为{{item.scoreInfo.minDate}}成绩为：{{item.scoreInfo.minScore}},班级平均成绩为：{{item.scoreInfo.minAvg}}。</div>
                     <div>{{item.scoreInfo.suggest}}</div>
                   </div>
+                </div>
+                <div v-if="!item.scoreInfo.total" class="empty-page">
+                  <img style="width: 70%;" src="../../assets/img/empty-2.png" alt/>
+                  <div class="grey9 fs12">当前没有数据~</div>
                 </div>
               </div>
             </div>
@@ -162,7 +170,7 @@
       getStudentName() {
         return getStudentName
       },
-      keyFlod() {
+      keyFold() {
         const index = this.tabList.findIndex(v => v.active)
         if (index === 0) {
           return 'kngFold'
@@ -349,8 +357,8 @@
         }
       },
       selectItem(item, index) {
-        this.$set(item, this.keyFlod, !item[this.keyFlod])
-        if (!item[this.keyFlod]) return
+        this.$set(item, this.keyFold, !item[this.keyFold])
+        if (!item[this.keyFold]) return
         this.$nextTick(() => {
           if (this.tabIndex === 0) {
             if (item.kngDone) return
@@ -556,11 +564,17 @@
             }
           ]
         };
+        if(!xData.length) {
+          item.kngChartShow = false
+        }
         // if (max > 0) {
         //     this.$set(item, 'kwgNotEnough', false)
         this.$nextTick(() => {
-          this.drawHistogram1(option1, index)
-          this.renderKnowledgeTable(xData, total, right, mastery, item)
+          if(xData.length) {
+            this.drawHistogram1(option1, index)
+            this.renderKnowledgeTable(xData, total, right, mastery, item)
+          }
+
           this.$set(item, 'kngDone', true)  // 标记该科目的知识点掌握情况已加载完毕,下次无需再加载
           this.$store.commit('setVanLoading', false)
         })
@@ -724,75 +738,78 @@
           }
         }
         this.$set(item, 'scoreInfo', {total: newArr.length, ...maxObj, ...minObj, suggest})
-        var myChart = echarts.init(document.getElementById('score' + index));
-        let option1 = {
-          grid: {
-            // top: '25%',
-            left: '3%',
-            right: '2%',
-            bottom: '1%',
-            containLabel: true
-          },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'cross',
-              crossStyle: {
-                color: '#999'
-              }
-            }
-          },
-          dataZoom: [
-            {
-              type: 'inside',
-              xAxisIndex: [0],
-              start: 0,
-              // end: 100 / 3
-              end: newArr.length ? Math.ceil(100 / newArr.length) : 100
-            }
-          ],
-          xAxis: [
-            {
-              // type: 'value',
-              data: newArr.map(v => v.date),
-              // axisPointer: {
-              //   type: 'shadow'
-              // },
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value',
-              name: '成绩',
-              // min: 0,
-              // max: 3,
-              // interval: 3 / 5,
-              axisLabel: {
-                formatter: '{value}'
-              }
-            }
-          ],
-          series: [
-            {
-              name: '成绩',
-              type: 'line',
-              data: newArr.map(v => v.score)
+        if(newArr.length) {
+          let myChart = echarts.init(document.getElementById('score' + index));
+          let option1 = {
+            grid: {
+              // top: '25%',
+              left: '3%',
+              right: '2%',
+              bottom: '1%',
+              containLabel: true
             },
-            {
-              name: '平均分',
-              type: 'line',
-              data: newArr.map(v => v.scoreAvg),
-              itemStyle: {
-                opacity: 0
+            tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'cross',
+                crossStyle: {
+                  color: '#999'
+                }
+              }
+            },
+            dataZoom: [
+              {
+                type: 'inside',
+                xAxisIndex: [0],
+                start: 0,
+                // end: 100 / 3
+                end: newArr.length ? Math.ceil(100 / newArr.length) : 100
+              }
+            ],
+            xAxis: [
+              {
+                // type: 'value',
+                data: newArr.map(v => v.date),
+                // axisPointer: {
+                //   type: 'shadow'
+                // },
+              }
+            ],
+            yAxis: [
+              {
+                type: 'value',
+                name: '成绩',
+                // min: 0,
+                // max: 3,
+                // interval: 3 / 5,
+                axisLabel: {
+                  formatter: '{value}'
+                }
+              }
+            ],
+            series: [
+              {
+                name: '成绩',
+                type: 'line',
+                data: newArr.map(v => v.score)
               },
-              lineStyle: {
-                opacity: 0
-              }
-            },
-          ]
-        };
-        myChart.setOption(option1, true);
-
+              {
+                name: '平均分',
+                type: 'line',
+                data: newArr.map(v => v.scoreAvg),
+                itemStyle: {
+                  opacity: 0
+                },
+                lineStyle: {
+                  opacity: 0
+                }
+              },
+            ]
+          };
+          myChart.setOption(option1, true);
+        }else {
+          item.showScoreChart = false
+        }
       },
       init() {
         this.subjectList = []
@@ -802,11 +819,13 @@
               subjectName: getSubjectName(v),
               subjectType: v,
               kngArr: [],
+              kngChartShow: true,
+              showScoreChart: true,
               statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
               scoreInfo: {total: 0, maxDate:'',maxScore:0,maxAvg:0,minDate:'',minScore:0,minAvg:0, suggest:''},
               kngFold: false,
               taskFold: false,
-              scoreFold: false
+              scoreFold: false,
             }
           })
         })
