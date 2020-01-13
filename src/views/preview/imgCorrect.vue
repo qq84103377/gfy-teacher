@@ -99,7 +99,7 @@ export default {
     }
   },
   created() {
-    screen.orientation.lock('landscape')
+    // screen.orientation.lock('landscape')
 
   },
   mounted() {
@@ -139,7 +139,7 @@ export default {
     }
   },
   beforeDestroy() {
-    screen.orientation.unlock()
+    screen.orientation.lock('portrait')
   },
   computed: {
     ...mapState({

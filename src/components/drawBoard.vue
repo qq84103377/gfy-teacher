@@ -857,11 +857,11 @@ export default {
     this.swordEle.rotateZ = 0
 
 
-    this.$store.commit('setVanLoading', true)
-    setTimeout(() => {
-      this.handleResize()
-      this.$store.commit('setVanLoading', false)
-    }, 1000);
+    // this.$store.commit('setVanLoading', true)
+    // setTimeout(() => {
+    //   this.handleResize()
+    //   this.$store.commit('setVanLoading', false)
+    // }, 1000);
 
 
 
