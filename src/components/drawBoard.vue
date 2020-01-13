@@ -122,7 +122,8 @@ export default {
       canvasHistory: [],
       rotateIndex: 0,
       lastLeft: 0,
-      lastTop: 0
+      lastTop: 0,
+      isIphone: false
     }
   },
   props: ['imgUrl', 'isPen', 'isRubber', 'text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -346,13 +347,13 @@ export default {
      * [离屏合成图]
      * @param  {[type]} imgArray   [背景图画布和涂鸦画布的地址数组]
      */
-    loadImg(compositeCtx,img) {
-      return new Promise( (resolve, reject) => {
-        img.onload = function() {
+    loadImg(compositeCtx, img) {
+      return new Promise((resolve, reject) => {
+        img.onload = function () {
           compositeCtx.drawImage(img, 0, 0); // 循环绘制图片到离屏画布
           resolve(img);
         }
-        img.onerror = function(err){
+        img.onerror = function (err) {
           reject(err)
         }
       })
@@ -373,7 +374,7 @@ export default {
         img.src = v
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
-      Promise.all([this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[0]),this.loadImg(compositeCtx,document.querySelectorAll('.offImgs img')[1])]).then(async res => {
+      Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
         let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
         await this.getOSSKey()
 
@@ -776,25 +777,38 @@ export default {
       this.drawImg(this.imgUrl); // 画图
 
 
-      if (this.isApp) {
-        this.rotate = 90
-        this.swordEle.rotateZ = 90
-        console.log(this.swordEle, 'this.swordEle');
-        let bbox = this.swordEle.getBoundingClientRect();
-        console.log(bbox, '初始旋转的bbox');
-        console.log(bbox.width, '初始旋转的bbox');
-        console.log(bbox.top, '初始旋转的bbox');
-        this.lastLeft = bbox.left
-        this.lastTop = bbox.top
-        console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
+      // if (this.isApp) {
+      // if (this.isIphone) {
+      //   // var heightA = this.canvas.width
+      //   // this.canvas.width = this.canvas.height
+      //   // this.canvas.height = heightA
+      //   // this.offCanvas.width = this.canvas.width
+      //   // this.offCanvas.height = this.canvas.height
+      //   // console.log(this.canvas.width);
+      //   // console.log(this.canvas.height);
+      // }
+      this.rotate = 90
+      this.swordEle.rotateZ = 90
+      console.log(this.swordEle, 'this.swordEle2');
+      let bbox = this.swordEle.getBoundingClientRect();
+      console.log(bbox, '初始旋转的bbox2');
+      console.log(bbox.width, '初始旋转的bbox2');
+      console.log(bbox.top, '初始旋转的bbox2');
+      this.lastLeft = bbox.left
+      this.lastTop = bbox.top
+      console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop2');
 
-        this.rotate = 0
-        this.swordEle.rotateZ = 0
-      }
+      this.rotate = 0
+      this.swordEle.rotateZ = 0
+      // }
     }
   },
   mounted() {
     console.log('mounted()');
+    if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+      console.log('苹果设备');
+      this.isIphone = true
+    }
     window.addEventListener('resize', this.handleResize)
 
     let _this = this
@@ -823,6 +837,8 @@ export default {
     this.containerFigure()
 
     console.log("zheshi ");
+    console.log(this.canvas.width);
+    console.log(this.canvas.height);
 
     this.rotate = 90
     this.swordEle.rotateZ = 90
@@ -839,6 +855,13 @@ export default {
 
     this.rotate = 0
     this.swordEle.rotateZ = 0
+
+
+    this.$store.commit('setVanLoading', true)
+    setTimeout(() => {
+      this.handleResize()
+      this.$store.commit('setVanLoading', false)
+    }, 1000);
 
 
 
