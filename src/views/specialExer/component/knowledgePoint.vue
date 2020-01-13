@@ -139,7 +139,18 @@ export default {
             this.isRecomment = true
             return
           }
-          if (!res.data.length || !res.data[0].resultList.length) {
+
+          if (!res.data.length) {
+            this.isRecomment = true
+            return
+          }
+
+          if (!res.data[0].resultList) {
+            this.isRecomment = true
+            return
+          }
+
+           if (!res.data[0].resultList.length) {
             this.isRecomment = true
             return
           }
