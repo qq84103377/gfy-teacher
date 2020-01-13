@@ -1,5 +1,5 @@
 <template>
-  <section class="img-correct-wrap bigbox">
+  <section class="img-correct-wrap">
     <i v-if="!isPen&&!isRubber&&(currentImgIndex>0)" class="iconGFY icon-circle-arrow" @click="toggle(0)"></i>
     <i v-if="!isPen&&!isRubber&&(currentImgIndex<imgArr.length-1)" class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
     <div class="img-correct-wrap__header" v-show="!isPen&&!isRubber">
@@ -99,44 +99,11 @@ export default {
     }
   },
   created() {
-    // screen.orientation.lock('landscape')
+    screen.orientation.lock('landscape')
 
   },
   mounted() {
     console.log(this.imgArr, 'imgArrimgArr');
-    console.log("11111")
-    // horizontalScreen(".bigbox")
-    function horizontalScreen(className) {
-      // transform 强制横屏
-      var conW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      var conH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-      // transform: rotate(90deg); width: 667px; height: 375px;transform-origin:28% 50%;
-      //var iosTopHe = 0;//若有其他样式判断，写于此
-
-      document.querySelector(className).style.transform = "rotate(90deg) translate(" + ((conH - conW) / 2) + "px," + ((conH - conW) / 2) + "px)"
-      document.querySelector(className).style.width = conH + "px"
-      document.querySelector(className).style.height = conW + "px"
-      document.querySelector(className).style.transformOrigin = "center center"
-      document.querySelector(className).style.webkitTransformOrigin = "center center"
-      // document.querySelector(className).style.zIndex = '999999999999'
-      // document.querySelector(className).style.position = 'absolute'
-      document.querySelector(className).style.position = 'static'
-
-      // console.log(document.querySelector(".video"), 'document.querySelector(".video")');
-      // if (document.querySelector(".video")) {
-      //   document.querySelector(".video").style.zIndex = ''
-      //   document.querySelector(".video").style.position = 'relatived !important'
-      // }
-
-      console.log(conW, 'conW');
-      console.log(conH, 'conH');
-      console.log(document.documentElement, 'document.documentElement');
-      var max = conW > conH ? conW : conH;
-      var min = conW > conH ? conH : conW;
-      document.querySelector(className).style.width = max + "px";
-      document.querySelector(className).style.height = min + "px";
-
-    }
   },
   beforeDestroy() {
     screen.orientation.lock('portrait')

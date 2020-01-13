@@ -171,7 +171,6 @@
       },
       subjectCorrect(item, stuIndex, aswIndex, imgIndex) {
         console.log(item);
-        screen.orientation.lock('landscape')
         // 点击图片
         // const index = this.tabList.findIndex(v => v.active)
         // const name = getStudentName(item.accountNo,this.$route.query.classId)
