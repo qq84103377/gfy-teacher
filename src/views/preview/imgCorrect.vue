@@ -99,7 +99,7 @@ export default {
     }
   },
   created() {
-    // screen.orientation.lock('landscape')
+    screen.orientation.lock('landscape')
 
   },
   mounted() {

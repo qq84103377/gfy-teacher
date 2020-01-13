@@ -24,7 +24,6 @@ export default {
 
     this.onMatchMeidaChange(this.mql);
     this.mql.addListener(this.onMatchMeidaChange);
-    screen.orientation.lock('portrait')
   },
   methods: {
       includes() {
