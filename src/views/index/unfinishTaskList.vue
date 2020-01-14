@@ -320,6 +320,12 @@ export default {
   &__body {
     flex: 1;
     overflow-y: auto;
+    .null-tips {
+      margin-top: 50px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+    }
   }
 }
 </style>

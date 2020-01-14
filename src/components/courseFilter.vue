@@ -1,6 +1,6 @@
 <template>
   <!--    <section class="course-filter-wrap"></section>-->
-  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'?'50%':'93%' }">
+  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'?'65%':'93%' }">
     <div class="course-filter-wrap">
       <van-overlay class-name="mask" :show="gradeDropdown||termDropdown||versionDropdown||classDropdown" @click="gradeDropdown = false;termDropdown=false;versionDropdown=false;classDropdown=false" />
 
@@ -320,8 +320,8 @@ export default {
         //年级计算
         let key = this.classGradeList[this.gradeIndex].classGrade + "_" + this.termTypeList[this.termIndex];
         let gradeId = this.gradeTermMap[key]
-
-        if (!this.bookInfoList || !this.bookInfoList[this.bookIndex].textBookId) {
+        if (!this.bookInfoList.length || !this.bookInfoList[this.bookIndex].textBookId) {
+          this.$store.commit('setVanLoading', false)
           this.$toast("版本配置错误")
           return
         }
@@ -545,7 +545,7 @@ export default {
         color: #333;
         font-size: 14px;
         background: #fff;
-        max-height: 220px;
+        max-height: 180px;
         overflow-y: auto;
 
         &-item {
