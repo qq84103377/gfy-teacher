@@ -9,8 +9,8 @@
           <slot name="cover"></slot>
         </div>
         <div style="flex: 1;min-width: 0;display: flex;flex-direction: column;justify-content: space-between">
-          <div class="title" @click=""><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-exam':taskType=='T01','icon-comment':taskType=='T02',
-          'icon-test':taskType=='T03','icon-learn-res':taskType =='T04' && testPaperId!=0,
+          <div class="title" @click=""><i class="iconGFY" v-if="taskType=='T01'||taskType=='T02'||taskType=='T03'||taskType=='T05'||(taskType =='T04' && testPaperId!=0)||(taskType =='T04' && testPaperId==0)||taskType =='T06'||taskType =='T13'" :class="{'icon-exam':taskType=='T01','icon-comment':taskType=='T02',
+          'icon-test':taskType=='T03'||taskType=='T05','icon-learn-res':taskType =='T04' && testPaperId!=0,
           'icon-learn-res-exp':taskType =='T04' && testPaperId==0,'icon-discuss':taskType =='T06','icon-spoken':taskType =='T13'}"></i>
             {{itemTitle}}
           </div>

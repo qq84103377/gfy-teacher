@@ -102,6 +102,7 @@ export default {
       deleteCourseTask(params).then(res => {
         if (res.flag) {
           this.taskList.splice(index, 1)
+          eventBus.$emit("indexEditTask")
           this.$toast('删除成功')
         } else {
           this.$toast(res.msg)
@@ -319,6 +320,12 @@ export default {
   &__body {
     flex: 1;
     overflow-y: auto;
+    .null-tips {
+      margin-top: 50px;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+    }
   }
 }
 </style>
