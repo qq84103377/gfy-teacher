@@ -27,7 +27,9 @@
     <div v-if="isApp" class="briefing-wrap__footer">
       <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
     </div>
-    <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
+    <share-bar :show.sync="shareBarShow"
+               :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`"
+               desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
   </section>
 </template>
 <script>
@@ -50,10 +52,10 @@
     },
     computed: {
       decodeURI() {
-       return decodeURI
+        return decodeURI
       },
       link() {
-        const {taskType,resourceType,testPaperId,subjectTypeName,title,taskId,classId,operateAccountNo,belongSchoolId} = this.$route.query
+        const {taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId} = this.$route.query
         return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
@@ -63,30 +65,30 @@
     async created() {
       this.$store.commit('setVanLoading', true)
       // if (!('cordova' in window)) {
-       await this.getClassStudent()
-        //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
-        await this.statTaskStat()
-        if (this.$route.query.testPaperId <= 0 && this.$route.query.taskType !== 'T13' && this.$route.query.resourceType !== 'R03') {
-          await this.getAppraise()
-        }
+      await this.getClassStudent()
+      //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
+      await this.statTaskStat()
+      if (this.$route.query.testPaperId <= 0 && this.$route.query.taskType !== 'T13' && this.$route.query.resourceType !== 'R03') {
+        await this.getAppraise()
+      }
       // }
 
       this.init()
       this.$store.commit('setVanLoading', false)
     },
     methods: {
-       goBack(){
-          this.common.goBack(this)
-        },
+      goBack() {
+        this.common.goBack(this)
+      },
       handleStudentName(accountNo) {
-       const item = this.classStudentList.find(v => v.accountNo == accountNo)
-        if(item) {
+        const item = this.classStudentList.find(v => v.accountNo == accountNo)
+        if (item) {
           return item.studentName
-        }else {
+        } else {
           return '--'
         }
       },
-     async getClassStudent() {
+      async getClassStudent() {
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -97,8 +99,8 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       await getClassStudent(params).then(res => {
-           this.classStudentList = res.data[0].classStudent
+        await getClassStudent(params).then(res => {
+          this.classStudentList = res.data[0].classStudent
         })
       },
       async getAppraise() {
@@ -176,7 +178,7 @@
               // percent = Number((v.score / this.info.testPaperScore).toFixed(2))
               percent = calculator.div(v.score, this.info.testPaperScore, 2)
             }
-            if (v.endDate) {
+            if (this.info.finishStudent.includes(v.accountNo)) {
               if (percent >= 1) {
                 this.scoreSpan[0].stu.push(v.accountNo)
               }

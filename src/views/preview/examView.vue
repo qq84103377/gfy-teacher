@@ -45,7 +45,7 @@
     computed: {
       classList() {
         let arr = this.info.studentStatList.reduce((t, v) => {
-          if (v.endDate) {
+          if (this.info.finishStudent.includes(v.accountNo)) {
             t.push({
               ...v,
               name: getStudentName(v.accountNo, this.info.classId),
@@ -58,7 +58,7 @@
       },
       groupList() {
         let arr = this.info.studentStatList.reduce((t, v) => {
-          if (v.endDate) {
+          if (this.info.finishStudent.includes(v.accountNo)) {
             const index = t.findIndex(g => g.groupId === v.groupId)
             const item = {
               ...v,
