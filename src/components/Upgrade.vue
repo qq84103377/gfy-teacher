@@ -125,11 +125,11 @@ export default {
         schoolId: this.$store.getters.schoolId,
         classId: Object.keys(JSON.parse(localStorage.classMap))[0]
       };
-      // if (platformType == "Android") {
-      //   param["moduleType"] = "T06";
-      // } else if (platformType == "iOS") {
-      //   param["moduleType"] = "T07";
-      // }
+      if (platformType == "Android") {
+        param["moduleType"] = "T09";
+      } else if (platformType == "iOS") {
+        param["moduleType"] = "T10";
+      }
       function compareVersion(curV,reqV) {
         if (curV && reqV) {
           //将两个版本号拆成数字
@@ -174,11 +174,12 @@ export default {
                 let flag = compareVersion(version,serverVersion);
                 // let flag = compareVersion(version,'1.0.2');
                 if (!flag) {
+                  _this.uploadDetail =
+                      response.data[0].versionRecord.uploadDetail;
+                  _this.showUpgrade = true; //显示升级弹框
                   if (platformType == "Android") {
                     // 升级内容
-                    _this.uploadDetail =
-                      response.data[0].versionRecord.uploadDetail;
-                    _this.showUpgrade = true; //显示升级弹框
+
                   } else if (platformType == "iOS") {
                     // _this.$dialog.confirm({
                     //   title: response.data[0].versionRecord.uploadTitle,
@@ -213,9 +214,25 @@ export default {
       );
     },
     downLoad() {
+      console.log("开始升级");
       this.showUpgrade = false;
-      this.progress = true;
-      this.upgradeForAndroid();
+      let that = this
+      let platform = device.platform
+      if (platform == "Android") {
+        console.log("Android升级")
+        this.progress = true;
+        this.upgradeForAndroid()
+      } else if (platform == "iOS") {
+        console.log("iOS升级")
+        //"itms-apps://apps.apple.com/cn/app/全朗e家/id1492778121"
+        if (that.releasePath){
+          that.$toast.fail("下载地址为空！");
+        }
+        let ref = cordova.InAppBrowser.open(that.releasePath, '_blank', 'location=yes')
+        setTimeout(function () {
+          ref.close()
+        }, 100)
+      }
     }
   },
   mounted() {

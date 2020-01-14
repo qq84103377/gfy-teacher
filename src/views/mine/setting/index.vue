@@ -29,7 +29,7 @@
           </div>
           <div class="content">
             <p>{{uploadDetail}}</p>
-            <p>2.首页搜索升级首页搜索升级</p>
+            <!--<p>2.首页搜索升级首页搜索升级</p>-->
           </div>
         </div>
       </van-dialog>
@@ -109,6 +109,7 @@ export default {
         this.showUpgrade = true; //显示升级弹框
       }else {
         let platform = device.platform;
+        console.log(platform);
         this.checkUpgrade(platform);
       }
     },
@@ -131,8 +132,8 @@ export default {
       var fileTransfer = new FileTransfer();
       fileTransfer.onprogress = function (progressEvent) {
         if (progressEvent.lengthComputable) {
-          _this.loaded = progressEvent.loaded;
-          _this.total = progressEvent.total;
+          _this.loaded = progressEvent.loaded/1024/1024;
+          _this.total = progressEvent.total/1024/1024;
           console.log('下载进度：', _this.loaded + '/' + _this.total);
           let downloadProgress =
             (progressEvent.loaded / progressEvent.total) * 100;
@@ -191,12 +192,13 @@ export default {
         schoolId: this.$store.getters.schoolId,
         classId: Object.keys(JSON.parse(localStorage.classMap))[0]
       };
-      // Domain_Module_Type  模块类型
-      // if (platformType == "Android") {
-      //   param["moduleType"] = "T09";
-      // } else if (platformType == "iOS") {
-      //   param["moduleType"] = "T09";
-      // }
+      //Domain_Module_Type  模块类型
+      if (platformType == "Android") {
+        param["moduleType"] = "T09";
+      } else if (platformType == "iOS") {
+        param["moduleType"] = "T10";
+      }
+
       sysModuleVersionApi
         .getLatestModuleVerion({ requestJson: JSON.stringify(param) })
         .then(
@@ -216,15 +218,19 @@ export default {
                 console.log("服务器版本：" + serverVersion);
                 let flag = _this.compareVersion(version, serverVersion);
                 if (!flag) {
+                  _this.uploadDetail =
+                      response.data[0].versionRecord.uploadDetail;
+                  // _this.showUpgrade = true; //显示升级弹框
+                  _this.tips = serverVersion;
+                  _this.hasNew = true;
+                  _this.showUpgrade = true; //显示升级弹框
                   if (platformType == "Android") {
                     // 升级内容
-                    _this.uploadDetail =
-                      response.data[0].versionRecord.uploadDetail;
-                    // _this.showUpgrade = true; //显示升级弹框
-                    _this.tips = serverVersion;
-                    _this.hasNew = true;
-                    _this.showUpgrade = true; //显示升级弹框
+
                   } else if (platformType == "iOS") {
+                    console.log("---Ios升级中,请稍后---");
+                    // let winRef = window.open('https://apps.apple.com/cn/app/全朗e家/id1470358138');
+                    // winRef.location = 'itms-apps://apps.apple.com/cn/app/全朗e家/id1470358138';
                     // _this.$dialog.confirm({
                     //   title: response.data[0].versionRecord.uploadTitle,
                     //   message: response.data[0].versionRecord.uploadDetail
@@ -260,9 +266,34 @@ export default {
       );
     },
     downLoad() {
+      console.log("开始升级");
       this.showUpgrade = false;
-      this.progress = true;
-      this.upgradeForAndroid();
+      let that = this
+      let platform = device.platform;
+      if (platform == "Android") {
+        console.log("Android升级");
+        this.progress = true;
+        this.upgradeForAndroid();
+      } else if (platform == "iOS"){
+        console.log("iOS升级");
+        if (that.releasePath){
+          that.$toast.fail("下载地址为空！");
+        }
+        let ref = cordova.InAppBrowser.open(that.releasePath, '_blank', 'location=yes')
+        setTimeout(function () {
+          ref.close()
+        }, 100)
+        // cordova.plugins.fileOpener2.openURL("itms-apps://apps.apple.com/cn/app/全朗e家/id1470358138", {
+        //   error() {
+        //     console.log('打开失败')
+        //   },
+        //   success: function() {
+        //     console.log('打开成功')
+        //   }
+        //
+        // });
+      }
+
       // var timer = setInterval(() => {
       //   this.percent += 5;
       //   if (this.percent >= 100) {
