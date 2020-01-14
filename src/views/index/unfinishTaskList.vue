@@ -102,6 +102,7 @@ export default {
       deleteCourseTask(params).then(res => {
         if (res.flag) {
           this.taskList.splice(index, 1)
+          eventBus.$emit("indexEditTask")
           this.$toast('删除成功')
         } else {
           this.$toast(res.msg)
