@@ -477,7 +477,7 @@ export default new Router({
           component: () => import('./views/mine/setting/serviceSheet.vue'),
           meta: {
             isShowHeader: true,
-            title: '服务条款'
+            title: '用户协议'
           }
         },
         {
