@@ -34,12 +34,12 @@
           <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value || asw.isMark==='I01'}" :overlay="false">
             <van-dropdown-item :disabled="ai !== aswIndex" :ref="'menuItem' + ai"
                                :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">
-              <div class="menu-wrap">
+<!--              <div class="menu-wrap">-->
                 <div @click="selectScore(ai,score,asw)" class="menu-item"
                      v-for="(score,scoreIndex) in  splitScore(asw.examScore || 5)"
                      :key="scoreIndex">{{score}}分
                 </div>
-              </div>
+<!--              </div>-->
             </van-dropdown-item>
           </van-dropdown-menu>
         </div>
@@ -1076,7 +1076,9 @@
           align-items: center;
           justify-content: space-between;
           padding: 5px 0;
-
+          @{deep} .van-dropdown-item__content {
+            border: 1px solid #ccc;
+          }
           .menu-wrap {
             max-height: 64px;
             border: 1px solid #ccc;
@@ -1087,6 +1089,7 @@
             font-size: 6px;
             text-align: center;
             line-height: 13px;
+
           }
 
           > span {
