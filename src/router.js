@@ -477,7 +477,16 @@ export default new Router({
           component: () => import('./views/mine/setting/serviceSheet.vue'),
           meta: {
             isShowHeader: true,
-            title: '服务条款'
+            title: '用户协议'
+          }
+        },
+        {
+          path: '/privateSheet',
+          name: 'privateSheet',
+          component: () => import('./views/mine/setting/privateSheet.vue'),
+          meta: {
+            isShowHeader: true,
+            title: '隐私政策'
           }
         },
         {
@@ -668,6 +677,16 @@ export default new Router({
             title: '分层',
             isShowHeader: true,
           }
+        },
+        {
+          path: '/singleCourse',
+          name: 'singleCourse',
+          component: () => import('./views/coursePacket/singleCourse.vue'),
+        },
+        {
+          path: '/finishStatus',
+          name: 'finishStatus',
+          component: () => import('./views/coursePacket/finishStatus.vue'),
         },
       ]
     },
