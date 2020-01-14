@@ -1213,6 +1213,25 @@
         }
         return t
       },
+      getObjectTypeCd() {
+        if(this.tabIndex) {
+          if(this.priSourceIndex === 1) {
+            return 'C03'
+          }else if(this.priSourceIndex === 2) {
+            return 'C04'
+          }else if(this.priSourceIndex === 3) {
+            return 'C02'
+          }
+        }else {
+          if(this.resourceIndex === 1) {
+            return 'C03'
+          }else if(this.resourceIndex === 2) {
+            return 'C04'
+          }else if(this.resourceIndex === 3) {
+            return 'C02'
+          }
+        }
+      },
       collect(item, objectId, statusCd, index, bol) {
         this.$store.commit('setVanLoading', true)
         if (this.tabIndex ? item.collect_id : item.collectId) {
@@ -1223,7 +1242,7 @@
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
               "collectId": this.tabIndex ? item.collect_id : item.collectId,
-              "objectTypeCd": "C03",
+              "objectTypeCd": this.getObjectTypeCd(),
               objectId,
               "collectType": "C01",
               "accountNo": this.$store.getters.getUserInfo.accountNo,
@@ -1253,7 +1272,7 @@
             "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
             "belongSchoolId": this.$store.getters.schoolId,
             "resCollectInfo": {
-              "objectTypeCd": "C03",
+              "objectTypeCd": this.getObjectTypeCd(),
               objectId,
               "collectType": "C01",
               "accountNo": this.$store.getters.getUserInfo.accountNo,

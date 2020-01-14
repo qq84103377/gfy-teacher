@@ -368,4 +368,13 @@ const toHump = (name) => {
     return letter.toUpperCase();
   });
 }
-export {toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+
+const getFontSize = (res) => {
+  let clientWidth = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+  if (!clientWidth) return 12;
+  let fontSize = 100 * (clientWidth / 375);
+  return res*fontSize;
+
+}
+
+export {getFontSize,toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}

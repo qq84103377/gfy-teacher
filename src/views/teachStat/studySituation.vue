@@ -76,6 +76,7 @@
   import echarts from "echarts";
   import {getUserKnowledgePointCounterV2} from '@/api/index'
   import * as calculate from '@/utils/calculate'
+  import {getFontSize} from "../../utils/filter";
 
   export default {
     name: "studySituation",
@@ -365,7 +366,10 @@
                 },
               }
             }
-          ]
+          ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         if(this.isClass) {
           this.barOption = option1
@@ -440,7 +444,10 @@
                 borderColor: '#D677EA'
               }
             },
-          ]
+          ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         if (tmpRadarIndicator.length >= 3) {
           if (this.isClass) {

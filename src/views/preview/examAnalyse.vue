@@ -58,7 +58,7 @@
 <script>
 import echarts from "echarts";
 import { getTestPaperAnalysis, getTestPaperScoreAnalysis } from '@/api/index'
-import { getStudentName } from '@/utils/filter'
+import { getStudentName, getFontSize } from '@/utils/filter'
 
 export default {
   name: "examAnalyse",
@@ -281,7 +281,10 @@ export default {
             // }, {name: '困难', value: 3, itemStyle: {color: '#FF9777'}},]
             data: this.examInfo.degreeCount
           }
-        ]
+        ],
+        textStyle:{
+          fontSize: getFontSize(0.12),
+        }
       };
 
 
@@ -328,6 +331,9 @@ export default {
             end: this.examInfo.knowledgePointInfos.length>5?(5/this.examInfo.knowledgePointInfos.length)*100:100,
           }
         ],
+        textStyle:{
+          fontSize: getFontSize(0.12),
+        }
       };
 
       myChart.setOption(contentOption, true);
@@ -414,7 +420,10 @@ export default {
               color: '#F2C760'
             },
           }
-        ]
+        ],
+        textStyle:{
+          fontSize: getFontSize(0.12),
+        }
       };
 
 
@@ -508,7 +517,10 @@ export default {
               color: '#F2C760'
             },
           }
-        ]
+        ],
+        textStyle:{
+          fontSize: getFontSize(0.12),
+        }
       };
 
       myChart.setOption(goalOption, true);
