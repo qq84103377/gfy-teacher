@@ -263,7 +263,7 @@
               </div>
             </div>
             <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.collect_type === 'C01'"
+              <div v-if="item.belong_account_no !== item.account_no"
                    @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                 <span>取消收藏</span>
@@ -305,7 +305,7 @@
               </div>
             </div>
             <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.collect_type === 'C01'"
+              <div v-if="item.belong_account_no !== item.account_no"
                    @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd,index)">
                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                 <span>取消收藏</span>
@@ -356,7 +356,7 @@
               </div>
             </div>
             <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.collect_type === 'C01'"
+              <div v-if="item.belong_account_no !== item.account_no"
                    @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd,index)">
                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
                 <span>取消收藏</span>
@@ -643,7 +643,7 @@
     },
     methods: {
       async delRes(item,index) {
-        if(item.collect_type === 'C01') {
+        if(item.belong_account_no !== item.account_no) {
           //这是别人的资源,不能删除
           return this.$toast('非本账号的资源无法删除')
         }
