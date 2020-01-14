@@ -129,7 +129,7 @@
 <script>
   import shareBar from '../../components/shareBar'
   import echarts from "echarts";
-  import {getSubjectName, getTaskTypeName} from '@/utils/filter'
+  import {getSubjectName, getTaskTypeName, getFontSize} from '@/utils/filter'
   import {getUserKnowledgePointCounter, statStuTaskFinishInfo, getStudentScoreStatistics} from '@/api/index'
   import * as calculate from '@/utils/calculate'
 
@@ -476,7 +476,10 @@
                   opacity: 0
                 }
               },
-            ]
+            ],
+            textStyle:{
+              fontSize: getFontSize(0.12),
+            }
           };
           myChart.setOption(option1, true);
         }else {
@@ -643,7 +646,10 @@
               yAxisIndex: 1,
               data: mastery
             }
-          ]
+          ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         if(!xData.length) {
           item.kngChartShow = false

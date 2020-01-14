@@ -486,7 +486,7 @@ export default new Router({
           component: () => import('./views/mine/setting/serviceSheet.vue'),
           meta: {
             isShowHeader: true,
-            title: '服务条款'
+            title: '用户协议'
           }
         },
         {
@@ -675,6 +675,15 @@ export default new Router({
           component: () => import('./views/layerTeach/layerTaskList.vue'),
           meta: {
             title: '分层',
+            isShowHeader: true,
+          }
+        },
+        {
+          path: '/privateSheet',
+          name: 'privateSheet',
+          component: () => import('./views/mine/setting/privateSheet.vue'),
+          meta: {
+            title: '隐私政策',
             isShowHeader: true,
           }
         },

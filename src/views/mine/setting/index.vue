@@ -131,8 +131,8 @@ export default {
       var fileTransfer = new FileTransfer();
       fileTransfer.onprogress = function (progressEvent) {
         if (progressEvent.lengthComputable) {
-          _this.loaded = progressEvent.loaded;
-          _this.total = progressEvent.total;
+          _this.loaded = progressEvent.loaded/1024/1024;
+          _this.total = progressEvent.total/1024/1024;
           console.log('下载进度：', _this.loaded + '/' + _this.total);
           let downloadProgress =
             (progressEvent.loaded / progressEvent.total) * 100;

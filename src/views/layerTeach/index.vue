@@ -137,7 +137,7 @@
 
 <script>
   import {mapMutations, mapGetters, mapState} from 'vuex'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName, getFontSize} from '@/utils/filter'
   import * as calculate from '@/utils/calculate'
   import {
     getLayerTaskInfoDetail,
@@ -498,7 +498,10 @@
                     }, 0), name: '未完成'
                   },
                   {value: this.taskInfo.finshCount, name: '已完成'}
-                ]
+                ],
+                textStyle:{
+                  fontSize: getFontSize(0.12),
+                }
               }
             ],
           };

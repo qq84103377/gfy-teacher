@@ -130,7 +130,7 @@
 <script>
   import echarts from "echarts";
   import {getUserKnowledgePointCounter, statStuTaskFinishInfo, getStudentScoreStatistics} from '@/api/index'
-  import {getStudentName, getSubjectName, getTaskTypeName} from '@/utils/filter'
+  import {getStudentName, getSubjectName, getTaskTypeName, getFontSize} from '@/utils/filter'
   import * as calculate from '@/utils/calculate'
   import html2canvas from "html2canvas"
   export default {
@@ -562,7 +562,10 @@
               yAxisIndex: 1,
               data: mastery
             }
-          ]
+          ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         if(!xData.length) {
           item.kngChartShow = false
@@ -804,7 +807,10 @@
                   opacity: 0
                 }
               },
-            ]
+            ],
+            textStyle:{
+              fontSize: getFontSize(0.12),
+            }
           };
           myChart.setOption(option1, true);
         }else {

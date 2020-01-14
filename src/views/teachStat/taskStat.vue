@@ -243,9 +243,9 @@
     getSysDictList
   } from '@/api/index'
   import echarts from "echarts";
-  import {mutualType, getStudentName} from '@/utils/filter'
-  import Blob from '@/utils/excel/Blob'
-  import {export_json_to_excel} from '@/utils/excel/Export2Excel'
+  import {mutualType, getStudentName, getFontSize} from '@/utils/filter'
+  // import Blob from '@/utils/excel/Blob'
+  // import {export_json_to_excel} from '@/utils/excel/Export2Excel'
 
   export default {
     name: "taskStat",
@@ -745,6 +745,9 @@
               }
             }
           ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         myChart.setOption(paperOption, true);
       },
@@ -780,6 +783,9 @@
               }
             }
           ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         myChart.setOption(paperOption, true);
       },
@@ -821,7 +827,10 @@
               // },
               data: this.stuStatInfo.taskTypeCount.length ? this.stuStatInfo.taskTypeCount.map(v => {
                 return {value: v.taskTypeCount, name: v.taskTypeName}
-              }) : [{value: 0, name: '无数据'}]
+              }) : [{value: 0, name: '无数据'}],
+              textStyle:{
+                fontSize: getFontSize(0.12),
+              }
             }
           ],
           // toolbox: {
