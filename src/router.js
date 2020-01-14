@@ -669,6 +669,15 @@ export default new Router({
             isShowHeader: true,
           }
         },
+        {
+          path: '/privateSheet',
+          name: 'privateSheet',
+          component: () => import('./views/mine/setting/privateSheet.vue'),
+          meta: {
+            title: '隐私政策',
+            isShowHeader: true,
+          }
+        },
       ]
     },
     {
