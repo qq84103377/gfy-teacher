@@ -2,10 +2,10 @@
   <section class="task-stat-wrap">
     <van-cell :border="false" title="统计类型" style="background: #f5f5f5;color: #999"/>
     <div class="task-tab">
-      <div class="task-tab__item" :class="{active:tabIndex==1}" @click="tabIndex=1">学生统计</div>
-      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==2}" @click="tabIndex=2">教师统计</div>
-      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==3}" @click="tabIndex=3">班级统计</div>
-      <div class="task-tab__item" :class="{active:tabIndex==4}" @click="tabIndex=4">个人统计</div>
+      <div class="task-tab__item" :class="{active:tabIndex==1}" @click="getData(1)">学生统计</div>
+      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==2}" @click="getData(2)">教师统计</div>
+      <div v-if="handleShowItem()" class="task-tab__item" :class="{active:tabIndex==3}" @click="getData(3)">班级统计</div>
+      <div class="task-tab__item" :class="{active:tabIndex==4}" @click="getData(4)">个人统计</div>
     </div>
 
     <div class="task-stat-wrap__body">
@@ -243,9 +243,9 @@
     getSysDictList
   } from '@/api/index'
   import echarts from "echarts";
-  import {mutualType, getStudentName} from '@/utils/filter'
-  import Blob from '@/utils/excel/Blob'
-  import {export_json_to_excel} from '@/utils/excel/Export2Excel'
+  import {mutualType, getStudentName, getFontSize} from '@/utils/filter'
+  // import Blob from '@/utils/excel/Blob'
+  // import {export_json_to_excel} from '@/utils/excel/Export2Excel'
 
   export default {
     name: "taskStat",
@@ -253,6 +253,7 @@
       return {
         tabIndex: 1,
         gradeSubjectList: JSON.parse(JSON.stringify(this.$parent.gradeSubjectList)),
+        masterGradeSubjectList: JSON.parse(JSON.stringify(this.$parent.masterGradeSubjectList)),
         stuStatInfo: {taskTypeCount: [], finishStat: {}, statAccountList: []},
         tchStatInfo: [],
         classDetailList: [],
@@ -262,32 +263,81 @@
         classStatList: [],
         personStatList: [],
         operateType: [],
+        doneArr: [], // 记录哪个Tab加载过数据
+      }
+    },
+    beforeRouteLeave(to, from, next) {
+      if (to.path === '/teachStat/') {
+        //当返回至教学统计页面时,需要将筛选条件切换为非班主任的
+        this.$emit('changeFilter',false)
+        next()
+      }else {
+        next()
       }
     },
     computed: {
       filterParams() {
         return {
-          classGrade: this.gradeSubjectList[this.$parent.gradeIndex].classGrade,
-          subjectType: this.gradeSubjectList[this.$parent.gradeIndex].subjectType,
+          classGrade: this.gradeSubjectList[this.$parent.tempGradeIndex].classGrade,
+          subjectType: this.gradeSubjectList[this.$parent.tempGradeIndex].teacherInfoList[this.$parent.tempSubjectIndex].subjectType,
           classId: this.$parent.classIndex || ''
         }
-      }
+      },
+      masterFilterParams() {
+        return {
+          classGrade: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].classGrade,
+          subjectType: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].teacherInfoList[this.$parent.tempMasterSubjectIndex].subjectType,
+          classId: this.$parent.masterClassIndex || ''
+        }
+      },
     },
     watch: {
       filterParams: {
         handler() {
-          this.init()
+          this.doneArr = []
+          this.getData(this.tabIndex)
         },
         deep: true
-      }
+      },
+      masterFilterParams: {
+        handler() {
+          if(this.tabIndex === 1 || this.tabIndex === 4) return
+          this.doneArr = []
+          this.getData(this.tabIndex)
+        },
+        deep: true
+      },
     },
     created() {
 
     },
     mounted() {
-      this.init()
+      this.getData(1)
     },
     methods: {
+      init() {
+        this.doneArr = []
+        this.getData(this.tabIndex)
+      },
+      async getData(index) {
+        this.$emit('changeFilter',index === 2 || index === 3);
+        this.tabIndex = index
+        switch (index) {
+          case 1 :
+           await this.statCourseByTeacher()
+            this.drawPie()
+            this.drawHistogram()
+                break
+          case 2 :
+            this.statByTeacher()
+                break
+          case 3 :
+            this.statByClass()
+                break
+          case 4 :
+            this.statByPersonal()
+        }
+      },
       //读取文件
       readFile(fileEntry) {
         fileEntry.file(function (file) {
@@ -467,6 +517,8 @@
         }
       },
       statByPersonal() {
+        if(this.doneArr.includes(4)) return
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -482,6 +534,8 @@
           requestJson: JSON.stringify(obj)
         }
         statByPersonal(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          this.doneArr.push(4)
           if (res.flag) {
             this.personStatList = res.data.length ? res.data[0].classCoureStat : []
           } else {
@@ -490,14 +544,16 @@
         })
       },
       statByClass() {
+        if(this.doneArr.includes(3)) return;
         if (!this.handleShowItem()) return
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          classId: this.filterParams.classId,
-          classGrade: this.filterParams.classGrade,
+          classId: this.masterFilterParams.classId,
+          classGrade: this.masterFilterParams.classGrade,
           startDate: this.$parent.filterTime.start,
           endDate: this.$parent.filterTime.end,
           pageSize: '999',
@@ -507,6 +563,8 @@
           requestJson: JSON.stringify(obj)
         }
         statByClass(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          this.doneArr.push(3)
           if (res.flag) {
             this.classStatList = res.data.length ? res.data[0].classCoureStat : []
           } else {
@@ -596,23 +654,28 @@
         })
       },
       statByTeacher() {
+        if(this.doneArr.includes(2)) return
+        if (!this.handleShowItem()) return
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          subjectType: this.filterParams.subjectType,
-          classGrade: this.filterParams.classGrade,
+          subjectType: this.masterFilterParams.subjectType,
+          classGrade: this.masterFilterParams.classGrade,
           startDate: this.$parent.filterTime.start,
           endDate: this.$parent.filterTime.end,
           pageSize: '999',
           currentPage: 1,
-          classIds: this.filterParams.classId,
+          classIds: this.masterFilterParams.classId,
         };
         let params = {
           requestJson: JSON.stringify(obj)
         }
         statByTeacher(params).then(res => {
+          this.$store.commit('setVanLoading', false)
+          this.doneArr.push(2)
           if (res.flag) {
             this.tchStatInfo = res.data
             //获取教师统计数据后,要将查看过的教师详情收起
@@ -622,14 +685,6 @@
             this.$toast(res.msg)
           }
         })
-      },
-      async init() {
-        this.statByTeacher()
-        this.statByClass()
-        this.statByPersonal()
-        await this.statCourseByTeacher()
-        this.drawPie()
-        this.drawHistogram()
       },
       handleOperateName(operateType) {
         let name = ''
@@ -690,6 +745,9 @@
               }
             }
           ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         myChart.setOption(paperOption, true);
       },
@@ -725,6 +783,9 @@
               }
             }
           ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         myChart.setOption(paperOption, true);
       },
@@ -766,7 +827,10 @@
               // },
               data: this.stuStatInfo.taskTypeCount.length ? this.stuStatInfo.taskTypeCount.map(v => {
                 return {value: v.taskTypeCount, name: v.taskTypeName}
-              }) : [{value: 0, name: '无数据'}]
+              }) : [{value: 0, name: '无数据'}],
+              textStyle:{
+                fontSize: getFontSize(0.12),
+              }
             }
           ],
           // toolbox: {
@@ -786,6 +850,7 @@
         myChart.setOption(_option, true)
       },
       async statCourseByTeacher() {
+        if(this.doneArr.includes(1)) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -802,6 +867,7 @@
           requestJson: JSON.stringify(obj)
         }
         await statCourseByTeacher(params).then(res => {
+          this.doneArr.push(1)
           this.$store.commit('setVanLoading', false)
           if (res.flag && res.data[0]) {
             this.stuStatInfo = res.data[0]

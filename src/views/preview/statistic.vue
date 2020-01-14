@@ -140,7 +140,10 @@
 
           <div>
             <div v-show="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')" class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
-            <div id="myChart3" ref="myChart3" class="subject-pie"></div>
+<!--            <div id="myChart3" ref="myChart3" class="subject-pie"></div>-->
+            <div class="objective-pie-group">
+              <div v-for="(item,index) in objectiveList" :key="index" :id="`objectivePie${index}`"></div>
+            </div>
           </div>
         </div>
 
@@ -199,7 +202,7 @@
     untopAppraise,
     statTaskStatV2
   } from '@/api/index'
-  import { getStudentName } from '@/utils/filter'
+  import { getStudentName, getFontSize } from '@/utils/filter'
 
   export default {
     name: "statistic",
@@ -227,6 +230,7 @@
         remind: false,
         loadWareFlag: true,
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
+        objectiveList: []
       }
     },
     computed: {
@@ -800,7 +804,8 @@
                   },
                   position: 'outside',
                   formatter: `{b}{d}%>\n({c}人)`,
-                  align: 'left'
+                  align: 'left',
+                  fontSize: getFontSize(0.12),
                 },
                 labelLine: {
                   normal: {
@@ -910,19 +915,21 @@
               }
             }
           ],
+          textStyle:{
+            fontSize: getFontSize(0.12),
+          }
         };
         myChart.setOption(paperOption, true);
       },
       drawObjectivePie() {
         //有客观题才渲染
         if (this.taskFinishInfo.examstat.some(v => v.auto_scoring === '1')) {
-          let myChart = echarts.init(this.$refs.myChart3);
-          let objectiveList = []
+          this.objectiveList = []
           if (this.$route.query.resourceType === 'R03') {
             // 单试题
             this.taskFinishInfo.examstat.forEach((v, i) => {
               if (v.auto_scoring === '1') {
-                objectiveList.push({ ...v, num: `1${this.taskFinishInfo.examstat.length > 1 ? `(${i + 1})` : ``}` })
+                this.objectiveList.push({ ...v, num: `1${this.taskFinishInfo.examstat.length > 1 ? `(${i + 1})` : ``}` })
               }
             })
           } else {
@@ -930,7 +937,7 @@
             this.taskFinishInfo.paperDataList.forEach((v, i) => {
               if (v.autoScoring === '1' && !v.groupExamList.length) {
                 //客观题并且没有小题时才添加
-                objectiveList.push({ ...v, num: i + 1, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present })
+                this.objectiveList.push({ ...v, num: i + 1, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present })
               }
               let group = []
               v.groupExamList.forEach((g, gi) => {
@@ -938,67 +945,63 @@
                   group.push({ ...g, num: `${i + 1}(${gi + 1})`, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present })
                 }
               })
-              objectiveList = objectiveList.concat(group)
+              this.objectiveList = this.objectiveList.concat(group)
             })
           }
-          const count = Math.floor(window.screen.width / 65) //一行显示的个数
-          myChart.getDom().style.height = Math.ceil(objectiveList.length / count) * 60 + 'px'
-          myChart.resize()
-          // 指定图表的配置项和数据
-          let arr = []
-          for (let i = 0; i < objectiveList.length; i++) {
-            const correct = Number((objectiveList[i].exam_present.split("%")[0]) / 100)
-            arr.push({
-              name: `第${objectiveList[i].num}题`,
-              type: 'pie',
-              radius: [22, 26],
-              center: [28 + i % count * 60, 28 + (((i + 1) / count > 1) ? Math.floor(i / count) * 60 : 0)],
-              label: {
-                show: false,
-                position: 'center',
-                formatter: ''
-              },
-              hoverAnimation: false,
-              data: [
-                {
-                  value: correct, name: '正确率', label: {
-                    show: true,
-                    position: 'center',
-                    formatter: '{a}\n{d}%',
-                    textStyle: {
-                      baseline: 'bottom',
-                      fontSize: 10,
-                      color: '#000'
-                    }
-                  },
-                },
-                { value: 1 - correct, name: '错误率' }
-              ]
-            })
-          }
-          var questionOption = {
-            color: ['#5EF0A6', '#FF6666'],
-            series: arr
-          };
 
-          myChart.setOption(questionOption, true);
-          myChart.off('click')
-          myChart.on('click', params => {
-            console.log(params, '=3=3=');
-            const item = objectiveList[params.seriesIndex]
-            const classId = this.info.tchClassTastInfo.find(t => t.active).classId
-            // this.$router.push(`/subjectAnalyse?taskId=${this.info.taskId}&examId=${item.exam_id}&classId=${classId}&groupId=${item.group_id}`)
-            this.$router.push({
-              path: '/subjectAnalyse', query: {
-                taskId: this.info.taskId,
-                examId: this.$route.query.resourceType === 'R03' ? item.exam_id : (item.examId || item.examGroupId),
-                groupId: this.$route.query.resourceType === 'R03' ? item.group_id : item.groupId,
-                classId,
-                questionList: objectiveList,
-                resourceType: this.$route.query.resourceType
+          this.$nextTick(() => {
+            for (let i = 0; i < this.objectiveList.length; i++) {
+              let myChart = echarts.init(document.getElementById(`objectivePie${i}`));
+              const correct = Number((this.objectiveList[i].exam_present.split("%")[0]) / 100)
+              var questionOption = {
+                color: ['#5EF0A6', '#FF6666'],
+                series: [{
+                  name: `第${this.objectiveList[i].num}题`,
+                  type: 'pie',
+                  radius: ['90%', '100%'],
+                  label: {
+                    show: false,
+                    position: 'center',
+                    formatter: ''
+                  },
+                  hoverAnimation: false,
+                  data: [
+                    {
+                      value: correct, name: '正确率', label: {
+                        show: true,
+                        position: 'center',
+                        formatter: '{a}\n{d}%',
+                        textStyle: {
+                          baseline: 'bottom',
+                          fontSize: getFontSize(0.1),
+                          color: '#000'
+                        }
+                      },
+                    },
+                    { value: 1 - correct, name: '错误率' }
+                  ]
+                }]
               }
-            })
+              myChart.setOption(questionOption, true);
+              myChart.off('click')
+              myChart.on('click', params => {
+                const item = this.objectiveList[i]
+                const classId = this.info.tchClassTastInfo.find(t => t.active).classId
+                this.$router.push({
+                  path: '/subjectAnalyse', query: {
+                    taskId: this.info.taskId,
+                    examId: this.$route.query.resourceType === 'R03' ? item.exam_id : (item.examId || item.examGroupId),
+                    groupId: this.$route.query.resourceType === 'R03' ? item.group_id : item.groupId,
+                    classId,
+                    questionList: this.objectiveList,
+                    resourceType: this.$route.query.resourceType
+                  }
+                })
+              })
+            }
+
           })
+
         }
       },
     },
@@ -1189,6 +1192,20 @@
             color: #ff6666;
             margin-top: 8px;
           }
+        }
+      }
+    }
+
+    .objective-pie-group {
+      display: flex;
+      flex-wrap: wrap;
+      >div{
+        flex: 0 0 46px;
+        height: 46px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        &:nth-child(6n) {
+          margin-right: 0;
         }
       }
     }

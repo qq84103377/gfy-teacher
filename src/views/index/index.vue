@@ -60,7 +60,8 @@
           <span>当前没有未结束的任务～</span>
         </div>
         <div v-else v-for="item in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
-          <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
+          <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
+                     :can-slide="true" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
@@ -101,7 +102,7 @@
 <script>
 import listItem from '../../components/list-item'
 import {  getUnFinishCourseTask, getMySchoolInfo, getClassStudent, getSubGroupStudent, getGradeTermInfo, getPublishByRole,
-  getClassTeacherCourseDeploy, getCourseTaskDetail} from '@/api/index'
+  getClassTeacherCourseDeploy, getCourseTaskDetail, deleteCourseTask} from '@/api/index'
 import { pubApi } from '@/api/parent-GFY'
 import eventBus from "@/utils/eventBus";
 
@@ -138,6 +139,27 @@ export default {
     })
   },
   methods: {
+    delTask(item, index) {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "taskId": item.taskId,
+        "tchCourseId": item.tchCourseId
+      };
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      deleteCourseTask(params).then(res => {
+        if (res.flag) {
+          this.getUnFinishCourseTask()
+          this.$toast('删除成功')
+        } else {
+          this.$toast(res.msg)
+        }
+      });
+    },
     viewStat(item) {
       this.$store.commit('setVanLoading', true)
       //估计后台字段任务名称写错了
