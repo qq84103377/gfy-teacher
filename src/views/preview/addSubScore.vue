@@ -45,6 +45,7 @@
   import {getStudentName} from '@/utils/filter'
   import {saveRewardScore} from '@/api/index'
   import * as calculate from '@/utils/calculate'
+
   export default {
     name: "addSubScore",
     data() {
@@ -70,8 +71,8 @@
           return t
         }, [])
         const str = accountArr.join('|')
-        if(str === '') return this.$toast('请选择学生')
-        this.$store.commit('setVanLoading',true)
+        if (str === '') return this.$toast('请选择学生')
+        this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -92,7 +93,7 @@
           requestJson: JSON.stringify(obj)
         }
         saveRewardScore(params).then(res => {
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(this.leftValue == '30%' ? '加分成功' : '减分成功')
           } else {
@@ -102,23 +103,48 @@
       },
       handleList() {
         //口语的总分都按100分来算
-        if(this.$route.params.info.testPaperScore>=20) {
+        if (this.$route.params.info.testPaperScore >= 20) {
           //总分不小于20
           this.scoreSpan = [
             {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.9,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.99,2))}分`, min: 0.9, max: 1, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.8,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.89,2))}分`, min: 0.8, max: 0.9, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.7,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.79,2))}分`, min: 0.7, max: 0.8, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.69,2))}分`, min: 0.6, max: 0.7, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}分以下`, min: 0, max: 0.6, stu: []},
+            {
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.9, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.99, 2))}分`,
+              min: 0.9,
+              max: 1,
+              stu: []
+            },
+            {
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.8, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.89, 2))}分`,
+              min: 0.8,
+              max: 0.9,
+              stu: []
+            },
+            {
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.7, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.79, 2))}分`,
+              min: 0.7,
+              max: 0.8,
+              stu: []
+            },
+            {
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.69, 2))}分`,
+              min: 0.6,
+              max: 0.7,
+              stu: []
+            },
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}分以下`, min: 0, max: 0.6, stu: []},
             {name: '未提交', stu: []},
           ]
-        }else {
+        } else {
           //总分小于20
           this.scoreSpan = [
             {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore,0.99,2))}分`, min: 0.6, max: 1, stu: []},
-            {name: `${calculate.mul(this.$route.params.info.testPaperScore,0.6,0)}分以下`, min: 0, max: 0.6, stu: []},
+            {
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.99, 2))}分`,
+              min: 0.6,
+              max: 1,
+              stu: []
+            },
+            {name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}分以下`, min: 0, max: 0.6, stu: []},
             {name: '未提交', stu: []},
           ]
         }
@@ -127,16 +153,16 @@
           let percent = 0
           if (this.$route.params.info.testPaperScore > 0) {
             // percent = Number((v.score / this.$route.params.info.testPaperScore * 100).toFixed(2))
-            percent = calculate.div(v.score,this.$route.params.info.testPaperScore,2)
+            percent = calculate.div(v.score, this.$route.params.info.testPaperScore, 2)
           }
-          if (v.endDate) {
+          if (this.$route.params.info.finishStudent.includes(v.accountNo)) {
             const index = this.scoreSpan.findIndex(s => percent >= s.min && percent < s.max)
             this.scoreSpan[index].stu.push({
               name: getStudentName(v.accountNo, this.$route.params.info.classId),
               accountNo: v.accountNo
             })
           } else {
-            this.scoreSpan[this.scoreSpan.length-1].stu.push({
+            this.scoreSpan[this.scoreSpan.length - 1].stu.push({
               name: getStudentName(v.accountNo, this.$route.params.info.classId),
               accountNo: v.accountNo
             })

@@ -154,7 +154,7 @@
       },
       handleList() {
         this.$route.params.info.studentStatList.forEach(v => {
-          if (v.endDate) {
+          if (this.$route.params.info.finishStudent.includes(v.accountNo)) {
             //已提交
             if (v.groupId) {
               //有分组
