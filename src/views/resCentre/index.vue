@@ -109,275 +109,287 @@
         <van-list v-model="listLoading" :finished="curFinish" :finished-text="curListLength>0?'没有更多了':'当前没有资源！'"
                   @load="onLoad" :offset='80'>
           <!--    平台资源      微课-->
-          <list-item class="mgt10" style="background: #fff;" v-if="resourceIndex==1&&tabIndex == 0"
-                     v-for="(item,index) in lessonList" :key="index"
-                     :itemTitle="item.resCourseWareInfo.coursewareName"
-                     @clickTo="goVideoPage(item)">
-            <div slot="cover" class="cover" :style="{'background':item.resCourseWareInfo.imageUrl?'none':'#67E0A3'}">
-              <img
-                v-if="item.resCourseWareInfo.imageUrl" :src="item.resCourseWareInfo.imageUrl" alt=""><i v-else
-                                                                                                        :class="['iconGFY', handleMediaIcon(item.resCourseWareInfo.srcUrl)]"></i>
-            </div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+          <div>
+            <list-item class="mgt10" style="background: #fff;" v-if="resourceIndex==1&&tabIndex == 0"
+                       v-for="(item,index) in lessonList" :key="index"
+                       :itemTitle="item.resCourseWareInfo.coursewareName"
+                       @clickTo="goVideoPage(item)">
+              <div slot="cover" class="cover" :style="{'background':item.resCourseWareInfo.imageUrl?'none':'#67E0A3'}">
+                <img
+                  v-if="item.resCourseWareInfo.imageUrl" :src="item.resCourseWareInfo.imageUrl" alt=""><i v-else
+                                                                                                          :class="['iconGFY', handleMediaIcon(item.resCourseWareInfo.srcUrl)]"></i>
               </div>
-              <div class="desc-bottom">
-                <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                </div>
               </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                <span>{{item.collectId?'取消':''}}收藏</span>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','lessonList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'lesson')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
               </div>
-              <div
-                @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','lessonList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
               </div>
-              <div @click="sendTask(item,'lesson')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
-              </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
-              </div>
-            </div>
-          </list-item>
+            </list-item>
+          </div>
           <!--    平台资源      素材-->
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" v-if="resourceIndex==2&&tabIndex == 0"
-                     v-for="(item,index) in materialList" :key="index"
-                     :itemTitle="item.resCourseWareInfo.coursewareName">
-            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.resCourseWareInfo)"></i></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+          <div>
+            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" v-if="resourceIndex==2&&tabIndex == 0"
+                       v-for="(item,index) in materialList" :key="index"
+                       :itemTitle="item.resCourseWareInfo.coursewareName">
+              <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.resCourseWareInfo)"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.resCourseWareInfo.shareType === 'S01','icon-school':item.resCourseWareInfo.shareType === 'S02','icon-share':item.resCourseWareInfo.shareType === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.resCourseWareInfo.qualityType === 'Q01','icon-boutique':item.resCourseWareInfo.qualityType === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                </div>
               </div>
-              <div class="desc-bottom">
-                <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','materialList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName)">
+                  <i class="iconGFY icon-download-orange"></i>
+                  <span>下载</span>
+                </div>
+                <div @click="sendTask(item,'material')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
               </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="collect(item,item.resCourseWareInfo.coursewareId,item.resCourseWareInfo.statusCd)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                <span>{{item.collectId?'取消':''}}收藏</span>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
               </div>
-              <div
-                @click="showAddPop(item.resCourseWareInfo.coursewareName,item.resCourseWareInfo.coursewareId,'R01','materialList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
-              </div>
-              <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName)">
-                <i class="iconGFY icon-download-orange"></i>
-                <span>下载</span>
-              </div>
-              <div @click="sendTask(item,'material')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
-              </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
-              </div>
-            </div>
-          </list-item>
+            </list-item>
+          </div>
           <!--    平台资源      试卷-->
-          <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="resourceIndex==3&&tabIndex == 0"
-                     style="background: #fff;" v-for="(item,index) in examList" :key="index"
-                     :itemTitle="item.testPaperName">
-            <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
-              </div>
-              <div class="desc-bottom">
-                <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.testPaperDegree==='D01'?'容易':item.testPaperDegree==='D02'?'中等':'困难'}}
+          <div>
+            <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="resourceIndex==3&&tabIndex == 0"
+                       style="background: #fff;" v-for="(item,index) in examList" :key="index"
+                       :itemTitle="item.testPaperName">
+              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.shareType === 'S01','icon-school':item.shareType === 'S02','icon-share':item.shareType === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.qualityType === 'Q01','icon-boutique':item.qualityType === 'Q02'}"></i>
                 </div>
-                <div><i class="iconGFY icon-zhu"></i>{{item.subjectiveItemNum || 0}}</div>
-                <div><i class="iconGFY icon-ke"></i>{{item.objectiveItemNum || 0}}</div>
-                <div><i class="iconGFY icon-download"></i>{{item.downCount || 0}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                <div class="desc-bottom">
+                  <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.testPaperDegree==='D01'?'容易':item.testPaperDegree==='D02'?'中等':'困难'}}
+                  </div>
+                  <div><i class="iconGFY icon-zhu"></i>{{item.subjectiveItemNum || 0}}</div>
+                  <div><i class="iconGFY icon-ke"></i>{{item.objectiveItemNum || 0}}</div>
+                  <div><i class="iconGFY icon-download"></i>{{item.downCount || 0}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
+                </div>
               </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="collect(item,item.testPaperId,item.statusCd)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
-                <span>{{item.collectId?'取消':''}}收藏</span>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div @click="collect(item,item.testPaperId,item.statusCd)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collectId}]"></i>
+                  <span>{{item.collectId?'取消':''}}收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.testPaperName,item.testPaperId,'R02','examList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'exam')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
               </div>
-              <div
-                @click="showAddPop(item.testPaperName,item.testPaperId,'R02','examList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
               </div>
-              <div @click="sendTask(item,'exam')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
-              </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
-              </div>
-            </div>
-          </list-item>
+            </list-item>
+          </div>
           <!--私人资源  微课-->
-          <list-item class="mgt10" style="background: #fff;" v-if="priSourceIndex==1&&tabIndex == 1"
-                     v-for="(item,index) in priLessonList" :key="index" :can-slide="true"
-                     :itemTitle="item.courseware_name" @del="delRes(item,index)"
-                     @clickTo="goVideoPage(item)">
-            <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
-              <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else :class="['iconGFY', handleMediaIcon(item.src_url)]"></i>
-            </div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+          <div>
+            <list-item class="mgt10" style="background: #fff;" v-if="priSourceIndex==1&&tabIndex == 1"
+                       v-for="(item,index) in priLessonList" :key="index" :can-slide="true"
+                       :itemTitle="item.courseware_name" @del="delRes(item,index)"
+                       @clickTo="goVideoPage(item)">
+              <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
+                <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else :class="['iconGFY', handleMediaIcon(item.src_url)]"></i>
               </div>
-              <div class="desc-bottom">
-                <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
-              </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.belong_account_no !== item.account_no"
-                   @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
-                <span>取消收藏</span>
-              </div>
-              <div
-                @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priLessonList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
-              </div>
-              <div @click="sendTask(item,'lesson')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
-              </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
-              </div>
-            </div>
-          </list-item>
-          <!--私人资源 素材-->
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
-                     v-if="priSourceIndex==2&&tabIndex == 1" :can-slide="true"
-                     v-for="(item,index) in priMaterialList" :key="index" @del="delRes(item,index)"
-                     :itemTitle="item.courseware_name">
-            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
-              </div>
-              <div class="desc-bottom">
-                <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
-              </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.belong_account_no !== item.account_no"
-                   @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd,index)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
-                <span>取消收藏</span>
-              </div>
-              <div
-                @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priMaterialList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
-              </div>
-              <div @click="download(item.src_url,item,courseware_name)">
-                <i class="iconGFY icon-download-orange"></i>
-                <span>下载</span>
-              </div>
-              <div @click="sendTask(item,'material')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
-              </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
-              </div>
-            </div>
-          </list-item>
-          <!--私人资源 试卷-->
-          <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="priSourceIndex==3&&tabIndex == 1"
-                     :can-slide="item.belong_account_no == $store.getters.getUserInfo.accountNo"
-                     @del="delTestPaper(item,index)"
-                     style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
-                     :itemTitle="item.test_paper_name">
-            <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
-            <div slot="desc">
-              <div class="desc-top">
-                <i class="iconGFY"
-                   :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
-                <i class="iconGFY"
-                   :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
-              </div>
-              <div class="desc-bottom">
-                <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.test_paper_degree==='D01'?'容易':item.test_paper_degree==='D02'?'中等':'困难'}}
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
                 </div>
-                <div><i class="iconGFY icon-zhu"></i>{{item.subjective_item_num || 0}}</div>
-                <div><i class="iconGFY icon-ke"></i>{{item.objective_item_num || 0}}</div>
-                <div><i class="iconGFY icon-download"></i>{{item.down_count || 0}}</div>
-                <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
-                <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                </div>
               </div>
-            </div>
-            <div slot="btn" class="btn-group van-hairline--top">
-              <div v-if="item.belong_account_no !== item.account_no"
-                   @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd,index)">
-                <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
-                <span>取消收藏</span>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div v-if="item.belong_account_no !== item.account_no"
+                     @click="priListKey='priLessonList';collect(item,item.courseware_id,item.status_cd,index)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                  <span>取消收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priLessonList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="sendTask(item,'lesson')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
               </div>
-              <div
-                @click="showAddPop(item.test_paper_name,item.test_paper_id,'R02','priExamList')">
-                <i class="iconGFY icon-circle-plus-yellow"></i>
-                <span>添加</span>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
               </div>
-              <div @click="sendTask(item,'exam')">
-                <i class="iconGFY icon-plane"></i>
-                <span>发任务</span>
+            </list-item>
+          </div>
+          <!--私人资源 素材-->
+          <div>
+            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                       v-if="priSourceIndex==2&&tabIndex == 1" :can-slide="true"
+                       v-for="(item,index) in priMaterialList" :key="index" @del="delRes(item,index)"
+                       :itemTitle="item.courseware_name">
+              <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
+              <div slot="desc">
+                <div class="desc-top">
+                  <i class="iconGFY"
+                     :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                  <i class="iconGFY"
+                     :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+                </div>
+                <div class="desc-bottom">
+                  <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
+                  <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                  <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+                </div>
               </div>
-            </div>
-            <div slot="remark" class="remark" v-if="item.record">
-              <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
-              <div>
-                <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+              <div slot="btn" class="btn-group van-hairline--top">
+                <div v-if="item.belong_account_no !== item.account_no"
+                     @click="priListKey='priMaterialList';collect(item,item.courseware_id,item.status_cd,index)">
+                  <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                  <span>取消收藏</span>
+                </div>
+                <div
+                  @click="showAddPop(item.courseware_name,item.courseware_id,'R01','priMaterialList')">
+                  <i class="iconGFY icon-circle-plus-yellow"></i>
+                  <span>添加</span>
+                </div>
+                <div @click="download(item.src_url,item,courseware_name)">
+                  <i class="iconGFY icon-download-orange"></i>
+                  <span>下载</span>
+                </div>
+                <div @click="sendTask(item,'material')">
+                  <i class="iconGFY icon-plane"></i>
+                  <span>发任务</span>
+                </div>
               </div>
-            </div>
-          </list-item>
+              <div slot="remark" class="remark" v-if="item.record">
+                <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+                <div>
+                  <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+                </div>
+              </div>
+            </list-item>
+          </div>
+          <!--私人资源 试卷-->
+         <div>
+           <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="priSourceIndex==3&&tabIndex == 1"
+                      :can-slide="item.belong_account_no == $store.getters.getUserInfo.accountNo"
+                      @del="delTestPaper(item,index)"
+                      style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
+                      :itemTitle="item.test_paper_name">
+             <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+             <div slot="desc">
+               <div class="desc-top">
+                 <i class="iconGFY"
+                    :class="{'icon-personal':item.share_type === 'S01','icon-school':item.share_type === 'S02','icon-share':item.share_type === 'S03'}"></i>
+                 <i class="iconGFY"
+                    :class="{'icon-choice':item.quality_type === 'Q01','icon-boutique':item.quality_type === 'Q02'}"></i>
+               </div>
+               <div class="desc-bottom">
+                 <div style="white-space: nowrap"><i class="iconGFY icon-difficult"></i>{{item.test_paper_degree==='D01'?'容易':item.test_paper_degree==='D02'?'中等':'困难'}}
+                 </div>
+                 <div><i class="iconGFY icon-zhu"></i>{{item.subjective_item_num || 0}}</div>
+                 <div><i class="iconGFY icon-ke"></i>{{item.objective_item_num || 0}}</div>
+                 <div><i class="iconGFY icon-download"></i>{{item.down_count || 0}}</div>
+                 <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
+                 <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
+               </div>
+             </div>
+             <div slot="btn" class="btn-group van-hairline--top">
+               <div v-if="item.belong_account_no !== item.account_no"
+                    @click="priListKey='priExamList';collect(item,item.test_paper_id,item.status_cd,index)">
+                 <i :class="['iconGFY','icon-collect', {'icon-collect-yellow':item.collect_id}]"></i>
+                 <span>取消收藏</span>
+               </div>
+               <div
+                 @click="showAddPop(item.test_paper_name,item.test_paper_id,'R02','priExamList')">
+                 <i class="iconGFY icon-circle-plus-yellow"></i>
+                 <span>添加</span>
+               </div>
+               <div @click="sendTask(item,'exam')">
+                 <i class="iconGFY icon-plane"></i>
+                 <span>发任务</span>
+               </div>
+             </div>
+             <div slot="remark" class="remark" v-if="item.record">
+               <div class="mgr10"><i class="iconGFY icon-lamp"></i>已添加至:</div>
+               <div>
+                 <div v-for="(r,ri) in item.record" :key="ri">{{r}}</div>
+               </div>
+             </div>
+           </list-item>
+         </div>
         </van-list>
       </van-pull-refresh>
 
