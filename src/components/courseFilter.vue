@@ -277,6 +277,7 @@ export default {
       this.$dialog.confirm({
         title: '提示',
         message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
+        closeOnPopstate: true,
         confirmButtonColor: '#39F0DD',
         className: 'change-subject'
       }).then(() => {
@@ -579,7 +580,7 @@ export default {
   &__body {
     display: flex;
     flex: 1;
-    overflow: hidden;
+    overflow: hidden !important;
 
     &-left {
       flex: 0 0 125px;
