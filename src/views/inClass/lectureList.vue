@@ -6,8 +6,14 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有讲义，快去选择课件吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;" @del="handleDelete(item.ClassTeachingData,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.ClassTeachingData.name" @up="moveItem(item.ClassTeachingData,index,0)" @down="moveItem(item.ClassTeachingData,index,1)" :can-slide="true" :up="index>0" :down="(list.length - 1) > index">
+          <list-item v-if="renderFlag" @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;" @del="handleDelete(item.ClassTeachingData,index)"
+                     v-for="(item,index) in list" :key="item.ClassTeachingData.seqId + '' + item.ClassTeachingData.resourceId"
+                     :itemTitle="item.ClassTeachingData.name" @up="moveItem(item.ClassTeachingData,index,0)"
+                     @down="moveItem(item.ClassTeachingData,index,1)" :can-slide="true" :up="index>0"
+                     :top="list.length > 1 && index > 0" :down="(list.length - 1) > index"
+                      @top="topItem(item.ClassTeachingData,index)">
             <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.ClassTeachingData)"></i></div>
+<!--            item.ClassTeachingData.seqId-->
             <div slot="desc">
               <div class="desc-top">
                 <i class="iconGFY" :class="{'icon-personal':item.ClassTeachingData.shareType === 'S01','icon-school':item.ClassTeachingData.shareType === 'S02','icon-share':item.ClassTeachingData.shareType === 'S03'}"></i>
@@ -36,7 +42,7 @@
 import listItem from '../../components/list-item'
 import wareFilter from '../../components/wareFilter'
 import { teachApi } from '@/api/parent-GFY'
-import { deleteCourseSummitInfo, setDataTaskOrder, createCourseSummitInfoList } from '@/api/index'
+import { deleteCourseSummitInfo, setDataTaskOrder, createCourseSummitInfoList, stickyNotes } from '@/api/index'
 
 export default {
   name: "lectureList",
@@ -50,7 +56,8 @@ export default {
       finished: false,
       currentPage: 0,
       total: 0,
-      scrollTop: 0
+      scrollTop: 0,
+      renderFlag: true
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -66,6 +73,31 @@ export default {
     });
   },
   methods: {
+    topItem(item,index) {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "seqId": item.seqId,
+        "essFlag":"1"
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      stickyNotes(params).then(res => {
+        if (res.flag) {
+          this.list[index] = this.list.splice(0, 1, this.list[index])[0]
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
+          this.$toast('置顶成功')
+        } else {
+          this.$toast(res.msg)
+        }
+      })
+    },
     selectCourse(tchClassTeachingDataList) {
       if (tchClassTeachingDataList.length) {
         this.$store.commit('setVanLoading', true)
@@ -85,6 +117,10 @@ export default {
             this.$refs['body'].scrollTop = 0
             this.$toast('添加成功!')
             this.onRefresh()
+            this.renderFlag = false
+            this.$nextTick(() => {
+              this.renderFlag = true
+            })
           } else {
             this.$toast(res.msg)
           }
@@ -142,6 +178,10 @@ export default {
       setDataTaskOrder(params).then(res => {
         if (res.flag) {
           this.list[index] = this.list.splice(type ? index + 1 : index - 1, 1, this.list[index])[0]
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
           this.$toast(`${type ? '下' : '上'}移成功`)
         } else {
           this.$toast(res.msg)
@@ -165,6 +205,10 @@ export default {
       deleteCourseSummitInfo(params).then(res => {
         if (res.flag) {
           this.list.splice(index, 1)
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
           this.$toast('删除成功')
         }
       })

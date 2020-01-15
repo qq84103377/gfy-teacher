@@ -513,3 +513,7 @@ export const getCourseInfoResourceCount =(params)=>{
 export const getKnowledgeCatalogInfo =(params)=>{
   return axios.post('resource/getKnowledgeCatalogInfo', qs.stringify(params))
 }
+//置顶讲义
+export const stickyNotes =(params)=>{
+  return axios.post('teach/stickyNotes', qs.stringify(params))
+}
