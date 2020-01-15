@@ -185,19 +185,19 @@ export default {
         //先查出当前学科有哪些年级
         let gradeArr = []
         for (let k in JSON.parse(localStorage.getItem("classMap"))) {
-          if(JSON.parse(localStorage.getItem("classMap"))[k].teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)) {
-            if(!gradeArr.includes(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)) {
+          if (JSON.parse(localStorage.getItem("classMap"))[k].teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)) {
+            if (!gradeArr.includes(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)) {
               gradeArr.push(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)
             }
           }
         }
         //筛选对应的年级
-        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade) )
+        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade))
         let tempList = this.classGradeList[this.gradeIndex].bookInfo
-        let sub =localStorage.getItem("currentSubjectType")
+        let sub = localStorage.getItem("currentSubjectType")
         this.bookInfoList = []
         tempList.forEach((item) => {
-          if (item.subjectType == sub){
+          if (item.subjectType == sub) {
             this.bookInfoList.push(item)
           }
         });
@@ -219,7 +219,7 @@ export default {
         } else {
           this.termIndex = 0
         }
-        this.$emit('init',this.classGradeList[this.gradeIndex].classGrade,this.termTypeList[this.termIndex])
+        this.$emit('init', this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
         this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
@@ -419,10 +419,10 @@ export default {
         this.gradeIndex = index
 
         let tempList = this.classGradeList[index].bookInfo
-        let sub =localStorage.getItem("currentSubjectType")
+        let sub = localStorage.getItem("currentSubjectType")
         this.bookInfoList = []
         tempList.forEach((item) => {
-          if (item.subjectType == sub){
+          if (item.subjectType == sub) {
             this.bookInfoList.push(item)
           }
         });
