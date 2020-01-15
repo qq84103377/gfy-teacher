@@ -120,7 +120,7 @@
           requestJson: JSON.stringify(obj)
         }
         let api
-        if (['T10'].includes(this.$route.query.taskType)) {
+        if (['T10'].includes(this.taskType)) {
           //从堂测统计进入
           api = statTaskStatV2
         } else {
@@ -129,7 +129,7 @@
         api(params).then(res => {
           this.$store.commit('setVanLoading',false)
           if (res.flag && res.data[0]) {
-            if (this.$route.query.taskType === 'T13') {
+            if (this.taskType === 'T13') {
               res.data[0].studentStatList = res.data[0].examstat
               //因为口语没有testPaperScore这个字段,但是总分是按100分来算的
               res.data[0].testPaperScore = 100

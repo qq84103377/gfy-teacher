@@ -87,12 +87,13 @@ export default {
       }
       stickyNotes(params).then(res => {
         if (res.flag) {
-          this.list[index] = this.list.splice(0, 1, this.list[index])[0]
+          this.$refs['body'].scrollTop = 0
+          this.$toast('置顶成功!')
+          this.onRefresh()
           this.renderFlag = false
           this.$nextTick(() => {
             this.renderFlag = true
           })
-          this.$toast('置顶成功')
         } else {
           this.$toast(res.msg)
         }
@@ -215,7 +216,7 @@ export default {
     },
     handleIcon(item) {
       if (item.resourceType === 'R01') {
-        const t = item.dataUrl.substring(item.dataUrl.lastIndexOf('.') + 1).toLowerCase();
+        const t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase();
         if (t === 'ppt' || t === 'pptx') {
           return 'icon-ppt'
         } else if (t === 'doc' || t === 'docx') {
