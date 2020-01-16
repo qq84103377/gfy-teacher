@@ -14,7 +14,7 @@ import * as myFilter from './utils/filter'
 import * as calculate from './utils/calculate'
 import VConsole from 'vconsole/dist/vconsole.min.js'
 import viewportUnitsBuggyfill from 'viewport-units-buggyfill'
-import "vant/lib/icon/local.css"
+
 // 引入vant组件
 import {
   Button,
