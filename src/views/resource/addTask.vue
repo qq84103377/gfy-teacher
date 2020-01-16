@@ -233,7 +233,7 @@
   import examFilter from '../../components/examFilter'
   import filterPanel from '../../components/filterPanel'
   import {
-    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo
+    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo, addTeachCourseRes
   } from '@/api/index'
   import eventBus from "@/utils/eventBus";
 
@@ -404,6 +404,25 @@
     },
 
     methods: {
+      addTeachCourseRes(resourceType) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "tchCourseId": this.tchCourseInfo.tchCourseId,
+          "sysCourseId": this.tchCourseInfo.sysCourseId,
+          "relationSeqId": this.tchCourseInfo.relationCourseId,
+          resourceType,
+          resourceId: this.form.resourceId,
+          "statusCd": "S04"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTeachCourseRes(params)
+      },
       //冒泡排序
       bubbleSort(arr, key) {
 
@@ -1068,6 +1087,11 @@
           //口语
           taskType = "T13";
           resourceType = "R08"
+        }
+
+        if(this.$route.query.isRes) {
+          //资源中心发任务,需要将资源添加到课程
+          this.addTeachCourseRes(resourceType)
         }
 
         //是否允许修改答案
