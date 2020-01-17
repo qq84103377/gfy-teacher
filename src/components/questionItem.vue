@@ -14,7 +14,7 @@
           <div class="btn-item" :class="{active:child.analyseShow}"
                @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
           </div>
-          <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
+          <div v-if="!isSend&&!isQuestion&&!isLec" class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
         </div>
         <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10 html-img" @click="previewImg"
              style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
@@ -42,8 +42,8 @@
         <div v-if="isQuestion" class="btn-item" :class="{active:item.collectId}" @click="handleCollect(item.collectId)">
           {{item.collectId?'取消':'添加'}}收藏
         </div>
-        <div v-if="!isSend&&!isQuestion" class="btn-item" @click="$emit('setPoint')">设置分数</div>
-        <div v-if="!isSend" class="btn-item" :class="{active:item.isRemove}"
+        <div v-if="!isSend&&!isQuestion&&!isLec" class="btn-item" @click="$emit('setPoint')">设置分数</div>
+        <div v-if="!isSend&&!isLec" class="btn-item" :class="{active:item.isRemove}"
              @click="handleAdd">
           {{!item.isRemove?'添加':'移除'}}试题
         </div>
@@ -78,7 +78,7 @@
   import { ImagePreview } from "vant";
   export default {
     name: "questionItem",
-    props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item'],//isQuestion 是否试题页面适用
+    props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item','isLec'],//isQuestion 是否试题页面适用  //isLec 讲义进来的试卷详情
     data() {
       return {
         analyseShow: false,

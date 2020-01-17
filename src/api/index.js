@@ -219,7 +219,7 @@ export const getTextBookVersionInfo =(params)=>{
 }
 //创建任务
 export const createCourseTask = (params) => {
-  return axios.post('teachNew/createCourseTask', qs.stringify(params))
+  return axios.post('teachNew/createCourseTask', qs.stringify(params),{ timeout: 0})
 }
 //获取科目信息
 export const getSubjectType =(params)=>{
@@ -516,4 +516,8 @@ export const getKnowledgeCatalogInfo =(params)=>{
 //置顶讲义
 export const stickyNotes =(params)=>{
   return axios.post('teach/stickyNotes', qs.stringify(params))
+}
+//更新资源下载数
+export const updateCourseWareCount =(params)=>{
+  return axios.post('resource/updateCourseWareCount', qs.stringify(params))
 }

@@ -23,11 +23,12 @@
         <div slot="title" class="aic">
           <div><span class="red">*</span>课件:</div>
           <div class="pdlt10" style="flex:1">{{wareName||'可添加office文件或pdf'}}</div>
-          <van-uploader
-            accept="application/vnd.ms-powerpoint,application/vnd.ms-excel,application/vnd.ms-works,application/vnd.ms-works,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.spreadsheetml.template.potx,application/vnd.openxmlformats-officedocument.presentationml.template.ppsx,application/vnd.openxmlformats-officedocument.presentationml.slideshow.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation.sldx,application/vnd.openxmlformats-officedocument.presentationml.slide.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document.dotx,application/vnd.openxmlformats-officedocument.wordprocessingml.template.xlsm,application/vnd.ms-excel.addin.macroEnabled.12.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12"
-            :before-read="read">
-            <van-icon @click="" class="add" name="add"/>
-          </van-uploader>
+<!--          <van-uploader-->
+<!--            accept="application/vnd.ms-powerpoint,application/vnd.ms-excel,application/vnd.ms-works,application/vnd.ms-works,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.spreadsheetml.template.potx,application/vnd.openxmlformats-officedocument.presentationml.template.ppsx,application/vnd.openxmlformats-officedocument.presentationml.slideshow.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation.sldx,application/vnd.openxmlformats-officedocument.presentationml.slide.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document.dotx,application/vnd.openxmlformats-officedocument.wordprocessingml.template.xlsm,application/vnd.ms-excel.addin.macroEnabled.12.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12"-->
+<!--            :before-read="read">-->
+            <van-icon @click="getFile" class="add" name="add"/>
+          <input type="file" id="upload" style="display: none">
+<!--          </van-uploader>-->
         </div>
       </van-cell>
       <van-cell class="upload-ware__body__cell">
@@ -97,6 +98,25 @@
       this.getOSSKey()
     },
     methods: {
+      fileSelect(id) {
+        let fileInputs = document.getElementById(id);
+        fileInputs.click();
+        var p = new Promise((resolve, reject) => {
+          fileInputs.onchange = function (e) {
+            let files = e.target.files || e.dataTransfer.files;
+            if (!files.length) return;
+            let file = files[0];
+            resolve(file);
+          };
+        });
+        return p;
+      },
+      getFile() {
+        this.fileSelect('upload').then(file => {
+          this.read(file)
+          console.log(file.name);
+        })
+      },
       uploadWare(curFile) {
         console.log("开始上传")
         this.$store.commit('setVanLoading', true)
@@ -131,7 +151,6 @@
         })
       },
       read(file, detail) {
-        console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
         if (file.type) {
           if (['.pdf', '.ppt', '.pptx', '.doc', '.docx', '.xls', '.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             this.wareSize = file.size

@@ -80,7 +80,8 @@ export default {
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
         "seqId": item.seqId,
-        "essFlag":"1"
+        "essFlag":"1",
+        "tchCourseId": item.tchCourseId,
       }
       let params = {
         requestJson: JSON.stringify(obj)
@@ -159,6 +160,7 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: this.$route.query.classGrade,
             title: item.name,
+            fromLec: 1, //因为讲义进去的试卷详情跟任务列表进去的类似,但是可以移动试题,所以需要区分
           }
         })
       }

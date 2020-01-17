@@ -11,7 +11,7 @@
         <div v-else class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
-        <van-icon class="icon-close" @click="show=false" name="close" />
+        <van-icon v-if="type!=='myCourse'" class="icon-close" @click="show=false" name="close" />
       </div>
       <div v-if="type === 'myCourse'" class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>

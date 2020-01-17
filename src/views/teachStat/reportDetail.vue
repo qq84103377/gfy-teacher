@@ -261,6 +261,7 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          beignDate: this.filterParams.startDate,
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -402,6 +403,7 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          beignDate: this.filterParams.startDate,
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };

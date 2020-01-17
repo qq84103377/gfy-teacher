@@ -16,7 +16,7 @@
               </div>
               <div class="desc-bottom">
                 <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
-                <div><i class="iconGFY icon-download"></i>{{item.downLoadCount}}</div>
+                <div><i class="iconGFY icon-download"></i>{{item.downCount}}</div>
                 <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
                 <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
               </div>
@@ -51,7 +51,7 @@
 <script>
   import listItem from '../../components/list-item'
   import { teachApi, pubApi } from '@/api/parent-GFY'
-  import { modifyTeachCourseRes } from '@/api/index'
+  import { modifyTeachCourseRes, updateCourseWareCount } from '@/api/index'
   import store from '../../store/store'
   export default {
     name: "materialList",
@@ -97,6 +97,25 @@
       }
     },
     methods: {
+      updateCourseWareCount(item) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          courseWareId: item.coursewareId,
+          "countType":"C02",
+          "sysTypeCd":"S02"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        updateCourseWareCount(params).then(res => {
+          if(res.flag) {
+            item.downCount++
+          }
+        })
+      },
       async download(item) {
         let url = item.srcUrl;
         if (url.indexOf("pubquanlang") > -1) {
@@ -119,6 +138,7 @@
             }
           });
         }
+        this.updateCourseWareCount(item)
         this.downLoadToOpen(item);
       },
       downLoadToOpen(item) {

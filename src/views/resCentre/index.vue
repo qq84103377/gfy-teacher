@@ -170,6 +170,7 @@
                 </div>
                 <div class="desc-bottom">
                   <div><i class="iconGFY icon-feather"></i>{{item.userName}}</div>
+                  <div><i class="iconGFY icon-download"></i>{{item.resCourseWareInfo.downCount||0}}</div>
                   <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
                   <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
                 </div>
@@ -184,7 +185,7 @@
                   <i class="iconGFY icon-circle-plus-yellow"></i>
                   <span>添加</span>
                 </div>
-                <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName)">
+                <div @click="download(item.resCourseWareInfo.srcUrl,item.resCourseWareInfo.coursewareName,item)">
                   <i class="iconGFY icon-download-orange"></i>
                   <span>下载</span>
                 </div>
@@ -309,6 +310,7 @@
                 </div>
                 <div class="desc-bottom">
                   <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
+                  <div><i class="iconGFY icon-download"></i>{{item.down_count || 0}}</div>
                   <div><i class="iconGFY icon-points"></i>{{item.use_count || 0}}</div>
                   <div><i class="iconGFY icon-star"></i>{{item.collect_count || 0}}</div>
                 </div>
@@ -324,7 +326,7 @@
                   <i class="iconGFY icon-circle-plus-yellow"></i>
                   <span>添加</span>
                 </div>
-                <div @click="download(item.src_url,item,courseware_name)">
+                <div @click="download(item.src_url,item.courseware_name,item)">
                   <i class="iconGFY icon-download-orange"></i>
                   <span>下载</span>
                 </div>
@@ -425,6 +427,7 @@
     getCollectInfoDetailV2,
     delTestPaper,
     delCourseWare,
+    updateCourseWareCount,
   } from '@/api/index'
   import {getGradeName, getSubjectName, toHump, formatTime} from "../../utils/filter";
   import {teachApi, pubApi} from '@/api/parent-GFY'
@@ -756,7 +759,30 @@
       goBack() {
         this.common.goBack(this)
       },
-      async download(srcUrl, name) {
+      updateCourseWareCount(item) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          courseWareId: item.courseware_id || item.resCourseWareInfo.coursewareId,
+          "countType":"C02",
+          "sysTypeCd":"S02"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        updateCourseWareCount(params).then(res => {
+          if(res.flag) {
+            if(item.courseware_id) {
+              item.down_count++
+            }else {
+              item.resCourseWareInfo.downCount++
+            }
+          }
+        })
+      },
+      async download(srcUrl, name, item) {
         let url = srcUrl;
         if (url.indexOf("pubquanlang") > -1) {
           this.accessUrl = url;
@@ -778,6 +804,7 @@
             }
           });
         }
+        this.updateCourseWareCount(item)
         this.downLoadToOpen(srcUrl, name);
       },
       downLoadToOpen(srcUrl, name) {
@@ -1188,10 +1215,11 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "subjectType": localStorage.getItem("currentSubjectType"),
           classGrade: this.gradeTerm.split('|')[0],
-          termType: this.gradeTerm.split('|')[1],
+          termType: '',
           "pageSize": "999",
-          "courseType": "C01",
+          "courseType": "C01,C02",
           "currentPage": 1,
+          "isFinish":2
         }
         let params = {
           requestJson: JSON.stringify(obj)

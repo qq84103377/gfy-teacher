@@ -312,7 +312,7 @@
               //不能选择课程,即有默认课程
               this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
             }
-
+            this.addExam = false
             this.knowledgePointIndex++
           } else {
             this.$toast(res.msg)

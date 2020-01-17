@@ -661,8 +661,6 @@
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          // "belongSchoolId": this.$store.getters.schoolId,
-          "belongSchoolId": '',
           subjectType: this.masterFilterParams.subjectType,
           classGrade: this.masterFilterParams.classGrade,
           startDate: this.$parent.filterTime.start,
