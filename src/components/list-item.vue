@@ -1,6 +1,6 @@
 <template>
   <van-swipe-cell class="list-item-wrap">
-    <div class="pd10">
+    <div class="pd10 list-item-wrap__ctn">
       <div class="badge">
         <slot name="badge"></slot>
       </div>
@@ -64,6 +64,12 @@ export default {
 
 <style lang="less" scoped>
 .list-item-wrap {
+  &__ctn {
+    height: 136px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
   .content {
     margin-top: 15px;
     margin-bottom: -10px;
@@ -90,6 +96,7 @@ export default {
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 20px;
+    flex: 0 0 20px;
   }
   .time {
     font-size: 10px;

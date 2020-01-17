@@ -300,6 +300,8 @@
           roleType: 'A03',
           termType: '',
           ...this.$route.query,
+          beignDate: this.$route.query.startDate + ' 00:00:00',
+          endDate: this.$route.query.endDate + ' 23:59:59',
           subjectType: item.subjectType,
         };
         let params = {
@@ -673,6 +675,8 @@
           roleType: 'A03',
           termType: '',
           ...this.$route.query,
+          beignDate: this.$route.query.startDate + ' 00:00:00',
+          endDate: this.$route.query.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           "schoolId": this.$route.query.belongSchoolId,
         };

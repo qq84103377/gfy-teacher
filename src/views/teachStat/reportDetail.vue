@@ -261,7 +261,8 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
-          beignDate: this.filterParams.startDate,
+          beignDate: this.filterParams.startDate + ' 00:00:00',
+          endDate: this.filterParams.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -403,7 +404,8 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
-          beignDate: this.filterParams.startDate,
+          beignDate: this.filterParams.startDate + ' 00:00:00',
+          endDate: this.filterParams.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
