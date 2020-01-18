@@ -65,7 +65,7 @@ export default {
 <style lang="less" scoped>
 .list-item-wrap {
   &__ctn {
-    height: 136px;
+    /*height: 136px;*/
     display: flex;
     justify-content: space-between;
     flex-direction: column;

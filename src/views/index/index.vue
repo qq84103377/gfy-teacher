@@ -54,10 +54,12 @@
         <span class="blue fs12" v-show="taskList && taskList.length>0" @click="$router.push(`/unfinishTaskList`)">查看更多></span>
 
       </div>
-      <van-skeleton :row="3" :loading="loading">
+      <van-skeleton :row="11" :loading="loading" :row-width="['40%','100%','100%','40%','100%','100%','40%','100%','100%','40%','100%']">
         <div v-if="!taskList||taskList.length==0" style="text-align: center;color:#999999;font-size: 14px" class="index-content-wrap__body__unfinish-wrap">
-          <img class="null-tips" src="../../assets/img/index/unfinish_task_empty.png" alt />
-          <span>当前没有未结束的任务～</span>
+          <div class="fix-height">
+            <img style="width: 100%;" src="../../assets/img/index/unfinish_task_empty.png" alt />
+            <span>当前没有未结束的任务～</span>
+          </div>
         </div>
         <div v-else v-for="item in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
           <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
@@ -781,6 +783,14 @@ export default {
       border-radius: 5px;
       margin-bottom: 10px;
       overflow-x: hidden;
+      .fix-height {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 10px 0;
+      }
     }
     .divider-title {
       margin: 30px 0 15px;
@@ -805,10 +815,5 @@ export default {
       }
     }
   }
-}
-.null-tips {
-  margin-left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
 }
 </style>

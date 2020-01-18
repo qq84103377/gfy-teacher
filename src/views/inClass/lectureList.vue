@@ -12,7 +12,7 @@
                      @down="moveItem(item.ClassTeachingData,index,1)" :can-slide="true" :up="index>0"
                      :top="list.length > 1 && index > 0" :down="(list.length - 1) > index"
                       @top="topItem(item.ClassTeachingData,index)">
-            <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item.ClassTeachingData)"></i></div>
+            <div slot="cover" class="cover" :style="{background:['icon-video','icon-audio'].includes(handleIcon(item.ClassTeachingData))?'#67E0A3':'#f3d233'}"><i class="iconGFY" :class="handleIcon(item.ClassTeachingData)"></i></div>
 <!--            item.ClassTeachingData.seqId-->
             <div slot="desc">
               <div class="desc-top">
@@ -229,8 +229,10 @@ export default {
           return 'icon-pdf'
         } else if (t == 'jpg' || t == 'png' || t == 'jpeg') {
           return 'icon-img'
-        } else if (t == 'mp4' || t == 'mp3') {
+        } else if (t == 'mp4') {
           return 'icon-video'
+        } else if (t == 'mp3') {
+          return 'icon-audio'
         }
       } else {
         //试卷
@@ -240,6 +242,8 @@ export default {
     async onLoad() {
       this.currentPage++
       if (this.currentPage > this.total && this.currentPage > 1) {
+        //由于多了renderFlag,页码不减一会出问题
+        this.currentPage--
         return
       }
       this.getList()
@@ -299,7 +303,6 @@ export default {
     overflow-y: auto;
 
     .cover {
-      background: #f3d233;
       display: flex;
       align-items: center;
       justify-content: center;

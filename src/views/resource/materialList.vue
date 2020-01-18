@@ -16,7 +16,7 @@
               </div>
               <div class="desc-bottom">
                 <div><i class="iconGFY icon-feather"></i>{{item.belongAccountName}}</div>
-                <div><i class="iconGFY icon-download"></i>{{item.downCount}}</div>
+                <div><i class="iconGFY icon-download"></i>{{item.downCount||0}}</div>
                 <div><i class="iconGFY icon-points"></i>{{item.useCount || 0}}</div>
                 <div><i class="iconGFY icon-star"></i>{{item.collectCount || 0}}</div>
               </div>
@@ -226,8 +226,10 @@
           t = 'icon-pdf'
         } else if (t == 'jpg' || t == 'png' || t == 'jpeg' || t == 'gif') {
           t = 'icon-img'
-        } else if (t == 'mp4' || t == 'mp3') {
+        } else if (t == 'mp4') {
           t = 'icon-video'
+        } else if (t == 'mp3') {
+          t = 'icon-audio'
         } else {
           // t = 'unkown'
         }
