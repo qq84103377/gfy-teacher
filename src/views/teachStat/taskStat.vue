@@ -652,13 +652,13 @@
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          subjectTypeList: this.filterParams.subjectType,
+          subjectTypeList: this.masterFilterParams.subjectType,
           beginDate: this.$parent.filterTime.start + ' 00:00:00',
           endDate: this.$parent.filterTime.end + ' 23:59:59',
           pageSize: '999',
           currentPage: 1,
           accountNo,
-          classIdList: this.filterParams.classId,
+          classIdList: this.masterFilterParams.classId,
         };
         let params = {
           requestJson: JSON.stringify(obj)
@@ -680,7 +680,6 @@
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
           subjectType: this.masterFilterParams.subjectType,
           classGrade: this.masterFilterParams.classGrade,
           startDate: this.$parent.filterTime.start,
@@ -688,6 +687,7 @@
           pageSize: '999',
           currentPage: 1,
           classIds: this.masterFilterParams.classId,
+          schoolIds: this.$store.getters.schoolIdList
         };
         let params = {
           requestJson: JSON.stringify(obj)

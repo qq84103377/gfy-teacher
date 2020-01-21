@@ -60,9 +60,9 @@
           this.$store.commit("setTchCourseInfo", this.list[this.radio].tchCourseInfo)
           this.$store.commit("setTaskClassInfo", '')
           if(this.listKey === 'exam') {
-            this.$router.push(`/addTask?type=exam&_t=new`)
+            this.$router.push(`/addTask?type=exam&_t=new&isRes=1`)
           }else {
-            this.$router.push(`/addTask?type=${this.listKey}&_t=new`)
+            this.$router.push(`/addTask?type=${this.listKey}&_t=new&isRes=1`)
           }
         }else {
           this.$store.commit('setVanLoading',true)

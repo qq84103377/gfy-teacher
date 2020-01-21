@@ -47,6 +47,8 @@ export default {
 </script>
 
 <style lang="less">
+@import 'vant/lib/index.css';
+@import "vant/lib/icon/local.css";
 @import "./assets/style/reset.less";
 @import "./assets/style/common.less";
 @import "./assets/style/icon.less";

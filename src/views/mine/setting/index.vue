@@ -100,14 +100,14 @@ export default {
       }, false)
     },
     checkVersion() {
-      if(this.checkDone) {
+      if (this.checkDone) {
         if (!this.hasNew) {
           // 没有新版本
           this.$toast.fail("当前已是最新版本哦");
           return;
         }
         this.showUpgrade = true; //显示升级弹框
-      }else {
+      } else {
         let platform = device.platform;
         console.log(platform);
         this.checkUpgrade(platform);
@@ -132,8 +132,8 @@ export default {
       var fileTransfer = new FileTransfer();
       fileTransfer.onprogress = function (progressEvent) {
         if (progressEvent.lengthComputable) {
-          _this.loaded = progressEvent.loaded/1024/1024;
-          _this.total = progressEvent.total/1024/1024;
+          _this.loaded = (progressEvent.loaded / 1024 / 1024).toFixed(2);
+          _this.total = (progressEvent.total / 1024 / 1024).toFixed(2);
           console.log('下载进度：', _this.loaded + '/' + _this.total);
           let downloadProgress =
             (progressEvent.loaded / progressEvent.total) * 100;
@@ -175,7 +175,7 @@ export default {
      * 检测升级方法
      */
     checkUpgrade(platformType) {
-      this.$store.commit('setVanLoading',true)
+      this.$store.commit('setVanLoading', true)
       var _this = this;
       console.log("设备类型：" + platformType);
       var appName = "教师app";
@@ -203,7 +203,7 @@ export default {
         .getLatestModuleVerion({ requestJson: JSON.stringify(param) })
         .then(
           response => {
-            this.$store.commit('setVanLoading',false)
+            this.$store.commit('setVanLoading', false)
             _this.checkDone = true
             if (response != null && response.flag) {
               _this.releasePath = response.data[0].versionRecord.downloadUrl;
@@ -219,7 +219,7 @@ export default {
                 let flag = _this.compareVersion(version, serverVersion);
                 if (!flag) {
                   _this.uploadDetail =
-                      response.data[0].versionRecord.uploadDetail;
+                    response.data[0].versionRecord.uploadDetail;
                   // _this.showUpgrade = true; //显示升级弹框
                   _this.tips = serverVersion;
                   _this.hasNew = true;
@@ -243,7 +243,7 @@ export default {
                     //   //_this.$toast.fail("取消升级");
                     // });
                   }
-                }else {
+                } else {
                   _this.$toast.fail("当前已是最新版本哦");
                 }
               });
@@ -274,9 +274,9 @@ export default {
         console.log("Android升级");
         this.progress = true;
         this.upgradeForAndroid();
-      } else if (platform == "iOS"){
+      } else if (platform == "iOS") {
         console.log("iOS升级");
-        if (that.releasePath){
+        if (that.releasePath) {
           that.$toast.fail("下载地址为空！");
         }
         let ref = cordova.InAppBrowser.open(that.releasePath, '_blank', 'location=yes')

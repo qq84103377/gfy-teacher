@@ -18,7 +18,7 @@
           <div v-if="!$route.query.fromTask" class="aic">
             <div v-if="si>0" class="set-point" @click="updateTestPaperSectonIndex(0,si)">上移</div>
             <div v-if="si<list.length-1" class="set-point" @click="updateTestPaperSectonIndex(1,si)">下移</div>
-            <div class="set-point" @click="setSectionPoint(section,si)">设置分数</div>
+            <div v-if="!$route.query.fromLec" class="set-point" @click="setSectionPoint(section,si)">设置分数</div>
           </div>
         </div>
         <question-item :up="ei>0" :down="ei<section.sectionExamList.length-1" :is-send="$route.query.fromTask"
@@ -32,7 +32,7 @@
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-    <exam-bar ref="examBar" v-if="!$route.query.fromTask" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
+    <exam-bar ref="examBar" v-if="!$route.query.fromTask && !$route.query.fromLec" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
             :canAddCourse="$route.query.flag==1" :can-select="true"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
@@ -87,7 +87,6 @@
 
       }
     },
-
     /**
      * $route.query.flag 是否能选择添加到课程(只有资源中心的试题详情和错题本试题详情和未结束任务的试卷详情才能显示)
      */
@@ -142,9 +141,40 @@
       },
       updateTestPaperSectonIndex(type, index) {
         // if (this.isOther) {
-        this.isModify = true
+        if(this.$route.query.fromLec) {
+          let obj = {
+            "interUser": "runLfb",
+            "interPwd": "25d55ad283aa400af464c76d713c07ad",
+            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+            "belongSchoolId": this.$store.getters.schoolId,
+            "testPaperId": this.$route.query.testPaperId,
+            "testPaperExamInfoList": [{
+              "sectionType": this.list[index].testPaperSectionInfo.sectionType,
+              "sectionName": this.list[index].testPaperSectionInfo.sectionName,
+              "sectionIndex": this.list[index + (type ? 1 : -1)].testPaperSectionInfo.sectionIndex,
+            }, {
+              "sectionType": this.list[index + (type ? 1 : -1)].testPaperSectionInfo.sectionType,
+              "sectionName": this.list[index + (type ? 1 : -1)].testPaperSectionInfo.sectionName,
+              "sectionIndex": this.list[index].testPaperSectionInfo.sectionIndex,
+            }]
+          }
+          let params = {
+            requestJson: JSON.stringify(obj)
+          }
+          updateTestPaperSectonIndex(params).then(res => {
+            if (res.flag) {
+              this.$toast('修改成功')
+              this.getDetail()
+            } else {
+              this.$toast(res.msg)
+            }
+          })
+        }else {
+          this.isModify = true
           this.list = this.swapArray(this.list, index, index + (type ? 1 : -1))
           this.selectList = this.swapArray(this.selectList, index, index + (type ? 1 : -1))
+        }
+
           return
         // }
         /**
@@ -179,45 +209,50 @@
         })
       },
       handleMove(type, arr, index,sectionIndex) {
-        this.isModify = true
-        this.sectionIndex = sectionIndex
-        this.list[this.sectionIndex].sectionExamList = this.swapArray(this.list[this.sectionIndex].sectionExamList, index, index + (type ? 1 : -1))
-        this.selectList[this.sectionIndex].child = this.swapArray(this.selectList[this.sectionIndex].child, index, index + (type ? 1 : -1))
+         if(this.$route.query.fromLec) {
+           // type :  1-下移   0-上移
+           let obj = {
+             "interUser": "runLfb",
+             "interPwd": "25d55ad283aa400af464c76d713c07ad",
+             "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+             "belongSchoolId": this.$store.getters.schoolId,
+             "testPaperId": this.$route.query.testPaperId,
+             testPaperExamInfoList: [
+               {
+                 examId: arr[index].sectionExamInfo.examId,
+                 examIndex: arr[index + (type ? 1 : -1)].sectionExamInfo.examIndex,
+                 examScore: arr[index].sectionExamInfo.examScore
+               },
+               {
+                 examId: arr[index + (type ? 1 : -1)].sectionExamInfo.examId,
+                 examIndex: arr[index].sectionExamInfo.examIndex,
+                 examScore: arr[index + (type ? 1 : -1)].sectionExamInfo.examScore
+               },
+             ]
+           }
+           let params = {
+             requestJson: JSON.stringify(obj)
+           }
+           updateTestPaperExamScore(params).then(res => {
+             if (res.flag) {
+               this.$toast('修改成功')
+               this.getDetail()
+             } else {
+               this.$toast(res.msg)
+             }
+           })
+         }else {
+           this.isModify = true
+           this.sectionIndex = sectionIndex
+           this.list[this.sectionIndex].sectionExamList = this.swapArray(this.list[this.sectionIndex].sectionExamList, index, index + (type ? 1 : -1))
+           this.selectList[this.sectionIndex].child = this.swapArray(this.selectList[this.sectionIndex].child, index, index + (type ? 1 : -1))
+         }
+
         return
         /**
          * //由于需求变更,所有的改分/上下移/添加移除试题都不再修改原试卷,所以以下内容作废
          */
-        // type :  1-下移   0-上移
-        let obj = {
-          "interUser": "runLfb",
-          "interPwd": "25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          "testPaperId": this.$route.query.testPaperId,
-          testPaperExamInfoList: [
-            {
-              examId: arr[index].sectionExamInfo.examId,
-              examIndex: arr[index + (type ? 1 : -1)].sectionExamInfo.examIndex,
-              examScore: arr[index].sectionExamInfo.examScore
-            },
-            {
-              examId: arr[index + (type ? 1 : -1)].sectionExamInfo.examId,
-              examIndex: arr[index].sectionExamInfo.examIndex,
-              examScore: arr[index + (type ? 1 : -1)].sectionExamInfo.examScore
-            },
-          ]
-        }
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        updateTestPaperExamScore(params).then(res => {
-          if (res.flag) {
-            this.$toast('修改成功')
-            this.getDetail()
-          } else {
-            this.$toast(res.msg)
-          }
-        })
+
       },
       handleAdd(sectionIndex,examIndex,exam) {
         this.isModify = true
@@ -669,7 +704,7 @@ this.setPointShow = false
         }
       })
       })
-     
+
       next(false)
     } else if (this.clickItem&&this.clickItem.showTooltip) {
       this.list.forEach((element,i)=>{

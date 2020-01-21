@@ -44,6 +44,7 @@
         <div class="form-footer fs10">
           <span @click="$toast.fail('敬请期待')">注册帮助</span>
           <span class="van-hairline--left" @click="$toast.fail('敬请期待')">随便看看</span>
+          <span class="van-hairline--left grey9">版本号V{{version}}</span>
         </div>
         <div class="fs10" v-if="!isApp" style="text-align: center">
           <!-- <p>Copyright<img src="../../assets/img/c.png" alt="">2017 高分云版权所有 </p> -->
@@ -599,7 +600,7 @@ export default {
         font-size: 18px;
         // margin-top: 45px;
         margin-top: 6.75vh;
-        
+
       }
 
 

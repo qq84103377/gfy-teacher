@@ -20,11 +20,11 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="courseList.length?(courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'):'当前没有课程,快去新建课程吧！'" @load="onLoad" :offset='80'>
-          <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="index" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
+          <list-item v-if="renderFlag" :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="`${item.taskId}${index}`" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchClassTastInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchClassTastInfo.length>2,'icon-arrow-grey':item.tchClassTastInfo.length<=2}"></i>
-                <span>班级查看</span>
+                <span>班级查看{{item.taskId}}</span>
               </div>
               <div @click="editTask(item)">
                 <i class="iconGFY icon-edit"></i>
@@ -71,6 +71,7 @@ export default {
   components: { listItem, dropdownHeader, editCourse },
   data() {
     return {
+      renderFlag: true,
       show: false,
       courseList: [],
       courseTaskList: [],
@@ -487,6 +488,10 @@ export default {
       setCourseTaskOrder(params).then(res => {
         if (res.flag) {
           this.courseTaskList[index] = this.courseTaskList.splice(type ? index + 1 : index - 1, 1, this.courseTaskList[index])[0]
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
           this.$toast(`${type ? '下' : '上'}移成功`)
         } else {
           this.$toast(res.msg)
@@ -506,6 +511,10 @@ export default {
       topCourseTask(params).then(res => {
         if (res.flag) {
           this.courseTaskList[index] = this.courseTaskList.splice(0, 1, this.courseTaskList[index])[0]
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
           this.$toast('置顶成功')
         } else {
           this.$toast(res.msg)
@@ -528,6 +537,10 @@ export default {
       deleteCourseTask(params).then(res => {
         if (res.flag) {
           this.courseTaskList.splice(index, 1)
+          this.renderFlag = false
+          this.$nextTick(() => {
+            this.renderFlag = true
+          })
           eventBus.$emit("indexEditTask")
           this.$toast('删除成功')
         } else {

@@ -91,7 +91,7 @@ export default {
       isQuestionType: this.$route.query.isQuestionType,
       isKnowledgePoint: this.$route.query.isKnowledgePoint,
       qesTypeName: this.$route.query.item?this.$route.query.item.examTypeName:'',
-      knowledgePoint:'知识点专项训练测试卷',
+      knowledgePoint:'',
       selectList: [], //添加的试题列表
       addInfo: {},
       correctInfo: {},
@@ -155,6 +155,10 @@ export default {
     }).catch(err => {
       this.$store.commit('setVanLoading', false)
     })
+
+    if (this.isKnowledgePoint) {
+      this.knowledgePoint='知识点专项训练测试卷'
+    }
   },
   beforeRouteLeave(to, from, next) {
 
@@ -561,7 +565,7 @@ export default {
         }).catch(err=>{
           this.$store.commit('setVanLoading', false)
         })
-      }else if (this.$route.query.isKnowledgePoint) {
+      }else if (this.isKnowledgePoint) {
         console.log("来自知识点专项");
         //知识点专项过来的
 

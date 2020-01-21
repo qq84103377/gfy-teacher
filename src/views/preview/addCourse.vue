@@ -1,10 +1,11 @@
 <template>
   <section class="add-course-wrap">
+    <van-overlay :show="showMask" @click="showMask = false" z-index="99" class-name="mask" style="background: transparent;" />
     <div class="add-course-wrap__body">
       <div class="name">
         <van-field label-class="gfy-label" label-width="12vw" required clearable label="名称:">
           <div slot="input" class="input-wrap">
-            <input maxlength="64" v-model="form.name" v-on:input="getSysCourseList" style="width: 100%" placeholder="请输入名称,字数在64字内" />
+            <input maxlength="64" v-model="form.name" @input="getSysCourseList" @focus="showMask = true" style="width: 100%" placeholder="请输入名称,字数在64字内" />
             <span class="num-tip">{{64 - form.name.length}}</span>
             <van-icon @click="form.name = ''" class="close" name="clear" />
           </div>
@@ -12,7 +13,7 @@
             筛选
           </div>
         </van-field>
-        <div class="search-wrap" v-show="showMask">
+        <div class="search-wrap" v-show="showMask" style="z-index: 100">
           <van-cell v-for="(item, index) in sysCourseList" :key="index" @click="selectCourse(index)">
             <div slot="title" class="aic jcsb search-wrap__item">
               <div class="search-wrap__item-title">
@@ -121,7 +122,7 @@
     </div>
     <!--<div class="mask"  v-show="showMask"></div>-->
 
-    <course-filter v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+    <course-filter ref="courseFilter" v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
   </section>
 </template>
 
@@ -200,6 +201,7 @@ export default {
         this.showMask = false
         this.isSelect = true
         this.currentShareCourse.courseId = ''
+        this.sysCourseList = []
       }
     }
   },
@@ -584,13 +586,13 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        "relationSeqId": this.form.course ? this.shareCourseList[this.form.course].sysCourseId : 0,
-        "sysCourseId": this.form.course ? this.shareCourseList[this.form.course].sysCourseId : 0,
-        "shareTchCourseId": this.form.course ? this.shareCourseList[this.form.course].tchCourseId : 0,
+        "relationSeqId":  this.shareCourseList.length?this.shareCourseList[this.form.course].sysCourseId:0,
+        "sysCourseId": this.shareCourseList.length?this.shareCourseList[this.form.course].sysCourseId:0,
+        "shareTchCourseId":this.shareCourseList.length?this.shareCourseList[this.form.course].tchCourseId:0,
         "courseName": this.form.name,
         "subjectType": localStorage.currentSubjectType,
         "courseType": "C01",
-        "termType": "T01",
+        "termType": this.$refs['courseFilter'].termTypeList[this.$refs['courseFilter'].termIndex],
         "shareType": "S01",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
         "classCount": this.result.length,
@@ -869,7 +871,7 @@ export default {
       width: 100%;
       top: 44px;
       left: 0;
-      z-index: 2;
+      z-index: 100;
       box-shadow: 0px 5px 9px 0px rgba(204, 204, 204, 1);
       border-radius: 0px 0px 10px 10px;
       max-height: 176px;

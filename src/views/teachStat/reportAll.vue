@@ -300,6 +300,8 @@
           roleType: 'A03',
           termType: '',
           ...this.$route.query,
+          beignDate: this.$route.query.startDate + ' 00:00:00',
+          endDate: this.$route.query.endDate + ' 23:59:59',
           subjectType: item.subjectType,
         };
         let params = {
@@ -673,6 +675,8 @@
           roleType: 'A03',
           termType: '',
           ...this.$route.query,
+          beignDate: this.$route.query.startDate + ' 00:00:00',
+          endDate: this.$route.query.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           "schoolId": this.$route.query.belongSchoolId,
         };
@@ -750,17 +754,32 @@
         })
       },
       init() {
-        this.subjectList = this.gradeList.find(v => this.$route.query.classGrade === v.classGrade).subject.map(v => {
-          return {
-            subjectName: getSubjectName(v),
-            subjectType: v,
-            kngArr: [],
-            kngChartShow: true,
-            showScoreChart: true,
-            statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
-            scoreInfo: {total: 0, maxDate: '', maxScore: 0, maxAvg: 0, minDate: '', minScore: 0, minAvg: 0, suggest: ''}
-          }
-        })
+        if(this.$route.query.isMaster == 1) {
+          this.subjectList = this.gradeList.find(v => this.$route.query.classGrade === v.classGrade).subject.map(v => {
+            return {
+              subjectName: getSubjectName(v),
+              subjectType: v,
+              kngArr: [],
+              kngChartShow: true,
+              showScoreChart: true,
+              statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
+              scoreInfo: {total: 0, maxDate: '', maxScore: 0, maxAvg: 0, minDate: '', minScore: 0, minAvg: 0, suggest: ''}
+            }
+          })
+        }else {
+          const arr = decodeURIComponent(this.$route.query.subject).split('/')
+          this.subjectList = arr.map(v => {
+            return {
+              subjectName: getSubjectName(v),
+              subjectType: v,
+              kngArr: [],
+              kngChartShow: true,
+              showScoreChart: true,
+              statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
+              scoreInfo: {total: 0, maxDate: '', maxScore: 0, maxAvg: 0, minDate: '', minScore: 0, minAvg: 0, suggest: ''}
+            }
+          })
+        }
       }
     }
   }

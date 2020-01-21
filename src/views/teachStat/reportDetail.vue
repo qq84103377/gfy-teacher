@@ -160,7 +160,8 @@
           {classGrade: 'G11', subject: ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09']},
           {classGrade: 'G12', subject: ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09']},
         ],
-        dataURL: ''
+        dataURL: '',
+        isMaster: false,
       }
     },
     computed: {
@@ -186,7 +187,12 @@
           this.common.goBack(this)
         },
       viewAll() {
-        this.$router.push(`/reportAll?stuName=${getStudentName(this.stuList[this.stuIndex].accountNo,this.stuList[this.stuIndex].classId)}&accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
+         let str = ''
+         if(!this.isMaster) {
+           str = this.subjectList.map(v => v.subjectType)
+           str = str.join('/')
+         }
+        this.$router.push(`/reportAll?subject=${encodeURIComponent(str)}&isMaster=${this.isMaster?1:0}&stuName=${getStudentName(this.stuList[this.stuIndex].accountNo,this.stuList[this.stuIndex].classId)}&accountNo=${this.stuList[this.stuIndex].accountNo}&classId=${this.stuList[this.stuIndex].classId}&classGrade=${this.filterParams.classGrade}&startDate=${this.filterParams.startDate}&endDate=${this.filterParams.endDate}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`)
       },
       createReport() {
         // let aa = document.createElement('div')
@@ -255,6 +261,8 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          beignDate: this.filterParams.startDate + ' 00:00:00',
+          endDate: this.filterParams.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -396,6 +404,8 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
+          beignDate: this.filterParams.startDate + ' 00:00:00',
+          endDate: this.filterParams.endDate + ' 23:59:59',
           subjectType: item.subjectType,
           accountNo: this.stuList[this.stuIndex].accountNo
         };
@@ -819,22 +829,46 @@
       },
       init() {
         this.subjectList = []
-        this.$nextTick(() => {
-          this.subjectList = this.gradeList.find(v => this.filterParams.classGrade === v.classGrade).subject.map(v => {
-            return {
-              subjectName: getSubjectName(v),
-              subjectType: v,
-              kngArr: [],
-              kngChartShow: true,
-              showScoreChart: true,
-              statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
-              scoreInfo: {total: 0, maxDate:'',maxScore:0,maxAvg:0,minDate:'',minScore:0,minAvg:0, suggest:''},
-              kngFold: false,
-              taskFold: false,
-              scoreFold: false,
-            }
-          })
-        })
+        //先判断选中的班级是否班主任
+          this.isMaster = JSON.parse(localStorage.classMap)[this.filterParams.classId].teacherInfoList.some(v => v.teacherType === 'T01' && v.subjectType !== 'S20')
+          if(this.isMaster) {
+            this.$nextTick(() => {
+              this.subjectList = this.gradeList.find(v => this.filterParams.classGrade === v.classGrade).subject.map(v => {
+                return {
+                  subjectName: getSubjectName(v),
+                  subjectType: v,
+                  kngArr: [],
+                  kngChartShow: true,
+                  showScoreChart: true,
+                  statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
+                  scoreInfo: {total: 0, maxDate:'',maxScore:0,maxAvg:0,minDate:'',minScore:0,minAvg:0, suggest:''},
+                  kngFold: false,
+                  taskFold: false,
+                  scoreFold: false,
+                }
+              })
+            })
+          }else {
+            //非班主任
+            this.$nextTick(() => {
+              const sub = JSON.parse(localStorage.classMap)[this.filterParams.classId].teacherInfoList.filter(v => v.subjectType !== 'S20')
+              this.subjectList = sub.map(v => {
+                return {
+                  subjectName: v.subjectName,
+                  subjectType: v.subjectType,
+                  kngArr: [],
+                  kngChartShow: true,
+                  showScoreChart: true,
+                  statInfo: {total: 0, finish: 0, percent: 0, taskArr: []},
+                  scoreInfo: {total: 0, maxDate:'',maxScore:0,maxAvg:0,minDate:'',minScore:0,minAvg:0, suggest:''},
+                  kngFold: false,
+                  taskFold: false,
+                  scoreFold: false,
+                }
+              })
+            })
+          }
+
       }
     },
     mounted() {
