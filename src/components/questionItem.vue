@@ -11,13 +11,11 @@
         <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
         <div v-html="child.title" class="html-img" @click="previewImg"></div>
         <div class="question-item-wrap__btn-group" style="justify-content: flex-end;padding-right: 0;">
-          <div class="btn-item" :class="{active:child.analyseShow}"
-               @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
+          <div class="btn-item" :class="{active:child.analyseShow}" @click="$set(child,'analyseShow',!child.analyseShow)">查看解析
           </div>
           <div v-if="!isSend&&!isQuestion&&!isLec" class="btn-item" @click="$emit('setPoint',childIndex)">设置分数</div>
         </div>
-        <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10 html-img" @click="previewImg"
-             style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
+        <div v-if="child.analyseShow" class="question-item-wrap__analyse mgb10 html-img" @click="previewImg" style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
           <div>正确答案及相关解析</div>
           <div>正确答案:</div>
           <div v-html="child.answer"></div>
@@ -42,8 +40,7 @@
           {{item.collectId?'取消':'添加'}}收藏
         </div>
         <div v-if="!isSend&&!isQuestion&&!isLec" class="btn-item" @click="$emit('setPoint')">设置分数</div>
-        <div v-if="!isSend&&!isLec" class="btn-item" :class="{active:item.isRemove}"
-             @click="handleAdd">
+        <div v-if="!isSend&&!isLec" class="btn-item" :class="{active:item.isRemove}" @click="handleAdd">
           {{!item.isRemove?'添加':'移除'}}试题
         </div>
       </div>
@@ -74,28 +71,29 @@
 </template>
 
 <script>
-  import {createCollectInfo, delCollectInfo} from '@/api/index'
-  import { Dialog } from 'vant';
-  import { ImagePreview } from "vant";
-  export default {
-    name: "questionItem",
-    props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item','isLec','showDel','showTooltip'],//isQuestion 是否试题页面适用  //isLec 讲义进来的试卷详情
-    data() {
-      return {
-        analyseShow: false,
-        tooltip: false,
-        collect: false
+import { createCollectInfo, delCollectInfo } from '@/api/index'
+import { Dialog } from 'vant';
+import { ImagePreview } from "vant";
+export default {
+  name: "questionItem",
+  props: ['isSend', 'index', 'isQuestion', 'up', 'down', 'item', 'isLec', 'showDel', 'showTooltip'],//isQuestion 是否试题页面适用  //isLec 讲义进来的试卷详情
+  data() {
+    return {
+      analyseShow: false,
+      tooltip: false,
+      collect: false
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      //去掉题目内容的audio下载按钮
+      let dom = this.$refs['title'].querySelectorAll('audio')
+      if (dom.length) {
+        dom[0].controlsList = "nodownload"
       }
-    },
-    mounted() {
-      this.$nextTick(() => {
-        //去掉题目内容的audio下载按钮
-        let dom = this.$refs['title'].querySelectorAll('audio')
-        if(dom.length) {
-          dom[0].controlsList="nodownload"
-        }
-      })
-    },
+    })
+  },
+  computed: {
     showDelDialog: {
       get() {
         return this.item.showDel
@@ -113,116 +111,117 @@
       }
     },
   },
-    methods: {
-      changeToolTip(show){
-        this.$emit('changeItem', this.item);
-        if(show){
-          console.log('showTooltip true');
-          this.$emit('update:showTooltip', true)
-        }else{
-          this.$emit('update:showTooltip', false)
 
-        }
+  methods: {
+    changeToolTip(show) {
+      this.$emit('changeItem', this.item);
+      if (show) {
+        console.log('showTooltip true');
+        this.$emit('update:showTooltip', true)
+      } else {
+        this.$emit('update:showTooltip', false)
 
-      },
-      confirmDel() {
-        this.$emit('update:showDel', false)
-        this.$set(this.item, 'isRemove', !this.item.isRemove)
-        this.$emit('add', !this.item.isRemove);
-      },
-      cancelDel() {
-        this.$emit('update:showDel', false)
-      },
-      previewImg($event) {
-        if ($event.target.nodeName == "IMG") {
-          console.log($event.target.src);
-          ImagePreview({
-            images: [$event.target.src],
-            // startPosition: 1,
-            onClose() {
-              // do something
-              console.log("close");
-            }
-          });
-        }
-      },
-      handleAdd() {
-        if(this.item.isRemove) {
-          Dialog.confirm({
-            title: '确定移除当前试题?'
-          }).then(() => {
-            this.$set(this.item, 'isRemove', !this.item.isRemove)
-            this.$emit('add', !this.item.isRemove);
-          }).catch(() => {
-            // on cancel
-          });
-        }else {
+      }
+
+    },
+    confirmDel() {
+      this.$emit('update:showDel', false)
+      this.$set(this.item, 'isRemove', !this.item.isRemove)
+      this.$emit('add', !this.item.isRemove);
+    },
+    cancelDel() {
+      this.$emit('update:showDel', false)
+    },
+    previewImg($event) {
+      if ($event.target.nodeName == "IMG") {
+        console.log($event.target.src);
+        ImagePreview({
+          images: [$event.target.src],
+          // startPosition: 1,
+          onClose() {
+            // do something
+            console.log("close");
+          }
+        });
+      }
+    },
+    handleAdd() {
+      if (this.item.isRemove) {
+        Dialog.confirm({
+          title: '确定移除当前试题?'
+        }).then(() => {
           this.$set(this.item, 'isRemove', !this.item.isRemove)
           this.$emit('add', !this.item.isRemove);
+        }).catch(() => {
+          // on cancel
+        });
+      } else {
+        this.$set(this.item, 'isRemove', !this.item.isRemove)
+        this.$emit('add', !this.item.isRemove);
+      }
+    },
+    handleCollect(v) {
+      if (!v) {
+        //添加收藏
+        let obj = {
+          "interUser": "value",
+          "interPwd": "value",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "resCollectInfo": {
+            "objectTypeCd": "C01",
+            "objectId": this.item.examId,
+            "collectType": "C01",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "statusCd": this.item.statusCd,
+            "subjectType": localStorage.currentSubjectType
+          },
+          "sysTypeCd": "S04"   //web传S02 app传S04
         }
-      },
-      handleCollect(v) {
-        if (!v) {
-          //添加收藏
-          let obj = {
-            "interUser": "value",
-            "interPwd": "value",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "resCollectInfo": {
-              "objectTypeCd": "C01",
-              "objectId": this.item.examId,
-              "collectType": "C01",
-              "accountNo": this.$store.getters.getUserInfo.accountNo,
-              "statusCd": this.item.statusCd,
-              "subjectType": localStorage.currentSubjectType
-            },
-            "sysTypeCd": "S04"   //web传S02 app传S04
-          }
-          let params = {
-            requestJson: JSON.stringify(obj)
-          }
-          createCollectInfo(params).then(res => {
-            if (res.flag) {
-              this.item.collectId = res.resCollectInfo.collectId
-              this.item.collectCount++
-              this.$toast('收藏成功')
-            } else {
-              this.$toast(res.msg)
-            }
-          })
-        } else {
-          //取消收藏
-          let obj = {
-            "interUser": "value",
-            "interPwd": "value",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "resCollectInfo": {
-              "collectId": this.item.collectId,
-              "objectTypeCd": "C01",
-              "objectId": this.item.examId,
-              "collectType": "C01",
-              "accountNo": this.$store.getters.getUserInfo.accountNo,
-              "statusCd": this.item.statusCd
-            },
-          }
-          let params = {
-            requestJson: JSON.stringify(obj)
-          }
-          delCollectInfo(params).then(res => {
-            if (res.flag) {
-              this.item.collectId = 0
-              this.item.collectCount--
-              this.$toast('取消收藏')
-            } else {
-              this.$toast(res.msg)
-            }
-          })
+        let params = {
+          requestJson: JSON.stringify(obj)
         }
+        createCollectInfo(params).then(res => {
+          if (res.flag) {
+            this.item.collectId = res.resCollectInfo.collectId
+            this.item.collectCount++
+            this.$toast('收藏成功')
+          } else {
+            this.$toast(res.msg)
+          }
+        })
+      } else {
+        //取消收藏
+        let obj = {
+          "interUser": "value",
+          "interPwd": "value",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "resCollectInfo": {
+            "collectId": this.item.collectId,
+            "objectTypeCd": "C01",
+            "objectId": this.item.examId,
+            "collectType": "C01",
+            "accountNo": this.$store.getters.getUserInfo.accountNo,
+            "statusCd": this.item.statusCd
+          },
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        delCollectInfo(params).then(res => {
+          if (res.flag) {
+            this.item.collectId = 0
+            this.item.collectCount--
+            this.$toast('取消收藏')
+          } else {
+            this.$toast(res.msg)
+          }
+        })
       }
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
