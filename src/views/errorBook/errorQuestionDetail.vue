@@ -6,13 +6,13 @@
       left-arrow>
     </van-nav-bar>
     <div class="error-question-detail__body">
-      <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true"
+      <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" @changeItem="changeItem" :is-question="true" 
                      :is-send="false" v-for="(item,index) in questionList" :key="index"
-                     :item="item" :index="index"></question-item>
+                     :item="item" :index="index" :showTooltip.sync='item.showTooltip'  :showDel.sync="item.showDel"></question-item>
     </div>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
-    <exam-bar type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
+    <exam-bar ref="examBar" type="error" v-model="selectList"  @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>
 
@@ -32,6 +32,7 @@
         correctInfo: {},
         correctShow: false,
         questionTypeList: [],
+      clickItem:'',
       }
     },
     watch: {
@@ -42,7 +43,63 @@
         deep: true
       }
     },
+    beforeRouteLeave(to, from, next) {
+    if (to.path !== '/errorBook') {
+      this.showDel = false
+      this.correctShow = false
+      this.filterShow2 = false
+      this.addExam = false
+      this.selectPop = false
+      next()
+      return
+    }
+    console.log(this.clickItem.showDel,'this.showDel')
+
+    // if (this.clickItem&&this.clickItem.showDel) {
+    //   this.questionList.some(ele=>{
+    //     if (ele.showDel) {
+    //       ele.showDel=false
+    //       return true
+    //     }
+    //   })
+    //   next(false)
+    // } else 
+    if (this.correctShow) {
+      this.correctShow = false
+      next(false)
+    }  else if (this.clickItem&&this.clickItem.showDel) {
+      this.questionList.some(ele=>{
+        if (ele.showDel) {
+          ele.showDel=false
+          return true
+        }
+      })
+      next(false)
+    } else if (this.clickItem&&this.clickItem.showTooltip) {
+      this.questionList.some(ele=>{
+        if (ele.showTooltip) {
+          ele.showTooltip=false
+          return true
+        }
+      })
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].filterShow) {
+      this.$refs['examBar'].filterShow = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].addExam) {
+      this.$refs['examBar'].addExam = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].selectPop) {
+      this.$refs['examBar'].selectPop = false
+      next(false)
+    } else {
+      next()
+    }
+  },
     methods: {
+      changeItem(item){
+        this.clickItem=item
+      },
    goBack(){
           this.common.goBack(this)
         },

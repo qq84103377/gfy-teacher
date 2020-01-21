@@ -233,9 +233,29 @@
           start: '',
           end: generateTimeReqestNumber(new Date()),
           type: true,   //true为开始
-        }
+        },
       }
     },
+     beforeRouteLeave(to, from, next) {
+    if (this.showTime) {
+      this.showTime=false
+      next(false)
+    } else if (this.masterGradePop) {
+      this.masterGradePop=false
+      next(false)
+    } else if (this.masterClassPop) {
+      this.masterClassPop = false
+      next(false)
+    } else if (this.gradePop) {
+      this.gradePop = false
+      next(false)
+    } else if (this.classPop) {
+      this.classPop = false
+      next(false)
+    } else {
+      next()
+    }
+  },
     methods: {
       changeFilter(isMaster) {
         this.isMaster = isMaster

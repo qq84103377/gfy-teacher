@@ -338,7 +338,7 @@ export default {
       info: [{}],
       imgUrl: "",
       activeIcon: require("../../../assets/img/icon-radio-active.png"),
-      inactiveIcon: require("../../../assets/img/icon-radio-disable.png")
+      inactiveIcon: require("../../../assets/img/icon-radio-disable.png"),
     };
   },
   watch: {
@@ -388,6 +388,17 @@ export default {
   },
   mounted() {
   },
+   beforeRouteLeave(to, from, next) {
+      if (this.showActionSheet) {
+        this.showActionSheet = false
+        next(false)
+      }else if (this.appraiseDialog) {
+        this.appraiseDialog = false
+        next(false)
+      } else{  
+      next();
+      }
+    },
   methods: {
     previewImg($event) {
       if ($event.target.nodeName == "IMG") {

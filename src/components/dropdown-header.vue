@@ -2,7 +2,7 @@
   <div class="dropdown-header van-hairline--bottom">
     <slot name="left"></slot>
     <van-dropdown-menu active-color="none" class="dropdown-btn">
-      <van-dropdown-item ref="dropdown" :title="courseName" :value="tchCourseId">
+      <van-dropdown-item @open='open' @close='close' ref="dropdown" :title="courseName" :value="tchCourseId">
         <div style="flex: 1;overflow-y: auto" class="pd10">
           <van-pull-refresh v-model="refLoad" @refresh="onRefresh">
             <van-list v-model="listLoad" :finished="finished" finished-text="没有更多了" @load="onLoad" :offset='80'>
@@ -35,6 +35,7 @@
             // refLoading: false,
             // listLoading: false,
             // finished: false,
+            showDrop:false
           }
       },
       computed: {
@@ -56,9 +57,17 @@
         },
       },
       methods:{
+        open(){
+          this.showDrop=true
+        },
+        close(){
+          this.$refs['dropdown'].toggle(false)
+          this.showDrop=false
+        },
         selectCourse(tchCourseInfo,index,resourceCount) {
           this.$emit('selectCourse',tchCourseInfo,index,resourceCount)
           this.$refs['dropdown'].toggle(false)
+          this.showDrop=false
         },
         onLoad() {
           this.$emit('onLoad')

@@ -49,7 +49,8 @@ export default {
       ],
       tempList: [],
       tempIndex: 0,
-      isChange: false
+      isChange: false,
+      showChangeDialog: false
     }
   },
   computed: {
@@ -158,6 +159,10 @@ export default {
 
   },
   methods: {
+    close() {
+      this.showChangeDialog=false
+      this.$dialog.close()
+    },
     // 获取该老师学科列表
     getSubjectList() {
       const classMap = JSON.parse(localStorage.classMap)
@@ -259,10 +264,12 @@ export default {
       if (item.check) return
 
       if (item.subjectType !== localStorage.currentSubjectType) {
+        this.showChangeDialog = true
         this.$dialog.confirm({
           title: '提示',
           message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换'
         }).then(() => {
+          this.showChangeDialog = false
           this.subjectList.forEach(v => {
             v.child.forEach(c => {
               this.$set(c, 'check', false)
@@ -279,7 +286,7 @@ export default {
           //   this.getExamSectionTypeRelation(item.subjectType)
           // }
         }).catch(() => {
-
+          this.showChangeDialog = false
         })
       } else {
         this.subjectList.forEach(v => {

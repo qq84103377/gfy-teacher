@@ -22,17 +22,17 @@
           </div>
         </div>
         <question-item :up="ei>0" :down="ei<section.sectionExamList.length-1" :is-send="$route.query.fromTask"
-                       @add="handleAdd(si,ei,exam)" v-for="(exam,ei) in section.sectionExamList" :key="ei"
+                       @add="handleAdd(si,ei,exam)" @changeItem="changeItem" v-for="(exam,ei) in section.sectionExamList" :key="ei"
                        @setPoint="setPoint($event,exam,si,ei)"
                        @move="handleMove($event,section.sectionExamList,ei,si)" :item="exam.examQuestion"
                        @correct="correctInfo=exam.examQuestion;correctShow=true"
-                       :index="si+'-'+ei">
+                       :index="si+'-'+ei" :showTooltip.sync='exam.examQuestion.showTooltip'  :showDel.sync="exam.examQuestion.showDel">
           <div slot="num">{{ei+1}}.本题{{exam.sectionExamInfo.examScore}}分</div>
         </question-item>
       </div>
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
-    <exam-bar v-if="!$route.query.fromTask" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
+    <exam-bar ref="examBar" v-if="!$route.query.fromTask" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
             :canAddCourse="$route.query.flag==1" :can-select="true"></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
@@ -87,6 +87,7 @@
 
       }
     },
+
     /**
      * $route.query.flag 是否能选择添加到课程(只有资源中心的试题详情和错题本试题详情和未结束任务的试卷详情才能显示)
      */
@@ -106,9 +107,13 @@
         sectionIndex: 0,  //章节
         examIndex: 0,  //大题
         isModify: false, //是否有修改过
+        clickItem:'',
       }
     },
     methods: {
+       changeItem(item){
+        this.clickItem=item
+      },
        goBack(){
           this.common.goBack(this)
         },
@@ -647,6 +652,48 @@
         next();
       }
     },
+     beforeRouteLeave(to, from, next) {
+
+     if (this.correctShow) {
+      this.correctShow = false
+      next(false)
+    } else if(this.setPointShow){
+this.setPointShow = false
+      next(false)
+    }else if (this.clickItem&&this.clickItem.showDel) {
+      this.list.forEach((element,i)=>{
+        element.sectionExamList.some(ele=>{
+        if (ele.examQuestion.showDel) {
+          ele.examQuestion.showDel=false
+          return true
+        }
+      })
+      })
+     
+      next(false)
+    } else if (this.clickItem&&this.clickItem.showTooltip) {
+      this.list.forEach((element,i)=>{
+        element.sectionExamList.some(ele=>{
+        if (ele.examQuestion.showTooltip) {
+          ele.examQuestion.showTooltip=false
+          return true
+        }
+      })
+      })
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].filterShow) {
+      this.$refs['examBar'].filterShow = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].addExam) {
+      this.$refs['examBar'].addExam = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].selectPop) {
+      this.$refs['examBar'].selectPop = false
+      next(false)
+    } else {
+    next();
+    }
+  },
   }
 </script>
 

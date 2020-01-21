@@ -118,7 +118,15 @@
           O12: 0,    //资源被使用
           O44: 0,    //上课
         },
-        isLoading: false
+        isLoading: false,
+      }
+    },
+     beforeRouteLeave(to, from, next) {
+      if (this.showTips) {
+        this.showTips = false
+        next(false)
+      } else{  
+      next();
       }
     },
     methods: {

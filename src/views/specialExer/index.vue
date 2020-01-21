@@ -53,11 +53,11 @@
 
     <filter-panel :label.sync="areaLabel" :visible.sync="areaFilterShow" :list.sync="area" :areaCode.sync="areaCode" :provinceCode.sync="provinceCode" :double='double'></filter-panel>
 
-    <year-subject-filter :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :active='active' :toggleNum='toggleNum1' :start.sync='startTypes' :onRefresh.sync='onRefresh1' :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
+    <year-subject-filter ref='yearSubject' :label.sync="typeSubjectLabel" :visible.sync="typeSubjectFilterShow" :active='active' :toggleNum='toggleNum1' :start.sync='startTypes' :onRefresh.sync='onRefresh1' :types.sync="typesList" :subjectType.sync='subjectType'></year-subject-filter>
 
     <version-filter :gradeTerm.sync="gradeTerm" :label.sync="versionLabel" :visible.sync="versionFilterShow" :courseIds.sync='courseIds' :subjectLabel.sync='typeSubjectLabel' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></version-filter>
 
-    <grade-subject-filter :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
+    <grade-subject-filter ref="gradeSubject" :label.sync="gradeSubjectLabel" :visible.sync="gradeSubjectShow" :active='active' :subjectType.sync='subjectType' :toggleNum='toggleNum2' :termType.sync='termType' :gradeItem.sync='gradeItem' :reviewtypeList.sync='reviewtypeList' :changeGradeSubject.sync='changeGradeSubject'></grade-subject-filter>
 
     <more-Filter :label.sync="reviewMoreLable" :visible.sync="reviewMoreShow" :yearList.sync='yearList' :reviewtypeList.sync='reviewtypeList' :yearItem.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :changeMore.sync='changeMore'></more-Filter>
 
@@ -191,8 +191,34 @@ export default {
     },
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs['body'].scrollTop
-    next();
+    if (this.$refs['gradeSubject']&&this.$refs['gradeSubject'].showChangeDialog) {
+      this.$refs['gradeSubject'].showChangeDialog = false
+      this.$refs['gradeSubject'].close()
+      next(false)
+    } else if (this.$refs['yearSubject']&&this.$refs['yearSubject'].showChangeDialog) {
+      this.$refs['yearSubject'].showChangeDialog = false
+      this.$refs['yearSubject'].close()
+      next(false)
+    } else if (this.areaFilterShow) {
+      this.areaFilterShow = false
+      next(false)
+    }else if (this.typeSubjectFilterShow) {
+      this.typeSubjectFilterShow = false
+      next(false)
+    } else if (this.versionFilterShow) {
+      this.versionFilterShow = false
+      next(false)
+    } else if (this.gradeSubjectShow) {
+      this.gradeSubjectShow = false
+      next(false)
+    } else if (this.reviewMoreShow) {
+      this.reviewMoreShow = false
+      next(false)
+    } else {
+      this.scrollTop = this.$refs['body'].scrollTop
+      next();
+    }
+
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -213,7 +239,7 @@ export default {
     },
     changeTab(active) {
       this.$refs["body"].scrollTop = 0
-      this.isLoading=false
+      this.isLoading = false
 
       if (active == 2) {
         this.getYearList()

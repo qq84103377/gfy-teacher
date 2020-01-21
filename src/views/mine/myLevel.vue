@@ -94,7 +94,15 @@
         loginCount: 0,
         createResource: 0,
         pubInfo: 0,
-        isLoading: false
+        isLoading: false,
+      }
+    },
+     beforeRouteLeave(to, from, next) {
+      if (this.showTips) {
+        this.showTips = false
+        next(false)
+      } else{  
+      next();
       }
     },
     methods: {

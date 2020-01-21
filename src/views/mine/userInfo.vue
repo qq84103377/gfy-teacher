@@ -147,6 +147,29 @@
         },
       };
     },
+      beforeRouteLeave(to, from, next) {
+      if (this.showActionSheet) {
+        this.showActionSheet = false
+        next(false)
+      } else if(this.showsubjectSheet){
+        this.showsubjectSheet = false
+        next(false)
+      } else if(this.showschoolSheet){
+        this.showschoolSheet = false
+        next(false)
+      } else if(this.showclassSheet){
+        this.showclassSheet = false
+        next(false)
+      } else if(this.showpostSheet){
+        this.showpostSheet = false
+        next(false)
+      } else if(this.showGenderPicker){
+        this.showGenderPicker = false
+        next(false)
+      }else{  
+      next();
+      }
+    },
     methods: {
       //获取学校信息
       getMySchoolInfo() {

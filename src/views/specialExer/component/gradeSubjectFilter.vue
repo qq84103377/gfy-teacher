@@ -47,7 +47,8 @@ export default {
       tempYearList: [],
       tempTermList: [],
       tempSubjectList: [],
-      subjectNow: ''
+      subjectNow: '',
+      showChangeDialog: false
     }
   },
   computed: {
@@ -102,6 +103,10 @@ export default {
 
   },
   methods: {
+    close() {
+      this.showChangeDialog=false
+      this.$dialog.close()
+    },
     // 重构 获取科目 年级 学期列表
     getLists() {
       const classMap = JSON.parse(localStorage.classMap)
@@ -182,6 +187,7 @@ export default {
 
     handleSelectSubject(item) {
       if (item.subjectType == localStorage.currentSubjectType) return
+      this.showChangeDialog = true
       this.$dialog
         .confirm({
           title: "提示",
@@ -190,6 +196,7 @@ export default {
           className: "change-subject"
         })
         .then(() => {
+          this.showChangeDialog = false
           // on confirm
           this.subjectList.forEach(v => {
             this.$set(v, 'active', false)
@@ -198,6 +205,7 @@ export default {
 
         })
         .catch(() => {
+          this.showChangeDialog = false
           // on cancel
         })
     },

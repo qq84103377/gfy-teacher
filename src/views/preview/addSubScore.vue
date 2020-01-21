@@ -60,6 +60,14 @@
     created() {
       this.handleList()
     },
+    beforeRouteLeave(to, from, next) {
+      if (this.scoreShow) {
+        this.scoreShow = false
+        next(false)
+      } else{  
+      next();
+      }
+    },
     methods: {
       saveRewardScore(score) {
         let accountArr = this.scoreSpan.reduce((t, v, i) => {

@@ -1,6 +1,6 @@
 <template>
   <section class="layer-task-list">
-    <dropdown-header v-if="!$route.query.tchCourseId" v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName"
+    <dropdown-header ref='dropdown' v-if="!$route.query.tchCourseId" v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName"
                      :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
@@ -65,8 +65,14 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-      this.scrollTop = this.$refs["body"].scrollTop;
+       if (this.$refs['dropdown']&&this.$refs['dropdown'].showDrop) {
+      this.$refs['dropdown'].showDrop = false
+      this.$refs['dropdown'].close()
+      next(false)
+    } else{
+    this.scrollTop = this.$refs["body"].scrollTop;
       next();
+    } 
     },
     beforeRouteEnter(to, from, next) {
       next(vm => {

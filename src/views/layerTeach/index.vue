@@ -164,7 +164,7 @@
         isEdit: false,
         scoreEditVisible: false,
         stuMoveVisible: false,
-        tempLayerList: []
+        tempLayerList: [],
       }
     },
     computed: {
@@ -193,6 +193,20 @@
         vanLoading: state => state.setting.vanLoading
       }),
     },
+     beforeRouteLeave(to, from, next) {
+    if (this.stuMoveVisible) {
+      this.stuMoveVisible = false
+      next(false)
+    } else if (this.scoreEditVisible) {
+      this.scoreEditVisible = false
+      next(false)
+    } else if (this.stuStatInfo.statDialog) {
+      this.stuStatInfo.statDialog = false
+      next(false)
+    } else{
+    next();
+    }
+  },
     methods: {
       editLayer() {
         this.isEdit = !this.isEdit

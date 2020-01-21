@@ -50,12 +50,17 @@ export default {
       finished: false,
       currentPage: 0,
       total: 0,
-      scrollTop: 0
+      scrollTop: 0,
     }
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
-    next();
+    if (this.popShow) {
+      this.popShow = false
+      next(false)
+    } else{
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {

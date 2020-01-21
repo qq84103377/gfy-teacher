@@ -10,9 +10,11 @@
 
     <div class="service-footer">
       <p>全朗高分云为您服务</p>
-      <van-button @click="handelClick" type="info">拨打</van-button>
+      <van-button @click="showDialog=true" type="info">拨打</van-button>
     </div>
     <a :href="`tel:${instructorInfo.contactNumber}`" ref="telBox" v-show="false"></a>
+    <van-dialog v-model="showDialog" :message='`${instructorInfo.contactNumber}`' show-cancel-button confirm-button-text='呼叫' confirm-button-color='#39F0DD' @cancel='cancel' @confirm='confirm'>
+    </van-dialog>
   </section>
 </template>
 
@@ -26,42 +28,54 @@
         instructorInfo: {
           name: '--',
           contactNumber: '--'
-        }
+        },
+        showDialog:false,
       }
     },
     beforeRouteLeave(to, from, next) {
-      this.$dialog.close();
+      if (this.showDialog) {
+        this.showDialog = false
+        next(false)
+      } else{  
       next();
+      }
     },
     methods: {
+      cancel(){
+        this.showDialog=false
+      },
+      confirm(){
+        this.showDialog=true
+        this.$refs["telBox"].click();
+      },
       handelClick() {
-        this.$dialog.confirm({
-          message: this.instructorInfo.contactNumber,
-          confirmButtonText: '呼叫',
-          confirmButtonColor: '#39F0DD'
-        }).then(() => {
-          // on confirm
-          console.log('呼叫电话');
-          this.$refs["telBox"].click();
-          // if ("cordova" in window) {
-          //   console.log('试试aapp呼叫电话')
-          //
-          //   this.$refs["telBox"].click();
-          //   /* window.plugins.CallNumber.callNumber(
-          //      function onSuccess(result) {
-          //        console.log("Success:call number" + result);
-          //      },
-          //      function onError(result) {
-          //        console.log("Error:call number" + result);
-          //      },
-          //      "18589082142", true);*/
-          //
-          // } else {
-          //   this.$refs["telBox"].click();
-          // }
-        }).catch(() => {
-          // on cancel
-        });
+        // this.$dialog.confirm({
+        //   message: this.instructorInfo.contactNumber,
+        //   confirmButtonText: '呼叫',
+        //   confirmButtonColor: '#39F0DD'
+        // }).then(() => {
+        //   // on confirm
+        //   console.log('呼叫电话');
+        //   this.$refs["telBox"].click();
+        //   // if ("cordova" in window) {
+        //   //   console.log('试试aapp呼叫电话')
+        //   //
+        //   //   this.$refs["telBox"].click();
+        //   //   /* window.plugins.CallNumber.callNumber(
+        //   //      function onSuccess(result) {
+        //   //        console.log("Success:call number" + result);
+        //   //      },
+        //   //      function onError(result) {
+        //   //        console.log("Error:call number" + result);
+        //   //      },
+        //   //      "18589082142", true);*/
+        //   //
+        //   // } else {
+        //   //   this.$refs["telBox"].click();
+        //   // }
+        // }).catch(() => {
+        //   // on cancel
+        // });
       },
       //获取学校信息
       getMySchoolInfo() {
@@ -100,6 +114,10 @@
   @deep: ~'>>>';
   .service {
     background-color: #F5F6FA;
+
+    @{deep} .van-dialog__message {
+    font-size: 16px;
+  }
 
     &-header {
       width: 138px;

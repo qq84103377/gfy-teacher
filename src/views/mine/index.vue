@@ -72,6 +72,9 @@
     />
     <cropper @finish="finish" :visible.sync="cropperData.visible" :img="cropperData.img"></cropper>
 
+       <van-dialog v-model="showLoginOut" message='确定退出登录？' show-cancel-button confirm-button-color='#39F0DD' confirm-button-text='取消' cancel-button-text='确定' @cancel='cancel' @confirm='confirm'>
+    </van-dialog>
+
   </section>
 </template>
 
@@ -151,7 +154,8 @@
         showActionSheet: false,
         blob: null,
         avatar: "",
-        loading: true
+        loading: true,
+        showLoginOut:false,
       };
     },
     components: {
@@ -162,10 +166,25 @@
         return "cordova" in window;
       }
     },
+     beforeRouteLeave(to, from, next) {
+      if (this.showLoginOut) {
+        this.showLoginOut = false
+        next(false)
+      } else{  
+      next();
+      }
+    },
     methods: {
+       cancel(){
+        this.showLoginOut=false
+        this.loginOut()
+      },
+      confirm(){
+        this.showLoginOut=false 
+      },
       jumpTo(url) {
         if (url == 'loginOut') {
-          this.loginOut();
+          this.showLoginOut=true;
         } else {
           this.$router.push(url)
         }
@@ -173,25 +192,25 @@
 
       // 退出登录
       loginOut() {
-        this.$dialog
-          .confirm({
-            title: "",
-            message: "确定退出登录吗？",
-            cancelButtonText: "确定",
-            confirmButtonText: "取消",
-            confirmButtonColor: '#39F0DD'
-          })
-          .then(() => {
-            // on confirm
-          })
-          .catch(() => {
-            // on cancel
+        // this.$dialog
+        //   .confirm({
+        //     title: "",
+        //     message: "确定退出登录吗？",
+        //     cancelButtonText: "确定",
+        //     confirmButtonText: "取消",
+        //     confirmButtonColor: '#39F0DD'
+        //   })
+        //   .then(() => {
+        //     // on confirm
+        //   })
+        //   .catch(() => {
+        //     // on cancel
             const loginInfo = JSON.parse(localStorage.loginInfo)
             localStorage.clear();
             localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
             this.$forceUpdate();
             this.$router.replace("/login");
-          });
+        //   });
       },
 
       //获取学校信息
@@ -462,6 +481,10 @@
     background: #f5f5f5;
     display: flex;
     flex-direction: column;
+
+      @{deep} .van-dialog__message {
+    font-size: 16px;
+  }
 
     &__header {
       height: 177px;

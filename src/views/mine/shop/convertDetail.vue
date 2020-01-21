@@ -69,11 +69,13 @@
             <span>兑换状态：</span>
             <span>{{recordDetail.status | getStatus}}</span>
             <span v-show="recordDetail.status == 'S01' || recordDetail.status=='S02'" class="btn"
-                  @click="cancelConvert">取消兑换</span>
+                  @click="showDialog=true">取消兑换</span>
           </div>
         </div>
       </div>
     </van-skeleton>
+       <van-dialog v-model="showDialog" message='是否取消兑换？' show-cancel-button confirm-button-color='#39F0DD' @cancel='cancel' @confirm='confirm'>
+    </van-dialog>
 
   </section>
 </template>
@@ -91,6 +93,7 @@
       return {
         recordDetail: null, // 记录详情
         loading: true,  // 是否显示骨架图
+        showDialog:false,
       }
     },
     filters: {
@@ -120,7 +123,22 @@
         }
       }
     },
+     beforeRouteLeave(to, from, next) {
+      if (this.showDialog) {
+        this.showDialog = false
+        next(false)
+      } else{  
+      next();
+      }
+    },
     methods: {
+       cancel(){
+        this.showDialog=false
+      },
+      confirm(){
+        this.showDialog=false
+        this.cancelConvert()
+      },
       // 获取兑换记录
       getConvertRecord() {
         let obj = {
@@ -143,16 +161,16 @@
       },
       // 取消兑换
       cancelConvert(status) {
-        this.$dialog
-          .confirm({
-            title: "",
-            message: "是否取消兑换？",
-            cancelButtonText: "取消",
-            confirmButtonText: "确定",
-            confirmButtonColor: '#39F0DD'
-          })
-          .then(() => {
-            // on confirm
+        // this.$dialog
+        //   .confirm({
+        //     title: "",
+        //     message: "是否取消兑换？",
+        //     cancelButtonText: "取消",
+        //     confirmButtonText: "确定",
+        //     confirmButtonColor: '#39F0DD'
+        //   })
+        //   .then(() => {
+        //     // on confirm
             let obj = {
               interUser: "runLfb",
               interPwd: "25d55ad283aa400af464c76d713c07ad",
@@ -172,11 +190,11 @@
                 this.$toast.fail(res.msg);
               }
             })
-          })
-          .catch(() => {
-            // on cancel
+        //   })
+        //   .catch(() => {
+        //     // on cancel
 
-          });
+        //   });
       }
     },
     mounted() {
@@ -191,6 +209,10 @@
 
   .convertDetail {
     background-color: #f5f5f5;
+
+      @{deep} .van-dialog__message {
+    font-size: 16px;
+  }
 
     @{deep}.van-skeleton__row, .van-skeleton__title {
       background-color: #eee;

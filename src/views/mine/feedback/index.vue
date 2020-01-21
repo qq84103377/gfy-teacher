@@ -15,7 +15,7 @@
         </van-col>
         <van-col span="23">
           <van-dropdown-menu>
-            <van-dropdown-item v-model="obj.problemType" :options="typeList"/>
+            <van-dropdown-item v-model="obj.problemType" :options="typeList" @open='open' @close='close' ref="dropdown" />
           </van-dropdown-menu>
         </van-col>
       </van-row>
@@ -235,10 +235,29 @@
           problemTitle: "",
           telOrQQ: "",
           problemType: ""
-        }
+        },
+         showDrop:false
       };
     },
+     beforeRouteLeave(to, from, next) {
+      if (this.showActionSheet) {
+        this.showActionSheet = false
+        next(false)
+      }else if (this.showDrop) {
+        this.close()
+        next(false)
+      }else{  
+      next();
+      }
+    },
     methods: {
+      open(){
+          this.showDrop=true
+        },
+        close(){
+          this.$refs['dropdown'].toggle(false)
+          this.showDrop=false
+        },
       // 预览图片
       previewImg($event) {
         if ($event.target.nodeName == "IMG") {

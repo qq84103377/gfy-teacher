@@ -1,13 +1,13 @@
 <template>
   <section class="preview-wrap">
-    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
+    <dropdown-header ref='dropdown' v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
       <div v-if="$route.query.from==='course'" slot="left" class="fs14" style="color: #16AAB7" @click="changeCourse(0)">上一课</div>
       <div v-else slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
       <!--      <div slot="right" ><i class="iconGFY icon-edit-blue"></i> 编辑</div>-->
       <div v-if="$route.query.from==='course'" slot="right" class="fs14" style="color: #16AAB7" @click="changeCourse(1)">下一课</div>
       <div v-else slot="right" class="preview-wrap-header-right">
         <van-dropdown-menu active-color="none" class="edit-btn">
-          <van-dropdown-item title="编辑" ref="dropdown" @open="open">
+          <van-dropdown-item title="编辑" ref="dropdown1" @open="open" @close='close'>
             <edit-course ref="editCourse" :is-edit="true" :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
           </van-dropdown-item>
         </van-dropdown-menu>
@@ -96,7 +96,8 @@ export default {
       currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //我的课程跳过来才有的
       scrollTop: 0,
       firstFlag: true,
-      tchCourseInfo: ''
+      tchCourseInfo: '',
+      showDrop:false
     }
   },
   mounted() {
@@ -116,8 +117,25 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
+     if (this.$refs['dropdown']&&this.$refs['dropdown'].showDrop) {
+      this.$refs['dropdown'].showDrop = false
+      this.$refs['dropdown'].close()
+      next(false)
+    } else if (this.$refs['editCourse']&&this.$refs['editCourse'].filterShow) {
+      this.$refs['editCourse'].filterShow = false
+      next(false)
+    } else if (this.$refs['editCourse']&&this.$refs['editCourse'].showTime) {
+      this.$refs['editCourse'].showTime = false
+      next(false)
+    } else if (this.showDrop) {
+      this.showDrop=false
+      this.$refs['dropdown1'].toggle(false)
+      next(false)
+    }else{
+     this.scrollTop = this.$refs["body"].scrollTop;
     next();
+    }
+    
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -129,18 +147,23 @@ export default {
   },
   methods: {
     viewResource() {
-      this.$router.push({path:`/resource`,query: {
+      this.$router.push({        path: `/resource`, query: {
           from: 'preview',
           currCourse: this.courseList[this.courseIndex]
-        }})
+        }      })
     },
     open() {
+      this.showDrop = true
       this.$nextTick(() => {
         this.$refs['editCourse'].courseChange()
       })
     },
+    close() {
+      this.showDrop = false
+    },
     async toggle(data, cancle) {
       this.$refs.dropdown.toggle()
+      this.showDrop = false
       if (cancle) return
       this.courseName = data
       await this.dropdownRefresh(true)

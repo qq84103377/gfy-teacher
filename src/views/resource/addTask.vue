@@ -285,6 +285,22 @@
         accountNo: this.$route.query.accountNo,
       }
     },
+     beforeRouteLeave(to, from, next) {
+
+    if (this.filterShow) {
+      this.filterShow = false
+      next(false)
+    } else if (this.courseFilterShow) {
+      this.courseFilterShow = false
+      next(false)
+    } else if (this.showTime) {
+      this.showTime = false
+      next(false)
+    } else{
+    next();
+    }
+   
+  },
     async mounted() {
       if (this.isReinforce) {
         //智能补强

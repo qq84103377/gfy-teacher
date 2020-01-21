@@ -1,6 +1,6 @@
 <template>
   <section class="resource-wrap">
-    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
+    <dropdown-header ref='dropdown' v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
 <!--      <div slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>-->
 <!--      <div slot="right" class="resource-wrap-header-right">-->
 <!--        <van-dropdown-menu active-color="none" class="edit-btn">-->
@@ -73,6 +73,15 @@ export default {
   computed: {
     currentSubjectType() {
       return localStorage.currentSubjectType
+    }
+  },
+   beforeRouteLeave(to, from, next) {
+     if (this.$refs['dropdown']&&this.$refs['dropdown'].showDrop) {
+      this.$refs['dropdown'].showDrop = false
+      this.$refs['dropdown'].close()
+      next(false)
+    }else{
+    next();
     }
   },
   methods: {

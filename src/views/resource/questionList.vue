@@ -62,7 +62,7 @@
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试题～'" @load="onLoad" :offset='80'>
           <!--          <div class="question-num">1.选择题</div>-->
-          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index" :item="item" :index="index" ></question-item>
+          <question-item @add="handleAdd($event,item)" @correct="correctInfo=item;correctShow=true" :is-question="true" :is-send="false" v-for="(item,index) in list" :key="index" :item="item" :index="index"  @changeItem="changeItem"  :showTooltip.sync='item.showTooltip'  :showDel.sync="item.showDel"></question-item>
         </van-list>
       </van-pull-refresh>
 
@@ -70,7 +70,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName' :knowledgePoint='knowledgePoint'></exam-bar>
+    <exam-bar ref="examBar"  @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName' :knowledgePoint='knowledgePoint' ></exam-bar>
   </section>
 </template>
 
@@ -126,6 +126,7 @@ export default {
       },
       scrollTop: 0,
       removeQuestionList: [], //试卷详情跳转到资源中心试题列表时,移除的试题需要记录起来,返回到试卷详情时要把移除的题目清理掉
+      clickItem:'',
     }
   },
   watch: {
@@ -156,11 +157,43 @@ export default {
     })
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
+
+     if (this.correctShow) {
+      this.correctShow = false
+      next(false)
+    } else if (this.clickItem&&this.clickItem.showDel) {
+      this.list.some(ele=>{
+        if (ele.showDel) {
+          ele.showDel=false
+          return true
+        }
+      })
+      next(false)
+    } else if (this.clickItem&&this.clickItem.showTooltip) {
+      this.list.some(ele=>{
+        if (ele.showTooltip) {
+          ele.showTooltip=false
+          return true
+        }
+      })
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].filterShow) {
+      this.$refs['examBar'].filterShow = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].addExam) {
+      this.$refs['examBar'].addExam = false
+      next(false)
+    } else if (this.$refs['examBar']&&this.$refs['examBar'].selectPop) {
+      this.$refs['examBar'].selectPop = false
+      next(false)
+    } else {
+        this.scrollTop = this.$refs["body"].scrollTop;
     if (this.$route.query.from === 'questionList') {
       this.$store.commit('setIsRevert', false)
     }
     next();
+    }
+  
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -178,6 +211,9 @@ export default {
     });
   },
   methods: {
+     changeItem(item){
+        this.clickItem=item
+      },
      goBack(){
           this.common.goBack(this)
         },

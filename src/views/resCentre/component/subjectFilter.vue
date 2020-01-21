@@ -187,7 +187,8 @@ export default {
       if (item.subjectType !== localStorage.currentSubjectType) {
         this.$dialog.confirm({
           title: '提示',
-          message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换'
+          message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
+          closeOnPopstate: true,
         }).then(() => {
           this.subjectList.forEach(v => {
             v.child.forEach(c => {

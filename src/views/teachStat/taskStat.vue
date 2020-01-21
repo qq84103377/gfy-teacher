@@ -267,13 +267,32 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-      if (to.path === '/teachStat/') {
+      
+    if (this.$parent.showTime) {
+      this.$parent.showTime=false
+      next(false)
+    } else if (this.$parent.masterGradePop) {
+      this.$parent.masterGradePop=false
+      next(false)
+    } else if (this.$parent.masterClassPop) {
+      this.$parent.masterClassPop = false
+      next(false)
+    } else if (this.$parent.gradePop) {
+      this.$parent.gradePop = false
+      next(false)
+    } else if (this.$parent.classPop) {
+      this.$parent.classPop = false
+      next(false)
+    } else {
+       if (to.path === '/teachStat/') {
         //当返回至教学统计页面时,需要将筛选条件切换为非班主任的
         this.$emit('changeFilter',false)
         next()
       }else {
         next()
       }
+    }
+  
     },
     computed: {
       filterParams() {
@@ -309,7 +328,7 @@
       },
     },
     created() {
-
+      console.log(this.$parent,"?")
     },
     mounted() {
       this.getData(1)

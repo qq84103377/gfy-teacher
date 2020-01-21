@@ -1,6 +1,6 @@
 <template>
   <section class="in-class-wrap">
-    <dropdown-header v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName"
+    <dropdown-header ref='dropdown' v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName"
                      :tch-course-id="tchCourseId"
                      :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading"
                      :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh"
@@ -71,6 +71,16 @@
         this.getCount(this.tchCourseId)
       }
     },
+     beforeRouteLeave(to, from, next) {
+    if (this.$refs['dropdown']&&this.$refs['dropdown'].showDrop) {
+      this.$refs['dropdown'].showDrop = false
+      this.$refs['dropdown'].close()
+      next(false)
+    } else{  
+    next();
+    }
+  },
+    
     methods: {
       getCount(tchCourseIdSelect) {
         this.$store.commit('setVanLoading', true)

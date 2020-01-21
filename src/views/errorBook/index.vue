@@ -26,7 +26,7 @@
     </div>
 
     <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
-    <exam-bar type="error" v-model="selectList" :selectPop.sync="selectPop" :addExam.sync="addExam" :filterShow.sync="filterShow2" @clear="clear" :can-add-course="true"></exam-bar>
+    <exam-bar ref="examBar" type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>
 
@@ -64,10 +64,9 @@ export default {
       selectList: this.$store.getters.getErrorBookSelected,
       selectCourseList: [],
       questionTypeList: [],
-      locationUrl: window.location.href,
-      selectPop: false,
-      addExam: false,
-      filterShow2: false,
+      // selectPop: false,
+      // addExam: false,
+      // filterShow2: false,
     }
   },
   watch: {
@@ -103,16 +102,16 @@ export default {
     }
     if (this.filterShow) {
       this.filterShow = false
-      window.history.pushState(null, null, this.locationUrl)
-    } else if (this.filterShow2) {
-      this.filterShow2 = false
-      window.history.pushState(null, null, this.locationUrl)
-    } else if (this.addExam) {
-      this.addExam = false
-      window.history.pushState(null, null, this.locationUrl)
-    } else if (this.selectPop) {
-      this.selectPop = false
-      window.history.pushState(null, null, this.locationUrl)
+      next(false)
+    } else if (this.$refs['examBar'].filterShow) {
+      this.$refs['examBar'].filterShow = false
+      next(false)
+    } else if (this.$refs['examBar'].addExam) {
+      this.$refs['examBar'].addExam = false
+      next(false)
+    } else if (this.$refs['examBar'].selectPop) {
+      this.$refs['examBar'].selectPop = false
+      next(false)
     } else {
       if (to.path === '/index') {
         //去首页 需要清空储存的值

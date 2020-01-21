@@ -114,6 +114,28 @@
     mounted() {
       // this.init()
     },
+     beforeRouteLeave(to, from, next) {
+      
+    if (this.$parent.showTime) {
+      this.$parent.showTime=false
+      next(false)
+    } else if (this.$parent.masterGradePop) {
+      this.$parent.masterGradePop=false
+      next(false)
+    } else if (this.$parent.masterClassPop) {
+      this.$parent.masterClassPop = false
+      next(false)
+    } else if (this.$parent.gradePop) {
+      this.$parent.gradePop = false
+      next(false)
+    } else if (this.$parent.classPop) {
+      this.$parent.classPop = false
+      next(false)
+    } else {
+        next()
+    }
+  
+    },
     methods: {
       showSelectKnw(item) {
         if(this.isClass) {

@@ -628,6 +628,26 @@
         this.courseList = []
       },
     },
+    beforeRouteLeave(to, from, next) {
+    if (this.subjectFilterShow) {
+      this.subjectFilterShow=false
+      next(false)
+    } else if (this.versionFilterShow) {
+      this.versionFilterShow = false
+      next(false)
+    } else if (this.areaFilterShow) {
+      this.areaFilterShow = false
+      next(false)
+    } else if (this.resCourseFilterShow) {
+      this.resCourseFilterShow = false
+      next(false)
+    } else if (this.addCourseShow) {
+      this.addCourseShow = false
+      next(false)
+    } else {
+      next()
+    }
+  },
     created() {
       this.checkPlatform()
       this.$store.commit('setErrorBookQuestionCourse', [])

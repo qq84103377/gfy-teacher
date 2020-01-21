@@ -75,7 +75,15 @@
         groupList: JSON.parse(JSON.stringify(this.$route.params.groupList)),
         visible: false,
         stuInfo: {},
-        btnLoading: false
+        btnLoading: false,
+      }
+    },
+    beforeRouteLeave(to, from, next) {
+      if (this.visible) {
+        this.visible = false
+        next(false)
+      }else{  
+      next();
       }
     },
     methods: {

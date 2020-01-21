@@ -154,8 +154,13 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
+    if (this.popShow) {
+      this.popShow=false
+      next(false)
+    } else {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {

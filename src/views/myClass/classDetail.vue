@@ -107,7 +107,7 @@
         groupList: [{tchClassSubGroupStudent: {tchClassSubGroup: {}, tchSubGroupStudent: []}}],
         classTeacherList: [],
         visible: false,
-        stuInfo: {}
+        stuInfo: {},
       }
     },
     created() {
@@ -118,6 +118,17 @@
       Promise.all([this.getSubGroupStudent()]).then(res => {
         this.$store.commit('setVanLoading', false)
       })
+    },
+     beforeRouteLeave(to, from, next) {
+      if (this.visible) {
+        this.visible = false
+        next(false)
+      }else if (this.teacherGroupShow) {
+        this.teacherGroupShow = false
+        next(false)
+      } else{  
+      next();
+      }
     },
     methods: {
        goBack(){

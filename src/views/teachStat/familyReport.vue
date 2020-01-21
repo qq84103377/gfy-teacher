@@ -130,9 +130,23 @@
           start: '',
           end: generateTimeReqestNumber(new Date()),
           type: true,   //true为开始
-        }
+        },
       }
     },
+      beforeRouteLeave(to, from, next) {
+    if (this.gradePop) {
+      this.gradePop=false
+      next(false)
+    } else if (this.classPop) {
+      this.classPop=false
+      next(false)
+    } else if (this.showTime) {
+      this.showTime = false
+      next(false)
+    } else {
+      next()
+    }
+  },
     methods: {
       viewDetail(item, index) {
         this.$router.push({

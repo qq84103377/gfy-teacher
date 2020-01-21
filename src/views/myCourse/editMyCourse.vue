@@ -1,5 +1,5 @@
 <template>
-  <edit-course :is-edit="true" :is-from-course='true' :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
+  <edit-course ref="editCourse" :is-edit="true" :is-from-course='true' :editCourseInfo.sync="currentTchCourseInfo" class="editClass" @onFinish='toggle'></edit-course>
 </template>
 
 <script>
@@ -16,6 +16,14 @@ export default {
   },
   created() {
     this.currentTchCourseInfo = this.$route.query.currentTchCourseInfo
+  },
+   beforeRouteLeave(to, from, next) {
+    if (this.$refs['editCourse']&&this.$refs['editCourse'].showTime) {
+      this.$refs['editCourse'].showTime = false
+      next(false)
+    } else{
+    next();
+    }
   },
   methods: {
     toggle() {

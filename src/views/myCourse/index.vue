@@ -61,8 +61,13 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
+    if (this.filterShow) {
+      this.filterShow = false
+      next(false)
+    } else{
+     this.scrollTop = this.$refs["body"].scrollTop;
     next();
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
