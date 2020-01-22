@@ -80,15 +80,24 @@
     </van-pull-refresh>
     <van-popup v-model="showTips" :round="true">
       <div class="title">
-        <h4>如何获取朗币?</h4>
+        <h4>如何赚取朗币?</h4>
         <span @click="showTips = false">×</span>
       </div>
       <div class="content">
-        <p>1、通过登录，每天的首次登录可以获得3个积分</p>
-        <p>2、通过创建课程，每个课件获得3个积分</p>
-        <p>3、通过创建任务，每个课程任务获得2个积分</p>
-        <p>4、通过他人使用您的资源，可以获得2个积分</p>
-        <p>5、获得的积分系统自动转换为朗币，10个积分可以转为一个朗币</p>
+        <h3>登录</h3>
+        <p>通过登录，每天的首次登录获得3个积分</p>
+
+        <h3>创建课程</h3>
+        <p>通过创建课程，每个课件获得3个积分</p>
+
+        <h3>创建任务</h3>
+        <p>通过创建任务，每个任务获得2个积分</p>
+
+        <h3>资源被使用</h3>
+        <p>通过他人使用您的资源，可以获得2个积分</p>
+
+        <h3>积分转换</h3>
+        <p>获得的积分系统自动转换为朗币，10个积分可以转为1个朗币</p>
       </div>
     </van-popup>
   </section>
@@ -125,7 +134,7 @@
       if (this.showTips) {
         this.showTips = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
@@ -510,8 +519,8 @@
     }
 
     @{deep} .van-popup {
-      width: 308px;
-      height: 355px;
+      width: 306px;
+      height: 458px;
 
       .title {
         height: 58px;
@@ -543,11 +552,22 @@
 
       .content {
         padding: 0 20px;
+        h3{
+          font-size: 15px;
+          font-weight: 500;
+          border-left: 3px solid #39F0DD;
+          padding-left: 7px;
+          color: #000;
+          margin-bottom: 4px;
+        }
 
         p {
-          font-size: 15px;
-          line-height: 26px;
-          color: #000;
+          font-size: 14px;
+          line-height: 20px;
+          color: #333;
+          padding-left: 7px;
+          margin-bottom: 25px;
+
 
           &:last-child {
             color: red;
