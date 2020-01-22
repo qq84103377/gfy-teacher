@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有讲义，快去选择课件吧！'" @load="onLoad" :offset='80'>
-          <list-item v-if="renderFlag" @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;" @del="handleDelete(item.ClassTeachingData,index)"
+          <list-item ref='listItem' v-if="renderFlag" @clickTo="goto(item.ClassTeachingData)" class="mgt10" style="background: #fff;" @del="handleDelete(item.ClassTeachingData,index)" @clickDel='clickDel(index)'
                      v-for="(item,index) in list" :key="item.ClassTeachingData.seqId + '' + item.ClassTeachingData.resourceId"
                      :itemTitle="item.ClassTeachingData.name" @up="moveItem(item.ClassTeachingData,index,0)"
                      @down="moveItem(item.ClassTeachingData,index,1)" :can-slide="true" :up="index>0"
@@ -57,14 +57,18 @@ export default {
       currentPage: 0,
       total: 0,
       scrollTop: 0,
-      renderFlag: true
+      renderFlag: true,
+      clickIndex:0
     }
   },
   beforeRouteLeave(to, from, next) {
     if (this.popShow) {
       this.popShow = false
       next(false)
-    } else{
+    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&        this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
       this.scrollTop = this.$refs["body"].scrollTop;
       next();
     }
@@ -78,6 +82,9 @@ export default {
     });
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     topItem(item,index) {
       let obj = {
         "interUser": "runLfb",

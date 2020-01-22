@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="taskList.length>0?'没有更多了':'当前没有未结束任务～'" @load="onLoad" :offset='80'>
-          <list-item :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in taskList" @clickTo="goto(item)" :key="index" :can-slide="true" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo" @del="delTask(item,index)">
+          <list-item ref='listItem' :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in taskList" @clickTo="goto(item)" :key="index" :can-slide="true" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo" @del="delTask(item,index)"  @clickDel='clickDel(index)'>
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
@@ -46,12 +46,18 @@ export default {
       pageSize: 10,
       taskList: [],
       total: 0,
-      scrollTop: 0
+      scrollTop: 0,
+      clickIndex:0
     }
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
-    next();
+     if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
+      this.scrollTop = this.$refs["body"].scrollTop
+    next()
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -69,6 +75,9 @@ export default {
     })
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     viewStat(item) {
       this.$store.commit('setVanLoading', true)
       //估计后台字段任务名称写错了

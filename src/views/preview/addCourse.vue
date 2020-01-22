@@ -208,7 +208,10 @@ export default {
   components: { courseFilter },
 
   beforeRouteLeave(to, from, next) {
-    if (this.filterShow) {
+    if (this.$refs['courseFilter']&&this.$refs['courseFilter'].showChangeDialog) {
+      this.$refs['courseFilter'].close()
+      next(false)
+    } else if (this.filterShow) {
       this.filterShow = false
       next(false)
     } else if (this.showTime) {

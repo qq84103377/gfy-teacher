@@ -72,16 +72,22 @@
           list: [],
           scrollTop: 0
         },
-        firstFlag: false // 首次加载学生白板
+        firstFlag: false, // 首次加载学生白板
+        showDialog:false
       }
     },
     beforeRouteLeave(to, from, next) {
-      if(this.tabIndex) {
+      if(this.showDialog) {
+        this.close()
+        next(false)
+      }else{
+       if(this.tabIndex) {
         this.teacher.scrollTop = this.$refs['body'].scrollTop
-      }else {
-        this.stu.scrollTop = this.$refs['body'].scrollTop
+       }else {
+         this.stu.scrollTop = this.$refs['body'].scrollTop
+       }
+       next()
       }
-      next();
     },
     beforeRouteEnter(to, from, next) {
       next(vm => {
@@ -92,6 +98,10 @@
       });
     },
     methods: {
+      close(){
+        this.showDialog=false
+        this.$dialog.close()
+      },
       changeTab(bol) {
         // this.tabIndex = index
         // if(this.tabIndex) {
@@ -209,10 +219,12 @@
         })
       },
       handleDelete(item, index) {
+        this.showDialog=true
         this.$dialog.confirm({
           title: '',
           message: '确定删除吗?'
         }).then(() => {
+          this.showDialog=false
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -236,6 +248,7 @@
             }
           })
         }).catch(() => {
+          this.showDialog=false
           // on cancel
         });
       },

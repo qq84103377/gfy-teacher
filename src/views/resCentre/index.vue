@@ -250,9 +250,9 @@
           </div>
           <!--私人资源  微课-->
           <div>
-            <list-item class="mgt10" style="background: #fff;" v-if="priSourceIndex==1&&tabIndex == 1"
+            <list-item ref='listItem1' class="mgt10" style="background: #fff;" v-if="priSourceIndex==1&&tabIndex == 1"
                        v-for="(item,index) in priLessonList" :key="index" :can-slide="true"
-                       :itemTitle="item.courseware_name" @del="delRes(item,index)"
+                       :itemTitle="item.courseware_name" @del="delRes(item,index)" @clickDel='clickDel(index)'
                        @clickTo="goVideoPage(item)">
               <div slot="cover" class="cover" :style="{'background':item.image_url?'none':'#67E0A3'}">
                 <img v-if="item.image_url" :src="item.image_url" alt=""><i v-else :class="['iconGFY', handleMediaIcon(item.src_url)]"></i>
@@ -296,9 +296,10 @@
           </div>
           <!--私人资源 素材-->
           <div>
-            <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+            <list-item ref='listItem2' @clickTo="goto(item)" class="mgt10" style="background: #fff;"
                        v-if="priSourceIndex==2&&tabIndex == 1" :can-slide="true"
                        v-for="(item,index) in priMaterialList" :key="index" @del="delRes(item,index)"
+                       @clickDel='clickDel(index)'
                        :itemTitle="item.courseware_name">
               <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
               <div slot="desc">
@@ -345,9 +346,10 @@
           </div>
           <!--私人资源 试卷-->
          <div>
-           <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="priSourceIndex==3&&tabIndex == 1"
+           <list-item ref='listItem3' @clickTo="viewDetail(item)" class="mgt10" v-if="priSourceIndex==3&&tabIndex == 1"
                       :can-slide="item.belong_account_no == $store.getters.getUserInfo.accountNo"
                       @del="delTestPaper(item,index)"
+                      @clickDel='clickDel(index)'
                       style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
                       :itemTitle="item.test_paper_name">
              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
@@ -505,6 +507,7 @@
         accessUrl: '',
         firstClickPri: false,
         isIOS: false,
+        clickIndex:0
       }
     },
     computed: {
@@ -659,7 +662,16 @@
     } else if (this.addCourseShow) {
       this.addCourseShow = false
       next(false)
-    } else {
+    } else if (this.$refs['listItem1']&&this.$refs['listItem1'][this.clickIndex]&&this.$refs['listItem1'][this.clickIndex].showDialog) {
+      this.$refs['listItem1'][this.clickIndex].close()
+      next(false)
+    }else if (this.$refs['listItem2']&&this.$refs['listItem2'][this.clickIndex]&&this.$refs['listItem2'][this.clickIndex].showDialog) {
+      this.$refs['listItem2'][this.clickIndex].close()
+      next(false)
+    }else if (this.$refs['listItem3']&&this.$refs['listItem3'][this.clickIndex]&&this.$refs['listItem3'][this.clickIndex].showDialog) {
+      this.$refs['listItem3'][this.clickIndex].close()
+      next(false)
+    }else {
       next()
     }
   },
@@ -677,6 +689,9 @@
       }
     },
     methods: {
+      clickDel(index){
+       this.clickIndex=index
+      },
       async delRes(item,index) {
         if(item.belong_account_no !== item.account_no) {
           //这是别人的资源,不能删除

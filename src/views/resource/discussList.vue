@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/discuss_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有讨论，快去创建吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.discussName" :can-slide="true">
+          <list-item ref='listItem' @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.discussName" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
             <div slot="cover" class="cover"><i class="iconGFY icon-chat"></i></div>
             <div slot="desc">
@@ -134,6 +134,7 @@ export default {
       curFile: null,
       oSSObject: null,
       scrollTop: 0,
+      clickIndex:0
     }
   },
   created() {
@@ -157,7 +158,10 @@ export default {
     if (this.popShow) {
       this.popShow=false
       next(false)
-    } else {
+    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else {
     this.scrollTop = this.$refs["body"].scrollTop;
     next();
     }
@@ -171,6 +175,9 @@ export default {
     });
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     getPic() {
       ImagePicker.getPictures((result) => {
         if(this.imgList.length + result.images.length > 9) {

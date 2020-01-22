@@ -7,8 +7,8 @@
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有内容～'" @load="onLoad" :offset='80'>
           <!--            this.$router.push(`/examDetail?type=1&testPaperId=${item.testPaperId}&subjectType=${localStorage.getItem("currentSubjectType")}&classGrade=${this.classGrade}&title=${item.testPaperName}`)-->
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;"
-                     @del="handleDelete(item,index)" v-for="(item,index) in list" :key="index"
+          <list-item ref='listItem' @clickTo="goto(item)" class="mgt10" style="background: #fff;"
+                     @del="handleDelete(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index"
                      :itemTitle="item.taskName"
                      :can-slide="true">
             <div slot="desc">
@@ -55,6 +55,7 @@
         total: 0,
         tchClassCourseInfo: JSON.parse(JSON.stringify(this.$route.query.tchClassCourseInfo)),
         scrollTop: 0,
+        clickIndex:0
       }
     },
     mounted() {
@@ -66,8 +67,13 @@
       })
     },
     beforeRouteLeave(to, from, next) {
-      this.scrollTop = this.$refs["body"].scrollTop;
-      next();
+      if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+       this.$refs['listItem'][this.clickIndex].close()
+       next(false)
+      }else{
+        this.scrollTop = this.$refs["body"].scrollTop;
+       next();
+      }
     },
     beforeRouteEnter(to, from, next) {
       next(vm => {
@@ -78,6 +84,9 @@
       });
     },
     methods: {
+      clickDel(index){
+        this.clickIndex=index
+      },
       viewStat(item) {
         if(item.tchClassTastInfo.some(v => v.classId === 0)) {
           return this.$toast('任务班级已不在当前课程的班级中，无法查看任务统计！')

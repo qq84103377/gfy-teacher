@@ -156,6 +156,7 @@ export default {
       classDropdown: false,
       // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
       classIndex: '',
+      showChangeDialog:false
     }
   },
   computed: {
@@ -248,6 +249,10 @@ export default {
     this.initClassIndex()
   },
   methods: {
+    close(){
+      this.showChangeDialog=false
+      this.$dialog.close()
+    },
     initClassIndex() {
       for (let key in JSON.parse(localStorage.getItem("classMap"))) {
         const value = JSON.parse(localStorage.getItem("classMap"))[key]
@@ -274,6 +279,7 @@ export default {
     },
     handleSubject(item) {
       if (item.active) return
+      this.showChangeDialog=true
       this.$dialog.confirm({
         title: '提示',
         message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
@@ -281,6 +287,7 @@ export default {
         confirmButtonColor: '#39F0DD',
         className: 'change-subject'
       }).then(() => {
+        this.showChangeDialog=false
         this.subjectList.forEach(v => {
           v.active = false
         })
@@ -291,6 +298,7 @@ export default {
         this.initClassIndex()
         // this.getTextBookCourseInfo()
       }).catch(() => {
+        this.showChangeDialog=false
         // on cancel
       });
     },

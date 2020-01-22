@@ -42,17 +42,25 @@ export default {
   props: ['canSlide', 'fold', 'itemTitle', 'taskType', 'testPaperId', 'classInfoList', 'up', 'down', 'top'],
   data() {
     return {
-
+      showDialog:false
     }
   },
   methods: {
+     close(){
+        this.showDialog=false
+        this.$dialog.close()
+      },
     del() {
+      this.showDialog=true
+      this.$emit('clickDel')
       this.$dialog.confirm({
         title: '',
         message: '确定删除吗?'
       }).then(() => {
+        this.showDialog=false
         this.$emit('del')
       }).catch(() => {
+        this.showDialog=false
         // on cancel
       });
 

@@ -61,9 +61,9 @@
             <span>当前没有未结束的任务～</span>
           </div>
         </div>
-        <div v-else v-for="item in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
-          <list-item @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
-                     :can-slide="true" @del="delTask(item,index)">
+        <div v-else v-for="(item,index) in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
+          <list-item ref='listItem' @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
+                     :can-slide="true" @del="delTask(item,index)" @clickDel='clickDel(index)'>
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
@@ -119,7 +119,8 @@ export default {
       subjectTypeList: {},
       currentSubjectType: '',
       loading: true,
-      publishList: []
+      publishList: [],
+      clickIndex:0
     }
   },
   activated() {
@@ -140,7 +141,18 @@ export default {
       this.getUnFinishCourseTask()
     })
   },
+  beforeRouteLeave (to, from, next) {
+    if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
+      next()
+    }
+  },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     delTask(item, index) {
       let obj = {
         "interUser": "runLfb",

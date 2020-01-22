@@ -20,7 +20,7 @@
           <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="courseList.length?(courseTaskList.length>0?'没有更多了':'当前没有已发任务，快去新建任务吧！'):'当前没有课程,快去新建课程吧！'" @load="onLoad" :offset='80'>
-          <list-item v-if="renderFlag" :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="`${item.taskId}${index}`" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)">
+          <list-item ref='listItem' v-if="renderFlag" :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in courseTaskList" @clickTo="goto(item)" :key="`${item.taskId}${index}`" :can-slide="true" :top="courseTaskList.length>1 && index!=0" :up="courseTaskList.length>1 &&index!=0" :down="courseTaskList.length>1 &&index!=courseTaskList.length-1" :itemTitle="item.taskName" :test-paper-id="item.testPaperId" :taskType="item.taskType" :class-info-list="item.tchClassTastInfo" @up="moveTask(item,index,0)" @top="topTask(item,index)" @down="moveTask(item,index,1)" @del="delTask(item,index)"  @clickDel='clickDel(index)'>
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchClassTastInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchClassTastInfo.length>2,'icon-arrow-grey':item.tchClassTastInfo.length<=2}"></i>
@@ -98,7 +98,8 @@ export default {
       scrollTop: 0,
       firstFlag: true,
       tchCourseInfo: '',
-      showDrop:false
+      showDrop:false,
+      clickIndex:0
     }
   },
   mounted() {
@@ -132,6 +133,9 @@ export default {
       this.showDrop=false
       this.$refs['dropdown1'].toggle(false)
       next(false)
+    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
     }else{
      this.scrollTop = this.$refs["body"].scrollTop;
     next();
@@ -147,6 +151,9 @@ export default {
     });
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     viewResource() {
       this.$router.push({        path: `/resource`, query: {
           from: 'preview',

@@ -9,7 +9,7 @@
           <img src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
+          <list-item ref='listItem'  @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseInfo.tchClassCourseInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseInfo.tchClassCourseInfo.length>2,'icon-arrow-grey':item.tchCourseInfo.tchClassCourseInfo.length<=2}"></i>
@@ -31,7 +31,7 @@
       <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
     </div>
 
-    <course-filter @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
+    <course-filter ref="courseFilter" @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
   </section>
 </template>
 
@@ -58,13 +58,20 @@ export default {
         classGrade: '', termType: '', classId: ''
       },
       scrollTop: 0,
+      clickIndex:0
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.filterShow) {
+    if (this.$refs['courseFilter']&&this.$refs['courseFilter'].showChangeDialog) {
+      this.$refs['courseFilter'].close()
+      next(false)
+    } else if (this.filterShow) {
       this.filterShow = false
       next(false)
-    } else{
+    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
      this.scrollTop = this.$refs["body"].scrollTop;
     next();
     }
@@ -84,6 +91,9 @@ export default {
     })
   },
   methods: {
+     clickDel(index){
+      this.clickIndex=index
+    },
      goBack(){
           this.common.goBack(this)
         },

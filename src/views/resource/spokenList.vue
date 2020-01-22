@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/spoken_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有口语～'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)" class="mgt10" style="background: #fff;" v-for="(item,index) in list" :key="index" @del="modifyTeachCourseRes(item,index)" :itemTitle="item.spokenTitle" :can-slide="true">
+          <list-item ref='listItem' @clickTo="$router.push(`/spokenDetail?spokenId=${item.spokenId}&sysCourseId=${$route.query.sysCourseId}`)" class="mgt10" style="background: #fff;" v-for="(item,index) in list" :key="index" @del="modifyTeachCourseRes(item,index)" @clickDel='clickDel(index)' :itemTitle="item.spokenTitle" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.isSend==='S05'}"></i></div>
             <div slot="cover" class="cover"><i class="iconGFY icon-en"></i></div>
             <div slot="desc">
@@ -138,12 +138,18 @@ export default {
       finished: false,
       currentPage: 0,
       total: 0,
-      scrollTop: 0
+      scrollTop: 0,
+      clickIndex:0
     }
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
-    next();
+    if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
+      this.scrollTop = this.$refs["body"].scrollTop
+    next()
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -154,6 +160,9 @@ export default {
     });
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     modify(item, bol) {
       if (bol) {
         //编辑

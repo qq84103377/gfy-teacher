@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/exam_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有试卷，快去创建吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="viewDetail(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.testPaperName" :can-slide="true">
+          <list-item ref='listItem' @clickTo="viewDetail(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.testPaperName" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
             <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
             <div slot="desc">
@@ -137,6 +137,7 @@ export default {
       "tchCourseId": this.$route.query.tchCourseId,
       "sysCourseId": this.$route.query.sysCourseId,
       "relationSeqId": this.$route.query.relationCourseId,
+      clickIndex:0
     }
   },
   computed: {
@@ -156,6 +157,9 @@ export default {
   beforeRouteLeave(to, from, next) {
     if (this.addExam.show) {
       this.addExam.show = false
+      next(false)
+    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
       next(false)
     } else {
       this.scrollTop = this.$refs["body"].scrollTop;
@@ -181,6 +185,9 @@ export default {
     eventBus.$off("examListRefresh")
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     createTestPaper() {
       this.$router.push({
         path: `/questionList`, query: {

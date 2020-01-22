@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/micro_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有微课，快去上传吧！'" @load="onLoad" :offset='80'>
-          <list-item class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true" @clickTo="goVideoPage(item)">
+          <list-item ref='listItem' class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true" @clickTo="goVideoPage(item)" @clickDel='clickDel(index)'>
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
             <div slot="cover" class="cover" :style="{'background':item.imageUrl?'none':'#67E0A3'}"><img v-if="item.imageUrl" :src="item.imageUrl" alt=""><i v-else :class="['iconGFY', handleIcon(item)]"></i></div>
             <div slot="desc">
@@ -59,11 +59,17 @@ export default {
       currentPage: 0,
       total: 0,
       scrollTop: 0,
+      clickIndex:0
     }
   },
   beforeRouteLeave(to, from, next) {
-    this.scrollTop = this.$refs["body"].scrollTop;
-    next();
+    if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
+      this.scrollTop = this.$refs["body"].scrollTop
+      next()
+    }
   },
   beforeRouteEnter(to, from, next) {
     if (from.path === '/uploadLesson' && store.getters.getIsAddWare) {
@@ -90,6 +96,9 @@ export default {
     }
   },
   methods: {
+    clickDel(index){
+      this.clickIndex=index
+    },
     handleIcon(item) {
       let t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
       if (t == 'mp3') {

@@ -6,7 +6,7 @@
           <img class="null-tips" src="../../assets/img/resource/material_empty.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length>0?'没有更多了':'当前没有素材，快去上传吧！'" @load="onLoad" :offset='80'>
-          <list-item @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true">
+          <list-item ref='listItem' @clickTo="goto(item)" class="mgt10" style="background: #fff;" @del="modifyTeachCourseRes(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.coursewareName" :can-slide="true">
             <div slot="badge"><i class="iconGFY" :class="{'icon-send': item.stateName}"></i></div>
             <div slot="cover" class="cover"><i class="iconGFY" :class="handleIcon(item)"></i></div>
             <div slot="desc">
@@ -64,12 +64,18 @@
         finished: false,
         currentPage: 0,
         total: 0,
-        accessUrl: ''
+        accessUrl: '',
+        clickIndex:0
       }
     },
     beforeRouteLeave(to, from, next) {
-      this.scrollTop = this.$refs["body"].scrollTop;
-      next();
+       if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      this.$refs['listItem'][this.clickIndex].close()
+      next(false)
+    }else{
+      this.scrollTop = this.$refs["body"].scrollTop
+      next()
+    } 
     },
     beforeRouteEnter(to, from, next) {
       if ((from.path === '/uploadWare' || from.path === '/uploadImg') && store.getters.getIsAddWare) {
@@ -97,6 +103,9 @@
       }
     },
     methods: {
+      clickDel(index){
+      this.clickIndex=index
+    },
       updateCourseWareCount(item) {
         let obj = {
           "interUser": "runLfb",
