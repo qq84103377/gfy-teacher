@@ -245,7 +245,7 @@
   import echarts from "echarts";
   import {mutualType, getStudentName, getFontSize} from '@/utils/filter'
   // import Blob from '@/utils/excel/Blob'
-  // import {export_json_to_excel} from '@/utils/excel/Export2Excel'
+  import {export_json_to_excel} from '@/utils/excel/Export2Excel'
 
   export default {
     name: "taskStat",

@@ -42,7 +42,7 @@
 
     </div>
     <div class="material-list-wrap__footer">
-      <van-button type="info" class="btn" @click="$router.push({path:'uploadWare',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传课件</van-button>
+      <van-button type="info" :class="['btn',{disabled:!isIOS}]" @click="gotoUpload">上传课件</van-button>
       <van-button type="info" class="btn" @click="$router.push({path:'uploadImg',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传图片</van-button>
     </div>
   </section>
@@ -68,6 +68,16 @@
         clickIndex:0
       }
     },
+    computed: {
+      isIOS() {
+        if('cordova' in window) {
+          var platform = device.platform;
+          return platform === 'iOS'
+        }else {
+          return true
+        }
+      }
+    },
     beforeRouteLeave(to, from, next) {
        if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
       this.$refs['listItem'][this.clickIndex].close()
@@ -75,7 +85,7 @@
     }else{
       this.scrollTop = this.$refs["body"].scrollTop
       next()
-    } 
+    }
     },
     beforeRouteEnter(to, from, next) {
       if ((from.path === '/uploadWare' || from.path === '/uploadImg') && store.getters.getIsAddWare) {
@@ -103,6 +113,13 @@
       }
     },
     methods: {
+      gotoUpload() {
+        if(this.isIOS) {
+          this.$router.push({path:'uploadWare',query:{tchCourseId:this.$route.query.tchCourseId,sysCourseId:this.$route.query.sysCourseId,relationCourseId:this.$route.query.relationCourseId,subjectType:this.$route.query.subjectType,classId:this.$route.query.classId,tchClassCourseInfo:this.$route.query.tchClassCourseInfo}})
+        }else {
+          return this.$toast('暂不支持课件上传')
+        }
+      },
       clickDel(index){
       this.clickIndex=index
     },
@@ -390,6 +407,10 @@
         border-radius: 22px;
         font-size: 16px;
         margin-right: 23px;
+        &.disabled{
+          background: #ccc;
+          border: 1px solid #ccc;
+        }
         &:last-child {
           margin-right: 0;
         }
