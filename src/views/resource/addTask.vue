@@ -140,14 +140,17 @@
 
                   <!--                  <van-checkbox-group v-else class="gfy-checkbox-group" @change="handleCheckChild($event,item)"-->
                   <!--                                      v-model="item.groupSelect">-->
-                  <div v-else class="gfy-checkbox-group">
+
+                    <!--                  </van-checkbox-group>-->
+                  </div>
+                <div class="select-wrap-desc">
+                  <div v-if="form.object == 2" class="gfy-checkbox-group">
                     <van-checkbox class="gfy-checkbox-group-item" v-for="(g, gi) in item.tchSubGroup" :key="gi"
                                   :name="gi" v-model="g.check" @click="handleCheckGroup(g,item)"
                                   :disabled="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0">
                       <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
                       {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
                     </van-checkbox>
-                    <!--                  </van-checkbox-group>-->
                   </div>
                 </div>
               </div>
@@ -299,7 +302,7 @@
     } else{
     next();
     }
-   
+
   },
     async mounted() {
       if (this.isReinforce) {
