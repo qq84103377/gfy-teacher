@@ -624,6 +624,11 @@ export default new Router({
             isShowHeader: true,
             title: "专项练习"
           }
+        }, 
+         {
+          path: "/fEducation",
+          name: 'fEducation',
+          component: () => import("./views/fEducation/index.vue"),
         },
         {
           path: '/reportDetail',

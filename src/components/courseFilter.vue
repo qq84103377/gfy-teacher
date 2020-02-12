@@ -3,12 +3,12 @@
   <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'?'65%':'93%' }">
     <div class="course-filter-wrap">
       <van-overlay class-name="mask" :show="gradeDropdown||termDropdown||versionDropdown||classDropdown" @click="gradeDropdown = false;termDropdown=false;versionDropdown=false;classDropdown=false" />
-
-      <div class="course-filter-wrap__header van-hairline--bottom">
-        <div v-if="type==='myCourse'" class="course-filter-wrap__header-tab">
+ 
+      <div class="course-filter-wrap__header van-hairline--bottom" >
+        <div v-if="type==='myCourse'&&!hideSubject" class="course-filter-wrap__header-tab">
           <span @click="handleSubject(item)" :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
         </div>
-        <div v-else class="course-filter-wrap__header-tab">
+        <div v-if="type!=='myCourse'" class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
         <van-icon v-if="type!=='myCourse'" class="icon-close" @click="show=false" name="close" />
@@ -122,7 +122,7 @@ import { getTextBookCourseInfo, getGradeTermInfo } from '@/api/index'
 
 export default {
   name: "courseFilter",
-  props: ['visible', 'sysCourseId', 'type'],
+  props: ['visible', 'sysCourseId', 'type','hideSubject'],
   data() {
     return {
       gradeDropdown: false,

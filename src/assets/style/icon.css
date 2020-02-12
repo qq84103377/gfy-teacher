@@ -32,6 +32,12 @@
   background: url(../../assets/img/icon-arrow.png) no-repeat;
   background-size: contain;
 }
+.icon-arrow-grey {
+  width: 10px;
+  height: 12px;
+  background: url(../../assets/img/icon-arrow-grey.png) no-repeat;
+  background-size: contain;
+}
 .icon-edit {
   width: 15px;
   height: 14px;
@@ -60,6 +66,12 @@
   width: 21px;
   height: 14px;
   background: url(../../assets/img/icon-tv.png) no-repeat;
+  background-size: contain;
+}
+.icon-cap {
+  width: 21px;
+  height: 14px;
+  background: url(../../assets/img/jiatingjiaoyu.png) no-repeat;
   background-size: contain;
 }
 .icon-errors {
@@ -276,6 +288,12 @@
   background: url(../../assets/img/icon-circle-plus-white.png) no-repeat;
   background-size: contain;
 }
+.icon-circle-plus-yellow {
+  width: 14px;
+  height: 14px;
+  background: url(../../assets/img/icon-circle-plus-yellow.png) no-repeat;
+  background-size: contain;
+}
 .icon-circle-sub-white {
   width: 10px;
   height: 10px;
@@ -390,6 +408,12 @@
   background: url(../../assets/img/icon-video.png) no-repeat;
   background-size: contain;
 }
+.icon-audio {
+  width: 59px;
+  height: 49px;
+  background: url(../../assets/img/icon-audio.png) no-repeat;
+  background-size: contain;
+}
 .icon-send {
   width: 35px;
   height: 22.5px;
@@ -420,6 +444,12 @@
   background: url(../../assets/img/icon-boutique.png) no-repeat;
   background-size: contain;
 }
+.icon-boutique-purple {
+  width: 30px;
+  height: 15px;
+  background: url(../../assets/img/icon-boutique-purple.png) no-repeat;
+  background-size: contain;
+}
 .icon-personal {
   width: 30px;
   height: 15px;
@@ -436,6 +466,18 @@
   width: 11.5px;
   height: 11.5px;
   background: url(../../assets/img/icon-star.png) no-repeat;
+  background-size: contain;
+}
+.icon-collect {
+  width: 15px;
+  height: 15px;
+  background: url(../../assets/img/icon-collect.png) no-repeat;
+  background-size: contain;
+}
+.icon-collect-yellow {
+  width: 15px;
+  height: 15px;
+  background: url(../../assets/img/icon-collect-yellow.png) no-repeat;
   background-size: contain;
 }
 .icon-plane {
@@ -460,6 +502,12 @@
   width: 15px;
   height: 15px;
   background: url(../../assets/img/icon-download-orange.png) no-repeat;
+  background-size: contain;
+}
+.icon-download-blue {
+  width: 15px;
+  height: 15px;
+  background: url(../../assets/img/icon-download-blue.png) no-repeat;
   background-size: contain;
 }
 .icon-pdf {
@@ -540,6 +588,18 @@
   background: url(../../assets/img/icon-auto.png) no-repeat;
   background-size: contain;
 }
+.icon-excellent {
+  width: 35px;
+  height: 22.5px;
+  background: url(../../assets/img/icon-excellent.png) no-repeat;
+  background-size: contain;
+}
+.icon-boutique-badge {
+  width: 35px;
+  height: 22.5px;
+  background: url(../../assets/img/icon-boutique-badge.png) no-repeat;
+  background-size: contain;
+}
 .icon-chat {
   width: 52px;
   height: 50px;
@@ -580,5 +640,11 @@
   width: 50px;
   height: 50px;
   background: url(../../assets/img/icon-circle-logo.png) no-repeat;
+  background-size: contain;
+}
+.icon-layer {
+  width: 25px;
+  height: 25px;
+  background: url(../../assets/img/icon-layer.png) no-repeat;
   background-size: contain;
 }
