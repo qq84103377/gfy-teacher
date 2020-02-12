@@ -1037,12 +1037,12 @@
     beforeRouteEnter(to, from, next) {
       if (from.path === '/imgCorrect') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
           vm.getAppraise()
         })
       }else if (from.path === '/examView') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
       }
       else if (from.path === '/addTask') {
@@ -1053,7 +1053,7 @@
       }
       else if (from.path === '/subjectList') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
       }
       else {
