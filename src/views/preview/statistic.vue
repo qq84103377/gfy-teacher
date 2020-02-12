@@ -71,8 +71,11 @@
           <!-- <video v-if="type === 'mp4'" controls="controls"
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video> -->
           <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
-          </video>
-          <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio>
+          </video> 
+
+           <img class="audio" v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="" @click='goVideoPage(wareDetail.courseware.srcUrl,1)'>
+
+          <!-- <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio> -->
           <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl" :src="wareDetail.courseware.srcUrl" />
           <!--      <PDF v-else-if=" type === 'pdf' && info.srcUrl" :url="info.srcUrl"-->
           <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
@@ -275,9 +278,9 @@
           }
         })
       },
-      goVideoPage(url) {
+      goVideoPage(url,isAudio) {
         if (!url) return
-        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
+        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName,isMp3: isAudio} })
       },
       singleQuestionScore(key) {
         return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t, v) => {

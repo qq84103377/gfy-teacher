@@ -1149,7 +1149,7 @@
             query: {
               src: this.tabIndex ? src_url : srcUrl,
               title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
-              isMp3: (this.tabIndex ? item.coursewareType : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
+              isMp3: (this.tabIndex ? item.courseware_type : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
             }
           })
         }).catch(() => {
