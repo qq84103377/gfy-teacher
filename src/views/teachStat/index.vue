@@ -152,7 +152,7 @@
             <div @click="selectParent(item,index)" v-for="(item,index) in masterGradeSubjectList" :key="index" :class="{active:item.active}">{{item.gradeName}}
             </div>
           </div>
-          <div class="grade-pop-wrap__body-right">
+          <div class="grade-pop-wrap__body-right" v-if="masterGradeSubjectList[masterGradeIndex]">
             <div class="" v-for="(child,ci) in masterGradeSubjectList[masterGradeIndex].teacherInfoList" :key="ci">
               <div @click="selectChild(child)" class="van-hairline--bottom">
                 <div :class="['cell__item',{active:child.check}]">{{child.subjectName}}
