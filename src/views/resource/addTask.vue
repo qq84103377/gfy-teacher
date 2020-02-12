@@ -950,25 +950,48 @@
         this.currentClassIdIndex = index
         if (this.form.time == "1") {
           if (type == "begin") {
-            this.minDate = new Date()
-            this.currentDate = new Date(this.form.time1.replace(/-/g, "/"))
+            if(this.isEdit) {
+              this.minDate = new Date(this.form.time1.replace(/-/g, "/"))
+              this.currentDate = new Date(this.form.time1.replace(/-/g, "/"))
+            }else {
+              this.minDate = new Date()
+              this.currentDate = new Date(this.form.time1.replace(/-/g, "/"))
+            }
           } else if (type == "end") {
-            let date = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
-            date.setDate(date.getDate() + 1)
-            this.minDate = date
-            this.currentDate = new Date(this.form.time2.replace(/-/g, "/"))
+            // let date = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
+            // date.setDate(date.getDate() + 1)
+            // this.minDate = date
+            if(this.isEdit) {
+              this.minDate = new Date(this.form.time1.replace(/-/g, "/"))
+              this.currentDate = new Date(this.form.time2.replace(/-/g, "/"))
+            }else {
+              this.minDate = new Date()
+              this.currentDate = new Date(this.form.time2.replace(/-/g, "/"))
+            }
           }
 
           //分班设置
         } else if (this.form.time == "2") {
           if (type == 'begin') {//开始时间
-            this.minDate = new Date()
-            this.currentDate = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+
+            if(this.isEdit) {
+              this.minDate = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+              this.currentDate = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+            }else {
+              this.minDate = new Date()
+              this.currentDate = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+            }
           } else if (type == 'end') {//结束时间
-            let date = new Date(this.classList[index].startDate.replace(/-/g, "/"))
-            date.setDate(date.getDate() + 1)
-            this.minDate = date
-            this.currentDate = new Date(this.classList[index].endDate.replace(/-/g, "/"))
+            // let date = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+            // date.setDate(date.getDate() + 1)
+            // this.minDate = date
+            if(this.isEdit) {
+              this.minDate = new Date(this.classList[index].startDate.replace(/-/g, "/"))
+              this.currentDate = new Date(this.classList[index].endDate.replace(/-/g, "/"))
+            }else {
+              this.minDate = new Date()
+              this.currentDate = new Date(this.classList[index].endDate.replace(/-/g, "/"))
+            }
           }
 
         }

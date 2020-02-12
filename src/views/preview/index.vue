@@ -24,7 +24,7 @@
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchClassTastInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchClassTastInfo.length>2,'icon-arrow-grey':item.tchClassTastInfo.length<=2}"></i>
-                <span>班级查看{{item.taskId}}</span>
+                <span>班级查看</span>
               </div>
               <div @click="editTask(item)">
                 <i class="iconGFY icon-edit"></i>
@@ -140,7 +140,7 @@ export default {
      this.scrollTop = this.$refs["body"].scrollTop;
     next();
     }
-    
+
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
