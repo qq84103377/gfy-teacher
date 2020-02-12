@@ -3,8 +3,10 @@
     <van-nav-bar :title="info.name" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="board-detail__body">
-      <video v-if="type === 'mp4'"  webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(info.dataUrl)' :src="info.dataUrl"></video>
-      <audio v-else-if="type === 'mp3' && info.dataUrl" controls="controls" controlsList="nodownload" :src="info.dataUrl"></audio>
+      <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(info.dataUrl)' :src="info.dataUrl"></video>
+      <img class="audio" v-else-if="type === 'mp3' && info.dataUrl" src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="" @click='goVideoPage(info.dataUrl,1)'>
+
+      <!-- <audio v-else-if="type === 'mp3' && info.dataUrl" controls="controls" controlsList="nodownload" :src="info.dataUrl"></audio> -->
       <img v-else-if="type === 'img' && info.dataUrl" :src="info.dataUrl" />
       <!--      <PDF v-else-if=" type === 'pdf' && info.dataUrl" :url="info.dataUrl"-->
       <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
@@ -53,12 +55,16 @@ export default {
     })
   },
   methods: {
-    goBack(){
-          this.common.goBack(this)
-        },
-    goVideoPage(url) {
+    goBack() {
+      this.common.goBack(this)
+    },
+    goVideoPage(url, isAudeo) {
       if (!url) return
-      this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name } })
+      if (isAudeo) {
+        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name, isAudeo: true } })
+      } else {
+        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name } })
+      }
     },
     handleIcon(url) {
       var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
@@ -168,6 +174,9 @@ export default {
     }
     > video {
       width: 100%;
+    }
+    > .audio{
+      height: 210px;
     }
     .cover {
       background: #f3d233;
