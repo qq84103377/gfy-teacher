@@ -267,7 +267,7 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-      
+
     if (this.$parent.showTime) {
       this.$parent.showTime=false
       next(false)
@@ -292,7 +292,7 @@
         next()
       }
     }
-  
+
     },
     computed: {
       filterParams() {
@@ -304,8 +304,8 @@
       },
       masterFilterParams() {
         return {
-          classGrade: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].classGrade,
-          subjectType: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].teacherInfoList[this.$parent.tempMasterSubjectIndex].subjectType,
+          classGrade: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex] ? this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].classGrade : '',
+          subjectType: this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex] ? this.masterGradeSubjectList[this.$parent.tempMasterGradeIndex].teacherInfoList[this.$parent.tempMasterSubjectIndex].subjectType : '',
           classId: this.$parent.masterClassIndex || ''
         }
       },
