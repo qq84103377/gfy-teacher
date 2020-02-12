@@ -207,7 +207,7 @@
             <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="resourceIndex==3&&tabIndex == 0"
                        style="background: #fff;" v-for="(item,index) in examList" :key="index"
                        :itemTitle="item.testPaperName">
-              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+              <div slot="cover" class="cover" style="background: #39F0DD;"><i class="iconGFY icon-exam-100"></i></div>
               <div slot="desc">
                 <div class="desc-top">
                   <i class="iconGFY"
@@ -352,7 +352,7 @@
                       @clickDel='clickDel(index)'
                       style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
                       :itemTitle="item.test_paper_name">
-             <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+             <div slot="cover" class="cover" style="background: #39F0DD;"><i class="iconGFY icon-exam-100"></i></div>
              <div slot="desc">
                <div class="desc-top">
                  <i class="iconGFY"
@@ -1605,7 +1605,7 @@
       }
 
       .cover {
-        background: #FCA361;
+        background: #f3d233;
         display: flex;
         align-items: center;
         justify-content: center;

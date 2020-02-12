@@ -407,11 +407,12 @@
           } else if (this.$route.query.taskType === 'T06') {//discuss
 
           } else if (this.$route.query.taskType === 'T13') {
-            if (this.resourceInfo.spokenTitle.length > 64) {
+            if (this.resourceInfo.spokenTitle&&(this.resourceInfo.spokenTitle.length > 64)) {
               this.form.name = this.resourceInfo.spokenTitle.substring(0, 64)
-            } else {
-              this.form.name = this.resourceInfo.spokenTitle
             }
+            // else {
+            //   this.form.name = this.resourceInfo.spokenTitle
+            // }
             this.form.resourceId = this.resourceInfo.spokenId
           }
 
