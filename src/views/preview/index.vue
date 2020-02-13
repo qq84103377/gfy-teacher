@@ -170,7 +170,7 @@ export default {
       this.showDrop = false
     },
     async toggle(data, cancle) {
-      this.$refs.dropdown.toggle()
+      this.$refs['dropdown1'].toggle()
       this.showDrop = false
       if (cancle) return
       this.courseName = data
