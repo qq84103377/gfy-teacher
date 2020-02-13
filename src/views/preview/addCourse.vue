@@ -458,6 +458,7 @@ export default {
       this.showTime = false
     },
     getSysCourseList() {
+      if(this.isEdit) return;
       this.showMask = true
       if (this.form.name == "") {
         return
