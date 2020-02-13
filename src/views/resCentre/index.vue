@@ -1072,9 +1072,11 @@
           }
           //私人资源素材的时间需要转格式
           humpObj.createDate = formatTime(humpObj.createDate)
-          this.$router.push({path: '/materialDetail', query: {data: humpObj}})
+          localStorage.setItem('materialDetail',JSON.stringify(humpObj))
+          this.$router.push({ path: '/materialDetail'})
         } else {
-          this.$router.push({path: '/materialDetail', query: {data: item.resCourseWareInfo}})
+          localStorage.setItem('materialDetail',JSON.stringify(item.resCourseWareInfo))
+          this.$router.push({ path: '/materialDetail'})
         }
       },
       sendTask(obj, key) {

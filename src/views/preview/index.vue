@@ -255,7 +255,8 @@ export default {
         if (res.flag) {
           console.log(item.tastType, "item.tastType");
           if (['T04'].includes(item.taskType)) {
-            this.$router.push({ path: '/materialDetail', query: { data: res.data[0].courseware } })
+            localStorage.setItem('materialDetail',JSON.stringify(res.data[0].courseware))
+            this.$router.push({ path: '/materialDetail'})
           } else if (['T06'].includes(item.taskType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
           } else if (['T01', 'T02'].includes(item.taskType)) {
