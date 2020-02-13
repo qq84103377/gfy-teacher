@@ -687,6 +687,11 @@ export default new Router({
             isShowHeader: true,
           }
         },
+        {
+          path: '/coursePacket',
+          name: 'coursePacket',
+          component: () => import('./views/coursePacket/index.vue')
+        },
       ]
     },
     {

@@ -175,7 +175,7 @@ export default {
     } else {
       //获取上下学期
       let now = new Date();
-      let month = now.getMonth();
+      let month = now.getMonth() + 1;
       if (7 >= month && month >= 2) {
         this.isNowTerm = 1
       } else {
