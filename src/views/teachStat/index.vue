@@ -177,7 +177,7 @@
       <div class="grade-pop-wrap">
         <van-icon @click="handleClose(masterClassList,1)" class="close" name="close"/>
         <div class="grade-pop-wrap__title van-hairline--bottom">班级</div>
-        <div class="grade-pop-wrap__body">
+        <div class="grade-pop-wrap__body" v-if="masterGradeSubjectList[masterGradeIndex]">
           <van-cell @click="selectItem(value,key,masterClassList)" v-for="(value,key) in masterClassList"
                     v-if="value.classGrade === masterGradeSubjectList[masterGradeIndex].classGrade"
                     :key="key">

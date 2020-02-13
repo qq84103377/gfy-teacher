@@ -1254,7 +1254,7 @@
           "pageSize": "999",
           "courseType": "C01,C02",
           "currentPage": 1,
-          "isFinish":2
+          "isFinish":4
         }
         let params = {
           requestJson: JSON.stringify(obj)

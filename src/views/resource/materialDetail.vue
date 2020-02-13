@@ -35,7 +35,6 @@
           </div>
         </div>
       </list-item>
-
     </div>
   </section>
 </template>
@@ -50,7 +49,7 @@
     components: {listItem,PDF},
     data() {
       return {
-        info: this.$route.query.data,
+        info: JSON.parse(localStorage.materialDetail),
         type: '',
         iconType: ''
       }

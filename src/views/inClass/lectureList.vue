@@ -74,6 +74,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+    localStorage.removeItem('materialDetail')
     next(vm => {
       vm.$nextTick(() => {
         // vm.$refs["body"].scrollTo(0, vm.scrollTop);
@@ -168,7 +169,8 @@ export default {
         } else if (t == 'mp4' || t == 'mp3') {
           type = 'video'
         }
-        this.$router.push({ path: '/boardDetail', query: { data: item } })
+        localStorage.setItem('materialDetail',JSON.stringify(item))
+        this.$router.push({ path: '/boardDetail'})
 
       } else {
         //试卷

@@ -88,6 +88,7 @@
     }
     },
     beforeRouteEnter(to, from, next) {
+      localStorage.removeItem('materialDetail')
       if ((from.path === '/uploadWare' || from.path === '/uploadImg') && store.getters.getIsAddWare) {
         // 从上传页面返回 并且已经添加了课件 则需要刷新列表(只能通过这种方式刷新,如果通过activated钩子函数刷新会出错)
         next(vm => {
@@ -262,7 +263,9 @@
         return t
       },
       goto(item) {
-        this.$router.push({ path: '/materialDetail', query: { data: item } })
+        localStorage.setItem('materialDetail',JSON.stringify(item))
+        // this.$router.push({ path: '/materialDetail', query: { data: item } })
+        this.$router.push({ path: '/materialDetail'})
       },
       modifyTeachCourseRes(item, index, type) {
         let obj = {
