@@ -1190,7 +1190,7 @@
                   })
                 }
               })
-              obj['subgroupIdList' + index] = subgroupIdList.join("|")
+              // obj['subgroupIdList' + index] = subgroupIdList.join("|")
               obj['accountNoList' + index] = accountNoList.join("|")
               index++
             }
@@ -1424,7 +1424,7 @@
                   })
                 }
               })
-              obj['subgroupIdList' + index] = subgroupIdList.join("|")
+              // obj['subgroupIdList' + index] = subgroupIdList.join("|")
               obj['accountNoList' + index] = accountNoList.join("|")
               index++
             }
