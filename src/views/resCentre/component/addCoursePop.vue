@@ -55,7 +55,7 @@
     methods: {
       submit() {
         if(this.radio === '') return this.$toast('请选择课程')
-
+        this.show = false
         if(this.isSendTask) {
           this.$store.commit("setTchCourseInfo", this.list[this.radio].tchCourseInfo)
           this.$store.commit("setTaskClassInfo", '')
