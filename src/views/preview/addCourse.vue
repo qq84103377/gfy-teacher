@@ -196,7 +196,7 @@ export default {
       if(!v.length) {
         this.shareCourseList = []
         this.form.course = 0;
-        this.result = []
+        if(!this.isEdit) this.result = []
         this.shareFlag = false
         this.showMask = false
         this.isSelect = true
