@@ -542,13 +542,13 @@
         //如果该年级只有一科家庭教育,则不显示该年级
         if(v.teacherInfoList.length === 1 && v.teacherInfoList.some(s => s.subjectType === 'S20')) return
         v.active = flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)
+        v.teacherInfoList = v.teacherInfoList.filter((t,i) => t.subjectType !== 'S20')
         if(v.active) {
-          v.teacherInfoList = v.teacherInfoList.filter((t,i) => {
-              t.check = t.subjectType === localStorage.currentSubjectType
+          v.teacherInfoList.forEach((t,i) => {
+            t.check = t.subjectType === localStorage.currentSubjectType
             if(t.check) {
               this.subjectIndex = i
             }
-            return t.subjectType !== 'S20'
           })
         }
         arr.push(v)
