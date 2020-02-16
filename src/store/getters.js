@@ -18,6 +18,11 @@ const getters = {
   getArticleScroll: state => state.user.articleScroll || JSON.parse(localStorage.getItem('articleScroll')),
   getRecommentList: state => state.user.recommentList || JSON.parse(localStorage.getItem('recommentList')),
   getLastArticle: state => state.user.lastArticle || JSON.parse(localStorage.getItem('lastArticle')),
+  getTempGradeIndex: state => state.teachStat.tempGradeIndex,
+  getTempSubjectIndex: state => state.teachStat.tempSubjectIndex,
+  getSubjectIndex: state => state.teachStat.subjectIndex,
+  getGradeIndex: state => state.teachStat.gradeIndex,
+  getClassIndex: state => state.teachStat.classIndex,
   ...parentGetters
 }
 export default getters

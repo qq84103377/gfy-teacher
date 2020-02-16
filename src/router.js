@@ -692,6 +692,11 @@ export default new Router({
           name: 'coursePacket',
           component: () => import('./views/coursePacket/index.vue')
         },
+        {
+          path: '/beforeClassTask',
+          name: 'beforeClassTask',
+          component: () => import('./views/teachStat/beforeClassTask.vue')
+        },
       ]
     },
     {
