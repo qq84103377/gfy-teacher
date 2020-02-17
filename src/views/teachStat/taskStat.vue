@@ -267,7 +267,6 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-
     if (this.$parent.showTime) {
       this.$parent.showTime=false
       next(false)
@@ -335,7 +334,7 @@
     },
     methods: {
       viewTaskInfo() {
-        this.$router.push({path:'/beforeClassTask',query:{grade:'',subjectType:'',classId: ''}})
+        this.$router.push({path:'/beforeClassTask',query:this.masterFilterParams})
       },
       init() {
         this.doneArr = []

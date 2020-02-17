@@ -386,6 +386,7 @@ export default {
 
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
+          this.$store.commit('setClassIndex',Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap', schoolMap)

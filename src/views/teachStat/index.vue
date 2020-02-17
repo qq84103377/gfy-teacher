@@ -1,5 +1,5 @@
 <template>
-  <section class="teach-stat-wrap">
+  <section class="teach-stat-wrap" ref="body">
     <van-nav-bar
       v-if="$route.path === '/teachStat/'"
       title="教学统计">
@@ -228,9 +228,20 @@
           end: generateTimeReqestNumber(new Date()),
           type: true,   //true为开始
         },
+        scrollTop: 0,
       }
     },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          vm.$refs["body"].scrollTop = vm.scrollTop
+        });
+      });
+    },
     beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop
+
       if (this.showTime) {
         this.showTime=false
         next(false)

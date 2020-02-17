@@ -60,7 +60,7 @@
                 <span>班级查看</span>
               </div>
               <div @click="">
-                <i class="iconGFY icon-edit"></i>
+                <i class="iconGFY icon-edit-disable"></i>
                 <span>编辑</span>
               </div>
               <div @click="viewStat(item)">
@@ -144,7 +144,7 @@
           this.filterTime.end = picker.getValues().join('-')
         }
       },
-      confirmDate() {
+     async confirmDate() {
         //判断结束时间时候小于结束时间
         let time1 = new Date(this.filterTime.start)
         let time2 = new Date(this.filterTime.end)
@@ -152,9 +152,12 @@
           return this.$toast('开始时间不能大于结束时间')
         }
         this.$store.commit('setTeachStatFilterTime', {start: this.filterTime.start, end: this.filterTime.end})
-          // this.$refs['routerView'].init()
+
         //需要更新列表数据
         this.showTime = false
+       this.$store.commit('setVanLoading',true)
+       await this.onRefresh()
+       this.$store.commit('setVanLoading',false)
       },
       dateRange(methodName1, methodName2, num, index) {
         let time1 = new Date()
@@ -187,7 +190,8 @@
             tchCourseId: item.tchCourseId,
             taskId: item.taskId,
             taskType: item.tastType,
-            resourceType: item.resourceType
+            resourceType: item.resourceType,
+            disabled: 1, //任务统计不允许任务操作(加减分,主观题批改,心得批改,一键提醒,任务重发),只能查看
           }
         })
         localStorage.setItem('stat', JSON.stringify(item))
@@ -226,7 +230,7 @@
         if (this.currentPage > this.total && this.currentPage > 1) {
           return
         }
-        this.getUnFinishCourseTask()
+       await this.getUnFinishCourseTask()
       },
       async onRefresh() {
         this.finished = false

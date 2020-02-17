@@ -4,7 +4,7 @@ const teachStat = {
     tempSubjectIndex: 0,
     gradeIndex: 0,
     subjectIndex: 0,
-    classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
+    classIndex: localStorage.getItem("classMap") ? Object.keys(JSON.parse(localStorage.getItem("classMap")))[0] : '',
   },
 
   mutations: {
