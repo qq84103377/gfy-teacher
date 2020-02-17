@@ -89,7 +89,7 @@
               </div>
               <div class="row" v-for="(item,index) in tchStatInfo" :key="index">
                 <div>{{item.courseNum}}</div>
-                <div @click="viewTaskInfo">{{item.outsideClassNum}}</div>
+                <div @click="viewTaskInfo(item)">{{item.outsideClassNum}}</div>
                 <div>{{item.outsideClassPrecent}}</div>
                 <div>{{item.insideClassNum}}</div>
                 <div>{{item.taskNum}}</div>
@@ -333,8 +333,8 @@
       this.getData(1)
     },
     methods: {
-      viewTaskInfo() {
-        this.$router.push({path:'/beforeClassTask',query:this.masterFilterParams})
+      viewTaskInfo(item) {
+        this.$router.push({path:'/beforeClassTask',query:{classId: this.masterFilterParams.classId,classGrade:this.masterFilterParams.classGrade,teacherNo:item.teacherNo,teacherName:item.teacherName}})
       },
       init() {
         this.doneArr = []

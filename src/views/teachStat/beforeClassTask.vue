@@ -1,6 +1,6 @@
 <template>
   <section class="before-class-task-list">
-    <van-nav-bar :title="'sdsdsd'" @click-left="goBack" left-arrow>
+    <van-nav-bar :title="$route.query.teacherName + '课前任务'" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="before-class-task-list__filter">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
@@ -50,13 +50,18 @@
     <div class="before-class-task-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && taskList.length==0" style="text-align: center;color: #999999">
-          <img class="null-tips" src="../../assets/img/preview/task_null.png" alt />
+          <img class="null-tips" src="../../assets/img/preview/task_null.png" alt/>
         </div>
-        <van-list v-model="listLoading" :finished="finished" :finished-text="taskList.length>0?'没有更多了':'当前没有课前任务～'" @load="onLoad" :offset='80'>
-          <list-item ref='listItem' :fold="item.fold" class="mgt10" style="background: #fff;" v-for="(item,index) in taskList" @clickTo="goto(item)" :key="index" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo">
+        <van-list v-model="listLoading" :finished="finished" :finished-text="taskList.length>0?'没有更多了':'当前没有课前任务～'"
+                  @load="onLoad" :offset='80'>
+          <list-item ref='listItem' :fold="item.fold" class="mgt10" style="background: #fff;"
+                     v-for="(item,index) in taskList" @clickTo="goto(item)" :key="index" :itemTitle="item.taskName"
+                     :test-paper-id="item.testPaperId" :taskType="item.taskType"
+                     :class-info-list="item.tchClassTastInfo">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
-                <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
+              <div @click="item.tchClassTastInfo.length>2?$set(item,'fold',!item.fold):''">
+                <i class="iconGFY"
+                   :class="{fold:item.fold,'icon-arrow':item.tchClassTastInfo.length>2,'icon-arrow-grey':item.tchClassTastInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
               <div @click="">
@@ -77,13 +82,13 @@
 
 <script>
   import listItem from '../../components/list-item'
-  import { getUnFinishCourseTask, getCourseTaskDetail, deleteCourseTask } from '@/api/index'
-  import { pubApi } from '@/api/parent-GFY'
+  import {getTaskInfoList} from '@/api/index'
+  import {pubApi} from '@/api/parent-GFY'
   import {generateTimeReqestNumber} from '@/utils/filter'
 
   export default {
     name: "beforeClassTask",
-    components: { listItem },
+    components: {listItem},
     data() {
       return {
         refLoading: false,
@@ -94,7 +99,7 @@
         taskList: [],
         total: 0,
         scrollTop: 0,
-        clickIndex:0,
+        clickIndex: 0,
         showTime: false,
         rangeList: [
           {name: '近一周', mtd1: 'getDate', mtd2: 'setDate', num: 7, active: false},
@@ -111,10 +116,10 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-      if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+      if (this.$refs['listItem'] && this.$refs['listItem'][this.clickIndex] && this.$refs['listItem'][this.clickIndex].showDialog) {
         this.$refs['listItem'][this.clickIndex].close()
         next(false)
-      }else{
+      } else {
         this.scrollTop = this.$refs["body"].scrollTop
         next()
       }
@@ -144,7 +149,7 @@
           this.filterTime.end = picker.getValues().join('-')
         }
       },
-     async confirmDate() {
+      async confirmDate() {
         //判断结束时间时候小于结束时间
         let time1 = new Date(this.filterTime.start)
         let time2 = new Date(this.filterTime.end)
@@ -155,9 +160,9 @@
 
         //需要更新列表数据
         this.showTime = false
-       this.$store.commit('setVanLoading',true)
-       await this.onRefresh()
-       this.$store.commit('setVanLoading',false)
+        this.$store.commit('setVanLoading', true)
+        await this.onRefresh()
+        this.$store.commit('setVanLoading', false)
       },
       dateRange(methodName1, methodName2, num, index) {
         let time1 = new Date()
@@ -174,22 +179,20 @@
           this.currentDate = new Date(this.filterTime.end)
         }
       },
-      goBack(){
+      goBack() {
         this.common.goBack(this)
       },
       viewStat(item) {
         this.$store.commit('setVanLoading', true)
-        //估计后台字段任务名称写错了
-        item.taskName = item.tastName
         this.$router.push({
           path: '/statistic',
           query: {
             info: item,
             testPaperId: item.testPaperId,
-            termType: item.tchCourseClassInfo[0].termType,
+            termType: item.termType,
             tchCourseId: item.tchCourseId,
             taskId: item.taskId,
-            taskType: item.tastType,
+            taskType: item.taskType,
             resourceType: item.resourceType,
             disabled: 1, //任务统计不允许任务操作(加减分,主观题批改,心得批改,一键提醒,任务重发),只能查看
           }
@@ -202,25 +205,25 @@
             path: `/examDetail`, query: {
               flag: 1,
               // "tchCourseId": this.$route.query.tchCourseId,
-              "sysCourseId": item.tchCourseClassInfo[0].sysCourseId,
+              "sysCourseId": item.sysCourseId,
               // "relationCourseId": this.$route.query.relationCourseId,
               type: 1,
               testPaperId: item.testPaperId,
-              subjectType: localStorage.currentSubjectType,
-              classGrade: item.tchCourseClassInfo[0].classGrade,
-              title: item.tchCourseClassInfo[0].testPaperName,
+              subjectType: item.subjectType,
+              classGrade: this.$route.query.classGrade,
+              title: item.testPaperName,
               fromTask: 1
             }
           })
-        } else if (item.tastType === 'T03') {
+        } else if (item.taskType === 'T03') {
           if (item.resourceType === 'R03') {
             //单道试题
-            this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.tastName}`)
+            this.$router.push(`/questionDetail?tchCourseId=${item.tchCourseId}&taskId=${item.taskId}&title=${item.taskName}`)
           }
-        } else if (['T13'].includes(item.tastType)) {
+        } else if (['T13'].includes(item.taskType)) {
           //口语
-          this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${item.tchCourseClassInfo[0].sysCourseId}`)
-        } else if (['T02', 'T04', 'T06'].includes(item.tastType)) {
+          this.$router.push(`/spokenDetail?spokenId=${item.resourceId}&sysCourseId=${item.sysCourseId}`)
+        } else if (['T02', 'T04', 'T06'].includes(item.taskType)) {
           // 学资源 微课+心得 讨论  跳任务统计
           this.viewStat(item)
         }
@@ -230,38 +233,50 @@
         if (this.currentPage > this.total && this.currentPage > 1) {
           return
         }
-       await this.getUnFinishCourseTask()
+        await this.getTaskInfoList()
       },
       async onRefresh() {
         this.finished = false
         this.currentPage = 0
         await this.onLoad()
       },
-      async getUnFinishCourseTask() {
+      async getTaskInfoList() {
         const page = this.currentPage
         let obj = {
-          operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-          currentPage: page,
-          pageSize: this.pageSize
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "classGrade": this.$route.query.classGrade,
+          "startDate": this.filterTime.start,
+          "endDate": this.filterTime.end,
+          "pageSize": this.pageSize,
+          "currentPage": page,
+          "classId": this.$route.query.classId,
+          "schoolIds": this.$store.getters.schoolIdList,
+          "teacherNo": this.$route.query.teacherNo
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
-        await getUnFinishCourseTask(params).then(res => {
+        await getTaskInfoList(params).then(res => {
           this.listLoading = false
           this.refLoading = false
           this.total = res.total
-          if (res.flag && res.data && res.data.length) {
-            this.taskList = page === 1 ? res.data : this.taskList.concat(res.data)
+          if (res.flag && res.data[0] && res.data[0].tchCourseTaskInfo.length) {
+            this.taskList = page === 1 ? res.data[0].tchCourseTaskInfo : this.taskList.concat(res.data[0].tchCourseTaskInfo)
             if (localStorage.getItem("classMap")) {
               let classMap = JSON.parse(localStorage.getItem("classMap"));
               this.taskList.forEach(item => {
-                if (item.tchCourseClassInfo) {
-                  item.tchCourseClassInfo.forEach((obj, i) => {
+                let finishCount = 0
+                let allCount = 0
+                if (item.tchClassTastInfo) {
+                  item.tchClassTastInfo.forEach((obj, i) => {
                     if (i == 0) {
                       //跳转到任务统计页面时自动将第一个班级设置为选中状态
                       obj.active = true
                     }
+                    finishCount += obj.finshCount
+                    allCount += obj.allCount
                     if (!classMap[obj.classId] || !classMap[obj.classId].className) {
                       obj['className'] = "--"
                     } else {
@@ -269,8 +284,8 @@
                     }
                   })
                 }
-                //任务统计需要tchClassTastInfo字段,但getUnFinishCourseTask接口字段为tchCourseClassInfo
-                item.tchClassTastInfo = item.tchCourseClassInfo
+                item.finishCount = finishCount
+                item.allCount = allCount
               });
             }
             if (this.currentPage >= res.total) {
@@ -294,9 +309,11 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+
     &__body {
       flex: 1;
       overflow-y: auto;
+
       .null-tips {
         margin-top: 50px;
         margin-left: 50%;
@@ -304,6 +321,7 @@
         width: 100%;
       }
     }
+
     .teach-stat__time-picker-wrap {
       @{deep} .van-picker__toolbar {
         display: none;

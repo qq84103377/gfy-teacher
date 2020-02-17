@@ -142,6 +142,7 @@
         })
       },
       addSubScore() {
+         if(this.isDisabled) return
         if(this.classView) {
         this.$router.push({name:`addSubScore`,params:{info:this.info,termType:this.termType}})
         }else {
