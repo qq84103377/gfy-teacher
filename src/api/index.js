@@ -423,7 +423,7 @@ export const getStudentScoreStatistics =(params)=>{
 }
 //更新已发布任务
 export const modifyCourseTask =(params)=>{
-  return axios.post('teach/modifyCourseTask', qs.stringify(params))
+  return axios.post('teach/modifyCourseTask', qs.stringify(params), {timeout: 0})
 }
 //学情数据
 export const getUserKnowledgePointCounterV2 =(params)=>{

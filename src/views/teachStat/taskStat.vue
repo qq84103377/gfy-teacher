@@ -89,7 +89,7 @@
               </div>
               <div class="row" v-for="(item,index) in tchStatInfo" :key="index">
                 <div>{{item.courseNum}}</div>
-                <div @click="viewTaskInfo(item)">{{item.outsideClassNum}}</div>
+                <div @click="viewTaskInfo(item)" class="blue">{{item.outsideClassNum}}</div>
                 <div>{{item.outsideClassPrecent}}</div>
                 <div>{{item.insideClassNum}}</div>
                 <div>{{item.taskNum}}</div>
@@ -106,6 +106,7 @@
           <div class="tip">
             <div>1.可在表格白色区域内左右滑动查看更多信息</div>
             <div>2.点击学生课堂次数查看展开课堂情况</div>
+            <div>3.点击“课前任务数”可查看该老师详细的课前任务布置情况</div>
           </div>
         </div>
         <div v-if="showClassDetail" class="van-hairline--top mgt10 pdt10">
