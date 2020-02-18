@@ -193,7 +193,10 @@ export default {
           }
         }
         //筛选对应的年级
-        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade))
+        if (gradeArr.includes("G09")) {
+          gradeArr.push("G09&1")
+        }
+        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade));
         let tempList = this.classGradeList[this.gradeIndex].bookInfo
         let sub = localStorage.getItem("currentSubjectType")
         this.bookInfoList = []
@@ -220,7 +223,7 @@ export default {
         } else {
           this.termIndex = 0
         }
-        this.$emit('init', this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
+        this.$emit('init', this.classGradeList[this.gradeIndex].classGrade.split("&")[0], this.termTypeList[this.termIndex])
         this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
@@ -256,7 +259,7 @@ export default {
     initClassIndex() {
       for (let key in JSON.parse(localStorage.getItem("classMap"))) {
         const value = JSON.parse(localStorage.getItem("classMap"))[key]
-        if (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
+        if (this.gradeList[this.gradeIndex].classGrade.split("&")[0] === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
           this.classIndex = key
           break
         }
@@ -264,7 +267,7 @@ export default {
     },
     classVisible(value, key) {
       // if (this.gradeIndex !== '') {
-      return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
+      return (this.gradeList[this.gradeIndex].classGrade.split("&")[0] === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
       // } else {
       //   return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
       // }
@@ -321,7 +324,7 @@ export default {
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "termType": this.termList[this.termIndex].value, //学期
-          "classGrade": this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', //年级
+          "classGrade": this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade.split("&")[0] : '', //年级
           "classId": this.classIndex || '', //班级
           "subjectType": localStorage.getItem("currentSubjectType") //科目
         }
