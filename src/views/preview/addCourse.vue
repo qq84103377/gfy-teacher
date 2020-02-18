@@ -509,7 +509,7 @@ export default {
         "belongSchoolId": this.$store.getters.schoolId,
         "schoolTypeCd": "S01",
         "sysCourseId": this.currentShareCourse.courseId,
-        "classGrade": this.currentShareCourse.classGrade,
+        "classGrade": this.currentShareCourse.classGrade.split("&")[0],
         "subjectType": localStorage.getItem("currentSubjectType"),
         "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
         "pageSize": "100",
