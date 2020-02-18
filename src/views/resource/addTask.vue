@@ -1098,7 +1098,7 @@
         //任务类型
         let taskType = ""
         let resourceType = ""
-        let isDrag = ""
+        let isDrag = "I02"
         if (this.$route.query.type === 'lesson') {
           if (this.testPaperId) {
             //微课+试卷
@@ -1342,7 +1342,7 @@
         //任务类型
         let taskType = this.$route.query.taskType
         let resourceType = this.$route.query.resourceType
-        let isDrag = ""
+        let isDrag = "I02"
 
         if (taskType == "T01" || taskType == "T02") {
           if (this.form.allowFast) {
