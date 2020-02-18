@@ -13,7 +13,7 @@
         <div class="col">{{index+1}}</div>
         <div class="col ex-width pd5" v-if="type == 'statistic'">{{item.splitSentence.sentenceContent}}</div>
         <div class="col ex-width pd5" v-if="type == 'personal'">{{item.sentenceContent}}</div>
-        <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage}} ></div>
+        <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage || 0}} ></div>
         <div class="col ex-width" v-if="type == 'analyse'">{{getStudentName(item.accountNo,classId)}}</div>
         <div class="col" v-if="type == 'analyse' || type == 'personal'">{{item.score}}</div>
 <!--        <div class="col" v-if="type == 'analyse' || type == 'personal'">-->

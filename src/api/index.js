@@ -521,3 +521,7 @@ export const stickyNotes =(params)=>{
 export const updateCourseWareCount =(params)=>{
   return axios.post('resource/updateCourseWareCount', qs.stringify(params))
 }
+//课前任务列表
+export const getTaskInfoList =(params)=>{
+  return axios.post('teachNew/getTaskInfoList', qs.stringify(params))
+}

@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="exam-view-wrap__footer">
-      <van-button type="info" class="btn" @click="addSubScore">加分/减分</van-button>
+      <van-button type="info" class="btn" :class="{disabled:isDisabled}" @click="addSubScore">加分/减分</van-button>
     </div>
   </section>
 </template>
@@ -40,6 +40,7 @@
         isSpoken: this.$route.params.isSpoken,
         taskType: this.$route.params.taskType,
         termType: this.$route.params.termType,
+        isDisabled: this.$route.params.isDisabled,
       }
     },
     computed: {
@@ -141,6 +142,7 @@
         })
       },
       addSubScore() {
+         if(this.isDisabled) return
         if(this.classView) {
         this.$router.push({name:`addSubScore`,params:{info:this.info,termType:this.termType}})
         }else {
@@ -190,7 +192,7 @@
       },
       handleToggle(bol) {
         //班级未分组时,无法切换小组查看 弹出toast
-        if (JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
+        if (!localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`] ||  JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
           return this.$toast('该班级未分组,无法进行小组查看')
         }
         this.classView = bol
@@ -249,6 +251,11 @@
         border-radius: 20px;
         font-size: 18px;
       }
+    }
+    .disabled {
+      background: #f5f6fa;
+      color: #ccc;
+      border: 1px solid #ccc;
     }
   }
 </style>
