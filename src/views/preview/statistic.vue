@@ -121,7 +121,7 @@
                   <div>平均分: {{calcScore(item,'avg_score')}}</div>
                   <div>总分:{{calcScore(item,'total_score')}}</div>
                 </div>
-                <div class="status" :class="{disabled:isDisabled}" style="border: none;">{{isCorrect(item)?
+                <div class="status">{{isCorrect(item)?
                   '已批改':'批改'}}
                 </div>
               </div>
@@ -138,7 +138,7 @@
                   <div>平均分: {{singleQuestionScore('avg_score')}}</div>
                   <div>总分:{{singleQuestionScore('total_score')}}</div>
                 </div>
-                <div class="status" :class="{disabled:isDisabled}" style="border: none;">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v => v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
+                <div class="status">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v => v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
                   '已批改':'批改'}}
                 </div>
               </div>
@@ -717,7 +717,6 @@
         })
       },
       viewSubjectList(item) {
-         if(this.isDisabled) return
         let questionList = []
         if (this.$route.query.resourceType === 'R03') {
           questionList.push({ examId: this.taskFinishInfo.resourceId, num: 1 })
@@ -739,7 +738,8 @@
             questionList,
             // info: this.taskFinishInfo,
             termType: this.$route.query.termType,
-            taskType: this.$route.query.taskType
+            taskType: this.$route.query.taskType,
+            disabled: this.isDisabled?1:''
           }
         })
       },

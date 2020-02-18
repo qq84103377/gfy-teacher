@@ -115,7 +115,7 @@
       // this.init()
     },
      beforeRouteLeave(to, from, next) {
-      
+
     if (this.$parent.showTime) {
       this.$parent.showTime=false
       next(false)
@@ -134,7 +134,7 @@
     } else {
         next()
     }
-  
+
     },
     methods: {
       showSelectKnw(item) {
@@ -185,8 +185,8 @@
           roleType: 'A03',
           termType: '',
           ...this.filterParams,
-          beignDate: this.$parent.filterTime.start,
-          endDate: this.$parent.filterTime.end,
+          beignDate: this.$store.getters.getTeachStatFilterTime.start,
+          endDate: this.$store.getters.getTeachStatFilterTime.end,
           accountNo:item?item.accountNo:''
         };
         let params = {

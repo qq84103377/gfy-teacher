@@ -881,8 +881,10 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           subjectTypeNot: 'S20',
-          startDate: this.$parent.filterTime.start + ' 00:00:00',
-          endDate: this.$parent.filterTime.end + ' 23:59:59',
+          // startDate: this.$parent.filterTime.start + ' 00:00:00',
+          // endDate: this.$parent.filterTime.end + ' 23:59:59',
+          startDate: this.$store.getters.getTeachStatFilterTime.start + ' 00:00:00',
+          endDate: this.$store.getters.getTeachStatFilterTime.end + ' 23:59:59',
           ...this.filterParams
         };
         let params = {
