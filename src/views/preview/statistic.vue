@@ -63,7 +63,11 @@
         </div>
 
         <!--        学生心得-->
-        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1" :list="appraiseList">
+        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
+                 @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+                 :classId="info.tchClassTastInfo.find(t => t.active).classId"
+                 v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
+                 :list="appraiseList" :disable="isDisabled">
         </stu-exp>
 
         <!--        学资源/微课详情-->

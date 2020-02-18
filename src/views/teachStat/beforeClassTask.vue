@@ -262,7 +262,7 @@
           this.listLoading = false
           this.refLoading = false
           this.total = res.total
-          if (res.flag && res.data[0] && res.data[0].tchCourseTaskInfo.length) {
+          if (res.flag && res.data && res.data[0] && res.data[0].tchCourseTaskInfo.length) {
             this.taskList = page === 1 ? res.data[0].tchCourseTaskInfo : this.taskList.concat(res.data[0].tchCourseTaskInfo)
             if (localStorage.getItem("classMap")) {
               let classMap = JSON.parse(localStorage.getItem("classMap"));
