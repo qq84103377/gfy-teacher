@@ -31,7 +31,7 @@
     <div v-show="!isPen&&!isRubber" class="img-correct-wrap__swipe">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
         <div class="img-wrap">
-          <img :class="{active:item.active}" :src="item.src" alt="">
+          <img :class="{active:item.active}" v-lazy="item.src" alt="">
           <span :class="{active:item.active}">{{index + 1}}</span>
         </div>
         <div>{{getStudentName(item.accountNo,classId)}}</div>

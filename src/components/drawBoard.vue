@@ -193,7 +193,8 @@ export default {
       this.offCtx.clearRect(0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height); // 先清除画布
       let changeImg = new Image();
       changeImg.setAttribute("crossOrigin", 'anonymous');
-      changeImg.src = changeValue + '&' + Math.random();
+      // changeImg.src = changeValue + '&' + Math.random();
+      changeImg.src = changeValue;
       changeImg.onload = () => {
         this.offCtx.drawImage(changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
       };
