@@ -520,7 +520,6 @@
           this.tchCourseInfo = this.$store.getters.getTchCourseInfo
         }
         console.log("课程", this.tchCourseInfo)
-
         if (this.tchCourseInfo) {
           this.currentTchCourseId = this.tchCourseInfo.tchCourseId
           // if (!this.isEdit) {

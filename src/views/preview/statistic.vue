@@ -280,7 +280,7 @@
             termType: this.termType,
             tchCourseId: this.info.tchCourseId,
             taskId: this.info.taskId,
-            taskType: this.info.taskType,
+            taskType: this.info.taskType || this.info.tastType,
             resourceType: this.info.resourceType,
             isEdit: true,
             isResend: 1,

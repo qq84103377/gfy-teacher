@@ -82,6 +82,21 @@ export default {
       this.$store.commit('setVanLoading', true)
       //估计后台字段任务名称写错了
       item.taskName = item.tastName
+      let classMap = JSON.parse(localStorage.getItem("classMap"));
+      for (const key in classMap) {
+        for (var i = 0; i < item.courseClassList.length; i++) {
+          if (classMap[key].classId == item.courseClassList[i].classId) {
+            item.courseClassList[i].className = classMap[key].className
+          }
+        }
+      }
+      let tchCourseInfo = {
+        tchCourseId: item.tchCourseId,
+        tchClassCourseInfo: item.courseClassList,
+        subjectType: item.subjectType,
+      }
+      localStorage.setItem('taskTchCourseInfo', JSON.stringify(tchCourseInfo))
+      localStorage.setItem('stat', JSON.stringify(item))
       this.$router.push({
         path: '/statistic',
         query: {
@@ -91,10 +106,11 @@ export default {
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
           taskType: item.tastType,
-          resourceType: item.resourceType
+          resourceType: item.resourceType,
+          courseName:item.courseName
         }
       })
-      localStorage.setItem('stat', JSON.stringify(item))
+
     },
     delTask(item, index) {
       let obj = {
