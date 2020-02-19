@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
+    <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="error"></course-filter>
     <exam-bar ref="examBar" type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>

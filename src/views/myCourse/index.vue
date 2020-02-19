@@ -143,9 +143,9 @@ export default {
       }
       const filter = this.$refs.courseFilter
       this.filterParams = {
-        classGrade:filter.gradeList[filter.gradeIndex].classGrade, termType:filter.termList[filter.termIndex].value, classId:filter.classIndex
+        classGrade:filter.gradeIndex === '' ? '' : filter.gradeList[filter.gradeIndex].classGrade, termType:filter.termList[filter.termIndex].value, classId:filter.classIndex||''
       }
-      this.getClassTeachCourseInfo(filter.gradeList[filter.gradeIndex].classGrade,filter.termList[filter.termIndex].value,filter.classIndex)
+      this.getClassTeachCourseInfo(filter.gradeIndex === '' ? '' : filter.gradeList[filter.gradeIndex].classGrade,filter.termList[filter.termIndex].value,filter.classIndex||'')
     },
     async onRefresh() {
       this.finished = false
