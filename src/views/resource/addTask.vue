@@ -413,7 +413,7 @@
             // else {
             //   this.form.name = this.resourceInfo.spokenTitle
             // }
-            this.form.resourceId = this.resourceInfo.spokenId
+            this.form.resourceId = this.resourceInfo.resourceId
           }
 
         }

@@ -432,6 +432,12 @@
             const score = item.score * 1 + (type === 'T01' ? 1 : -1)
             item.score = score > 0 ? '+' + score : score
             this.$toast(`${type === 'T01' ? '加' : '减'}分成功`)
+
+            //更新this.taskFinishInfo.studentStatList的值 因为点赞/置顶/精华/加分/评论以后没有刷新this.taskFinishInfo.studentStatList
+            const index = this.taskFinishInfo.studentStatList.findIndex(v => v.accountNo === item.appraiseAccountNo)
+            if(index>-1) {
+              this.taskFinishInfo.studentStatList[index].studentRewardScore = score
+            }
           } else {
             this.$toast(res.msg)
           }
