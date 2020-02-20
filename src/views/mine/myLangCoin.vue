@@ -130,18 +130,18 @@
         isLoading: false,
       }
     },
-     beforeRouteLeave(to, from, next) {
+    beforeRouteLeave(to, from, next) {
       if (this.showTips) {
         this.showTips = false
         next(false)
-      } else{
-      next();
+      } else {
+        next();
       }
     },
     methods: {
-      goBack(){
-          this.common.goBack(this)
-        },
+      goBack() {
+        this.common.goBack(this)
+      },
       onLoad() {
         console.log('onload')
         this.loading = true;
@@ -194,7 +194,7 @@
           roleType: this.$store.getters.getUserInfo.roleType,
           belongSchoolId: this.$store.getters.schoolId,
           operateAccountNo: this.$store.getters.getUserInfo.accountNo,
-          counterTypeList: [{counterType: 'U01'}],
+          counterTypeList: [{counterType: "U01"}, {counterType: "C03"}],
           orginTypeList: [
             {orginType: "O01"},
             {orginType: "O05"},
@@ -213,9 +213,7 @@
             {orginType: "O35"},
             {orginType: "O36"},
             {orginType: "O37"},
-            {orginType: "O44"}
-          ]
-
+            {orginType: "O44"}]
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -552,7 +550,8 @@
 
       .content {
         padding: 0 20px;
-        h3{
+
+        h3 {
           font-size: 15px;
           font-weight: 500;
           border-left: 3px solid #39F0DD;

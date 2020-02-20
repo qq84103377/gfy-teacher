@@ -58,12 +58,12 @@
             <span>{{recordDetail.convertCompleteDate | formatDate}}</span>
           </div>
           <div>
-            <span>兑换积分：</span>
-            <span>{{recordDetail.consumeIntegral}}</span>
+            <span>兑换朗币：</span>
+            <span>{{Math.floor(recordDetail.consumeIntegral/10)}}</span>
           </div>
           <div>
-            <span>原价积分：</span>
-            <span>{{recordDetail.orginIntegral}}</span>
+            <span>原价朗币：</span>
+            <span>{{Math.floor(recordDetail.orginIntegral/10)}}</span>
           </div>
           <div>
             <span>兑换状态：</span>
@@ -127,7 +127,7 @@
       if (this.showDialog) {
         this.showDialog = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
