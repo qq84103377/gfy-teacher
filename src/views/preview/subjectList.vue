@@ -174,6 +174,7 @@
         })
       },
       subjectCorrect(item, stuIndex, aswIndex, imgIndex) {
+        if(this.$route.query.disabled == 1) return
         console.log(item);
         // 点击图片
         // const index = this.tabList.findIndex(v => v.active)

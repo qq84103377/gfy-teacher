@@ -207,7 +207,7 @@
             <list-item @clickTo="viewDetail(item)" class="mgt10" v-if="resourceIndex==3&&tabIndex == 0"
                        style="background: #fff;" v-for="(item,index) in examList" :key="index"
                        :itemTitle="item.testPaperName">
-              <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+              <div slot="cover" class="cover" style="background: #39F0DD;"><i class="iconGFY icon-exam-100"></i></div>
               <div slot="desc">
                 <div class="desc-top">
                   <i class="iconGFY"
@@ -352,7 +352,7 @@
                       @clickDel='clickDel(index)'
                       style="background: #fff;" v-for="(item,index) in priExamList" :key="index"
                       :itemTitle="item.test_paper_name">
-             <div slot="cover" class="cover"><i class="iconGFY icon-exam-100"></i></div>
+             <div slot="cover" class="cover" style="background: #39F0DD;"><i class="iconGFY icon-exam-100"></i></div>
              <div slot="desc">
                <div class="desc-top">
                  <i class="iconGFY"
@@ -1072,9 +1072,11 @@
           }
           //私人资源素材的时间需要转格式
           humpObj.createDate = formatTime(humpObj.createDate)
-          this.$router.push({path: '/materialDetail', query: {data: humpObj}})
+          localStorage.setItem('materialDetail',JSON.stringify(humpObj))
+          this.$router.push({ path: '/materialDetail'})
         } else {
-          this.$router.push({path: '/materialDetail', query: {data: item.resCourseWareInfo}})
+          localStorage.setItem('materialDetail',JSON.stringify(item.resCourseWareInfo))
+          this.$router.push({ path: '/materialDetail'})
         }
       },
       sendTask(obj, key) {
@@ -1149,7 +1151,7 @@
             query: {
               src: this.tabIndex ? src_url : srcUrl,
               title: this.tabIndex ? item.courseware_name : item.resCourseWareInfo.coursewareName,
-              isMp3: (this.tabIndex ? item.coursewareType : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
+              isMp3: (this.tabIndex ? item.courseware_type : item.resCourseWareInfo.coursewareType) == "T06" ? true : false
             }
           })
         }).catch(() => {
@@ -1254,7 +1256,7 @@
           "pageSize": "999",
           "courseType": "C01,C02",
           "currentPage": 1,
-          "isFinish":2
+          "isFinish":4
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -1605,7 +1607,7 @@
       }
 
       .cover {
-        background: #FCA361;
+        background: #f3d233;
         display: flex;
         align-items: center;
         justify-content: center;

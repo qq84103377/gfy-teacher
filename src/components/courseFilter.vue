@@ -1,25 +1,28 @@
 <template>
   <!--    <section class="course-filter-wrap"></section>-->
-  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'||type==='fEducation'?'65%':'93%' }">
+  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: (type==='myCourse' || type==='error'||type==='fEducation')?'65%':'93%' }">
     <div class="course-filter-wrap">
       <van-overlay class-name="mask" :show="gradeDropdown||termDropdown||versionDropdown||classDropdown" @click="gradeDropdown = false;termDropdown=false;versionDropdown=false;classDropdown=false" />
 
       <div class="course-filter-wrap__header van-hairline--bottom">
-        <div v-if="type==='myCourse'" class="course-filter-wrap__header-tab">
+        <div v-if="type==='myCourse' || type==='error'" class="course-filter-wrap__header-tab">
           <span @click="handleSubject(item)" :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
         </div>
-        <div v-if="type!=='myCourse'&&type!=='fEducation'" class="course-filter-wrap__header-tab">
+        <div v-if="type!=='myCourse'&&type!=='fEducation'&&type!=='error'" class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
-        <van-icon v-if="type!=='myCourse'" class="icon-close" @click="show=false" name="close" />
+        <van-icon v-if="type==='myCourse' || type==='error'" class="icon-close" @click="show=false" name="close" />
       </div>
-      <div v-if="type === 'myCourse'||type === 'fEducation'" class="course-filter-wrap__dropdown van-hairline--bottom">
+      <div v-if="type==='myCourse' || type==='error'||type === 'fEducation'" class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>
           <div class="dropdown-title" @click="gradeDropdown=!gradeDropdown">
-            {{gradeList[gradeIndex]?gradeList[gradeIndex].gradeName:'年级'}}
+            {{gradeList[gradeIndex]?gradeList[gradeIndex].gradeName:'全部'}}
             <van-icon class="arrow" :name="gradeDropdown?'arrow-up':'arrow-down'" />
           </div>
           <div v-show="gradeDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" :class="{active: gradeIndex === ''}" v-if="type === 'myCourse'" @click="changeGrade('')">全部
+              <van-icon v-show="gradeIndex === '' " class="check blue" name="success" />
+            </div>
             <div class="dropdown-menu-item" :class="{active: gradeIndex === index}" v-if="item.teacherInfoList.some(t => t.subjectType === subjectList.find(v => v.active).key)" v-for="(item,index) in gradeList" :key="index" @click="changeGrade(index)">{{item.gradeName}}
               <van-icon v-show="gradeIndex === index " class="check blue" name="success" />
             </div>
@@ -28,10 +31,14 @@
 
         <div>
           <div class="dropdown-title" @click="termDropdown=!termDropdown">
-            {{termList[termIndex]?termList[termIndex].name:'学期'}}
+<!--            {{termList[termIndex]?termList[termIndex].name:'学期'}}-->
+            {{termList[termIndex]?termList[termIndex].name:'全部'}}
             <van-icon class="arrow" :name="termDropdown?'arrow-up':'arrow-down'" />
           </div>
           <div v-show="termDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" @click="changeTermType('')" v-if="type==='myCourse'" :class="{active: termIndex === ''}">全部
+              <van-icon v-show="termIndex === '' " class="check blue" name="success" />
+            </div>
             <div class="dropdown-menu-item" @click="changeTermType(index)" :class="{active: termIndex === index}" v-for="(item,index) in termList" :key="index">{{item.name}}
               <van-icon v-show="termIndex === index " class="check blue" name="success" />
             </div>
@@ -40,10 +47,14 @@
 
         <div>
           <div class="dropdown-title" @click="classDropdown=!classDropdown">
-            <span>{{classList[classIndex]?classList[classIndex].className:'班级'}}</span>
+<!--            <span>{{classList[classIndex]?classList[classIndex].className:'班级'}}</span>-->
+            <span>{{classList[classIndex]?classList[classIndex].className:'全部'}}</span>
             <van-icon class="arrow" :name="classDropdown?'arrow-up':'arrow-down'" />
           </div>
           <div v-show="classDropdown" class="dropdown-menu">
+            <div class="dropdown-menu-item" @click="changeClass(0)" v-if="type==='myCourse'" :class="{active: classIndex === 0}">全部
+              <van-icon v-show="classIndex === 0" class="check blue" name="success" />
+            </div>
             <div class="dropdown-menu-item" @click="changeClass(key)" :class="{active: classIndex === key}" v-if="classVisible(value,key)" v-for="(value ,key) in classList" :key="key">{{value.className}}
               <van-icon v-show="classIndex === key" class="check blue" name="success" />
             </div>
@@ -87,12 +98,12 @@
         </div>
       </div>
       <div class="course-filter-wrap__body">
-        <div v-if="type!=='myCourse'" class="course-filter-wrap__body-left">
+        <div v-if="type!=='myCourse'||type!=='error'" class="course-filter-wrap__body-left">
           <div :class="{'active':unitIndex ==index }" v-for="(item,index) in unitList" :key="index" @click="handleUnit(index)">
             {{item.nodeName}}
           </div>
         </div>
-        <div v-if="type!=='myCourse'" class="course-filter-wrap__body-right">
+        <div v-if="type!=='myCourse'||type!=='error'" class="course-filter-wrap__body-right">
           <div class="" v-for="(item,index) in courseList" :key="index">
             <div v-if="item.childNodeList && item.childNodeList.length>0">
               <div class="course-first van-hairline--bottom" @click="$set(item,'fold',!item.fold)"><span>{{item.nodeName}}</span>
@@ -122,7 +133,7 @@ import { getTextBookCourseInfo, getGradeTermInfo } from '@/api/index'
 
 export default {
   name: "courseFilter",
-  props: ['visible', 'sysCourseId', 'type',],
+  props: ['visible', 'sysCourseId', 'type'],
   data() {
     return {
       gradeDropdown: false,
@@ -139,7 +150,7 @@ export default {
       gradeTermList: this.$store.getters.getGradeTermInfo,
       subjectName: localStorage.getItem("currentSubjectTypeName"),
       classGradeMap: [],
-      gradeIndex: 0,
+      gradeIndex: this.type === 'myCourse' ? '' : 0,
       textBookList: [],
       bookIndex: 0,
       currentSysCourseId: this.sysCourseId,
@@ -156,7 +167,7 @@ export default {
       classDropdown: false,
       // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
       classIndex: '',
-      showChangeDialog: false
+      showChangeDialog:false
     }
   },
   computed: {
@@ -170,14 +181,12 @@ export default {
     },
   },
   mounted() {
-    if (this.type === 'myCourse') {
-      // this.getTextBookCourseInfo()
-    } if (this.type === 'fEducation') {
+    if (this.type === 'myCourse' || this.type === 'error'||this.type === 'fEducation') {
       // this.getTextBookCourseInfo()
     } else {
       //获取上下学期
       let now = new Date();
-      let month = now.getMonth();
+      let month = now.getMonth() + 1;
       if (7 >= month && month >= 2) {
         this.isNowTerm = 1
       } else {
@@ -195,7 +204,10 @@ export default {
           }
         }
         //筛选对应的年级
-        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade))
+        if (gradeArr.includes("G09")) {
+          gradeArr.push("G09&1")
+        }
+        this.classGradeList = JSON.parse(localStorage.getItem("deployList")).filter(v => gradeArr.includes(v.classGrade));
         let tempList = this.classGradeList[this.gradeIndex].bookInfo
         let sub = localStorage.getItem("currentSubjectType")
         this.bookInfoList = []
@@ -222,7 +234,7 @@ export default {
         } else {
           this.termIndex = 0
         }
-        this.$emit('init', this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
+        this.$emit('init', this.classGradeList[this.gradeIndex].classGrade.split("&")[0], this.termTypeList[this.termIndex])
         this.isDeploy = true;
       } else {
         this.$toast("未配置年级学科信息")
@@ -266,25 +278,32 @@ export default {
     }
   },
   methods: {
-    close() {
-      this.showChangeDialog = false
+    close(){
+      this.showChangeDialog=false
       this.$dialog.close()
     },
     initClassIndex() {
-      for (let key in JSON.parse(localStorage.getItem("classMap"))) {
-        const value = JSON.parse(localStorage.getItem("classMap"))[key]
-        if (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
-          this.classIndex = key
-          break
+      if(this.type === 'myCourse') {
+        this.classIndex = 0
+      }else {
+        for (let key in JSON.parse(localStorage.getItem("classMap"))) {
+          const value = JSON.parse(localStorage.getItem("classMap"))[key]
+          if (this.gradeList[this.gradeIndex].classGrade.split("&")[0] === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
+            this.classIndex = key
+            break
+          }
         }
       }
     },
     classVisible(value, key) {
       // if (this.gradeIndex !== '') {
-      if (this.type === 'fEducation') {
+      if(this.gradeIndex === '') {
+        return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
+      }else if (this.type === 'fEducation') {
         return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === 'S20'))
+      }else {
+        return (this.gradeList[this.gradeIndex].classGrade.split("&")[0] === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
       }
-      return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
       // } else {
       //   return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
       // }
@@ -299,7 +318,7 @@ export default {
     },
     handleSubject(item) {
       if (item.active) return
-      this.showChangeDialog = true
+      this.showChangeDialog=true
       this.$dialog.confirm({
         title: '提示',
         message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
@@ -307,18 +326,18 @@ export default {
         confirmButtonColor: '#39F0DD',
         className: 'change-subject'
       }).then(() => {
-        this.showChangeDialog = false
+        this.showChangeDialog=false
         this.subjectList.forEach(v => {
           v.active = false
         })
         item.active = true
         localStorage.setItem("currentSubjectTypeName", item.value);
         localStorage.setItem("currentSubjectType", item.key);
-        this.gradeIndex = 0
+        this.gradeIndex = this.type === 'myCourse' ? '' : 0
         this.initClassIndex()
         // this.getTextBookCourseInfo()
       }).catch(() => {
-        this.showChangeDialog = false
+        this.showChangeDialog=false
         // on cancel
       });
     },
@@ -334,14 +353,14 @@ export default {
       // this.unitList = []
       // this.courseList = []
       let obj
-      if (this.type === 'myCourse') {
+      if (this.type === 'myCourse'||this.type === 'error') {
         obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "termType": this.termList[this.termIndex].value, //学期
-          "classGrade": this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', //年级
+          "classGrade": this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade.split("&")[0] : '', //年级
           "classId": this.classIndex || '', //班级
           "subjectType": localStorage.getItem("currentSubjectType") //科目
         }
@@ -432,14 +451,14 @@ export default {
     changeTermType(index) {
       this.termIndex = index
       this.termDropdown = !this.termDropdown
-      if (this.type === 'myCourse'||this.type === 'fEducation') {
+      if (this.type === 'myCourse'||this.type === 'error'||this.type === 'fEducation') {
         // this.getTextBookCourseInfo()
       } else {
         this.getTextBookCourseInfo()
       }
     },
     changeGrade(index) {
-      if (this.type === 'myCourse') {
+      if (this.type === 'myCourse'||this.type === 'error') {
         this.gradeIndex = index
         this.initClassIndex()
         this.gradeDropdown = !this.gradeDropdown
@@ -488,11 +507,11 @@ export default {
       this.show = false
       this.$emit('update:visible', false)
       this.$emit('update:sysCourseId', this.currentSysCourseId)
-      if (this.type === 'myCourse') {
+      if (this.type === 'myCourse'||this.type === 'error') {
         this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
       }else if (this.type === 'fEducation') {
         this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
-      } else {
+      }  else {
         this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])
       }
     },

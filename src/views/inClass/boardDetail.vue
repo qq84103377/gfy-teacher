@@ -44,7 +44,7 @@ export default {
   components: { listItem, PDF },
   data() {
     return {
-      info: this.$route.query.data,
+      info: JSON.parse(localStorage.materialDetail),
       type: '',
       iconType: ''
     }
@@ -60,11 +60,7 @@ export default {
     },
     goVideoPage(url, isAudeo) {
       if (!url) return
-      if (isAudeo) {
-        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name, isAudeo: true } })
-      } else {
-        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name } })
-      }
+      this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.name, isMp3: isAudeo } })
     },
     handleIcon(url) {
       var t = url.substring(url.lastIndexOf('.') + 1).toLowerCase()
@@ -175,7 +171,7 @@ export default {
     > video {
       width: 100%;
     }
-    > .audio{
+    > .audio {
       height: 210px;
     }
     .cover {

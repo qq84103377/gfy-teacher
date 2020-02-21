@@ -4,7 +4,7 @@
       <div slot="right" class="fs12 blue" @click="filterShow=true">筛选</div>
     </van-nav-bar>
     <div class="error-book__tab van-hairline--bottom">
-      <span class="fs15 grey6" style="white-space: nowrap">错误率</span>
+      <div class="fs15 grey6" style="white-space: nowrap">错误率</div>
       <div @click="selectError(item)" :class="{active:item.active}" v-for="(item,index) in errorPercent" :key="index">{{item.value}}
       </div>
     </div>
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
+    <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="error"></course-filter>
     <exam-bar ref="examBar" type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
   </section>
 </template>

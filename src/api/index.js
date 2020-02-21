@@ -423,7 +423,7 @@ export const getStudentScoreStatistics =(params)=>{
 }
 //更新已发布任务
 export const modifyCourseTask =(params)=>{
-  return axios.post('teach/modifyCourseTask', qs.stringify(params))
+  return axios.post('teach/modifyCourseTask', qs.stringify(params), {timeout: 0})
 }
 //学情数据
 export const getUserKnowledgePointCounterV2 =(params)=>{
@@ -520,6 +520,10 @@ export const stickyNotes =(params)=>{
 //更新资源下载数
 export const updateCourseWareCount =(params)=>{
   return axios.post('resource/updateCourseWareCount', qs.stringify(params))
+}
+//课前任务列表
+export const getTaskInfoList =(params)=>{
+  return axios.post('teachNew/getTaskInfoList', qs.stringify(params))
 }
 //获取家长分组信息
 export const getSubGroupParent =(params)=>{

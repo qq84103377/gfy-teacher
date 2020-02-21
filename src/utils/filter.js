@@ -147,6 +147,9 @@ let getGradeName = (grade)=>{
     case 'G09':
       gradeName = "初三"
       break
+    case 'G09&1':
+      gradeName = "中考总复习"
+      break
     case 'G10':
       gradeName = "高一"
       break

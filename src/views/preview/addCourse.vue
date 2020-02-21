@@ -196,7 +196,7 @@ export default {
       if (!v.length) {
         this.shareCourseList = []
         this.form.course = 0;
-        this.result = []
+        if(!this.isEdit) this.result = []
         this.shareFlag = false
         this.showMask = false
         this.isSelect = true
@@ -471,6 +471,7 @@ export default {
       this.showTime = false
     },
     getSysCourseList() {
+      if(this.isEdit) return;
       this.showMask = true
       if (this.form.name == "") {
         return
@@ -524,7 +525,7 @@ export default {
         "belongSchoolId": this.$store.getters.schoolId,
         "schoolTypeCd": "S01",
         "sysCourseId": this.currentShareCourse.courseId,
-        "classGrade": this.currentShareCourse.classGrade,
+        "classGrade": this.currentShareCourse.classGrade.split("&")[0],
         "subjectType": localStorage.getItem("currentSubjectType"),
         "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
         "pageSize": "100",
@@ -662,7 +663,9 @@ export default {
     },
     async getClassTeacherCourseDeploy() {
       let obj = {
-        'operateAccountNo': this.$store.getters.getUserInfo.accountNo
+        'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
       }
       let params = {
         requestJson: JSON.stringify(obj)

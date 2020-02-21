@@ -6,30 +6,57 @@
         </div>
 
         <div class="stu-answer">
-          <div v-html="item.text"></div>
-          <div style="width: 100%;" v-if="item.audioArr&&item.audioArr.length">
-            <!--            <video-player class="video-player-box"-->
-            <!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
-            <!--                          ref="videoPlayer"-->
-            <!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
-            <!--                          :playsinline="true"-->
-            <!--                          customEventName="customstatechangedeventname">-->
-            <!--            </video-player>-->
-            <audio controls controlsList="nodownload" v-for="(audio,index) in item.audioArr" :key="index" :src="audio"></audio>
-          </div>
-          <div style="width: 100%;" v-if="item.videoArr&&item.videoArr.length">
+          <div>
+            <div v-html="item.text"></div>
+            <div style="width: 100%;" v-if="item.audioArr&&item.audioArr.length">
+              <!--            <video-player class="video-player-box"-->
+              <!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
+              <!--                          ref="videoPlayer"-->
+              <!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
+              <!--                          :playsinline="true"-->
+              <!--                          customEventName="customstatechangedeventname">-->
+              <!--            </video-player>-->
+              <audio controls controlsList="nodownload" v-for="(audio,index) in item.audioArr" :key="index" :src="audio"></audio>
+            </div>
+            <div style="width: 100%;" v-if="item.videoArr&&item.videoArr.length">
 
-            <video class="video-wrap" v-for="(s,index) in item.videoArr" webkit-playsinline playsinline x5-playsinline=""  poster="../assets/img/video-poster.png" @click='goVideoPage(s)' :src="s">
-            </video>
+              <video class="video-wrap" v-for="(s,index) in item.videoArr" webkit-playsinline playsinline x5-playsinline=""  poster="../assets/img/video-poster.png" @click='goVideoPage(s)' :src="s">
+              </video>
+            </div>
+            <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]" v-if="item.imgArr&&item.imgArr.length">
+              <div @click="imgCorrect(img,i,index)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
+            </div>
           </div>
-          <div class="img-wrap" :class="[{img4: item.imgArr.length==4},{img56:item.imgArr.length>4}]" v-if="item.imgArr&&item.imgArr.length">
-            <div @click="imgCorrect(img,i,index)" v-for="(img,i) in item.imgArr" :key="i"><img :src="img" alt=""></div>
+
+<!--          追加内容-->
+          <div class="mgt10" v-for="append in item.pubAppendContentInfoList" :key="append.appendId">
+            <div>{{append.appendTime}}追加</div>
+            <div v-html="append.text"></div>
+            <div style="width: 100%;" v-if="append.audioArr&&append.audioArr.length">
+              <!--            <video-player class="video-player-box"-->
+              <!--                          v-for="(audio,index) in item.audioArr" :key="index"-->
+              <!--                          ref="videoPlayer"-->
+              <!--                          :options="{ sources: [{type: 'audio/mp4',src: audio}],}"-->
+              <!--                          :playsinline="true"-->
+              <!--                          customEventName="customstatechangedeventname">-->
+              <!--            </video-player>-->
+              <audio controls controlsList="nodownload" v-for="(audio,index) in append.audioArr" :key="index" :src="audio"></audio>
+            </div>
+            <div style="width: 100%;" v-if="append.videoArr&&append.videoArr.length">
+
+              <video class="video-wrap" v-for="(s,index) in append.videoArr" webkit-playsinline playsinline x5-playsinline=""  poster="../assets/img/video-poster.png" @click='goVideoPage(s)' :src="s">
+              </video>
+            </div>
+            <div class="img-wrap" :class="[{img4: append.imgArr.length==4},{img56:append.imgArr.length>4}]" v-if="append.imgArr&&append.imgArr.length">
+<!--              <div @click="imgCorrect(img,calImgIndex(index,item.imgArr.length,i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>-->
+              <div @click="imgCorrect(img,item.imgArr.length + i,index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
+            </div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
         </div>
 
       </div>
-      <div class="stu-exp-wrap__item__btn-group">
+      <div class="stu-exp-wrap__item__btn-group" :class="{disable:disable}">
         <div @click="handlePraise(item)" :class="{blue:item.good}"><i class="iconGFY icon-good"
                                                                       :class="{'icon-good-active':item.good}"></i>赞
         </div>
@@ -41,7 +68,7 @@
         </div>
         <div @click="handleScore(item,'T01')"><i class="iconGFY icon-circle-plus"></i>加分</div>
         <div @click="handleScore(item,'T02')"><i class="iconGFY icon-circle-sub"></i>减分</div>
-        <div @click="$set(item,'showComment',!item.showComment)"><i class="iconGFY icon-talk"></i>评论</div>
+        <div @click="handleComment(item)"><i class="iconGFY icon-talk"></i>评论</div>
       </div>
       <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active mgr10"></i><span
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
@@ -69,11 +96,11 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId','isfEducation'],
+    props: ['list', 'classId','isfEducation','disable'],
     computed: {
       getStudentName() {
         return getStudentName
-      }
+      },
     },
     data() {
       return {
@@ -86,6 +113,7 @@
         this.$router.push({ name: 'videoPage', query: { src: url} })
       },
       imgCorrect(item,imgIndex,stuIndex) {
+        if(this.disable) return
         this.$router.push({name:'imgCorrect',params: {
             list:this.list,
             imgIndex,
@@ -96,17 +124,25 @@
           }})
       },
       handlePraise(item) {
+        if(this.disable) return
         this.$emit('praise',item)
       },
       handleTop(item) {
+        if(this.disable) return
         this.$emit('top',item)
       },
       handleEss(item) {
+        if(this.disable) return
         this.$emit('ess',item)
       },
       handleScore(item,type) {
+        if(this.disable) return
         this.$emit('score',item,type)
       },
+      handleComment(item) {
+        if(this.disable) return
+        this.$set(item,'showComment',!item.showComment)
+      }
     }
   }
 </script>
@@ -231,6 +267,11 @@
           .icon-good, .icon-good-active {
             width: 15px;
             height: 15px;
+          }
+        }
+        &.disable {
+          >div{
+            color: #999;
           }
         }
       }

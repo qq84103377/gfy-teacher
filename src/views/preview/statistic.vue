@@ -10,9 +10,9 @@
     <div style="flex: 1;overflow-y: auto">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
-          <van-button class="notice-btn" v-if="isTaskEnd" @click="sendTask">一键重发
+          <van-button class="notice-btn" :class="{remind: isDisabled}" v-if="isTaskEnd" @click="sendTask">一键重发
           </van-button>
-          <van-button class="notice-btn" v-else :class="{remind: remind || (taskFinishInfo.studentUnfinishList&&taskFinishInfo.studentUnfinishList.length===0)}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          <van-button class="notice-btn" v-else :class="{remind: isDisabled || remind || (taskFinishInfo.studentUnfinishList&&taskFinishInfo.studentUnfinishList.length===0)}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
         </div>
         <div class="statistic-wrap__pie-chart-label divider" v-else>任务完成情况:
@@ -63,7 +63,11 @@
         </div>
 
         <!--        学生心得-->
-        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1" :list="appraiseList" :isfEducation='isfEducation'>
+        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
+                 @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+                 :classId="info.tchClassTastInfo.find(t => t.active).classId"
+                 v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
+                 :list="appraiseList" :disable="isDisabled" :isfEducation='isfEducation'>
         </stu-exp>
 
         <!--        学资源/微课详情-->
@@ -72,7 +76,10 @@
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video> -->
           <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
           </video>
-          <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio>
+
+           <img class="audio" v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="" @click='goVideoPage(wareDetail.courseware.srcUrl,1)'>
+
+          <!-- <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio> -->
           <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl" :src="wareDetail.courseware.srcUrl" />
           <!--      <PDF v-else-if=" type === 'pdf' && info.srcUrl" :url="info.srcUrl"-->
           <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
@@ -154,7 +161,7 @@
     </div>
 
     <div class="statistic-wrap__footer" v-if="showFooter">
-      <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType,isfEducation:isfEducation}})">
+      <van-button v-if="($route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03')" class="btn" :class="{'disabled':isDisabled}" type="info" @click="modifyScore">
         加分/减分
       </van-button>
       <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId,isfEducation:isfEducation}})">
@@ -247,12 +254,20 @@
       isTaskEnd() {
         return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g,"/")).getTime()
       },
+      isDisabled() {
+        return this.$route.query.disabled == 1
+      }
     },
     methods: {
+      modifyScore() {
+        if(this.isDisabled) return
+        this.$router.push({name:`addSubScore`,params:{info:this.taskFinishInfo,termType:this.$route.query.termType,isfEducation:this.isfEducation}})
+      },
        goBack(){
           this.common.goBack(this)
         },
       sendTask() {
+         if(this.isDisabled) return
         let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
         tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)
         this.$store.commit('setResourceInfo', this.info)
@@ -266,7 +281,7 @@
             termType: this.termType,
             tchCourseId: this.info.tchCourseId,
             taskId: this.info.taskId,
-            taskType: this.info.taskType,
+            taskType: this.info.taskType || this.info.tastType,
             resourceType: this.info.resourceType,
             isEdit: true,
             isResend: 1,
@@ -277,9 +292,9 @@
           }
         })
       },
-      goVideoPage(url) {
+      goVideoPage(url,isAudio) {
         if (!url) return
-        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName } })
+        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName,isMp3: isAudio} })
       },
       singleQuestionScore(key) {
         return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t, v) => {
@@ -314,12 +329,12 @@
         // }else {
         this.$router.push({
           name: `examView`,
-          params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType,isfEducation:this.isfEducation }
+          params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType, isDisabled:this.isDisabled?1:'',isfEducation:this.isfEducation }
         })
         // }
       },
       saveDailyReminder() {
-        if (this.remind || this.taskFinishInfo.studentUnfinishList.length===0) return
+        if (this.isDisabled || this.remind || this.taskFinishInfo.studentUnfinishList.length===0) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -419,6 +434,12 @@
             const score = item.score * 1 + (type === 'T01' ? 1 : -1)
             item.score = score > 0 ? '+' + score : score
             this.$toast(`${type === 'T01' ? '加' : '减'}分成功`)
+
+            //更新this.taskFinishInfo.studentStatList的值 因为点赞/置顶/精华/加分/评论以后没有刷新this.taskFinishInfo.studentStatList
+            const index = this.taskFinishInfo.studentStatList.findIndex(v => v.accountNo === item.appraiseAccountNo)
+            if(index>-1) {
+              this.taskFinishInfo.studentStatList[index].studentRewardScore = score
+            }
           } else {
             this.$toast(res.msg)
           }
@@ -543,32 +564,47 @@
               v.videoArr = []
               dom.innerHTML = v.appraiseContent
               if (v.appraiseContent) {
-                const imgArr = dom.querySelectorAll('img')
-                const audioArr = dom.querySelectorAll('audio')
-                const videoArr = dom.querySelectorAll('video')
-                for (let i = 0; i < imgArr.length; i++) {
-                  v.imgArr.push(imgArr[i].src + '&' + Math.random())
-                  let parent = imgArr[i].parentElement
-                  parent.removeChild(imgArr[i])
-                }
-                for (let i = 0; i < audioArr.length; i++) {
-                  v.audioArr.push(audioArr[i].src)
-                  let parent = audioArr[i].parentElement
-                  parent.removeChild(audioArr[i])
-                }
-                for (let i = 0; i < videoArr.length; i++) {
-                  v.videoArr.push(videoArr[i].src)
-                  let parent = videoArr[i].parentElement
-                  parent.removeChild(videoArr[i])
-                }
+               this.handleAppraiseCtn(dom,v)
               }
               v.text = dom.outerHTML
+
+              //追加内容
+              v.pubAppendContentInfoList.forEach(append => {
+                let appendDom = document.createElement('div')
+                append.imgArr = []
+                append.audioArr = []
+                append.videoArr = []
+                appendDom.innerHTML = append.appendContent
+                this.handleAppraiseCtn(appendDom,append)
+                append.text = appendDom.outerHTML
+              })
+
             })
             this.appraiseList = res.data[0].appraiseListInfo
           } else {
             this.appraiseList = []
           }
         })
+      },
+      handleAppraiseCtn(dom,v) {
+        const imgArr = dom.querySelectorAll('img')
+        const audioArr = dom.querySelectorAll('audio')
+        const videoArr = dom.querySelectorAll('video')
+        for (let i = 0; i < imgArr.length; i++) {
+          v.imgArr.push(imgArr[i].src + '&' + Math.random())
+          let parent = imgArr[i].parentElement
+          parent.removeChild(imgArr[i])
+        }
+        for (let i = 0; i < audioArr.length; i++) {
+          v.audioArr.push(audioArr[i].src)
+          let parent = audioArr[i].parentElement
+          parent.removeChild(audioArr[i])
+        }
+        for (let i = 0; i < videoArr.length; i++) {
+          v.videoArr.push(videoArr[i].src)
+          let parent = videoArr[i].parentElement
+          parent.removeChild(videoArr[i])
+        }
       },
       rewardScore(accountNo) {
          try {
@@ -711,6 +747,7 @@
             // info: this.taskFinishInfo,
             termType: this.$route.query.termType,
             taskType: this.$route.query.taskType,
+            disabled: this.isDisabled?1:'',
             isfEducation: this.isfEducation
           }
         })
@@ -1040,12 +1077,12 @@
     beforeRouteEnter(to, from, next) {
       if (from.path === '/imgCorrect') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
           vm.getAppraise()
         })
       }else if (from.path === '/examView') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
       }
       else if (from.path === '/addTask') {
@@ -1056,7 +1093,7 @@
       }
       else if (from.path === '/subjectList') {
         next(async vm => {
-          await vm.statTaskStat()
+          await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
       }
       else {
@@ -1472,6 +1509,11 @@
           flex: 1;
         }
       }
+    }
+    .disabled {
+      background: #f5f6fa;
+      color: #ccc;
+      border: 1px solid #ccc;
     }
   }
 </style>

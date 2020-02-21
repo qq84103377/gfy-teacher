@@ -190,8 +190,8 @@
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
-        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-          filetime +
+        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr + ".jpeg"
         );
         formData.append('policy', this.oSSObject.policyBase64)
@@ -206,8 +206,8 @@
           var imgUrl =
             this.oSSObject.host +
             "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + ".jpeg";
           var imgObj = {
             src: imgUrl,

@@ -12,7 +12,7 @@
                      @down="moveItem(item.ClassTeachingData,index,1)" :can-slide="true" :up="index>0"
                      :top="list.length > 1 && index > 0" :down="(list.length - 1) > index"
                       @top="topItem(item.ClassTeachingData,index)">
-            <div slot="cover" class="cover" :style="{background:['icon-video','icon-audio'].includes(handleIcon(item.ClassTeachingData))?'#67E0A3':'#f3d233'}"><i class="iconGFY" :class="handleIcon(item.ClassTeachingData)"></i></div>
+            <div slot="cover" class="cover" :style="{background:handleBackground(item)}"><i class="iconGFY" :class="handleIcon(item.ClassTeachingData)"></i></div>
 <!--            item.ClassTeachingData.seqId-->
             <div slot="desc">
               <div class="desc-top">
@@ -74,6 +74,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+    localStorage.removeItem('materialDetail')
     next(vm => {
       vm.$nextTick(() => {
         // vm.$refs["body"].scrollTo(0, vm.scrollTop);
@@ -82,6 +83,16 @@ export default {
     });
   },
   methods: {
+    handleBackground(item) {
+      const type = this.handleIcon(item.ClassTeachingData)
+      if(['icon-video','icon-audio'].includes(type)) {
+        return '#67E0A3'
+      }else if (['icon-exam-100'].includes(type)) {
+        return '#39F0DD'
+      }else {
+        return '#f3d233'
+      }
+    },
     clickDel(index){
       this.clickIndex=index
     },
@@ -158,7 +169,8 @@ export default {
         } else if (t == 'mp4' || t == 'mp3') {
           type = 'video'
         }
-        this.$router.push({ path: '/boardDetail', query: { data: item } })
+        localStorage.setItem('materialDetail',JSON.stringify(item))
+        this.$router.push({ path: '/boardDetail'})
 
       } else {
         //试卷

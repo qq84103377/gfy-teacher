@@ -1,5 +1,5 @@
 <template>
-  <section class="teach-stat-wrap">
+  <section class="teach-stat-wrap" ref="body">
     <van-nav-bar
       v-if="$route.path === '/teachStat/'"
       title="教学统计">
@@ -49,12 +49,12 @@
 
 
 
-<!--          <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList"-->
-<!--                    :key="index">-->
-<!--            <div slot="title" class="aic jcsb"><span>{{item.name}}</span>-->
-<!--              <van-icon v-if="item.active" class="blue" name="success"/>-->
-<!--            </div>-->
-<!--          </van-cell>-->
+          <!--          <van-cell @click="selectItem(item,index,gradeSubjectList)" v-for="(item,index) in gradeSubjectList"-->
+          <!--                    :key="index">-->
+          <!--            <div slot="title" class="aic jcsb"><span>{{item.name}}</span>-->
+          <!--              <van-icon v-if="item.active" class="blue" name="success"/>-->
+          <!--            </div>-->
+          <!--          </van-cell>-->
 
 
           <div class="grade-pop-wrap__body-left">
@@ -177,7 +177,7 @@
       <div class="grade-pop-wrap">
         <van-icon @click="handleClose(masterClassList,1)" class="close" name="close"/>
         <div class="grade-pop-wrap__title van-hairline--bottom">班级</div>
-        <div class="grade-pop-wrap__body">
+        <div class="grade-pop-wrap__body" v-if="masterGradeSubjectList[masterGradeIndex]">
           <van-cell @click="selectItem(value,key,masterClassList)" v-for="(value,key) in masterClassList"
                     v-if="value.classGrade === masterGradeSubjectList[masterGradeIndex].classGrade"
                     :key="key">
@@ -222,40 +222,87 @@
         currentDate: '',
         maxDate: new Date(),
         gradeSubjectList: [],
-        gradeIndex: 0,
-        tempGradeIndex: 0,
-        subjectIndex: 0,
-        tempSubjectIndex: 0,
-        classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
-        // classList: {0:{gradeName:'全部',schoolYear:'',className:'',classId:'',active:true},...JSON.parse(localStorage.getItem("classMap"))},
         classList: JSON.parse(localStorage.getItem("classMap")),
         filterTime: {
           start: '',
           end: generateTimeReqestNumber(new Date()),
           type: true,   //true为开始
         },
+        scrollTop: 0,
       }
     },
-     beforeRouteLeave(to, from, next) {
-    if (this.showTime) {
-      this.showTime=false
-      next(false)
-    } else if (this.masterGradePop) {
-      this.masterGradePop=false
-      next(false)
-    } else if (this.masterClassPop) {
-      this.masterClassPop = false
-      next(false)
-    } else if (this.gradePop) {
-      this.gradePop = false
-      next(false)
-    } else if (this.classPop) {
-      this.classPop = false
-      next(false)
-    } else {
-      next()
-    }
-  },
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        vm.$nextTick(() => {
+          // vm.$refs["body"].scrollTo(0, vm.scrollTop);
+          vm.$refs["body"].scrollTop = vm.scrollTop
+        });
+      });
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop
+
+      if (this.showTime) {
+        this.showTime=false
+        next(false)
+      } else if (this.masterGradePop) {
+        this.masterGradePop=false
+        next(false)
+      } else if (this.masterClassPop) {
+        this.masterClassPop = false
+        next(false)
+      } else if (this.gradePop) {
+        this.gradePop = false
+        next(false)
+      } else if (this.classPop) {
+        this.classPop = false
+        next(false)
+      } else {
+        next()
+      }
+    },
+    computed: {
+      classIndex: {
+        get() {
+          return this.$store.getters.getClassIndex
+        },
+        set(v) {
+          this.$store.commit('setClassIndex',v)
+        }
+      },
+      tempGradeIndex: {
+        get() {
+          return this.$store.getters.getTempGradeIndex
+        },
+        set(v) {
+          this.$store.commit('setTempGradeIndex',v)
+        }
+      },
+      gradeIndex: {
+        get() {
+          return this.$store.getters.getGradeIndex
+        },
+        set(v) {
+          this.$store.commit('setGradeIndex',v)
+        }
+      },
+      tempSubjectIndex: {
+        get() {
+          return this.$store.getters.getTempSubjectIndex
+        },
+        set(v) {
+          this.$store.commit('setTempSubjectIndex',v)
+        }
+      },
+      subjectIndex: {
+        get() {
+          return this.$store.getters.getSubjectIndex
+        },
+        set(v) {
+          this.$store.commit('setSubjectIndex',v)
+        }
+      },
+    },
     methods: {
       changeFilter(isMaster) {
         this.isMaster = isMaster
@@ -396,7 +443,9 @@
         }else {
           this.gradePop = true
           this.tempGradeIndex = this.gradeIndex
+          // this.$store.commit('setGradeIndex',this.gradeIndex)
           this.tempSubjectIndex = this.subjectIndex
+          // this.$store.commit('setSubjectIndex',this.tempSubjectIndex)
           this.$set(this.gradeSubjectList[this.gradeIndex], 'active', true)
           this.$set(this.gradeSubjectList[this.gradeIndex].teacherInfoList[this.subjectIndex], 'check', true)
         }
@@ -432,6 +481,7 @@
             for (let key in this.classList) {
               if (this.classList[key].active) {
                 this.classIndex = key * 1
+                // this.$store.commit('setClassIndex',this.classIndex)
                 break
               }
             }
@@ -466,12 +516,17 @@
             for (let key in this.classList) {
               if(this.classList[key].classGrade === this.gradeSubjectList[this.gradeIndex].classGrade && this.classList[key].teacherInfoList.some(s => s.subjectType === this.gradeSubjectList[this.gradeIndex].teacherInfoList[this.subjectIndex].subjectType)) {
                 this.$set(this.classList[key],'active',!flag)
-                if(!flag) this.classIndex = key
+                if(!flag) {
+                  this.classIndex = key
+                  // this.$store.commit('setClassIndex',this.classIndex)
+                }
                 flag = true
               }
             }
             this.tempGradeIndex = this.gradeIndex
+            // this.$store.commit('setGradeIndex',this.gradeIndex)
             this.tempSubjectIndex = this.subjectIndex
+            // this.$store.commit('setSubjectIndex',this.tempSubjectIndex)
           }
         }
       },
@@ -536,29 +591,42 @@
       }
     },
     created() {
-      let arr = []
-      let flag = true
-      JSON.parse(localStorage.gradeList).forEach(v => {
-        //如果该年级只有一科家庭教育,则不显示该年级
-        if(v.teacherInfoList.length === 1 && v.teacherInfoList.some(s => s.subjectType === 'S20')) return
-        v.active = flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)
-        if(v.active) {
-          v.teacherInfoList = v.teacherInfoList.filter((t,i) => {
-              t.check = t.subjectType === localStorage.currentSubjectType
-            if(t.check) {
-              this.subjectIndex = i
-            }
-            return t.subjectType !== 'S20'
-          })
-        }
-        arr.push(v)
+      // if(this.$route.path === '/teachStat/') {
+        let arr = []
+        let flag = true
+        JSON.parse(localStorage.gradeList).forEach((v,vi) => {
+          //如果该年级只有一科家庭教育,则不显示该年级
+          if(v.teacherInfoList.length === 1 && v.teacherInfoList.some(s => s.subjectType === 'S20')) return
+          if(this.$route.path === '/teachStat/') {
+            v.active = flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)
+          }else {
+            v.active = vi === this.gradeIndex
+          }
+          v.teacherInfoList = v.teacherInfoList.filter((t,i) => t.subjectType !== 'S20')
+          if(v.active) {
+            v.teacherInfoList.forEach((t,i) => {
+              if(this.$route.path === '/teachStat/') {
+                t.check = t.subjectType === localStorage.currentSubjectType
+                if(t.check) {
+                  this.subjectIndex = i
+                  this.tempSubjectIndex = i
+                }
+              }else {
+                t.check = i === this.subjectIndex
+              }
 
-        if(flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)){
-          flag = false
-        }
+            })
+          }
+          arr.push(v)
 
-      })
-      this.gradeSubjectList = arr
+          if(flag && v.teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)){
+            flag = false
+          }
+
+        })
+        this.gradeSubjectList = arr
+      // }
+
 
       //先找出哪个年级有班主任
       this.gradeSubjectList.forEach(g => {
@@ -577,7 +645,8 @@
           }
         }
       }
-
+    },
+    activated() {
       if (this.$store.getters.getTeachStatFilterTime) {
         //有设置过时间
         this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
@@ -590,8 +659,7 @@
         this.currentDate = new Date(this.filterTime.start)
         this.$store.commit('setTeachStatFilterTime', {start: this.filterTime.start, end: this.filterTime.end})
       }
-
-    },
+    }
   }
 </script>
 

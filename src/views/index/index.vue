@@ -248,6 +248,21 @@ export default {
       this.$store.commit('setVanLoading', true)
       //估计后台字段任务名称写错了
       item.taskName = item.tastName
+      let classMap = JSON.parse(localStorage.getItem("classMap"));
+      for (const key in classMap) {
+        for (var i = 0; i < item.courseClassList.length; i++) {
+          if (classMap[key].classId == item.courseClassList[i].classId) {
+            item.courseClassList[i].className = classMap[key].className
+          }
+        }
+      }
+      let tchCourseInfo = {
+        tchCourseId: item.tchCourseId,
+        tchClassCourseInfo: item.courseClassList,
+        subjectType: item.subjectType,
+      }
+      localStorage.setItem('taskTchCourseInfo', JSON.stringify(tchCourseInfo))
+      localStorage.setItem('stat', JSON.stringify(item))
       this.$router.push({
         path: '/statistic',
         query: {
@@ -257,10 +272,10 @@ export default {
           tchCourseId: item.tchCourseId,
           taskId: item.taskId,
           taskType: item.tastType,
-          resourceType: item.resourceType
+          resourceType: item.resourceType,
+          courseName:item.courseName
         }
       })
-      localStorage.setItem('stat', JSON.stringify(item))
     },
     goto(item) {
       if (item.testPaperId > 0) {
@@ -308,7 +323,8 @@ export default {
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
           if (['T04'].includes(item.tastType)) {
-            this.$router.push({ path: '/materialDetail', query: { data: res.data[0].courseware } })
+            localStorage.setItem('materialDetail',JSON.stringify(res.data[0].courseware))
+            this.$router.push({ path: '/materialDetail'})
           } else if (['T06'].includes(item.tastType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
           } else if (['T01', 'T02'].includes(item.taskType)) {
@@ -328,6 +344,8 @@ export default {
     },
     getUnFinishCourseTask() {
       let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
         operateAccountNo: this.$store.getters.getUserInfo.accountNo,
         currentPage: 1,
         pageSize: 2
@@ -403,17 +421,16 @@ export default {
             if (item.myClassInfo) {
               item.myClassInfo.forEach(obj => {
                 if (!gradeList.some(v => v.classGrade === obj.classGrade)) {
-                  gradeList.push({ classGrade: obj.classGrade, gradeName: obj.gradeName, teacherInfoList: obj.teacherInfoList || [] })
+                  gradeList.push({ classGrade: obj.classGrade, gradeName: obj.gradeName, teacherInfoList: [...obj.teacherInfoList] || [] })
                 } else {
                   //有的时候
                   const index = gradeList.findIndex(v => v.classGrade === obj.classGrade)
                   obj.teacherInfoList.forEach(s => {
-                    if (!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
+                    // if (!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
                       gradeList[index].teacherInfoList.push(s)
-                    }
+                    // }
                   })
                 }
-
                 classMap[obj.classId] = obj
                 if (obj.teacherInfoList) {
                   obj.teacherInfoList.forEach(obj2 => {
@@ -458,6 +475,7 @@ export default {
 
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
+          this.$store.commit('setClassIndex',Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap', schoolMap)
@@ -581,7 +599,9 @@ export default {
     },
     async getClassTeacherCourseDeploy() {
       let obj = {
-        'operateAccountNo': this.$store.getters.getUserInfo.accountNo
+        'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
       }
       let params = {
         requestJson: JSON.stringify(obj)

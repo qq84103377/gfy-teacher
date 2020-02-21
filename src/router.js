@@ -624,7 +624,7 @@ export default new Router({
             isShowHeader: true,
             title: "专项练习"
           }
-        }, 
+        },
          {
           path: "/fEducation",
           name: 'fEducation',
@@ -703,14 +703,14 @@ export default new Router({
           }
         },
         {
-          path: '/singleCourse',
-          name: 'singleCourse',
-          component: () => import('./views/coursePacket/singleCourse.vue'),
+          path: '/coursePacket',
+          name: 'coursePacket',
+          component: () => import('./views/coursePacket/index.vue')
         },
         {
-          path: '/finishStatus',
-          name: 'finishStatus',
-          component: () => import('./views/coursePacket/finishStatus.vue'),
+          path: '/beforeClassTask',
+          name: 'beforeClassTask',
+          component: () => import('./views/teachStat/beforeClassTask.vue')
         },
       ]
     },

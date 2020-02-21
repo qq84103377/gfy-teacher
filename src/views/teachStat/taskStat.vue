@@ -89,7 +89,7 @@
               </div>
               <div class="row" v-for="(item,index) in tchStatInfo" :key="index">
                 <div>{{item.courseNum}}</div>
-                <div>{{item.outsideClassNum}}</div>
+                <div @click="viewTaskInfo(item)" class="blue">{{item.outsideClassNum}}</div>
                 <div>{{item.outsideClassPrecent}}</div>
                 <div>{{item.insideClassNum}}</div>
                 <div>{{item.taskNum}}</div>
@@ -106,6 +106,7 @@
           <div class="tip">
             <div>1.可在表格白色区域内左右滑动查看更多信息</div>
             <div>2.点击学生课堂次数查看展开课堂情况</div>
+            <div>3.点击“课前任务数”可查看该老师详细的课前任务布置情况</div>
           </div>
         </div>
         <div v-if="showClassDetail" class="van-hairline--top mgt10 pdt10">
@@ -245,7 +246,7 @@
   import echarts from "echarts";
   import {mutualType, getStudentName, getFontSize} from '@/utils/filter'
   // import Blob from '@/utils/excel/Blob'
-  // import {export_json_to_excel} from '@/utils/excel/Export2Excel'
+  import {export_json_to_excel} from '@/utils/excel/Export2Excel'
 
   export default {
     name: "taskStat",
@@ -267,7 +268,6 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-
     if (this.$parent.showTime) {
       this.$parent.showTime=false
       next(false)
@@ -316,7 +316,7 @@
           this.doneArr = []
           this.getData(this.tabIndex)
         },
-        deep: true
+        deep: true,
       },
       masterFilterParams: {
         handler() {
@@ -334,6 +334,9 @@
       this.getData(1)
     },
     methods: {
+      viewTaskInfo(item) {
+        this.$router.push({path:'/beforeClassTask',query:{classId: this.masterFilterParams.classId,classGrade:this.masterFilterParams.classGrade,teacherNo:item.teacherNo,teacherName:item.teacherName}})
+      },
       init() {
         this.doneArr = []
         this.getData(this.tabIndex)
@@ -878,8 +881,10 @@
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           subjectTypeNot: 'S20',
-          startDate: this.$parent.filterTime.start + ' 00:00:00',
-          endDate: this.$parent.filterTime.end + ' 23:59:59',
+          // startDate: this.$parent.filterTime.start + ' 00:00:00',
+          // endDate: this.$parent.filterTime.end + ' 23:59:59',
+          startDate: this.$store.getters.getTeachStatFilterTime.start + ' 00:00:00',
+          endDate: this.$store.getters.getTeachStatFilterTime.end + ' 23:59:59',
           ...this.filterParams
         };
         let params = {
