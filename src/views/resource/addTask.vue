@@ -236,7 +236,7 @@
   import examFilter from '../../components/examFilter'
   import filterPanel from '../../components/filterPanel'
   import {
-    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo, addTeachCourseRes
+    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo, addTeachCourseRes,getSubGroupParent
   } from '@/api/index'
   import eventBus from "@/utils/eventBus";
 
@@ -286,6 +286,8 @@
         isReinforce: this.$route.query.isReinforce,
         classId: this.$route.query.classId,
         accountNo: this.$route.query.accountNo,
+        isfEducation: this.$route.query.isfEducation,
+        parentList: {}
       }
     },
      beforeRouteLeave(to, from, next) {
@@ -558,7 +560,7 @@
         this.tchCourseInfo = item.tchCourseInfo
         this.courseList = JSON.parse(JSON.stringify(this.tempList))
       },
-      initClass() {
+      async initClass() {
         //课程信息
         if (!this.isReinforce) {
           this.tchCourseInfo = this.$store.getters.getTchCourseInfo
@@ -607,29 +609,29 @@
             await this.getSubGroupParent(this.classList[i].classId)
           }
           console.log(this.parentList, 'parentList')
-
           this.classList.forEach(ele => {
             ele.classStudent = {}
             ele.tchSubGroup = []
             this.parentList[ele.classId].forEach(element => {
-              element.tchSubGroupStudent = element.tchSubGroupParent = element.tchSubGroupParent.filter(i => {
-                if (i.parentAccountNo) {
+              if (element.tchSubGroupParent!==null) {
+                element.tchSubGroupStudent = element.tchSubGroupParent = element.tchSubGroupParent.filter(i => {
+                 if (i.parentAccountNo) {
                   return i
-                }
-              })
-              console.log(element.tchSubGroupStudent, 'newArr')
-              if (element.tchSubGroupStudent.length) {
-                element.tchSubGroupStudent.forEach(s => {
-                  this.$set(s, 'active', true)
-                  ele.classStudent[s.parentAccountNo] = s
+                 }
                 })
-              }
-
-              if (element.tchClassSubGroup.subgroupName != '未分组') {
-              ele.tchSubGroup.push({
-                check: true,
-                tchClassSubGroupStudent: { ...element }
-              })
+                //  console.log(element.tchSubGroupStudent, 'newArr')
+                if (element.tchSubGroupStudent&&element.tchSubGroupStudent.length) {
+                  element.tchSubGroupStudent.forEach(s => {
+                    this.$set(s, 'active', true)
+                    ele.classStudent[s.parentAccountNo] = s
+                  })
+                }
+                if (element.tchClassSubGroup.subgroupName != '未分组') {
+                  ele.tchSubGroup.push({
+                   check: true,
+                   tchClassSubGroupStudent: { ...element }
+                  })
+                }
               }
             })
 
