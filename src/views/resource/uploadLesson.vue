@@ -137,10 +137,15 @@
       read(file, detail) {
         console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
-            this.wareFile = file;
-            this.form.name = file.name.split('.')[0]
-            this.wareSize = file.size
-            this.uploadWare(file);
+            if(file.size > 0) {
+              this.wareFile = file;
+              this.form.name = file.name.split('.')[0]
+              this.wareSize = file.size
+              this.uploadWare(file);
+            }else {
+              this.$toast('文件大小为0')
+            }
+
           } else {
             this.$toast('请上传MP3、MP4、WMV、AVI格式的音视频文件')
           }
