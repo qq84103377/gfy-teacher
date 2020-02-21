@@ -213,6 +213,8 @@ export default {
     async getUnFinishCourseTask() {
       const page = this.currentPage
       let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
         operateAccountNo: this.$store.getters.getUserInfo.accountNo,
         currentPage: page,
         pageSize: this.pageSize

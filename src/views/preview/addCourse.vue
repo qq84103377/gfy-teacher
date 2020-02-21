@@ -640,7 +640,9 @@ export default {
     },
     async getClassTeacherCourseDeploy() {
       let obj = {
-        'operateAccountNo': this.$store.getters.getUserInfo.accountNo
+        'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
       }
       let params = {
         requestJson: JSON.stringify(obj)

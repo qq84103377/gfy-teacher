@@ -374,14 +374,18 @@
 
 
           // this.form.object = this.resourceInfo.description
-          this.resourceInfo.tchClassTastInfo.forEach(ele => {
-            if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
-              this.form.object = '2'
-            } else {
-              this.form.object = '1'
-            }
+          if(this.$route.query.isResend) {
+            this.form.object = '1'
+          }else {
+            this.resourceInfo.tchClassTastInfo.forEach(ele => {
+              if (ele.tchClassSubGroup && ele.tchClassSubGroup.length != 0) {
+                this.form.object = '2'
+              } else {
+                this.form.object = '1'
+              }
+            })
+          }
 
-          })
 
           if (this.resourceInfo.tastName) {
             this.resourceInfo.taskName = this.resourceInfo.tastName
