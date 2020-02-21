@@ -232,7 +232,8 @@
         scale: 1,
         timer: null,
         // filterStuList: [],
-        autoSubmit: true
+        autoSubmit: true,
+        selectScoreFlag: false, //是否选择过分数
       }
     },
     watch: {
@@ -348,7 +349,8 @@
             this.stuArr[this.stuIndex].answer[this.aswIndex].score = studentScore
             // if(!this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) this.toggle(1)
 
-            if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+            if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length && this.$refs['drawBoard'].drawFlag) {
+              //有图片并且涂鸦过才提交
               this.$refs['drawBoard'].save()
             }else {
               this.toggle(1)
@@ -369,8 +371,16 @@
       },
       async submit() {
         if (!this.stuArr[this.stuIndex].answer[this.aswIndex].value && this.stuArr[this.stuIndex].answer[this.aswIndex].value !== 0 && this.stuArr[this.stuIndex].answer[this.aswIndex].isMark === 'I02') return this.$toast('还没选择分数')
-        this.$store.commit('setVanLoading', true)
-       await this.examResultScroe()
+
+        if(this.selectScoreFlag) {
+          this.$store.commit('setVanLoading', true)
+          await this.examResultScroe()
+        }else if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length && this.$refs['drawBoard'].drawFlag) {
+          this.$refs['drawBoard'].save()
+        }
+        else {
+          this.toggle(1)
+        }
 
       },
       clickComment() {
@@ -478,12 +488,14 @@
             //下一个图片
             this.imgIndex++
             this.scale = 1
+            this.selectScoreFlag = false
           } else {
             if (this.aswIndex < this.stuArr[this.stuIndex].answer.length - 1) {
               //下一个小题
               this.aswIndex++
               this.imgIndex = 0
               this.scale = 1
+              this.selectScoreFlag = false
             } else {
               //下一个学生
               if (this.stuIndex < this.stuArr.length - 1) {
@@ -491,6 +503,7 @@
                 this.aswIndex = 0
                 this.imgIndex = 0
                 this.scale = 1
+                this.selectScoreFlag = false
               } else {
                 this.$dialog.confirm({
                   title: "",
@@ -511,17 +524,20 @@
             //上一个图片
             this.imgIndex--
             this.scale = 1
+            this.selectScoreFlag = false
           } else {
             if (this.aswIndex > 0) {
               this.aswIndex--
               this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
               this.scale = 1
+              this.selectScoreFlag = false
             } else {
               if (this.stuIndex > 0) {
                 this.stuIndex--
                 this.aswIndex = this.stuArr[this.stuIndex].answer.length ? this.stuArr[this.stuIndex].answer.length - 1 : 0
                 this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
                 this.scale = 1
+                this.selectScoreFlag = false
               } else {
                 this.$toast('最前啦')
               }
@@ -670,6 +686,7 @@
       },
      async selectScore(i, score, asw) {
         console.log(asw.value);
+        this.selectScoreFlag = true
         this.$refs['menuItem' + i][0].toggle(false)
         // this.value1 = `${index}分`
         this.$set(asw, 'value', score)

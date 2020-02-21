@@ -123,7 +123,8 @@ export default {
       rotateIndex: 0,
       lastLeft: 0,
       lastTop: 0,
-      isIphone: false
+      isIphone: false,
+      drawFlag: false, //是否涂鸦过
     }
   },
   props: ['imgUrl', 'isPen', 'isRubber', 'text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -131,6 +132,7 @@ export default {
     imgUrl() {
       // $('.clearButton').trigger('click')
       this.clearScreen()
+      this.drawFlag = false
       this.canvasHistory = []
       this.rotateIndex = 0
       this.rotate = 0
@@ -317,6 +319,11 @@ export default {
     },
     // 绘制直线
     drawLine(context, x1, y1, x2, y2, /*optional*/ lineWidth, /*optional*/ strokeColor) {
+      /**
+       * 有过涂鸦就需要发请求提交,没有则不用
+       */
+      if(!this.drawFlag) this.drawFlag = true
+
       console.log('drawLine()');
       context.beginPath();
       context.lineTo(x1, y1);
