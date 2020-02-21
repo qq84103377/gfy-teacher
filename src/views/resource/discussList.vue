@@ -79,7 +79,7 @@
               </draggable>
               <van-checkbox style="margin-left: 0;" v-model="form.check" @click="">
                 <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
-                学生发帖后才能查看评论
+                {{isfEducation?'家长':'学生'}}发帖后才能查看评论
               </van-checkbox>
             </div>
 
@@ -134,7 +134,8 @@ export default {
       curFile: null,
       oSSObject: null,
       scrollTop: 0,
-      clickIndex:0
+      clickIndex:0,
+      isfEducation: this.$route.query.isfEducation
     }
   },
   created() {
@@ -545,7 +546,8 @@ export default {
       console.log("发任务：", obj.discussName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
-      this.$router.push(`/addTask?type=discuss&_t=new`)
+
+      this.$router.push(`/addTask?type=discuss&_t=new${this.isfEducation?'&isfEducation=true':''}`)
     },
   }
 }

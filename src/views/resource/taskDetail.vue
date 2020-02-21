@@ -4,7 +4,7 @@
     <div class="task-detail__body">
       <div class="task-detail__body__top" v-if="isApp">
         <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
-        <div class="red fs10">您可以把练习分享给家长，督促学生及时完成练习</div>
+        <div class="red fs10">您可以把练习分享给家长，督促{{isfEducation?'家长':'学生'}}及时完成练习</div>
       </div>
       <div class="task-detail__body__center">
         <van-cell>
@@ -92,7 +92,7 @@ export default {
   components: { shareBar },
   data() {
     return {
-      remark: this.$route.query.remark?decodeURI(this.$route.query.remark): '',
+      remark: this.$route.query.remark ? decodeURI(this.$route.query.remark) : '',
       shareBarShow: false,
       taskList: [],
       taskTypeList: this.$store.state.taskTypeList,
@@ -112,7 +112,7 @@ export default {
       return decodeURI
     },
     link() {
-      const {tchCourseId,taskId,accountNo,subjectTypeName} = this.$route.query
+      const { tchCourseId, taskId, accountNo, subjectTypeName } = this.$route.query
       return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${encodeURI(subjectTypeName)}&remark=${encodeURI(this.remark)}`
     },
     isApp() {
@@ -120,17 +120,17 @@ export default {
     }
   },
   methods: {
-       goBack() {
+    goBack() {
       console.log('路由页面' + this.$route.meta.title + '按了返回')
       console.log('appHeader当前路由记录' + this.$navigation.getRoutes())
-      if (this.$navigation.getRoutes()&&this.$navigation.getRoutes().length>1) {
+      if (this.$navigation.getRoutes() && this.$navigation.getRoutes().length > 1) {
         console.log('存在路由记录')
         // this.$router.back()
         window.history.back(-2)
       } else {
         this.$router.replace('/index')
       }
-        // this.$router.back()
+      // this.$router.back()
     },
     initTaskDetail() {
       let obj = {

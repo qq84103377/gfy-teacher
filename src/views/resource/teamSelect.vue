@@ -14,8 +14,15 @@
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
           </van-checkbox>
-          <div class="team-select-wrap__body__group-wrap">
-            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]"><span v-if="s.studentNumber>0">{{s.studentNumber}}</span>{{s.accountNo| getStudentName(item.classId)}}
+          <div v-if="isfEducation!=='true'" class="team-select-wrap__body__group-wrap">
+            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
+              <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>
+              {{s.accountNo| getStudentName(item.classId)}}
+            </div>
+          </div>
+          <div v-else class="team-select-wrap__body__group-wrap">
+            <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
+              {{s.parentName?s.parentName:s.parentAccountNo}}
             </div>
           </div>
         </div>
@@ -26,8 +33,16 @@
           <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
           {{c.className}}
         </van-checkbox>
-        <div class="team-select-wrap__body__group-wrap">
-          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]"><span v-if="s.studentNumber>0">{{s.studentNumber}}</span>{{s.accountNo|getStudentName(c.classId)}}
+        <div v-if="isfEducation!=='true'" class="team-select-wrap__body__group-wrap">
+          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
+            <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>
+            {{s.accountNo|getStudentName(c.classId)}}
+          </div>
+        </div>
+
+        <div v-else class="team-select-wrap__body__group-wrap">
+          <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
+            {{s.parentName?s.parentName:s.parentAccountNo}}
           </div>
         </div>
       </div>
@@ -47,6 +62,7 @@ export default {
       list: [],
       sendStudent: {},
       sendGroup: {},
+      isfEducation: this.$route.query.isfEducation
     }
   },
   created() {
@@ -72,7 +88,7 @@ export default {
       this.$router.back()
     },
     handleSelectGroupClass(item) {
-      if (!item.tchSubGroup || item.tchSubGroup.length==0) return
+      if (!item.tchSubGroup || item.tchSubGroup.length == 0) return
       this.$set(item, 'check', !item.check)
       item.tchSubGroup.forEach(ele => {
         if (ele.tchClassSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent) {
@@ -202,7 +218,7 @@ export default {
           background: #eee;
           color: #333;
           text-align: center;
-          >span{
+          > span {
             margin-right: 7px;
           }
           &:nth-child(3n) {

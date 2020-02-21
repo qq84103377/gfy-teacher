@@ -44,13 +44,13 @@
         </div>
       </div>
       <div class="tip">
-        <div>点击题号或者学生姓名可以查看更多比较信息</div>
+        <div>点击题号或者{{isfEducation?'家长':'学生'}}姓名可以查看更多比较信息</div>
       </div>
       <div id="myChart4" ref="myChart4" v-show="scoreChartShow" class="chart-histogram mgt10"></div>
       <i @click="backTop" class="iconGFY icon-backtop backtop"></i>
     </div>
     <div v-if="!isExam&&!scoreInfo.length" class="pd10" style="text-align: center;">
-      暂无学生完成情况!
+      暂无{{isfEducation?'家长':'学生'}}完成情况!
     </div>
   </section>
 </template>
@@ -78,7 +78,8 @@ export default {
         accuracy: [],
       },
       scoreInfo: [],
-      finishStudent: this.$route.query.finishStudent.split(',')
+      finishStudent: this.$route.query.finishStudent.split(','),
+      isfEducation:this.$route.query.isfEducation
     }
   },
   created() {

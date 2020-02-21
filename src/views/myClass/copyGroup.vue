@@ -55,6 +55,7 @@
         activeNames: [],
         btnLoading: false,
         groupList: [{tchClassSubGroupStudent:{tchClassSubGroup:{},tchSubGroupStudent:[]}}],
+        isClassParent:this.$route.query.isClassParent,
       }
     },
     created() {
@@ -102,7 +103,7 @@
           "classId": this.$route.query.classId,
           "toTercherNo": this.$store.getters.getUserInfo.accountNo,
           fromTercherNo: this.$route.query.accountNo,
-          toSubjectType: localStorage.currentSubjectType,
+          toSubjectType: this.isClassParent?'S20':localStorage.currentSubjectType,
           fromSubjectType: this.$route.query.subjectType
         };
         let params ={

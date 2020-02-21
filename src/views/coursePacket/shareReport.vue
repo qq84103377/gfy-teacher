@@ -4,38 +4,36 @@
     </van-nav-bar>
     <div class="briefing-wrap__body">
       <div class="briefing-wrap__body-ctn-wrap black">
-        <div class="fs18" style="color: #000">{{decodeURI($route.query.subjectTypeName)}}练习《{{info.taskName}}》{{new
+        <div class="fs18" style="color: #000;fontWeight:700">{{decodeURI($route.query.subjectTypeName)}}寒假作业{{new
           Date()|generateTimeReqestNumber('MMdd')}}完成情况简报
         </div>
         <div class="info-wrap" v-if="$route.query.testPaperId>0 || $route.query.taskType === 'T13'">
-          <div>本次练习班级平均分为<span class="orange">{{info.finshCount>0?parseFloat((info.totalScore / info.finshCount).toFixed(2)):0}}分</span>
+          <div>本次寒假作业共有<span class="orange">{{info.finshCount>0?parseFloat((info.totalScore / info.finshCount).toFixed(2)):0}}个任务</span>
+            <div>所有任务的截至时间为{{new Date()|generateTimeReqestNumber('YY-MM-dd')}}</div>
+
           </div>
-          <div>最高分为<span class="orange">{{info.maxScore||0}}分</span></div>
-          <div>最低分为<span class="orange">{{info.minScore||0}}分</span></div>
+          <div class="fs10 red">请家长及时关注孩子的完成情况，未提交练习的提醒补做</div>
         </div>
-        <div v-if='!isfEducation' class="fs10 red">请家长及时关注孩子的完成情况，未提交练习的提醒补做</div>
-        <div v-else class="fs10 red">请各位家长注意任务时间，及时完成家庭教育任务</div>
-      </div>
-      <div class="briefing-wrap__body-ctn-wrap" v-for="(item,index) in scoreSpan" :key="index">
-        <div class="fs16">{{item.name}} 共计{{item.stu.length}}人</div>
-        <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{handleStudentName(s)}}{{si < item.stu.length -1 ? '、':''}}</span>
+        <div class="briefing-wrap__body-ctn-wrap" v-for="(item,index) in scoreSpan" :key="index">
+          <div class="fs16">{{item.name}} 共计{{item.stu.length}}人</div>
+          <div class="pdlt10 fs14"><span v-for="(s,si) in item.stu" :key="si">{{handleStudentName(s)}}{{si < item.stu.length -1 ? '、':''}}</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-if="isApp" class="briefing-wrap__footer">
-      <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
-    </div>
-    <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="isfEducation?'请各位家长注意任务时间，及时完成家庭教育任务':'请家长配合督促学生认真完成练习,表现好的同学给予表扬!'" :link="link"></share-bar>
+      <div v-if="isApp" class="briefing-wrap__footer">
+        <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
+      </div>
+      <share-bar :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${decodeURI($route.query.title)}》完成情况简报--请家长及时查看`" desc="请家长配合督促学生认真完成练习,表现好的同学给予表扬!" :link="link"></share-bar>
   </section>
 </template>
 <script>
 import shareBar from '../../components/shareBar'
 import { getStudentName } from '@/utils/filter'
-import { statTaskStat, getAppraiseV2, getClassStudent, statTaskStatV2, getParentRelationStudent } from '@/api/index'
+import { statTaskStat, getAppraiseV2, getClassStudent, statTaskStatV2 } from '@/api/index'
 import * as calculator from '@/utils/calculate'
 
 export default {
-  name: "briefing",
+  name: "shareReport",
   components: { shareBar },
   data() {
     return {
@@ -43,9 +41,7 @@ export default {
       scoreSpan: [],
       info: {},
       appraiseList: [],
-      classStudentList: [],
-      classParentList: [],
-      isfEducation: this.$route.query.isfEducation
+      classStudentList: []
     }
   },
   computed: {
@@ -53,8 +49,8 @@ export default {
       return decodeURI
     },
     link() {
-      const { taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId, isfEducation } = this.$route.query
-      return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}&isfEducation=${isfEducation}`
+      const { taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId } = this.$route.query
+      return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&title=${encodeURI(title)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
     },
     isApp() {
       return 'cordova' in window
@@ -63,11 +59,7 @@ export default {
   async created() {
     this.$store.commit('setVanLoading', true)
     // if (!('cordova' in window)) {
-    if (this.isfEducation) {
-      await this.getParentRelationStudent()
-    } else {
-      await this.getClassStudent()
-    }
+    await this.getClassStudent()
     //分享出去以后浏览器打开需要调接口获取数据,无法通过url传递对象参数,因为数据太多
     await this.statTaskStat()
     if (this.$route.query.testPaperId <= 0 && this.$route.query.taskType !== 'T13' && this.$route.query.resourceType !== 'R03') {
@@ -79,54 +71,16 @@ export default {
     this.$store.commit('setVanLoading', false)
   },
   methods: {
-    async getParentRelationStudent(classId) {
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        // "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        // "belongSchoolId": this.$store.getters.schoolId,
-        // "accountNo": this.$store.getters.getUserInfo.accountNo,
-        // "tchCourseId": this.tchCourseInfo.tchCourseId,
-        "classId": this.$route.query.classId,
-        // "subjectType": 'S20',
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      await getParentRelationStudent(params).then(res => {
-        console.log(res, 'getParentRelationStudent res')
-        if (res.flag && res.data.length) {
-          this.classParentList = res.data[0].parentRelationStudentInfo
-
-          let tmp = {};
-
-          this.classParentList = this.classParentList.reduce((cur, next) => {
-            tmp[next.parentAccountNo] ? "" : tmp[next.parentAccountNo] = true && cur.push(next);
-            return cur;
-          }, [])
-        }
-      })
-    },
     goBack() {
       this.common.goBack(this)
     },
     handleStudentName(accountNo) {
-      if (this.isfEducation) {
-        const item = this.classParentList.find(v => v.parentAccountNo == accountNo)
-        if (item) {
-          return item.parentLoginName?item.parentLoginName:item.parentAccountNo
-        } else {
-          return '--'
-        }
+      const item = this.classStudentList.find(v => v.accountNo == accountNo)
+      if (item) {
+        return item.studentName
       } else {
-        const item = this.classStudentList.find(v => v.accountNo == accountNo)
-        if (item) {
-          return item.studentName
-        } else {
-          return '--'
-        }
+        return '--'
       }
-
     },
     async getClassStudent() {
       let obj = {
@@ -218,7 +172,7 @@ export default {
             // percent = Number((v.score / this.info.testPaperScore).toFixed(2))
             percent = calculator.div(v.score, this.info.testPaperScore, 2)
           }
-          if (this.info.finishStudent.includes(v.accountNo)) {
+          if (v.endDate) {
             if (percent >= 1) {
               this.scoreSpan[0].stu.push(v.accountNo)
             }
@@ -249,15 +203,15 @@ export default {
             //有人点赞
             this.scoreSpan[1].stu.push(v.appraiseAccountNo)
           }
-        })
-        this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t, value) => {
-          t.push(...value.accountNoList)
-          return t
-        }, [])
-        this.info.studentStatList.forEach(v => {
-          if (v.redoTimes > 0) {
-            this.scoreSpan[3].stu.push(v.accountNo)
-          }
+          this.scoreSpan[2].stu = this.info.studentUnfinishList.reduce((t, v) => {
+            t.push(...v.accountNoList)
+            return t
+          }, [])
+          this.info.studentStatList.forEach(v => {
+            if (v.redoTimes > 0) {
+              this.scoreSpan[3].stu.push(v.accountNo)
+            }
+          })
         })
       }
     },

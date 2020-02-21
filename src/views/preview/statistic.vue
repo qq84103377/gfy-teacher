@@ -52,18 +52,18 @@
           <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="['T06'].includes($route.query.taskType)">
             论题内容
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">学生心得详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}心得详情
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">学生讨论详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}讨论详情
           </div>
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
-          <div @click="viewStu" v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
+          <div @click="viewStu" v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按{{isfEducation?'家长':'学生'}}查看
           </div>
         </div>
 
         <!--        学生心得-->
-        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1" :list="appraiseList">
+        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment" @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" :classId="info.tchClassTastInfo.find(t => t.active).classId" v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1" :list="appraiseList" :isfEducation='isfEducation'>
         </stu-exp>
 
         <!--        学资源/微课详情-->
@@ -154,10 +154,10 @@
     </div>
 
     <div class="statistic-wrap__footer" v-if="showFooter">
-      <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType}})">
+      <van-button v-if="$route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03'" class="btn" type="info" @click="$router.push({name:`addSubScore`,params:{info:taskFinishInfo,termType:$route.query.termType,isfEducation:isfEducation}})">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId,isfEducation:isfEducation}})">
         分享报告
       </van-button>
     </div>
@@ -230,7 +230,8 @@
         remind: false,
         loadWareFlag: true,
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
-        objectiveList: []
+        objectiveList: [],
+        isfEducation: this.$route.query.isfEducation
       }
     },
     computed: {
@@ -272,6 +273,7 @@
             taskFinishInfo: this.taskFinishInfo,
             courseName: this.$route.query.courseName,
             from: this.$route.query.from,
+            isfEducation: this.$route.query.isfEducation,
           }
         })
       },
@@ -312,7 +314,7 @@
         // }else {
         this.$router.push({
           name: `examView`,
-          params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType }
+          params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType,isfEducation:this.isfEducation }
         })
         // }
       },
@@ -708,12 +710,13 @@
             questionList,
             // info: this.taskFinishInfo,
             termType: this.$route.query.termType,
-            taskType: this.$route.query.taskType
+            taskType: this.$route.query.taskType,
+            isfEducation: this.isfEducation
           }
         })
       },
       viewAnalyse() {
-        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}`)
+        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}&isfEducation=${this.isfEducation}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
         let obj = {

@@ -56,7 +56,7 @@
     </div>
     <div v-if="!list.length" class="empty-page">
       <img style="width: 70%;" src="../assets/img/empty-1.png" alt />
-      <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
+      <div>当前还没有{{isfEducation?'家长':'学生'}}完成任务,快去提醒{{isfEducation?'家长':'学生'}}完成任务吧!</div>
     </div>
   </section>
 </template>
@@ -69,7 +69,7 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId'],
+    props: ['list', 'classId','isfEducation'],
     computed: {
       getStudentName() {
         return getStudentName

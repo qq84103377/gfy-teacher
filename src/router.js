@@ -631,6 +631,16 @@ export default new Router({
           component: () => import("./views/fEducation/index.vue"),
         },
         {
+          path: '/fClassDetail',
+          name: 'fClassDetail',
+          component: () => import('./views/fEducation/fClassDetail.vue')
+        },
+        {
+          path: '/changeScore',
+          name: 'changeScore',
+          component: () => import('./views/fEducation/changeScore.vue')
+        },
+        {
           path: '/reportDetail',
           name: 'reportDetail',
           component: () => import('./views/teachStat/reportDetail.vue')
@@ -691,6 +701,16 @@ export default new Router({
             title: '隐私政策',
             isShowHeader: true,
           }
+        },
+        {
+          path: '/singleCourse',
+          name: 'singleCourse',
+          component: () => import('./views/coursePacket/singleCourse.vue'),
+        },
+        {
+          path: '/finishStatus',
+          name: 'finishStatus',
+          component: () => import('./views/coursePacket/finishStatus.vue'),
         },
       ]
     },

@@ -91,6 +91,32 @@ let getStudentName = (accountNo,classId) => {
     return "--"
   }
 };
+
+let getParentName= (accountNo,classId) => {
+  if(accountNo === JSON.parse(localStorage.userInfo).accountNo) {
+    return JSON.parse(localStorage.userInfo).userName
+  }
+  if (!classId || !accountNo){
+    return "--"
+  }
+  if (localStorage.getItem('parentClassList')) {
+    let parentList = JSON.parse(localStorage.getItem('parentClassList'))[classId]
+    if(parentList&&Object.keys(parentList).length>0){
+      let parent = parentList.classStudent[accountNo]
+      if (parent){
+        return parent.parentName?parent.parentName:parent.parentAccountNo
+      } else{
+        return '--'
+      }
+    }else {
+      return "--"
+    }
+    
+  } else {
+    return "--"
+  }
+};
+
 let getGradeName = (grade)=>{
   let gradeName = "其他"
   switch (grade) {
@@ -377,4 +403,4 @@ const getFontSize = (res) => {
 
 }
 
-export {getFontSize,toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+export {getFontSize,toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getParentName,getGradeName,getTermName,dealType, numToWord}

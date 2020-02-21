@@ -521,3 +521,19 @@ export const stickyNotes =(params)=>{
 export const updateCourseWareCount =(params)=>{
   return axios.post('resource/updateCourseWareCount', qs.stringify(params))
 }
+//获取家长分组信息
+export const getSubGroupParent =(params)=>{
+  return axios.post('teach/getSubGroupParent', qs.stringify(params))
+}
+//获取单个班级家长列表信息
+export const getParentRelationStudent =(params)=>{
+  return axios.post('school/getParentRelationStudent', qs.stringify(params))
+}
+//删除班级分组
+export const deleteClassSubGroupForce =(params)=>{
+  return axios.post('teach/deleteClassSubGroupForce', qs.stringify(params))
+}
+//家长积分调整:加分/减分
+export const saveParentRewardScore =(params)=>{
+  return axios.post('teach/saveParentRewardScore', qs.stringify(params))
+}

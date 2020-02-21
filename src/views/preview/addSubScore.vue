@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
   import {saveRewardScore} from '@/api/index'
   import * as calculate from '@/utils/calculate'
 
@@ -54,6 +54,7 @@
         scoreShow: false,
         checkbox: 0,
         scoreSpan: [],
+        isfEducation:this.$route.params.isfEducation
       }
     },
     computed: {},
@@ -89,7 +90,7 @@
           "taskId": this.$route.params.info.taskId,
           "type": this.leftValue === '30%' ? "T01" : 'T02',
           score,
-          "subjectType": localStorage.currentSubjectType,
+          "subjectType": this.isfEducation?'S20':localStorage.currentSubjectType,
           "teacherName": JSON.parse(localStorage.getItem('userInfo')).userName,
           "taskName": JSON.parse(localStorage.getItem('stat')).taskName,
           "termType": this.$route.params.termType,
@@ -166,12 +167,12 @@
           if (this.$route.params.info.finishStudent.includes(v.accountNo)) {
             const index = this.scoreSpan.findIndex(s => percent >= s.min && percent < s.max)
             this.scoreSpan[index].stu.push({
-              name: getStudentName(v.accountNo, this.$route.params.info.classId),
+              name: this.isfEducation?getParentName(v.accountNo, this.$route.params.info.classId):getStudentName(v.accountNo, this.$route.params.info.classId),
               accountNo: v.accountNo
             })
           } else {
             this.scoreSpan[this.scoreSpan.length - 1].stu.push({
-              name: getStudentName(v.accountNo, this.$route.params.info.classId),
+              name: this.isfEducation?getParentName(v.accountNo, this.$route.params.info.classId):getStudentName(v.accountNo, this.$route.params.info.classId),
               accountNo: v.accountNo
             })
           }

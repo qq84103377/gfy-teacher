@@ -1,19 +1,19 @@
 <template>
   <!--    <section class="course-filter-wrap"></section>-->
-  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'?'65%':'93%' }">
+  <van-popup :close-on-click-overlay="false" v-model="show" position="bottom" :style="{ height: type==='myCourse'||type==='fEducation'?'65%':'93%' }">
     <div class="course-filter-wrap">
       <van-overlay class-name="mask" :show="gradeDropdown||termDropdown||versionDropdown||classDropdown" @click="gradeDropdown = false;termDropdown=false;versionDropdown=false;classDropdown=false" />
- 
-      <div class="course-filter-wrap__header van-hairline--bottom" >
-        <div v-if="type==='myCourse'&&!hideSubject" class="course-filter-wrap__header-tab">
+
+      <div class="course-filter-wrap__header van-hairline--bottom">
+        <div v-if="type==='myCourse'" class="course-filter-wrap__header-tab">
           <span @click="handleSubject(item)" :class="{active:item.active}" v-for="(item, index) in subjectList" :key="index">{{item.value}}</span>
         </div>
-        <div v-if="type!=='myCourse'" class="course-filter-wrap__header-tab">
+        <div v-if="type!=='myCourse'&&type!=='fEducation'" class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
         <van-icon v-if="type!=='myCourse'" class="icon-close" @click="show=false" name="close" />
       </div>
-      <div v-if="type === 'myCourse'" class="course-filter-wrap__dropdown van-hairline--bottom">
+      <div v-if="type === 'myCourse'||type === 'fEducation'" class="course-filter-wrap__dropdown van-hairline--bottom">
         <div>
           <div class="dropdown-title" @click="gradeDropdown=!gradeDropdown">
             {{gradeList[gradeIndex]?gradeList[gradeIndex].gradeName:'年级'}}
@@ -122,7 +122,7 @@ import { getTextBookCourseInfo, getGradeTermInfo } from '@/api/index'
 
 export default {
   name: "courseFilter",
-  props: ['visible', 'sysCourseId', 'type','hideSubject'],
+  props: ['visible', 'sysCourseId', 'type',],
   data() {
     return {
       gradeDropdown: false,
@@ -156,7 +156,7 @@ export default {
       classDropdown: false,
       // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
       classIndex: '',
-      showChangeDialog:false
+      showChangeDialog: false
     }
   },
   computed: {
@@ -171,6 +171,8 @@ export default {
   },
   mounted() {
     if (this.type === 'myCourse') {
+      // this.getTextBookCourseInfo()
+    } if (this.type === 'fEducation') {
       // this.getTextBookCourseInfo()
     } else {
       //获取上下学期
@@ -238,19 +240,34 @@ export default {
 
   },
   created() {
-    for (let key in JSON.parse(localStorage.getItem("subjectTypeList"))) {
+    if (this.type === 'fEducation') {
       this.subjectList.push({
-        key,
-        value: JSON.parse(localStorage.getItem("subjectTypeList"))[key],
+        key: 'S20',
+        value: '家庭教育',
+        active: true
       })
+      for (let key in JSON.parse(localStorage.getItem("classMap"))) {
+        const value = JSON.parse(localStorage.getItem("classMap"))[key]
+        if (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === "S20")) {
+          this.classIndex = key
+          break
+        }
+      }
+    } else {
+      for (let key in JSON.parse(localStorage.getItem("subjectTypeList"))) {
+        this.subjectList.push({
+          key,
+          value: JSON.parse(localStorage.getItem("subjectTypeList"))[key],
+        })
+      }
+      const index = this.subjectList.findIndex(v => localStorage.getItem("currentSubjectType") === v.key)
+      this.$set(this.subjectList[index], 'active', true)
+      this.initClassIndex()
     }
-    const index = this.subjectList.findIndex(v => localStorage.getItem("currentSubjectType") === v.key)
-    this.$set(this.subjectList[index], 'active', true)
-    this.initClassIndex()
   },
   methods: {
-    close(){
-      this.showChangeDialog=false
+    close() {
+      this.showChangeDialog = false
       this.$dialog.close()
     },
     initClassIndex() {
@@ -264,6 +281,9 @@ export default {
     },
     classVisible(value, key) {
       // if (this.gradeIndex !== '') {
+      if (this.type === 'fEducation') {
+        return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === 'S20'))
+      }
       return (this.gradeList[this.gradeIndex].classGrade === value.classGrade && value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType))
       // } else {
       //   return value.teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)
@@ -279,7 +299,7 @@ export default {
     },
     handleSubject(item) {
       if (item.active) return
-      this.showChangeDialog=true
+      this.showChangeDialog = true
       this.$dialog.confirm({
         title: '提示',
         message: '是否进行科目的切换？科目切换后，首页的科目也将进行切换',
@@ -287,7 +307,7 @@ export default {
         confirmButtonColor: '#39F0DD',
         className: 'change-subject'
       }).then(() => {
-        this.showChangeDialog=false
+        this.showChangeDialog = false
         this.subjectList.forEach(v => {
           v.active = false
         })
@@ -298,7 +318,7 @@ export default {
         this.initClassIndex()
         // this.getTextBookCourseInfo()
       }).catch(() => {
-        this.showChangeDialog=false
+        this.showChangeDialog = false
         // on cancel
       });
     },
@@ -412,7 +432,7 @@ export default {
     changeTermType(index) {
       this.termIndex = index
       this.termDropdown = !this.termDropdown
-      if (this.type === 'myCourse') {
+      if (this.type === 'myCourse'||this.type === 'fEducation') {
         // this.getTextBookCourseInfo()
       } else {
         this.getTextBookCourseInfo()
@@ -469,6 +489,8 @@ export default {
       this.$emit('update:visible', false)
       this.$emit('update:sysCourseId', this.currentSysCourseId)
       if (this.type === 'myCourse') {
+        this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
+      }else if (this.type === 'fEducation') {
         this.$emit('confirm', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade : '', this.termList[this.termIndex] ? this.termList[this.termIndex].value : '', this.classIndex > 0 ? this.classIndex : '', this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].gradeName : '', this.termList[this.termIndex] ? this.termList[this.termIndex].name : '', this.classIndex > 0 ? this.classList[this.classIndex].className : '')
       } else {
         this.$parent.handleSysCourse(this.currentSysCourseName, this.currentSysCourseId, this.classGradeList[this.gradeIndex].classGrade, this.termTypeList[this.termIndex])

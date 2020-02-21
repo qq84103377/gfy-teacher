@@ -9,7 +9,7 @@
           <img src="../../assets/img/preview/task_null.png" alt />
         </div>
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
-          <list-item ref='listItem'  @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
+          <list-item ref='listItem' @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseInfo.tchClassCourseInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseInfo.tchClassCourseInfo.length>2,'icon-arrow-grey':item.tchCourseInfo.tchClassCourseInfo.length<=2}"></i>
@@ -24,14 +24,14 @@
         </van-list>
       </van-pull-refresh>
       <div v-if="!listLoading && !list.length" class="empty-btn">
-        <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+        <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: {from:'fEducation' } })">新建课</van-button>
       </div>
     </div>
     <div v-if="list.length" class="my-course-list__footer van-hairline--top">
-      <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+      <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: { from:'fEducation' } })">新建课</van-button>
     </div>
 
-    <course-filter ref="courseFilter" @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse" hideSubject='1'></course-filter>
+    <course-filter ref="courseFilter" @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="fEducation"></course-filter>
   </section>
 </template>
 
@@ -58,22 +58,22 @@ export default {
         classGrade: '', termType: '', classId: ''
       },
       scrollTop: 0,
-      clickIndex:0
+      clickIndex: 0
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$refs['courseFilter']&&this.$refs['courseFilter'].showChangeDialog) {
+    if (this.$refs['courseFilter'] && this.$refs['courseFilter'].showChangeDialog) {
       this.$refs['courseFilter'].close()
       next(false)
     } else if (this.filterShow) {
       this.filterShow = false
       next(false)
-    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+    } else if (this.$refs['listItem'] && this.$refs['listItem'][this.clickIndex] && this.$refs['listItem'][this.clickIndex].showDialog) {
       this.$refs['listItem'][this.clickIndex].close()
       next(false)
-    }else{
-     this.scrollTop = this.$refs["body"].scrollTop;
-    next();
+    } else {
+      this.scrollTop = this.$refs["body"].scrollTop;
+      next();
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -89,16 +89,21 @@ export default {
     eventBus.$on("editMyCourse", (data) => {
       this.onRefresh()
     })
+    eventBus.$off("courseListRefresh")
+    eventBus.$on("courseListRefresh", (data) => {
+      this.onRefresh()
+    })
+
   },
   methods: {
-     clickDel(index){
-      this.clickIndex=index
+    clickDel(index) {
+      this.clickIndex = index
     },
-     goBack(){ 
-          this.common.goBack(this)
-        },
+    goBack() {
+      this.common.goBack(this)
+    },
     goEdit(item) {
-      this.$router.push({ path: '/editMyCourse', query: { currentTchCourseInfo: item } })
+      this.$router.push({ path: '/editMyCourse', query: { currentTchCourseInfo: item, from: 'fEducation' } })
     },
     goto(item) {
       this.$router.push({        path: '/courseDetail', query: {
@@ -110,7 +115,7 @@ export default {
           fltGrade: this.filterParams.classGrade,
           fltTerm: this.filterParams.termType,
           fltClassId: this.filterParams.classId,
-          isfEducation:true
+          isfEducation: true
           // currCourse: item
         }      })
     },
@@ -161,12 +166,12 @@ export default {
         // "belongSchoolId": this.$store.getters.schoolId,
         "operateRoleType": "A02",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "subjectType": localStorage.getItem("currentSubjectType"),
+        // "subjectType": localStorage.getItem("currentSubjectType"),
         classGrade,
         termType,
         classId,
         "pageSize": "10",
-        "courseType": "C01",
+        "courseType": "C02",
         "currentPage": page
       }
       let params = {

@@ -137,7 +137,8 @@ export default {
       "tchCourseId": this.$route.query.tchCourseId,
       "sysCourseId": this.$route.query.sysCourseId,
       "relationSeqId": this.$route.query.relationCourseId,
-      clickIndex:0
+      clickIndex: 0,
+      isfEducation: this.$route.query.isfEducation
     }
   },
   computed: {
@@ -158,7 +159,7 @@ export default {
     if (this.addExam.show) {
       this.addExam.show = false
       next(false)
-    } else if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+    } else if (this.$refs['listItem'] && this.$refs['listItem'][this.clickIndex] && this.$refs['listItem'][this.clickIndex].showDialog) {
       this.$refs['listItem'][this.clickIndex].close()
       next(false)
     } else {
@@ -185,8 +186,8 @@ export default {
     eventBus.$off("examListRefresh")
   },
   methods: {
-    clickDel(index){
-      this.clickIndex=index
+    clickDel(index) {
+      this.clickIndex = index
     },
     createTestPaper() {
       this.$router.push({
@@ -195,7 +196,9 @@ export default {
           "sysCourseId": this.$route.query.sysCourseId,
           "relationCourseId": this.$route.query.relationCourseId,
           "courseName": this.$route.query.courseName,
-          from: 'examList'
+          subjectType: this.isfEducation?'S20':localStorage.currentSubjectType,
+          from: 'examList',
+          isfEducation:this.isfEducation
         }
       })
     },
@@ -209,9 +212,10 @@ export default {
           "relationCourseId": this.$route.query.relationCourseId,
           type: item.stateName ? 1 : 0,
           testPaperId: item.testPaperId,
-          subjectType: localStorage.currentSubjectType,
+          subjectType: this.isfEducation?'S20':localStorage.currentSubjectType,
           classGrade: this.$route.query.classGrade,
           title: item.testPaperName,
+          isfEducation:this.isfEducation
         }
       })
     },
@@ -496,7 +500,7 @@ export default {
       console.log("发任务：", obj.testPaperName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
-      this.$router.push(`/addTask?type=exam&_t=new&from=examList`)
+      this.$router.push(`/addTask?type=exam&_t=new&from=examList${this.isfEducation ? '&isfEducation=true' : ''}`)
     },
   }
 }

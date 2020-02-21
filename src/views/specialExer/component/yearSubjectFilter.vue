@@ -174,7 +174,7 @@ export default {
           } else if (classMap[k].classYearSection == "Y02") {
             list2.push(ele)
 
-          } else if (classMap[k].classYearSection == "Y02") {
+          } else if (classMap[k].classYearSection == "Y03") {
             list3.push(ele)
           }
         })

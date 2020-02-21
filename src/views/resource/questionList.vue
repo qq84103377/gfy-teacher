@@ -127,6 +127,7 @@ export default {
       scrollTop: 0,
       removeQuestionList: [], //试卷详情跳转到资源中心试题列表时,移除的试题需要记录起来,返回到试卷详情时要把移除的题目清理掉
       clickItem:'',
+      isfEducation: this.$route.query.isfEducation
     }
   },
   watch: {
@@ -343,7 +344,7 @@ export default {
         "pageSize": 999,
         "examSectionTypeRlation": {
           "seqId": null,//编号可空
-          "subjectType": localStorage.currentSubjectType,
+           subjectType: this.isfEducation?'S20':localStorage.currentSubjectType,
           "examType": this.$route.query.item ? this.$route.query.item.examType : null,//题型，可空
           "sectionType": null //章节类型，可空
         }
