@@ -206,8 +206,8 @@
           var imgUrl =
             this.oSSObject.host +
             "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + ".jpeg";
           var imgObj = {
             src: imgUrl,

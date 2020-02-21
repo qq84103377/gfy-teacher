@@ -415,8 +415,8 @@
           this.wareUrl =
             this.wareOSSObject.host +
             "/" +
-            this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + '.' + curFile.type.split('/')[1]
         }).catch(err => {
           this.$store.commit('setVanLoading',false)
@@ -445,8 +445,8 @@
           var imgUrl =
             this.oSSObject.host +
             "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + ".jpeg";
           var imgObj = {
             url: imgUrl

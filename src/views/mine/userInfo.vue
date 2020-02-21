@@ -352,8 +352,8 @@
               this.oSSObject.host +
               "/" +
               this.oSSObject.key +
-              this.$store.getters.getUserInfo.accountNo +
-              filetime +
+              this.$store.getters.getUserInfo.accountNo + '_' +
+              filetime + '_' +
               randomStr +
               ".png";
             console.log(this.iconUrl);

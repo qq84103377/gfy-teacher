@@ -143,8 +143,8 @@
           this.wareUrl =
             this.oSSObject.host +
             "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + suffix
         }).catch(err => {
           this.$store.commit('setVanLoading', false)
