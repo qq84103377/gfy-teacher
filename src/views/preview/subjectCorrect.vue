@@ -77,7 +77,7 @@
       <div class="correct-wrap__body__draw" :style="{flex: stuArr[stuIndex].answer[aswIndex].text? '0 0 80%':'1'}"
            v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
         <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
-        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="toggle(1)"
+        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="handleSubmit"
                     :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
       </div>
       <div class="correct-wrap__body__undo"
@@ -292,6 +292,11 @@
       this.figure()
     },
     methods: {
+      handleSubmit() {
+        //更新涂鸦后的图片
+        this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '&' + Math.random()
+        this.toggle(1)
+      },
       rotateLeft() {
         this.$refs['drawBoard'].rotateLeft()
       },
