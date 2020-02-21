@@ -9,7 +9,7 @@
         </div>
         <div class="content">
           <h2>更新内容</h2>
-          <p>{{uploadDetail}}</p>
+          <p v-html="uploadDetail"></p>
         </div>
         <div class="bottom">
           <van-button type="info" size="large" @click="downLoad()">立即更新</van-button>

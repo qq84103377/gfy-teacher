@@ -166,7 +166,7 @@
       } else if(this.showGenderPicker){
         this.showGenderPicker = false
         next(false)
-      }else{  
+      }else{
       next();
       }
     },
@@ -329,8 +329,8 @@
         formData.append(
           "key",
           this.oSSObject.key +
-          this.$store.getters.getUserInfo.accountNo +
-          filetime +
+          this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr +
           ".png"
         );

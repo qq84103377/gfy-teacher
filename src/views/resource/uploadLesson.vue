@@ -396,8 +396,8 @@
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
-        formData.append("key", this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
-          filetime +
+        formData.append("key", this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr + '.' + curFile.type.split('/')[1]
         );
         console.log(this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
@@ -429,8 +429,8 @@
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
-        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-          filetime +
+        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr + ".jpeg"
         );
         console.log(123);
