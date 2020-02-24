@@ -97,7 +97,7 @@ export default {
             t.push({
               src: img,
               accountNo: v.appraiseAccountNo,
-              active: si == this.$route.params.stuIndex && (i + v.imgArr.length + this.calImgIndex(v,ai)) == this.$route.params.imgIndex
+              active: si == this.$route.params.stuIndex && (i + this.calImgIndex(v,ai)) == this.$route.params.imgIndex
             })
           })
         })

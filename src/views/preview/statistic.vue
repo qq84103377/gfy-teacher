@@ -248,7 +248,8 @@
         remind: false,
         loadWareFlag: true,
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
-        objectiveList: []
+        objectiveList: [],
+        scrollTop: 0,
       }
     },
     computed: {
@@ -1134,12 +1135,21 @@
       // if (!this.isWk && !this.isSpoken) {
       // }
     },
+    beforeRouteLeave(to, from, next) {
+        this.scrollTop = this.$refs["body"].scrollTop
+        next()
+    },
     beforeRouteEnter(to, from, next) {
       if (from.path === '/imgCorrect') {
         next(async vm => {
+          vm.$refs["body"].scrollTop = vm.scrollTop
           await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
           vm.currentPage = 1
+          vm.pageSize = vm.appraiseList.length
           vm.getAppraise()
+          //刷新数据以后pageSize和currentPage都要还原
+          vm.currentPage = Math.ceil(vm.pageSize / 10)
+          vm.pageSize = 10
         })
       }else if (from.path === '/examView') {
         next(async vm => {
