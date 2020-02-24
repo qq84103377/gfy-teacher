@@ -96,7 +96,7 @@ export default {
             t.push({
               src: img,
               accountNo: v.appraiseAccountNo,
-              active: si == this.$route.params.stuIndex && (i + v.imgArr.length) == this.$route.params.imgIndex
+              active: si == this.$route.params.stuIndex && (i + v.imgArr.length + this.calImgIndex(v,ai)) == this.$route.params.imgIndex
             })
           })
         })
@@ -129,6 +129,18 @@ export default {
     }
   },
   methods: {
+    calImgIndex(item,appendIndex) {
+      let count = item.imgArr.length
+      for (let j = 0; j < item.pubAppendContentInfoList.length; j++) {
+        const itemElement =  item.pubAppendContentInfoList[j];
+        if(j<appendIndex) {
+          count += itemElement.imgArr.length
+        }else {
+          break
+        }
+      }
+      return count
+    },
     // changeImg(){
 
     // },

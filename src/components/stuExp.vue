@@ -29,7 +29,7 @@
           </div>
 
 <!--          追加内容-->
-          <div class="mgt10" v-for="append in item.pubAppendContentInfoList" :key="append.appendId">
+          <div class="mgt10" v-for="(append,appendIndex) in item.pubAppendContentInfoList" :key="append.appendId">
             <div>{{append.appendTime}}追加</div>
             <div v-html="append.text"></div>
             <div style="width: 100%;" v-if="append.audioArr&&append.audioArr.length">
@@ -49,7 +49,7 @@
             </div>
             <div class="img-wrap" :class="[{img4: append.imgArr.length==4},{img56:append.imgArr.length>4}]" v-if="append.imgArr&&append.imgArr.length">
 <!--              <div @click="imgCorrect(img,calImgIndex(index,item.imgArr.length,i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>-->
-              <div @click="imgCorrect(img,item.imgArr.length + i,index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
+              <div @click="imgCorrect(img,calImgIndex(item ,appendIndex, i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
             </div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
@@ -108,6 +108,19 @@
       }
     },
     methods: {
+      calImgIndex(item,appendIndex,i) {
+        let count = item.imgArr.length
+        for (let j = 0; j < item.pubAppendContentInfoList.length; j++) {
+          const itemElement =  item.pubAppendContentInfoList[j];
+          if(j<appendIndex) {
+            count += itemElement.imgArr.length
+          }else {
+            break
+          }
+        }
+        count += i
+        return count
+      },
       goVideoPage(url) {
         if (!url) return
         this.$router.push({ name: 'videoPage', query: { src: url} })

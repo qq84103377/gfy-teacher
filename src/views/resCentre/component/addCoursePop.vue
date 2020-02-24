@@ -9,16 +9,17 @@
     <div class="add-course-pop">
       <div class="add-course-pop__header">《{{resName}}》添加至课程</div>
       <div class="add-course-pop__body">
-        <div v-if="list.length">
-          <div class="subject-title" v-if="gradeTerm">
-            {{gradeTerm.split('|')[0]|getGradeName}}{{list[0].tchCourseInfo.subjectType|getSubjectName}}
-          </div>
+        <div v-for="(item,index) in list" :key="index">
+<!--          <div class="subject-title" v-if="gradeTerm">-->
+<!--            {{gradeTerm.split('|')[0]|getGradeName}}{{list[0].tchCourseInfo.subjectType|getSubjectName}}-->
+<!--          </div>-->
+          <div class="subject-title">{{item.classGrade|getGradeName}}{{item.arr[0].tchCourseInfo.subjectType|getSubjectName}}</div>
           <van-radio-group class="course-group" v-model="radio">
-            <van-radio v-for="(item,index) in list" :key="index" :name="index" class="mgr10 mgb15">
+            <van-radio v-for="(c,ci) in item.arr" :key="ci" :name="ci" class="mgr10 mgb15">
               <i slot="icon"
                  slot-scope="props"
                  :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-              {{item.tchCourseInfo.courseName}}
+              {{c.tchCourseInfo.courseName}}
             </van-radio>
           </van-radio-group>
         </div>

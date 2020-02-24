@@ -1266,6 +1266,13 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.courseList = res.data || []
+            let classGradeArr = [...new Set(this.courseList.map(v => v.tchCourseInfo.classGrade))].sort()
+            this.courseList = classGradeArr.map(g => {
+              return {
+                classGrade:g,
+                arr: this.courseList.filter(c => c.tchCourseInfo.classGrade === g)
+              }
+            })
           }
         })
       },
