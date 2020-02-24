@@ -96,7 +96,7 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId','disable'],
+    props: ['list', 'classId','disable','currentPage','total','finished'],
     computed: {
       getStudentName() {
         return getStudentName
@@ -133,7 +133,10 @@
             stuIndex,
             classId:this.classId,
             taskId: this.$route.query.taskId,
-            termType: this.$route.query.termType
+            termType: this.$route.query.termType,
+            currentPage: this.currentPage,
+            total: this.total,
+            finished: this.finished,
           }})
       },
       handlePraise(item) {

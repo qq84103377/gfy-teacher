@@ -1,7 +1,7 @@
 <template>
   <section class="img-correct-wrap">
     <i v-if="!isPen&&!isRubber&&(currentImgIndex>0)" class="iconGFY icon-circle-arrow" @click="toggle(0)"></i>
-    <i v-if="!isPen&&!isRubber&&(currentImgIndex<imgArr.length-1)" class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
+    <i v-if="!isPen&&!isRubber&&((currentImgIndex<imgArr.length-1)||!finished)" class="iconGFY icon-circle-arrow rotate" @click="toggle(1)"></i>
     <div class="img-correct-wrap__header" v-show="!isPen&&!isRubber">
       <van-icon @click="$router.back()" name="arrow-left" />
       <span>{{getStudentName(list[stuIndex].appraiseAccountNo,classId)}}</span>
@@ -28,7 +28,7 @@
       </i>
       <van-icon class="close" name="cross" @click="isPen=false;isRubber=false"></van-icon>
     </div>
-    <div v-show="!isPen&&!isRubber" class="img-correct-wrap__swipe">
+    <div v-show="!isPen&&!isRubber" class="img-correct-wrap__swipe" @scroll="handleScroll">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
         <div class="img-wrap">
           <img :class="{active:item.active}" v-lazy="item.src" alt="">
@@ -68,7 +68,8 @@ import {
   unessAppraise,
   essAppraise,
   saveRewardScore,
-  addReply
+  addReply,
+  getAppraiseV2,
 } from '@/api/index'
 
 export default {
@@ -105,6 +106,10 @@ export default {
       stuIndex: this.$route.params.stuIndex,
       imgIndex: this.$route.params.imgIndex,
       classId: this.$route.params.classId,
+      currentPage: this.$route.params.currentPage,
+      total: this.$route.params.total,
+      finished: this.$route.params.finished,
+      listLoading: false,
     }
   },
   created() {
@@ -129,6 +134,125 @@ export default {
     }
   },
   methods: {
+    async getAppraise() {
+      const page = this.currentPage
+      this.$store.commit('setVanLoading', true)
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        classId: this.classId,
+        // currPage: 1,
+        "currPage": page,
+        isAppendMode: true,
+        objectId: this.$route.params.taskId,
+        objectTypeCd: 'A01',
+        pageSize: 10,
+        praiseType: 1,
+        replyType: 1,
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getAppraiseV2(params).then(res => {
+        this.total = res.total
+        this.listLoading = false
+        this.$store.commit('setVanLoading', false)
+
+        if (res.flag && res.data[0]) {
+          res.data[0].appraiseListInfo.forEach(async v => {
+            // 本账号是否有点过赞
+            v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
+            let dom = document.createElement('div')
+            v.imgArr = []
+            v.audioArr = []
+            v.videoArr = []
+            dom.innerHTML = v.appraiseContent
+            if (v.appraiseContent) {
+              this.handleAppraiseCtn(dom,v)
+            }
+            v.text = dom.outerHTML
+
+            //追加内容
+            v.pubAppendContentInfoList.forEach(append => {
+              let appendDom = document.createElement('div')
+              append.imgArr = []
+              append.audioArr = []
+              append.videoArr = []
+              appendDom.innerHTML = append.appendContent
+              this.handleAppraiseCtn(appendDom,append)
+              append.text = appendDom.outerHTML
+            })
+
+          })
+          this.list = page === 1 ? res.data[0].appraiseListInfo : this.list.concat(res.data[0].appraiseListInfo)
+
+          let imgArr = res.data[0].appraiseListInfo.reduce((t, v, si) => {
+            v.imgArr.forEach((img, i) => {
+              t.push({
+                src: img,
+                accountNo: v.appraiseAccountNo,
+                active: false
+              })
+            })
+            v.pubAppendContentInfoList.forEach((append,ai) => {
+              append.imgArr.forEach((img,i) => {
+                t.push({
+                  src: img,
+                  accountNo: v.appraiseAccountNo,
+                  active: false
+                })
+              })
+            })
+            return t
+          }, [])
+          this.imgArr = this.imgArr.concat(imgArr)
+
+          if (page >= res.total) {
+            this.finished = true
+          }else {
+            this.finished = false
+          }
+        } else {
+          this.list = page === 1 ? [] : this.list.concat([])
+          this.finished = true
+        }
+      })
+    },
+    handleAppraiseCtn(dom,v) {
+      const imgArr = dom.querySelectorAll('img')
+      const audioArr = dom.querySelectorAll('audio')
+      const videoArr = dom.querySelectorAll('video')
+      for (let i = 0; i < imgArr.length; i++) {
+        v.imgArr.push(imgArr[i].src + '&' + Math.random())
+        let parent = imgArr[i].parentElement
+        parent.removeChild(imgArr[i])
+      }
+      for (let i = 0; i < audioArr.length; i++) {
+        v.audioArr.push(audioArr[i].src)
+        let parent = audioArr[i].parentElement
+        parent.removeChild(audioArr[i])
+      }
+      for (let i = 0; i < videoArr.length; i++) {
+        v.videoArr.push(videoArr[i].src)
+        let parent = videoArr[i].parentElement
+        parent.removeChild(videoArr[i])
+      }
+    },
+    async onLoad() {
+      this.currentPage++
+      if (this.currentPage > this.total && this.currentPage > 1) {
+        return
+      }
+      await this.getAppraise()
+    },
+    handleScroll(e) {
+      if(this.listLoading) return
+      if(((e.target.scrollLeft + window.document.body.offsetWidth) > (e.target.scrollWidth - 30)) && !this.finished) {
+        //触发加载
+        this.listLoading = true
+        this.onLoad()
+      }
+    },
     calImgIndex(item,appendIndex) {
       let count = item.imgArr.length
       for (let j = 0; j < item.pubAppendContentInfoList.length; j++) {
@@ -141,14 +265,15 @@ export default {
       }
       return count
     },
-    // changeImg(){
-
-    // },
-    toggle(type) {
+    async toggle(type) {
       if (type) {
         // 下一个
         if (this.currentImgIndex < this.imgArr.length - 1) {
           //下一个图片
+          this.selectImg(this.imgArr[this.currentImgIndex + 1])
+        }else if(!this.finished) {
+          //加载下一页
+          await this.onLoad()
           this.selectImg(this.imgArr[this.currentImgIndex + 1])
         }
       } else {
