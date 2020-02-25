@@ -289,6 +289,7 @@ export default {
           this.taskList = res.data;
           if (localStorage.getItem("classMap") && this.taskList && this.taskList.length > 0) {
             let classMap = JSON.parse(localStorage.getItem("classMap"));
+            let hisClassMap = localStorage.getItem("hisClassMap") ? JSON.parse(localStorage.getItem("hisClassMap")) : {}
             this.taskList.forEach(item => {
               if (item.tchCourseClassInfo) {
                 item.tchCourseClassInfo.forEach((obj, i) => {
@@ -296,10 +297,12 @@ export default {
                     //跳转到任务统计页面时自动将第一个班级设置为选中状态
                     obj.active = true
                   }
-                  if (!classMap[obj.classId] || !classMap[obj.classId].className) {
-                    obj['className'] = "--"
-                  } else {
+                  if(classMap[obj.classId] && classMap[obj.classId].className) {
                     obj['className'] = classMap[obj.classId].className
+                  }else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
+                    obj['className'] = hisClassMap[obj.classId].className
+                  }else {
+                    obj['className'] = "--"
                   }
                 })
               }
