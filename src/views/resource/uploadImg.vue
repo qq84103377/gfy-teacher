@@ -22,9 +22,9 @@
             <div class="img-group-item" v-for="(item,index) in imgList" :key="index">
               <img @click="previewImg(index)" :src="item.src" alt="">
               <div class="img-group-item__name" v-if="!item.edit" @click="changeName(item)">{{item.name}}</div>
-              <div class="img-group-item__input" v-if="item.edit"><input @blur="$set(item,'edit',false)" maxlength="20"
+              <div class="img-group-item__input" v-if="item.edit"><input @blur="$set(item,'edit',false)" maxlength="64"
                                                                          v-model="item.name" v-focus="item.edit"
-                                                                         type="text"><span class="red">{{20 - item.name.length}}</span>
+                                                                         type="text"><span class="red">{{64 - item.name.length}}</span>
               </div>
               <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" class="clear" name="clear"/>
             </div>

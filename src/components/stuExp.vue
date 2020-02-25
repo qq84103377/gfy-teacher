@@ -2,7 +2,7 @@
   <section class="stu-exp-wrap">
     <div class="stu-exp-wrap__item" v-for="(item,index) in list" v-if="list.length" :key="index">
       <div class="stu-exp-wrap__item__content-wrap">
-        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score || 0}}</span>
+        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score > 0 ? '+' + item.score : item.score}}</span>
         </div>
 
         <div class="stu-answer">
@@ -74,7 +74,7 @@
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
       <div class="comment-wrap" v-if="item.showComment" >
-        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
+        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" maxLength="500" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
         <van-button @click="$emit('comment',item.comment,item)" class="submit-btn" type="info">发表</van-button>
       </div>
       <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{getStudentName(rep.replyAccount,classId)}}:

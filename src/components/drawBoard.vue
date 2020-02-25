@@ -690,6 +690,8 @@ export default {
         multipointEnd: function () {
         },
         tap: function () {
+          if (_this.isPen || _this.isRubber) return
+          _this.$emit('tap')
         },
         doubleTap: function () {
         },
@@ -720,13 +722,13 @@ export default {
 
         },
         pressMove: function (evt) {
-          // if (_this.isPen || _this.isRubber) return
-          // let widthDiff = bwidth - swidth;
-          // let heightDiff = bheight - sheight;
-          // // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
-          // // } else {
-          // _this.swordEle.translateX += evt.deltaX;
-          // _this.swordEle.translateY += evt.deltaY;
+          if (_this.isPen || _this.isRubber) return
+          let widthDiff = bwidth - swidth;
+          let heightDiff = bheight - sheight;
+          // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
+          // } else {
+          _this.swordEle.translateX += evt.deltaX;
+          _this.swordEle.translateY += evt.deltaY;
           // }
         },
         swipe: function (evt) {
@@ -842,7 +844,7 @@ export default {
     this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
 
     this.figure()
-    this.containerFigure()
+    // this.containerFigure()
 
     console.log("zheshi ");
     console.log(this.canvas.width);

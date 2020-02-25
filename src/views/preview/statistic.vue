@@ -662,8 +662,7 @@
       },
       rewardScore(accountNo) {
          try {
-           const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
-           return score > 0 ? '+' + score : score
+           return this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
          }catch {
            console.log(accountNo,'有错啊');
          }

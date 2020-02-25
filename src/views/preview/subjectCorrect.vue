@@ -2,7 +2,7 @@
   <div class="correct-wrap" id="correct-wrap">
     <div class="correct-wrap__header" v-show="!isFold">
       <van-icon @click="$router.back()" name="arrow-left"/>
-      <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}</span>
+      <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}({{stuArr[stuIndex].rewardScore}})</span>
       <span>题号:{{$route.params.examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}}</span>
       <span>进度：{{progress}}/{{stuArr.length}}</span>
       <i @click="zoom(1)" class="iconGFY icon-enlarge"></i>
@@ -77,7 +77,7 @@
       <div class="correct-wrap__body__draw" :style="{flex: stuArr[stuIndex].answer[aswIndex].text? '0 0 80%':'1'}"
            v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
         <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
-        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="handleSubmit"
+        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="handleSubmit" @tap="isFold=!isFold"
                     :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
       </div>
       <div class="correct-wrap__body__undo"
@@ -110,7 +110,7 @@
 
     <!--    阅卷情况-->
     <van-popup
-      :overlay="false"
+      :overlay="true"
       v-model="stuInfo"
       position="right">
       <div class="stu-info-wrap">
@@ -206,7 +206,6 @@
         commentWord: '你是老师最值得骄傲的学生',
         isShowTitle: true, //是否查看原题弹窗
         commentText: '',
-        commonWord: ['你做的很不错,继续加油!', '理解的很好,可以毕业', '做得很差,明天不用来上课'],
         comment: '',
         stuName: '',
         stuInfo: false,
@@ -469,6 +468,7 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(type === 'T01' ? '加分成功' : '减分成功')
+            this.stuArr[this.stuIndex].rewardScore = this.stuArr[this.stuIndex].rewardScore * 1 + (type === 'T01'?1:-1)
           } else {
             this.$toast(res.msg)
           }
