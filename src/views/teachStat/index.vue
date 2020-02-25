@@ -602,6 +602,10 @@
           }else {
             v.active = vi === this.gradeIndex
           }
+
+          if(v.teacherInfoList.some(s => s.teacherType === 'T01')) {
+
+          }
           v.teacherInfoList = v.teacherInfoList.filter((t,i) => t.subjectType !== 'S20')
           if(v.active) {
             v.teacherInfoList.forEach((t,i) => {
