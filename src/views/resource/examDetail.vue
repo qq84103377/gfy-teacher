@@ -369,6 +369,7 @@
         }
       },
       submitScore(scoreValue) {
+        if(scoreValue === '') return this.$toast('分数为空') //增加toast为了找出分数为空的原因
         this.isModify = true
         this.setScoreForView(scoreValue)
           return
