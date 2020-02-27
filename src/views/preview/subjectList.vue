@@ -298,12 +298,12 @@
               res.data[0][key][k].text = dom.outerText
               if (index > -1) {
                 // 该学生已存在数组中
-                stuArr[index].answer.push({...res.data[0][key][k], error: errorPercent, examScore})
+                stuArr[index].answer.push({...res.data[0][key][k], error: errorPercent, examScore: examScore === null ? 5 : examScore})
               } else {
                 stuArr.push({
                   accountNo,
                   rewardScore: this.rewardScore(accountNo),
-                  answer: [{...res.data[0][key][k], error: errorPercent, examScore}],
+                  answer: [{...res.data[0][key][k], error: errorPercent, examScore: examScore === null ? 5 : examScore}],
                 })
               }
             })
