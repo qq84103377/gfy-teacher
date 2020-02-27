@@ -380,4 +380,17 @@ const getFontSize = (res) => {
 
 }
 
-export {getFontSize,toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord}
+// 根据年级获取年段
+const getYearSection = (gradeType) =>{
+  var yearSection = 'Y02';
+  if (['G01','G02','G03','G04','G05','G06'].includes(gradeType)) {
+    yearSection ='Y01'
+  } else if (['G07','G08','G09'].includes(gradeType)) {
+    yearSection ='Y02'
+  } else if(['G10','G11','G12'].includes(gradeType)){
+    yearSection ='Y03'
+  }
+  return yearSection;
+}
+
+export {getFontSize,toHump,getTaskTypeName,ellipsis,mutualType, formatSeconds,formathms, generateTimeReqestNumber, formatTime, randomString,getSubjectName,getStudentName,getGradeName,getTermName,dealType, numToWord,getYearSection}
