@@ -51,6 +51,7 @@
             v-model="loading"
             :finished="finished"
             finished-text=""
+            loading-text=" "
             @load="onLoad"
           >
             <ul v-if="goodsLists.length>0" class="goodsList">
@@ -132,6 +133,7 @@
       handleDropdown(val) {
         console.log('下拉列表选择了内容', val, this.goodsType);
         this.finished = false;
+        // this.loading = true;
         this.$store.commit('setVanLoading', true);
         this.currentPage = 0;
         this.pageSize = 10;
@@ -171,7 +173,7 @@
       },
       onLoad() {
         console.log('onload');
-        // this.loading = true;
+        this.loading = true;
         if (this.currentPage < this.total) {
           this.currentPage++;
           this.getGoodsList();
@@ -504,6 +506,9 @@
                 }
               }
             }
+          }
+          .van-list__loading{
+            opacity: 0;
           }
 
           .placeholderImg {
