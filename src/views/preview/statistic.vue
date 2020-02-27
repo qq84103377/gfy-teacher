@@ -69,7 +69,7 @@
           <div @click="viewStu"
                v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
           </div>
-          <i @click="showTip=true" v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper"
+          <i @click="showReplyTip=true" v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper"
              class="iconGFY icon-tip"></i>
         </div>
 
@@ -175,6 +175,7 @@
           <div>
             <div v-show="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')"
                  class="fs12 black statistic-wrap__view-label mgt10">客观题
+              <i @click="showPieTip=true" class="iconGFY icon-tip"></i>
             </div>
             <!--            <div id="myChart3" ref="myChart3" class="subject-pie"></div>-->
             <div class="objective-pie-group">
@@ -216,11 +217,19 @@
       </div>
     </van-dialog>
 
-    <van-popup round v-model="showTip">
+    <van-popup round v-model="showReplyTip">
       <div class="pd10 fs16 tip-wrap">
         <div style="text-align: center" class="fs18">讨论详情说明</div>
         <div class="mgt5">1.点击评论区域的评论人名字可直接回复该评论个人</div>
         <div class="mgt5">2.点击自己的名字可直接删除评论或回复</div>
+      </div>
+    </van-popup>
+    <van-popup round v-model="showPieTip">
+      <div class="pd10 fs16 tip-wrap">
+        <div style="text-align: center" class="fs18">发布范围</div>
+        <div class="mgt5"><span style="color: green">●</span> 错误率 = 答题错误人数/答题总人数</div>
+        <div class="mgt5"><span class="red">●</span> 正确率 = 答题正确人数/答题总人数</div>
+        <div class="mgt5">● 饼状图中间显示的是该题目的正确率</div>
       </div>
     </van-popup>
 
@@ -258,7 +267,8 @@
     components: {stuExp, spokenTable, listItem},
     data() {
       return {
-        showTip: false,
+        showPieTip: false,
+        showReplyTip: false,
         listLoading: false,
         finished: true, //首次加载页面不需要触发列表滚动加载
         currentPage: 1,
@@ -1648,7 +1658,7 @@
       border: 1px solid #ccc;
     }
     .tip-wrap {
-      width: 250px;
+      width: 280px;
     }
   }
 </style>
