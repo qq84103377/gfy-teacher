@@ -189,8 +189,8 @@
         } else {
           this.selectedClass = [{
             teacherType: this.checked ? 'T01' : 'T02',
-            classId:this.classId,
-            className:this.className
+            classId: this.classId,
+            className: this.className
           }]
         }
 
@@ -306,6 +306,9 @@
       // 选择科目
       selectSubject(val) {
         console.log('selectSubject', val);
+        if (val == '0') {
+          return;
+        }
         this.getVersionList(val)
       },
       // 获取学科列表
@@ -349,7 +352,7 @@
           })
         };
         getVersionBySubjectType(json).then(res => {
-          if (res.flag) {
+          if (res.flag && res.data) {
             this.versionList = res.data.map(function (item) {
               return {
                 text: item.textBookName,
@@ -371,7 +374,7 @@
             belongSchoolId: this.$store.getters.schoolId,
             classGrade: this.classGrade,
             schoolId: this.schoolId,
-            statusCd:'S01'
+            statusCd: 'S01'
           })
         };
         getClassByGrade(json).then(res => {
@@ -500,17 +503,22 @@
 
 
           }
-          &.dropdown{
+
+          &.dropdown {
             padding-top: 0;
             padding-bottom: 0;
-            .van-cell__title{
+
+            .van-cell__title {
               display: flex;
               align-items: center;
             }
-            .van-cell__value{
+
+            .van-cell__value {
               padding-right: 0;
+
               .van-dropdown-menu {
                 /*padding-right: 20px;*/
+
                 .van-dropdown-item__content {
                   padding-top: 10px;
 
@@ -530,8 +538,10 @@
                   .van-dropdown-menu__title {
                     padding-right: 0;
                     color: #969799;
-                    .van-ellipsis{
+
+                    .van-ellipsis {
                       padding-right: 20px;
+                      /*color: #333;*/
                     }
 
                     &:after {
@@ -546,7 +556,8 @@
 
               }
             }
-            i{
+
+            i {
               position: absolute;
               right: 15px;
               top: 50%;
