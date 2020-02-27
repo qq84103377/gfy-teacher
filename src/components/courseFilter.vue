@@ -129,7 +129,7 @@
 </template>
 
 <script>
-import { getTextBookCourseInfo, getGradeTermInfo } from '@/api/index'
+import { getTextBookCourseInfo, getGradeTermInfo, getTextBookVersionByGradeTerm } from '@/api/index'
 
 export default {
   name: "courseFilter",

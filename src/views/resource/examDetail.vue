@@ -636,7 +636,9 @@
           //找出在资源中心添加的试题
           vm.selectList.forEach(v => {
             v.child.forEach(c => {
-
+              c.groupExamList = c.groupExamList.map(g => {
+                return {...g,examScore:5}
+              })
               //找出对应的题型
              const index = vm.list.findIndex(item => item.testPaperSectionInfo.sectionName === v.sectionName)
               if(index > -1) {
@@ -645,17 +647,18 @@
                 //没有对应的试题
                 if(!vm.list[index].sectionExamList.some(item => item.examQuestion.examId === c.examId)) {
                   vm.isModify = true
+
                   vm.list[index].sectionExamList.push({
                     examQuestion : c,
                     sectionExamInfo: {
                       examId: c.examId,
-                      examScore: 5
+                      examScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5
                     },
                     sectionIndex: vm.list[index].sectionExamList.length + 1,
                     sectionName: v.sectionName,
                     testPaperExamGroupList: c.groupExamList || []
                   })
-                  vm.list[index].testPaperSectionInfo.sectionScore = vm.list[index].testPaperSectionInfo.sectionScore * 1 + 5
+                  vm.list[index].testPaperSectionInfo.sectionScore = vm.list[index].testPaperSectionInfo.sectionScore * 1 + (c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5)
                   vm.list[index].testPaperSectionInfo.sectionExamNum++
                 }
               }else {
@@ -666,7 +669,7 @@
                     examQuestion : c,
                     sectionExamInfo: {
                       examId: c.examId,
-                      examScore: 5
+                      examScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5
                     },
                     sectionIndex: vm.list.length + 1,
                     sectionName: v.sectionName,
@@ -676,7 +679,7 @@
                     sectionExamNum: 1,
                     sectionIndex: vm.list.length + 1,
                     sectionName: v.sectionName,
-                    sectionScore: 5,
+                    sectionScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5,
                     sectionType: v.sectionType
                   }
                 })
