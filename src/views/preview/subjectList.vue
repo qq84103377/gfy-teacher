@@ -42,7 +42,7 @@
           <div class="row" v-for="(item,index) in stuArr" :key="index">
             <div class="name">
               <span>{{getStudentName(item.accountNo,$route.query.classId)}}</span>
-              <span class="blue">({{rewardScore(item.accountNo)}})</span>
+              <span class="blue">({{item.rewardScore > 0 ? '+' + item.rewardScore : item.rewardScore}})</span>
               <span class="red">{{stuScore(item)}}分</span>
             </div>
             <div class="answer">
@@ -219,8 +219,7 @@
         }, 0)
       },
       rewardScore(accountNo) {
-        const score = this.studentStatList.find(v => v.accountNo == accountNo).studentRewardScore || 0
-        return score > 0 ? '+' + score : score
+        return this.studentStatList.find(v => v.accountNo == accountNo).studentRewardScore || 0
       },
       toggleTab(item) {
         if (item.active) return
@@ -303,6 +302,7 @@
               } else {
                 stuArr.push({
                   accountNo,
+                  rewardScore: this.rewardScore(accountNo),
                   answer: [{...res.data[0][key][k], error: errorPercent, examScore}],
                 })
               }

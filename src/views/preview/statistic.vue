@@ -7,7 +7,7 @@
       <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
       </div>
     </div>
-    <div style="flex: 1;overflow-y: auto">
+    <div style="flex: 1;overflow-y: auto" ref="body">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" :class="{remind: isDisabled}" v-if="isTaskEnd" @click="sendTask">一键重发
@@ -62,13 +62,19 @@
           </div>
         </div>
 
-        <!--        学生心得-->
-        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
-                 @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
-                 :classId="info.tchClassTastInfo.find(t => t.active).classId"
-                 v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
-                 :list="appraiseList" :disable="isDisabled">
-        </stu-exp>
+
+        <van-list v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper" v-show="tabIndex === 1" v-model="listLoading" :finished="finished" :finished-text="appraiseList.length>0?'没有更多了':''" @load="onLoad" :offset='80'>
+          <!--        学生心得-->
+          <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
+                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+                   :classId="info.tchClassTastInfo.find(t => t.active).classId" :currentPage="currentPage" :total="total" :finished="finished"
+                   v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
+                   :list="appraiseList" :disable="isDisabled">
+          </stu-exp>
+        </van-list>
+
+
+
 
         <!--        学资源/微课详情-->
         <div class="ware-detail" v-if="$route.query.taskType !== 'T06'" v-show="!isSpoken&&tabIndex === 0">
@@ -216,6 +222,11 @@
     components: { stuExp, spokenTable, listItem },
     data() {
       return {
+        listLoading: false,
+        finished: true, //首次加载页面不需要触发列表滚动加载
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
         showFooter: true,
         appraiseList: [],
         type: '', //学资源类型
@@ -237,7 +248,8 @@
         remind: false,
         loadWareFlag: true,
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
-        objectiveList: []
+        objectiveList: [],
+        scrollTop: 0,
       }
     },
     computed: {
@@ -258,6 +270,13 @@
       }
     },
     methods: {
+      async onLoad() {
+        this.currentPage++
+        if (this.currentPage > this.total && this.currentPage > 1) {
+          return
+        }
+        this.getAppraise()
+      },
       modifyScore() {
         if(this.isDisabled) return
         this.$router.push({name:`addSubScore`,params:{info:this.taskFinishInfo,termType:this.$route.query.termType}})
@@ -463,7 +482,16 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.topFlag === '1' ? '取消置顶' : '置顶成功')
+
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
@@ -489,7 +517,16 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.essFlag === '1' ? '取消精华' : '加精华成功')
+
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
@@ -520,23 +557,33 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.good ? '取消点赞' : '点赞成功')
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
         })
       },
       async getAppraise() {
+        const page = this.currentPage
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
-          currPage: 1,
+          // currPage: 1,
+          "currPage": page,
           isAppendMode: true,
           objectId: this.$route.query.taskId,
           objectTypeCd: 'A01',
-          pageSize: 9999,
+          pageSize: this.pageSize,
           praiseType: 1,
           replyType: 1,
         }
@@ -544,7 +591,10 @@
           requestJson: JSON.stringify(obj)
         }
         await getAppraiseV2(params).then(res => {
+          this.listLoading = false
+          this.total = res.total
           this.$store.commit('setVanLoading', false)
+
           if (res.flag && res.data[0]) {
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
@@ -578,9 +628,15 @@
               })
 
             })
-            this.appraiseList = res.data[0].appraiseListInfo
+            this.appraiseList = page === 1 ? res.data[0].appraiseListInfo : this.appraiseList.concat(res.data[0].appraiseListInfo)
+            if (page >= res.total) {
+              this.finished = true
+            }else {
+              this.finished = false
+            }
           } else {
-            this.appraiseList = []
+            this.appraiseList = page === 1 ? [] : this.appraiseList.concat([])
+            this.finished = true
           }
         })
       },
@@ -606,8 +662,7 @@
       },
       rewardScore(accountNo) {
          try {
-           const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
-           return score > 0 ? '+' + score : score
+           return this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
          }catch {
            console.log(accountNo,'有错啊');
          }
@@ -784,6 +839,11 @@
           }
         })
       },
+      initPage() {
+        this.$refs["body"].scrollTop = 0
+        this.finished = true
+        this.currentPage = 1
+      },
       async handleSelectTab(item) {
         if (item.active) return
         this.$store.commit('setVanLoading', true)
@@ -791,6 +851,9 @@
           this.$set(v, 'active', false)
         })
         item.active = true
+
+        this.initPage()
+
         this.getDailyRemindStatus()
         await this.statTaskStat(item.classId)
         this.drawPie()
@@ -1071,11 +1134,21 @@
       // if (!this.isWk && !this.isSpoken) {
       // }
     },
+    beforeRouteLeave(to, from, next) {
+        this.scrollTop = this.$refs["body"].scrollTop
+        next()
+    },
     beforeRouteEnter(to, from, next) {
       if (from.path === '/imgCorrect') {
         next(async vm => {
+          vm.$refs["body"].scrollTop = vm.scrollTop
           await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
+          vm.currentPage = 1
+          vm.pageSize = vm.appraiseList.length
           vm.getAppraise()
+          //刷新数据以后pageSize和currentPage都要还原
+          vm.currentPage = Math.ceil(vm.pageSize / 10)
+          vm.pageSize = 10
         })
       }else if (from.path === '/examView') {
         next(async vm => {

@@ -355,6 +355,7 @@
           this.$parent.list.forEach(v => {
             v.sectionExamList.forEach(c => {
               examIndex++
+              if(c.sectionExamInfo.examScore === '') this.$toast('分数为空')  //增加toast为了找出分数为空的原因
               testPaperExamInfoList.push({
                 "examId": c.examQuestion.examId,
                 "sectionType": v.testPaperSectionInfo.sectionType,
@@ -362,15 +363,16 @@
                 "sectionName": v.testPaperSectionInfo.sectionName,
                 "sectionIndex": v.testPaperSectionInfo.sectionIndex,
                 examIndex,
-                "examScore": c.sectionExamInfo.examScore,
+                "examScore": c.sectionExamInfo.examScore || 0,
                 "groupId": c.examQuestion.groupId,
                 "groupExamReList": c.examQuestion.groupExamList.map((g, gi) => {
+                  if(g.examScore === '') this.$toast('分数为空') //增加toast为了找出分数为空的原因
                   return {
                     "examGroupId": g.examGroupId,
                     "groupId": g.groupId,
                     "autoScoring": g.autoScoring,
                     "groupIndex": gi + 1,
-                    "examScore": g.examScore
+                    "examScore": g.examScore || 0
                   }
                 })
               })

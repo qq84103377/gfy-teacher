@@ -274,6 +274,8 @@ export default {
     },
     getUnFinishCourseTask() {
       let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
         operateAccountNo: this.$store.getters.getUserInfo.accountNo,
         currentPage: 1,
         pageSize: 2
@@ -287,6 +289,7 @@ export default {
           this.taskList = res.data;
           if (localStorage.getItem("classMap") && this.taskList && this.taskList.length > 0) {
             let classMap = JSON.parse(localStorage.getItem("classMap"));
+            let hisClassMap = localStorage.getItem("hisClassMap") ? JSON.parse(localStorage.getItem("hisClassMap")) : {}
             this.taskList.forEach(item => {
               if (item.tchCourseClassInfo) {
                 item.tchCourseClassInfo.forEach((obj, i) => {
@@ -294,10 +297,12 @@ export default {
                     //跳转到任务统计页面时自动将第一个班级设置为选中状态
                     obj.active = true
                   }
-                  if (!classMap[obj.classId] || !classMap[obj.classId].className) {
-                    obj['className'] = "--"
-                  } else {
+                  if(classMap[obj.classId] && classMap[obj.classId].className) {
                     obj['className'] = classMap[obj.classId].className
+                  }else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
+                    obj['className'] = hisClassMap[obj.classId].className
+                  }else {
+                    obj['className'] = "--"
                   }
                 })
               }
@@ -349,14 +354,19 @@ export default {
             if (item.myClassInfo) {
               item.myClassInfo.forEach(obj => {
                 if (!gradeList.some(v => v.classGrade === obj.classGrade)) {
-                  gradeList.push({ classGrade: obj.classGrade, gradeName: obj.gradeName, teacherInfoList: [...obj.teacherInfoList] || [] })
+                  gradeList.push({ classGrade: obj.classGrade, gradeName: obj.gradeName, teacherInfoList: obj.teacherInfoList.length ? JSON.parse(JSON.stringify(obj.teacherInfoList)) : [] })
                 } else {
                   //有的时候
                   const index = gradeList.findIndex(v => v.classGrade === obj.classGrade)
                   obj.teacherInfoList.forEach(s => {
-                    // if (!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
+                    if (gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
+                      if(s.teacherType === 'T01') {
+                        const tIndex = gradeList[index].teacherInfoList.findIndex(sub => sub.subjectType === s.subjectType)
+                        gradeList[index].teacherInfoList[tIndex].teacherType = 'T01'
+                      }
+                    }else {
                       gradeList[index].teacherInfoList.push(s)
-                    // }
+                    }
                   })
                 }
                 classMap[obj.classId] = obj
@@ -524,7 +534,9 @@ export default {
     },
     async getClassTeacherCourseDeploy() {
       let obj = {
-        'operateAccountNo': this.$store.getters.getUserInfo.accountNo
+        'operateAccountNo': this.$store.getters.getUserInfo.accountNo,
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
       }
       let params = {
         requestJson: JSON.stringify(obj)

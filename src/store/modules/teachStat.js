@@ -1,3 +1,16 @@
+const getClassIndexFn = () => {
+  let flag = false
+  let index = ''
+  for(let key in JSON.parse(localStorage.getItem("classMap"))) {
+    if(JSON.parse(localStorage.getItem("classMap"))[key].teacherInfoList.some(s => s.subjectType !== 'S20' && s.teacherType === 'T01')) {
+      if(!flag) {
+        flag = true
+        index = key
+      }
+    }
+  }
+  return index
+}
 const teachStat = {
   state: {
     tempGradeIndex: 0,

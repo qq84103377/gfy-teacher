@@ -2,7 +2,7 @@
   <section class="stu-exp-wrap">
     <div class="stu-exp-wrap__item" v-for="(item,index) in list" v-if="list.length" :key="index">
       <div class="stu-exp-wrap__item__content-wrap">
-        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score || 0}}</span>
+        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score > 0 ? '+' + item.score : item.score}}</span>
         </div>
 
         <div class="stu-answer">
@@ -29,7 +29,7 @@
           </div>
 
 <!--          追加内容-->
-          <div class="mgt10" v-for="append in item.pubAppendContentInfoList" :key="append.appendId">
+          <div class="mgt10" v-for="(append,appendIndex) in item.pubAppendContentInfoList" :key="append.appendId">
             <div>{{append.appendTime}}追加</div>
             <div v-html="append.text"></div>
             <div style="width: 100%;" v-if="append.audioArr&&append.audioArr.length">
@@ -49,7 +49,7 @@
             </div>
             <div class="img-wrap" :class="[{img4: append.imgArr.length==4},{img56:append.imgArr.length>4}]" v-if="append.imgArr&&append.imgArr.length">
 <!--              <div @click="imgCorrect(img,calImgIndex(index,item.imgArr.length,i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>-->
-              <div @click="imgCorrect(img,item.imgArr.length + i,index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
+              <div @click="imgCorrect(img,calImgIndex(item ,appendIndex, i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
             </div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
@@ -74,7 +74,7 @@
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
       <div class="comment-wrap" v-if="item.showComment" >
-        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
+        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" maxLength="500" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
         <van-button @click="$emit('comment',item.comment,item)" class="submit-btn" type="info">发表</van-button>
       </div>
       <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{getStudentName(rep.replyAccount,classId)}}:
@@ -96,7 +96,7 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId','disable'],
+    props: ['list', 'classId','disable','currentPage','total','finished'],
     computed: {
       getStudentName() {
         return getStudentName
@@ -108,6 +108,19 @@
       }
     },
     methods: {
+      calImgIndex(item,appendIndex,i) {
+        let count = item.imgArr.length
+        for (let j = 0; j < item.pubAppendContentInfoList.length; j++) {
+          const itemElement =  item.pubAppendContentInfoList[j];
+          if(j<appendIndex) {
+            count += itemElement.imgArr.length
+          }else {
+            break
+          }
+        }
+        count += i
+        return count
+      },
       goVideoPage(url) {
         if (!url) return
         this.$router.push({ name: 'videoPage', query: { src: url} })
@@ -120,7 +133,10 @@
             stuIndex,
             classId:this.classId,
             taskId: this.$route.query.taskId,
-            termType: this.$route.query.termType
+            termType: this.$route.query.termType,
+            currentPage: this.currentPage,
+            total: this.total,
+            finished: this.finished,
           }})
       },
       handlePraise(item) {

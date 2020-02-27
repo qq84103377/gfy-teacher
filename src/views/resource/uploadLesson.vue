@@ -137,10 +137,15 @@
       read(file, detail) {
         console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
-            this.wareFile = file;
-            this.form.name = file.name.split('.')[0]
-            this.wareSize = file.size
-            this.uploadWare(file);
+            if(file.size > 0) {
+              this.wareFile = file;
+              this.form.name = file.name.split('.')[0]
+              this.wareSize = file.size
+              this.uploadWare(file);
+            }else {
+              this.$toast('文件大小为0')
+            }
+
           } else {
             this.$toast('请上传MP3、MP4、WMV、AVI格式的音视频文件')
           }
@@ -396,8 +401,8 @@
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
-        formData.append("key", this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
-          filetime +
+        formData.append("key", this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr + '.' + curFile.type.split('/')[1]
         );
         console.log(this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
@@ -415,8 +420,8 @@
           this.wareUrl =
             this.wareOSSObject.host +
             "/" +
-            this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + '.' + curFile.type.split('/')[1]
         }).catch(err => {
           this.$store.commit('setVanLoading',false)
@@ -429,8 +434,8 @@
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
-        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-          filetime +
+        formData.append("key", this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+          filetime + '_' +
           randomStr + ".jpeg"
         );
         console.log(123);
@@ -445,8 +450,8 @@
           var imgUrl =
             this.oSSObject.host +
             "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo +
-            filetime +
+            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+            filetime + '_' +
             randomStr + ".jpeg";
           var imgObj = {
             url: imgUrl

@@ -123,7 +123,8 @@ export default {
       rotateIndex: 0,
       lastLeft: 0,
       lastTop: 0,
-      isIphone: false
+      isIphone: false,
+      drawFlag: false, //是否涂鸦过
     }
   },
   props: ['imgUrl', 'isPen', 'isRubber', 'text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -131,6 +132,7 @@ export default {
     imgUrl() {
       // $('.clearButton').trigger('click')
       this.clearScreen()
+      this.drawFlag = false
       this.canvasHistory = []
       this.rotateIndex = 0
       this.rotate = 0
@@ -317,6 +319,11 @@ export default {
     },
     // 绘制直线
     drawLine(context, x1, y1, x2, y2, /*optional*/ lineWidth, /*optional*/ strokeColor) {
+      /**
+       * 有过涂鸦就需要发请求提交,没有则不用
+       */
+      if(!this.drawFlag) this.drawFlag = true
+
       console.log('drawLine()');
       context.beginPath();
       context.lineTo(x1, y1);
@@ -683,6 +690,8 @@ export default {
         multipointEnd: function () {
         },
         tap: function () {
+          if (_this.isPen || _this.isRubber) return
+          _this.$emit('tap')
         },
         doubleTap: function () {
         },
@@ -713,13 +722,13 @@ export default {
 
         },
         pressMove: function (evt) {
-          // if (_this.isPen || _this.isRubber) return
-          // let widthDiff = bwidth - swidth;
-          // let heightDiff = bheight - sheight;
-          // // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
-          // // } else {
-          // _this.swordEle.translateX += evt.deltaX;
-          // _this.swordEle.translateY += evt.deltaY;
+          if (_this.isPen || _this.isRubber) return
+          let widthDiff = bwidth - swidth;
+          let heightDiff = bheight - sheight;
+          // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
+          // } else {
+          _this.swordEle.translateX += evt.deltaX;
+          _this.swordEle.translateY += evt.deltaY;
           // }
         },
         swipe: function (evt) {
@@ -835,7 +844,7 @@ export default {
     this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
 
     this.figure()
-    this.containerFigure()
+    // this.containerFigure()
 
     console.log("zheshi ");
     console.log(this.canvas.width);
