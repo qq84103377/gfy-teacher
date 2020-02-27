@@ -525,3 +525,7 @@ export const updateCourseWareCount =(params)=>{
 export const getTaskInfoList =(params)=>{
   return axios.post('teachNew/getTaskInfoList', qs.stringify(params))
 }
+//新建课根据年级学期编号、学科查询版本
+export const getTextBookVersionByGradeTerm =(params)=>{
+  return axios.post('resource/getTextBookVersionByGradeTerm', qs.stringify(params))
+}

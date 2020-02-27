@@ -389,7 +389,7 @@
                 "sectionName": v.sectionName,
                 "sectionIndex": v.sectionIndex,
                 examIndex,
-                "examScore": 5,
+                "examScore": c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5,
                 "groupId": c.groupId,
                 "groupExamReList": c.groupExamList.map((g, gi) => {
                   return {
