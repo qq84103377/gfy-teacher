@@ -53,12 +53,20 @@
       <div class="comment-dialog">
         <div class="comment-dialog__header">评论</div>
         <div class="comment-dialog__body">
-
-          <textarea v-model="comment" maxlength="500" placeholder="请输入评论" rows="4"></textarea>
-          <span class="limit-tip">{{comment.length}}/500</span>
+          <div style="position: relative;">
+            <textarea v-model="comment" maxlength="500" placeholder="请输入评论" rows="4"></textarea>
+            <span class="limit-tip">{{comment.length}}/500</span>
+          </div>
+          <div class="comment-dialog__body__new-comment" v-if="!isDelNewComment && list[stuIndex].replyList.some(v => v.replyAccount === $store.getters.getUserInfo.accountNo)">
+            <div class="grey9">您的最新评论:</div>
+            <div class="comment-dialog__body__new-comment__scroll">
+              <div class="new">{{getNewComment(stuIndex)}}</div>
+              <div @click="delComment" class="blue">删除</div>
+            </div>
+          </div>
         </div>
         <div class="comment-dialog__footer van-hairline--top">
-          <van-button class="cancel" @click="commentShow=false;comment=''">取消</van-button>
+          <van-button class="cancel" @click="commentShow=false;comment='';isDelNewComment=false">取消</van-button>
           <van-button class="confirm" type="info" @click="handleComment">确定</van-button>
         </div>
       </div>
@@ -90,6 +98,7 @@
     name: "imgCorrect",
     data() {
       return {
+        isDelNewComment: false,
         isHide: false,
         isPen: false,
         isRubber: false,
@@ -150,6 +159,13 @@
       }
     },
     methods: {
+      delComment() {
+        this.isDelNewComment = true
+      },
+      getNewComment(stuIndex) {
+        const item = this.list[stuIndex].replyList.find(v => v.replyAccount === this.$store.getters.getUserInfo.accountNo)
+          return item ? item.replyContent : ''
+      },
       figure() {
         // let swordEle = document.getElementsByClassName('canvas')[0]
         let swordEle = document.getElementById('tools-bar')
@@ -406,6 +422,7 @@
             this.$toast('评论成功')
             this.commentShow = false
             this.comment = ''
+            this.isDelNewComment = false
             // item.comment = ''
             // item.replyList.unshift(res.data[0].pubReplyInfo)
           } else {
@@ -725,7 +742,6 @@
         flex: 1;
         overflow-y: auto;
         padding: 6px;
-        position: relative;
 
         textarea {
           width: 100%;
@@ -752,6 +768,20 @@
             padding: 0 5px;
             margin-right: 5px;
             margin-bottom: 5px;
+          }
+        }
+        &__new-comment{
+          display: flex;
+          margin-top: 3px;
+          &__scroll{
+            flex: 1;
+            margin-left: 3px;
+            .new{
+              word-break: break-all;
+              max-height: 30px;
+              overflow-y: auto;
+              margin-bottom: 3px;
+            }
           }
         }
       }
