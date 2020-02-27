@@ -246,7 +246,7 @@
               this.isSuccess = true;
               for (let i = 0; i < this.qrCodeList.length; i++) {
                 this.$nextTick(function () {
-                  let url = `${process.env.VUE_APP_HOST}/#qrCode?id=${this.qrCodeList[i].qrCodeId}`;
+                  let url = `${process.env.VUE_APP_HOST}/#/qrCode?id=${this.qrCodeList[i].qrCodeId}`;
                   let elementId = `qrCode${this.qrCodeList[i].qrCodeId}`;
                   this.renderQrcode(elementId, url);
 
