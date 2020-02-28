@@ -76,10 +76,10 @@
 
         <van-list v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper" v-show="tabIndex === 1"
                   v-model="listLoading" :finished="finished" :finished-text="appraiseList.length>0?'没有更多了':''"
-                  @load="onLoad" :offset='80'>
+                  @load="onLoad" :offset='80' :error.sync="error" error-text="请求失败，点击重新加载">
           <!--        学生心得-->
           <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
-                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" @delReply="delReply"
                    :classId="info.tchClassTastInfo.find(t => t.active).classId" :currentPage="currentPage"
                    :total="total" :finished="finished"
                    v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
@@ -258,7 +258,8 @@
     addPraise,
     topAppraise,
     untopAppraise,
-    statTaskStatV2
+    statTaskStatV2,
+    delReplyV2
   } from '@/api/index'
   import {getStudentName, getFontSize} from '@/utils/filter'
 
@@ -297,6 +298,7 @@
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
         objectiveList: [],
         scrollTop: 0,
+        error: false,
       }
     },
     computed: {
@@ -317,6 +319,20 @@
       }
     },
     methods: {
+      delReply(replyId,replyIndex) {
+        this.$store.commit('setVanLoading', true)
+        delReplyV2({replyId}).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+           const index = this.appraiseList[replyIndex].replyList.findIndex(v => replyId === v.replyId)
+            if(index > -1) {
+              this.appraiseList[replyIndex].replyList.splice(index,1)
+            }
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       async onLoad() {
         this.currentPage++
         if (this.currentPage > this.total && this.currentPage > 1) {
@@ -695,6 +711,10 @@
             this.appraiseList = page === 1 ? [] : this.appraiseList.concat([])
             this.finished = true
           }
+        }).catch(err => {
+          this.error = true
+          this.listLoading = false
+          this.currentPage--
         })
       },
       handleAppraiseCtn(dom, v) {

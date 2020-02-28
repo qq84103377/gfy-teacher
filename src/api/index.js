@@ -529,3 +529,7 @@ export const getTaskInfoList =(params)=>{
 export const getTextBookVersionByGradeTerm =(params)=>{
   return axios.post('resource/getTextBookVersionByGradeTerm', qs.stringify(params))
 }
+//删除评论回复
+export const delReplyV2 =(params)=>{
+  return axios.post('public/delReplyV2', qs.stringify(params))
+}

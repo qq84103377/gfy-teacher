@@ -690,7 +690,8 @@
         })
       },
      async selectScore(i, score, asw) {
-        console.log(asw.value);
+       if (this.vanLoading) return
+       console.log(asw.value);
         this.selectScoreFlag = true
         this.$refs['menuItem' + i][0].toggle(false)
         // this.value1 = `${index}分`
