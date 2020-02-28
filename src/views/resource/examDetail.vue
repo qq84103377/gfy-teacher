@@ -315,8 +315,20 @@
       },
       //设置分数(没有保存后台)
       setScoreForView(scoreValue) {
+        let errorFlag = false
         if (this.secArr.length) {
           const avergePoint = Math.floor(scoreValue / this.secArr.length) // 每大题分配的分数
+          if(avergePoint <= 0) return this.$toast('分数设置有误')
+
+          //校验是否有题目设置到0分
+          this.list[this.sectionIndex].sectionExamList.forEach((e,i) => {
+            let s = ((i === this.secArr.length - 1) ? (scoreValue % this.secArr.length + avergePoint) : avergePoint)
+            if(s / e.examQuestion.groupExamList.length < 1) {
+              errorFlag = true
+            }
+          })
+          if(errorFlag) return this.$toast('分数设置有误')
+
           // 章节设置分数
           this.list[this.sectionIndex].testPaperSectionInfo.sectionScore = scoreValue * 1
           this.list[this.sectionIndex].sectionExamList.forEach((e, i) => {
@@ -341,9 +353,7 @@
             //点击了大题设置分数
             const length = this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList.length
             // this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.score = scoreValue
-            //修改大题分数
-            this.list[this.sectionIndex].sectionExamList[this.examIndex].sectionExamInfo.examScore = scoreValue
-
+            if(scoreValue / length < 1) return this.$toast('分数设置有误')
             if (length) {
               //大题内有小题
               this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList.forEach((g,gi) => {
@@ -354,6 +364,8 @@
             } else {
               //大题内无小题
             }
+            //修改大题分数
+            this.list[this.sectionIndex].sectionExamList[this.examIndex].sectionExamInfo.examScore = scoreValue
           }else {
             //点击了小题设置分数
             this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList[this.childIndex].examScore = scoreValue
@@ -367,12 +379,12 @@
           //修改章节总分
           this.list[this.sectionIndex].testPaperSectionInfo.sectionScore = this.calSectionScore(this.list[this.sectionIndex])
         }
+        this.isModify = true
       },
       submitScore(scoreValue) {
         if(scoreValue === '') return this.$toast('分数为空') //增加toast为了找出分数为空的原因
-        this.isModify = true
         this.setScoreForView(scoreValue)
-          return
+        return
         /**
          * //由于需求变更,所有的改分/上下移/添加移除试题都不再修改原试卷,所以以下内容作废
          */

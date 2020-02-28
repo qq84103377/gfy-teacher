@@ -1192,30 +1192,36 @@
     },
     async mounted() {
       this.$store.commit('setVanLoading', true)
-      this.getDailyRemindStatus()
-      await this.statTaskStat()
+      try {
+        this.getDailyRemindStatus()
+        await this.statTaskStat()
 
-      this.drawPie()
-      if (this.isTestPaper) {
-        this.drawHistogram()
-      }
-      if (this.taskFinishInfo.examstat) {
-        this.drawObjectivePie()
-      }
-      if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
-        //如果是学资源则把tab设置为激活
-        // this.wareActive = true
-        if (!this.isTestPaper) {
-          this.getAppraise()
+        this.drawPie()
+        if (this.isTestPaper) {
+          this.drawHistogram()
         }
-        await this.getCourseTaskDetail()
-        if (this.$route.query.taskType !== 'T06') {
-          //讨论不需要鉴权
-          this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
-          this.checkUrlPermission()
+        if (this.taskFinishInfo.examstat) {
+          this.drawObjectivePie()
         }
+        if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
+          //如果是学资源则把tab设置为激活
+          // this.wareActive = true
+          if (!this.isTestPaper) {
+            this.getAppraise()
+          }
+          await this.getCourseTaskDetail()
+          if (this.$route.query.taskType !== 'T06') {
+            //讨论不需要鉴权
+            this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
+            this.checkUrlPermission()
+          }
+        }
+        this.$store.commit('setVanLoading', false)
+      }catch (e) {
+        this.$store.commit('setVanLoading', false)
+
       }
-      this.$store.commit('setVanLoading', false)
+
       // if (!this.isWk && !this.isSpoken) {
       // }
     },
