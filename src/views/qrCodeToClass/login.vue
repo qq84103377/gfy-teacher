@@ -160,7 +160,7 @@
         this.loginDisabled2 = false
       }
     },
-    mounted() {
+    activated() {
       this.getQrcodeInfo()
     },
     methods: {

@@ -10,7 +10,8 @@
           <span>姓</span>
           <span>名</span>
         </label>：
-        <van-field class="custom-input" placeholder="请输入学生真实姓名" @blur="handleBlur" v-model.trim="username" clearable/>
+        <van-field class="custom-input" placeholder="请输入学生真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
+                   v-model.trim="username" clearable/>
       </div>
       <div class="form-cell" v-if="roleType == 'A02'">
         <label>
@@ -19,7 +20,8 @@
           <span>姓</span>
           <span>名</span>
         </label>：
-        <van-field class="custom-input" placeholder="请输入老师真实姓名" @blur="handleBlur" v-model.trim="username" clearable/>
+        <van-field class="custom-input" placeholder="请输入老师真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
+                   v-model.trim="username" clearable/>
       </div>
       <div class="form-cell">
         <label>
@@ -60,6 +62,7 @@
 
   export default {
     name: "Settings",
+
     data() {
       return {
         username: "",   //真实姓名
@@ -81,11 +84,21 @@
       onClickLeft() {
         this.$router.replace("/qrCode");
       },
+      changeInput() {
+        // 过滤掉除数字、字母、汉字以外的所有字符
+        this.username = this.username.replace(/[^A-Za-z0-9\u4e00-\u9fa5]/g, "");
+      },
       handleBlur() {
         this.num = 0;
         if (!this.username) {
           this.isComplete = true;
           return;
+        } else {
+          if (this.setPwd &&!this.isDifferent && !this.isUnAvailable) {
+            this.isComplete = false;
+          } else {
+            this.isComplete = true;
+          }
         }
         this.checkName();
       },
