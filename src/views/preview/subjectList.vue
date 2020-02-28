@@ -316,7 +316,6 @@
                 dom[0].controlsList="nodownload"
               }
             })
-            console.log(stuArr, 'dllddldlld');
           } else {
             this.$toast(res.msg)
           }

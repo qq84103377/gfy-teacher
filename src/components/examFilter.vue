@@ -197,7 +197,9 @@ export default {
     },
     chooseTestPaper() {
       console.log("选择试卷", this.paperInfo);
-
+      if (!this.paperInfo.objectiveItemNum && !this.paperInfo.subjectiveItemNum) {
+        return this.$toast('该试卷不含试题')
+      }
       this.$emit('update:testPaperId', this.paperInfo.testPaperId)
       this.$emit('update:testPaperName', this.paperInfo.testPaperName)
     }
