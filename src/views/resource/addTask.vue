@@ -1047,7 +1047,8 @@
         if (this.form.time == "1") {
           if (type == "begin") {
             if(this.isEdit) {
-              this.minDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
+              // this.minDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
+              this.minDate = new Date()
               this.currentDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
             }else {
               this.minDate = new Date()
@@ -1071,7 +1072,8 @@
           if (type == 'begin') {//开始时间
 
             if(this.isEdit) {
-              this.minDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
+              // this.minDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
+              this.minDate = new Date()
               this.currentDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
             }else {
               this.minDate = new Date()
