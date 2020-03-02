@@ -541,3 +541,12 @@ export const deleteClassSubGroupForce =(params)=>{
 export const saveParentRewardScore =(params)=>{
   return axios.post('teach/saveParentRewardScore', qs.stringify(params))
 }
+//获取班级学生/家长积分明细列表
+export const statClassCounterByOrigin =(params)=>{
+  return axios.post('counter/statClassCounterByOrigin', qs.stringify(params))
+}
+//获取班级学生/家长积分明细来源列表
+export const getUserCounterOriginDetail =(params)=>{
+  return axios.post('counter/getUserCounterOriginDetail', qs.stringify(params))
+}
+

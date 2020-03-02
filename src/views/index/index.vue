@@ -47,8 +47,8 @@
           <div class="icon-wrap orange"><i class="iconGFY icon-layer"></i></div>
           <div>分层</div>
         </div>
-
       </div>
+
       <div class="jcsb aic mgb10">
         <span class="fs16 black">未结束任务</span>
         <span class="blue fs12" v-show="taskList && taskList.length>0" @click="$router.push(`/unfinishTaskList`)">查看更多></span>
@@ -138,7 +138,8 @@ export default {
       clickIndex: 0,
       showfEduction: false,
       parentClassList: {},
-      parentList: {}
+      parentList: {},
+      nowFileName: ''
     }
   },
   activated() {
@@ -147,6 +148,7 @@ export default {
     this.currentSubjectType = localStorage.getItem("currentSubjectTypeName") || ''
   },
   mounted() {
+
     this.$store.commit('setVanLoading', true)
     Promise.all([this.getMySchoolInfo(), this.getGradeTermInfo(), this.getPublishByRole(), this.getClassTeacherCourseDeploy()]).then(res => {
       this.$store.commit('setVanLoading', false)
@@ -204,16 +206,19 @@ export default {
           for (let key in this.parentClassList) {
             this.parentClassList[key].classStudent = {}
             this.parentClassList[key].groupInfo.forEach(e => {
-              e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
-                if (i.parentAccountNo) {
-                  return i
-                }
-              })
-              if (e.tchSubGroupStudent.length) {
-                e.tchSubGroupStudent.forEach(s => {
-                  this.parentClassList[key].classStudent[s.parentAccountNo] = s
+              if (e.tchSubGroupParent !== null) {
+                e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
+                  if (i.parentAccountNo) {
+                    return i
+                  }
                 })
+                if (e.tchSubGroupStudent.length) {
+                  e.tchSubGroupStudent.forEach(s => {
+                    this.parentClassList[key].classStudent[s.parentAccountNo] = s
+                  })
+                }
               }
+
             })
           }
           localStorage.setItem('parentClassList', JSON.stringify(this.parentClassList))
@@ -273,7 +278,7 @@ export default {
           taskId: item.taskId,
           taskType: item.tastType,
           resourceType: item.resourceType,
-          courseName:item.courseName
+          courseName: item.courseName
         }
       })
     },
@@ -323,8 +328,8 @@ export default {
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
           if (['T04'].includes(item.tastType)) {
-            localStorage.setItem('materialDetail',JSON.stringify(res.data[0].courseware))
-            this.$router.push({ path: '/materialDetail'})
+            localStorage.setItem('materialDetail', JSON.stringify(res.data[0].courseware))
+            this.$router.push({ path: '/materialDetail' })
           } else if (['T06'].includes(item.tastType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
           } else if (['T01', 'T02'].includes(item.taskType)) {
@@ -427,7 +432,7 @@ export default {
                   const index = gradeList.findIndex(v => v.classGrade === obj.classGrade)
                   obj.teacherInfoList.forEach(s => {
                     // if (!gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
-                      gradeList[index].teacherInfoList.push(s)
+                    gradeList[index].teacherInfoList.push(s)
                     // }
                   })
                 }
@@ -475,7 +480,7 @@ export default {
 
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
-          this.$store.commit('setClassIndex',Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
+          this.$store.commit('setClassIndex', Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap', schoolMap)
@@ -485,6 +490,17 @@ export default {
           //获取班级学生信息
 
           //获取班级分组信息
+          let schoolList = res.data[0].schoolList;
+          let postList = []
+          let length = schoolList.length;
+
+          // 获取老师科目列表，去重后
+          for (let i = 0; i < length; i++) {
+            // 职务
+            postList = Array.from(new Set([...postList, schoolList[i].postType]));
+          }
+          console.log(postList, 'postList')
+          localStorage.setItem('postList', JSON.stringify(postList))
 
         } else {
           this.$toast(res.msg)

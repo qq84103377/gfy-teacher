@@ -844,29 +844,36 @@
                         this.$set(item, 'type', "part")
                       }
                     } else {
-                      element.accountNo.forEach(i => {
-                        if (key == i) {
-                          this.$set(item.classStudent[key], 'active', true)
-                          item.classStudent[key].active = true
-                        }
-                      })
+                      if (element.accountNo.some(account => account == key)) {
+                        this.$set(item.classStudent[key], 'active', true)
+                        item.classStudent[key].active = true
+                      } else {
+                        //只要有一个学生不在未完成列表里面 就证明不是全选
+                        this.$set(item, 'type', "part")
+                      }
+                      // element.accountNo.forEach(i => {
+                      //   if (key == i) {
+                      //     this.$set(item.classStudent[key], 'active', true)
+                      //     item.classStudent[key].active = true
+                      //   }
+                      // })
                     }
                   }
 
                   item.tchSubGroup.forEach((ele, index) => {
                     this.$set(ele, 'check', false)
                     //============这段要检查影响===============================================================
-                    if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
-                      ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                        s.active = false
-                        this.$set(s, 'active', false)
-                        element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
-                          if (s.subgroupId == i.subgroupId) {
-                            s.active = true
-                          }
-                        })
-                      })
-                    }
+                    // if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
+                    //   ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                    //     s.active = false
+                    //     this.$set(s, 'active', false)
+                    //     element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
+                    //       if (s.subgroupId == i.subgroupId) {
+                    //         s.active = true
+                    //       }
+                    //     })
+                    //   })
+                    // }
                     //============这段要检查影响===============================================================
                     if (element.tchClassSubGroup) {
                       element.tchClassSubGroup.forEach(i => {

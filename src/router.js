@@ -625,7 +625,7 @@ export default new Router({
             title: "专项练习"
           }
         },
-         {
+        {
           path: "/fEducation",
           name: 'fEducation',
           component: () => import("./views/fEducation/index.vue"),
@@ -711,6 +711,29 @@ export default new Router({
           path: '/beforeClassTask',
           name: 'beforeClassTask',
           component: () => import('./views/teachStat/beforeClassTask.vue')
+        },
+        {
+          path: "/integralStat",
+          name: "integralStat",
+          component: () => import("./views/teachStat/integralStat.vue"),
+
+          children: [{
+              path: '/',
+              name: 'integralStat',
+              component: () => import('./views/teachStat/integralStatList.vue'),
+            },
+            {
+              path: '/integralDetail',
+              name: 'integralDetail',
+              component: () => import('./views/teachStat/integralDetail.vue'),
+            },
+
+          ]
+        },
+        {
+          path: '/integralOrigin',
+          name: 'integralOrigin',
+          component: () => import('./views/teachStat/integralOrigin.vue')
         },
       ]
     },

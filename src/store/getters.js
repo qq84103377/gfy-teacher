@@ -23,6 +23,8 @@ const getters = {
   getSubjectIndex: state => state.teachStat.subjectIndex,
   getGradeIndex: state => state.teachStat.gradeIndex,
   getClassIndex: state => state.teachStat.classIndex,
+  getInterlGradeList: state => state.teachStat.interlGradeList,
+  getInterlClassIndex: state => state.teachStat.interlClassIndex,
   ...parentGetters
 }
 export default getters
