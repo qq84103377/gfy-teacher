@@ -1,6 +1,7 @@
 <template>
   <section class="error-book">
-    <van-nav-bar title="错题集" @click-left="goBack" left-arrow>
+    <van-nav-bar @click-left="goBack" left-arrow>
+      <div slot="title">错题集 <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i></div>
       <div slot="right" class="fs12 blue" @click="filterShow=true">筛选</div>
     </van-nav-bar>
     <div class="error-book__tab van-hairline--bottom">
@@ -27,6 +28,16 @@
 
     <course-filter ref="courseFilter" @confirm="confirmCb" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="error"></course-filter>
     <exam-bar ref="examBar" type="error" v-model="selectList" @clear="clear" :can-add-course="true"></exam-bar>
+
+    <van-popup round v-model="showTip">
+      <div class="pd10 fs16 tip-wrap">
+        <div style="text-align: center" class="fs18">错题集说明</div>
+        <div class="mgt5">1.点击“筛选”,可切换科目、年级学科和班级。</div>
+        <div class="mgt5">2.选择错误率,显示的是大于等于该错误率的所有试题,如选择错误率为0.5,则显示错误率大于0.5的所有错题。</div>
+        <div class="mgt5">3.点击课程标题,可进入到该课程的错题详情页面。</div>
+        <div class="mgt5">4.点击“添加”,则是选择该课程下的所有错题。</div>
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -40,6 +51,7 @@ export default {
   name: "index",
   data() {
     return {
+      showTip: false,
       filterShow: false,
       sysCourseId: '',
       errorPercent: [
@@ -376,6 +388,9 @@ export default {
         }
       }
     }
+  }
+  .tip-wrap {
+    width: 280px;
   }
 }
 </style>

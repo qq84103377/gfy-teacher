@@ -1131,6 +1131,7 @@
         this.$router.push(`/teamSelect?type=` + type + '&isfEducation=' + this.isfEducation)
       },
       selectTestPaper() {
+        if(this.form.comment) return
         this.filterShow = true;
         this.$refs.examFilter.getTeachCourseResDetail()
       },

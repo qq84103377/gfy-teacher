@@ -549,4 +549,12 @@ export const statClassCounterByOrigin =(params)=>{
 export const getUserCounterOriginDetail =(params)=>{
   return axios.post('counter/getUserCounterOriginDetail', qs.stringify(params))
 }
+//新建课根据年级学期编号、学科查询版本
+export const getTextBookVersionByGradeTerm =(params)=>{
+  return axios.post('resource/getTextBookVersionByGradeTerm', qs.stringify(params))
+}
+//删除评论回复
+export const delReplyV2 =(params)=>{
+  return axios.post('public/delReplyV2', qs.stringify(params))
+}
 

@@ -11,17 +11,47 @@
 <!--          <span>总分: {{info.score}}</span>-->
 <!--        </div>-->
         <div v-html="info.title" class="html-img" @click="previewImg"></div>
+
+        <div class="van-hairline--bottom init-wrap" v-for="(child,childIndex) in info.groupExamList" :key="childIndex">
+          ({{childIndex+1}})<span v-if="child.examScore>=0">本小题{{child.examScore}}分</span>
+          <i class="iconGFY icon-auto" v-if="child.autoScoring == 1"></i>
+          <div v-html="child.title" class="html-img" @click="previewImg"></div>
+          <div style="display: flex;justify-content: flex-end">
+            <div class="question-detail__body__qst-wrap__btn" :class="{active:child.analyseShow}" @click="$set(child,'analyseShow',!child.analyseShow)">查看解析</div>
+          </div>
+          <div v-if="child.analyseShow" class="question-detail__body__qst-wrap__analyse mgb10 html-img" @click="previewImg" style="padding-left: 0;padding-right: 0;background: #f5f5f5;">
+            <div>正确答案及相关解析</div>
+            <div>正确答案:</div>
+            <div v-html="child.answer"></div>
+            <div>解析:</div>
+            <div v-html="child.examExplain"></div>
+          </div>
+        </div>
+
         <span class="fs12 mgt15" style="display: block;"><i class="iconGFY icon-difficult"></i>&nbsp;{{info.titleDegree==='D01'?'容易':info.titleDegree==='D02'?'中等':'困难'}}</span>
-        <div style="display: flex;justify-content: flex-end">
+        <div v-if="!info.groupExamList.length" style="display: flex;justify-content: flex-end">
           <div class="question-detail__body__qst-wrap__btn" :class="{active:analyseShow}" @click="analyseShow=!analyseShow">查看解析</div>
         </div>
-        <div v-if="analyseShow">
-          <div>正确答案及相关解析</div>
-          <div>正确答案:</div>
-          <div v-html="info.answer"></div>
-          <div>解析:</div>
-          <div v-html="info.examExplain"></div>
+<!--        <div v-if="analyseShow">-->
+<!--          <div>正确答案及相关解析</div>-->
+<!--          <div>正确答案:</div>-->
+<!--          <div v-html="info.answer"></div>-->
+<!--          <div>解析:</div>-->
+<!--          <div v-html="info.examExplain"></div>-->
+<!--        </div>-->
+
+        <div v-if="analyseShow" class="question-detail__body__qst-wrap__analyse html-img" @click="previewImg">
+          <div>试题编号:{{info.examId}}</div>
+          <div v-if="info.knowledgePointName">知识点:{{info.knowledgePointName}}</div>
+          <div v-if="!info.groupExamList.length">
+            <div>正确答案及相关解析</div>
+            <div>正确答案:</div>
+            <div v-html="info.answer"></div>
+            <div>解析:</div>
+            <div v-html="info.examExplain"></div>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -100,6 +130,17 @@
       &__qst-wrap {
         background: #fff;
         padding: 10px;
+        .init-wrap {
+          margin: 0 -12px;
+          padding: 0 12px;
+          position: relative;
+          .icon-auto {
+            position: absolute;
+            right: 0;
+            top: 0;
+          }
+        }
+
         &__score {
           line-height: 40px;
           text-align: right;
@@ -121,6 +162,9 @@
             color: @blue;
             border: 1px solid @blue;
           }
+        }
+        &__analyse {
+          padding: 8px 12px;
         }
       }
     }

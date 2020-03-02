@@ -42,7 +42,7 @@
           <div class="row" v-for="(item,index) in stuArr" :key="index">
             <div class="name">
               <span>{{isfEducation?getParentName(item.accountNo, $route.query.classId):getStudentName(item.accountNo,$route.query.classId)}}</span>
-              <span class="blue">({{rewardScore(item.accountNo)}})</span>
+              <span class="blue">({{item.rewardScore > 0 ? '+' + item.rewardScore : item.rewardScore}})</span>
               <span class="red">{{stuScore(item)}}分</span>
             </div>
             <div class="answer">
@@ -223,8 +223,7 @@
         }, 0)
       },
       rewardScore(accountNo) {
-        const score = this.studentStatList.find(v => v.accountNo == accountNo).studentRewardScore || 0
-        return score > 0 ? '+' + score : score
+        return this.studentStatList.find(v => v.accountNo == accountNo).studentRewardScore || 0
       },
       toggleTab(item) {
         if (item.active) return
@@ -303,11 +302,12 @@
               res.data[0][key][k].text = dom.outerText
               if (index > -1) {
                 // 该学生已存在数组中
-                stuArr[index].answer.push({...res.data[0][key][k], error: errorPercent, examScore})
+                stuArr[index].answer.push({...res.data[0][key][k], error: errorPercent, examScore: examScore === null ? 5 : examScore})
               } else {
                 stuArr.push({
                   accountNo,
-                  answer: [{...res.data[0][key][k], error: errorPercent, examScore}],
+                  rewardScore: this.rewardScore(accountNo),
+                  answer: [{...res.data[0][key][k], error: errorPercent, examScore: examScore === null ? 5 : examScore}],
                 })
               }
             })
@@ -320,7 +320,6 @@
                 dom[0].controlsList="nodownload"
               }
             })
-            console.log(stuArr, 'dllddldlld');
           } else {
             this.$toast(res.msg)
           }

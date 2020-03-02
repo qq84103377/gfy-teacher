@@ -9,16 +9,17 @@
     <div class="add-course-pop">
       <div class="add-course-pop__header">《{{resName}}》添加至课程</div>
       <div class="add-course-pop__body">
-        <div v-if="list.length">
-          <div class="subject-title" v-if="gradeTerm">
-            {{gradeTerm.split('|')[0]|getGradeName}}{{list[0].tchCourseInfo.subjectType|getSubjectName}}
-          </div>
-          <van-radio-group class="course-group" v-model="radio">
-            <van-radio v-for="(item,index) in list" :key="index" :name="index" class="mgr10 mgb15">
+        <div v-for="(item,index) in list" :key="index">
+<!--          <div class="subject-title" v-if="gradeTerm">-->
+<!--            {{gradeTerm.split('|')[0]|getGradeName}}{{list[0].tchCourseInfo.subjectType|getSubjectName}}-->
+<!--          </div>-->
+          <div class="subject-title">{{item.classGrade|getGradeName}}{{item.arr[0].tchCourseInfo.subjectType|getSubjectName}}</div>
+          <van-radio-group class="course-group" v-model="item.radio">
+            <van-radio @click="handleChange(index)" v-for="(c,ci) in item.arr" :key="ci" :name="ci" class="mgr10 mgb15">
               <i slot="icon"
                  slot-scope="props"
                  :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
-              {{item.tchCourseInfo.courseName}}
+              {{c.tchCourseInfo.courseName}}
             </van-radio>
           </van-radio-group>
         </div>
@@ -39,7 +40,8 @@
     props: ['visible', 'gradeTerm', 'list', 'resName','resourceId','resourceType','isSendTask','listKey'],
     data() {
       return {
-        radio: ''
+        // radio: ''
+        listIndex: ''
       }
     },
     computed: {
@@ -53,11 +55,20 @@
       },
     },
     methods: {
+      handleChange(index) {
+        if(this.listIndex === index) return
+        this.list.forEach((v,i) => {
+          if(index !== i) {
+            this.$set(v,'radio','')
+          }
+        })
+        this.listIndex = index
+      },
       submit() {
-        if(this.radio === '') return this.$toast('请选择课程')
+        if(this.listIndex === '') return this.$toast('请选择课程')
         this.show = false
         if(this.isSendTask) {
-          this.$store.commit("setTchCourseInfo", this.list[this.radio].tchCourseInfo)
+          this.$store.commit("setTchCourseInfo", this.list[this.listIndex].arr[this.list[this.listIndex].radio].tchCourseInfo)
           this.$store.commit("setTaskClassInfo", '')
           if(this.listKey === 'exam') {
             this.$router.push(`/addTask?type=exam&_t=new&isRes=1`)
@@ -66,7 +77,7 @@
           }
         }else {
           this.$store.commit('setVanLoading',true)
-          const {tchCourseId,sysCourseId, relationSeqId, statusCd, courseName} = this.list[this.radio].tchCourseInfo
+          const {tchCourseId,sysCourseId, relationSeqId, statusCd, courseName} = this.list[this.listIndex].arr[this.list[this.listIndex].radio].tchCourseInfo
           let obj = {
             "interUser": "runLfb",
             "interPwd": "25d55ad283aa400af464c76d713c07ad",

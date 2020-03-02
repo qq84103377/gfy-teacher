@@ -315,8 +315,20 @@
       },
       //设置分数(没有保存后台)
       setScoreForView(scoreValue) {
+        let errorFlag = false
         if (this.secArr.length) {
           const avergePoint = Math.floor(scoreValue / this.secArr.length) // 每大题分配的分数
+          if(avergePoint <= 0) return this.$toast('分数设置有误')
+
+          //校验是否有题目设置到0分
+          this.list[this.sectionIndex].sectionExamList.forEach((e,i) => {
+            let s = ((i === this.secArr.length - 1) ? (scoreValue % this.secArr.length + avergePoint) : avergePoint)
+            if(s / e.examQuestion.groupExamList.length < 1) {
+              errorFlag = true
+            }
+          })
+          if(errorFlag) return this.$toast('分数设置有误')
+
           // 章节设置分数
           this.list[this.sectionIndex].testPaperSectionInfo.sectionScore = scoreValue * 1
           this.list[this.sectionIndex].sectionExamList.forEach((e, i) => {
@@ -341,9 +353,7 @@
             //点击了大题设置分数
             const length = this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList.length
             // this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.score = scoreValue
-            //修改大题分数
-            this.list[this.sectionIndex].sectionExamList[this.examIndex].sectionExamInfo.examScore = scoreValue
-
+            if(scoreValue / length < 1) return this.$toast('分数设置有误')
             if (length) {
               //大题内有小题
               this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList.forEach((g,gi) => {
@@ -354,6 +364,8 @@
             } else {
               //大题内无小题
             }
+            //修改大题分数
+            this.list[this.sectionIndex].sectionExamList[this.examIndex].sectionExamInfo.examScore = scoreValue
           }else {
             //点击了小题设置分数
             this.list[this.sectionIndex].sectionExamList[this.examIndex].examQuestion.groupExamList[this.childIndex].examScore = scoreValue
@@ -367,11 +379,12 @@
           //修改章节总分
           this.list[this.sectionIndex].testPaperSectionInfo.sectionScore = this.calSectionScore(this.list[this.sectionIndex])
         }
+        this.isModify = true
       },
       submitScore(scoreValue) {
-        this.isModify = true
+        if(scoreValue === '') return this.$toast('分数为空') //增加toast为了找出分数为空的原因
         this.setScoreForView(scoreValue)
-          return
+        return
         /**
          * //由于需求变更,所有的改分/上下移/添加移除试题都不再修改原试卷,所以以下内容作废
          */
@@ -635,7 +648,9 @@
           //找出在资源中心添加的试题
           vm.selectList.forEach(v => {
             v.child.forEach(c => {
-
+              c.groupExamList = c.groupExamList.map(g => {
+                return {...g,examScore:5}
+              })
               //找出对应的题型
              const index = vm.list.findIndex(item => item.testPaperSectionInfo.sectionName === v.sectionName)
               if(index > -1) {
@@ -644,17 +659,18 @@
                 //没有对应的试题
                 if(!vm.list[index].sectionExamList.some(item => item.examQuestion.examId === c.examId)) {
                   vm.isModify = true
+
                   vm.list[index].sectionExamList.push({
                     examQuestion : c,
                     sectionExamInfo: {
                       examId: c.examId,
-                      examScore: 5
+                      examScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5
                     },
                     sectionIndex: vm.list[index].sectionExamList.length + 1,
                     sectionName: v.sectionName,
                     testPaperExamGroupList: c.groupExamList || []
                   })
-                  vm.list[index].testPaperSectionInfo.sectionScore = vm.list[index].testPaperSectionInfo.sectionScore * 1 + 5
+                  vm.list[index].testPaperSectionInfo.sectionScore = vm.list[index].testPaperSectionInfo.sectionScore * 1 + (c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5)
                   vm.list[index].testPaperSectionInfo.sectionExamNum++
                 }
               }else {
@@ -665,7 +681,7 @@
                     examQuestion : c,
                     sectionExamInfo: {
                       examId: c.examId,
-                      examScore: 5
+                      examScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5
                     },
                     sectionIndex: vm.list.length + 1,
                     sectionName: v.sectionName,
@@ -675,7 +691,7 @@
                     sectionExamNum: 1,
                     sectionIndex: vm.list.length + 1,
                     sectionName: v.sectionName,
-                    sectionScore: 5,
+                    sectionScore: c.groupExamList.length > 0 ? c.groupExamList.length * 5 : 5,
                     sectionType: v.sectionType
                   }
                 })
