@@ -1075,6 +1075,8 @@
           localStorage.setItem('materialDetail',JSON.stringify(humpObj))
           this.$router.push({ path: '/materialDetail'})
         } else {
+          //平台资源素材没有belongAccountName这个字段 需要加上去
+          this.$set(item.resCourseWareInfo,'belongAccountName',item.userName)
           localStorage.setItem('materialDetail',JSON.stringify(item.resCourseWareInfo))
           this.$router.push({ path: '/materialDetail'})
         }

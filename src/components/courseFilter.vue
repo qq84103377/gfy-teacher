@@ -309,6 +309,7 @@ export default {
       }
       await getTextBookVersionByGradeTerm(params).then(res => {
         this.$store.commit('setVanLoading', false)
+        this.bookIndex = 0
         if (res.flag) {
           this.bookInfoList = res.data || []
         } else {
@@ -468,7 +469,11 @@ export default {
                   item.courseList = tmp
                 }
               })
-              this.courseList = this.unitList[this.unitIndex].courseList
+              if(this.unitList.length) {
+                this.courseList = this.unitList[this.unitIndex].courseList
+              }else {
+                this.courseList = []
+              }
             }
           } else {
             this.$toast(res.msg)
@@ -488,12 +493,13 @@ export default {
       this.classDropdown = false
       // this.getTextBookCourseInfo()
     },
-    changeTermType(index) {
+    async changeTermType(index) {
       this.termIndex = index
       this.termDropdown = !this.termDropdown
       if (this.type === 'myCourse' || this.type === 'error' || this.type === 'fEducation') {
         // this.getTextBookCourseInfo()
       } else {
+        await this.getTextBookVersionByGradeTerm()
         this.getTextBookCourseInfo()
       }
     },
@@ -535,7 +541,6 @@ export default {
 
         this.gradeDropdown = !this.gradeDropdown
         await this.getTextBookVersionByGradeTerm()
-        this.bookIndex = 0
         this.getTextBookCourseInfo()
       }
     },
