@@ -100,7 +100,7 @@
         </div> -->
 
         <div @click="$router.push(`/specialExer`)">
-          <i class="iconGFY icon-res-plus"></i>
+          <i class="iconGFY icon-special"></i>
           <span>专项练习</span>
         </div>
       </div>
