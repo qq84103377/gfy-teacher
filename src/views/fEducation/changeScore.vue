@@ -99,8 +99,8 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.visible) {
-      this.visible = false
+    if (this.showAddBox) {
+      this.showAddBox = false
       next(false)
     } else {
       next();

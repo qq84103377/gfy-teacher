@@ -38,6 +38,12 @@
   background: url(../../assets/img/icon-arrow-grey.png) no-repeat;
   background-size: contain;
 }
+.icon-edit-disable {
+  width: 15px;
+  height: 14px;
+  background: url(../../assets/img/icon-edit-grey.png) no-repeat;
+  background-size: contain;
+}
 .icon-edit {
   width: 15px;
   height: 14px;
@@ -78,6 +84,12 @@
   width: 17px;
   height: 20px;
   background: url(../../assets/img/icon-errors.png) no-repeat;
+  background-size: contain;
+}
+.icon-special {
+  width: 17px;
+  height: 20px;
+  background: url(../../assets/img/icon-special.png) no-repeat;
   background-size: contain;
 }
 .icon-res-plus {
@@ -646,5 +658,11 @@
   width: 25px;
   height: 25px;
   background: url(../../assets/img/icon-layer.png) no-repeat;
+  background-size: contain;
+}
+.icon-tip {
+  width: 15px;
+  height: 15px;
+  background: url(../../assets/img/icon-tip.png) no-repeat;
   background-size: contain;
 }
