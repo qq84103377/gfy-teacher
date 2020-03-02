@@ -4,7 +4,7 @@
     </van-nav-bar>
     <van-cell title="表现积分来源" style="background: #f5f5f5;color: #999" />
 
-    <div class="stat-table">
+    <div class="stat-table" v-if='list.length'>
       <div class="row row-header" style="font-weight: bold;">
         <div style="flex: 0 0 12%">序号</div>
         <div style="flex: 0 0 13%">分值</div>
@@ -19,6 +19,10 @@
         <div style="flex: 0 0 25%">{{item.createDate|formatTime}}</div>
 
       </div>
+    </div>
+    <div v-else class="empty-page">
+      <img style="width: 70%;" src="@/assets/img/empty-2.png" alt />
+      <div class="grey9 fs12">当前没有数据~</div>
     </div>
 
   </div>
@@ -83,6 +87,11 @@ export default {
   background: #fff;
   overflow-y: auto;
   overflow-x: hidden;
+
+  .empty-page {
+    margin-bottom: 30px;
+  }
+
   .stat-table {
     font-size: 12px;
     border-top: 1.5px solid @blue;
@@ -91,10 +100,12 @@ export default {
     position: relative;
     margin: 15px 8px 15px;
     overflow-x: hidden;
+    
     .row,
     .col {
       display: flex;
       flex-wrap: nowrap;
+
       &.row-header {
         height: 44px;
       }

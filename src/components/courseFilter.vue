@@ -193,7 +193,7 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     if (this.type === 'myCourse' || this.type === 'error' || this.type === 'fEducation') {
       // this.getTextBookCourseInfo()
     } else {
@@ -497,7 +497,7 @@ export default {
         this.getTextBookCourseInfo()
       }
     },
-    changeGrade(index) {
+    async changeGrade(index) {
       if (this.type === 'myCourse' || this.type === 'error'|| this.type === 'fEducation') {
         this.gradeIndex = index
         this.initClassIndex()
