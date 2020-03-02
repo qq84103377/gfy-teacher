@@ -155,6 +155,7 @@
           console.log(blob,"-----------------");
           console.log(blob.size,"-----------------");
         }
+        console.log("-----------------11");
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             if(file.size > 0) {
               this.wareFile = file;
@@ -227,6 +228,7 @@
           console.log(blob,"-----------------");
           console.log(blob.size,"-----------------");
         }
+        console.log("-----------------22");
 
           const fileType = obj.curFile.name.substr(obj.curFile.name.lastIndexOf('.'))
           console.log(fileType,'ttttttttttttttttttttttttt');
