@@ -1093,6 +1093,7 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
+        padding-bottom: 50px;
 
         .dropdown-group {
           display: flex;
@@ -1146,6 +1147,7 @@
               right: 10px;
               max-height: 64px;
               left: auto;
+              z-index: 999;
 
               .van-cell {
                 padding: 0;
