@@ -62,8 +62,7 @@
           </div>
         </div>
         <div v-else v-for="(item,index) in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
-          <list-item ref='listItem' @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
-                     :can-slide="true" @del="delTask(item,index)" @clickDel='clickDel(index)'>
+          <list-item ref='listItem' @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo" :can-slide="true" @del="delTask(item,index)" @clickDel='clickDel(index)'>
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
@@ -95,23 +94,15 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <div v-if='showfEduction' @click="$router.push('/fEducation')">
+        <!-- <div v-if='showfEduction' @click="$router.push('/fEducation')">
           <i class="iconGFY icon-cap"></i>
           <span>家庭教育</span>
-        </div>
-        <!-- <div @click="$router.push('/reinforce')">
-          <i class="iconGFY icon-res-plus"></i>
-          <span>智能补强</span>
-        </div>
-        <div v-if='showfEduction' @click="$router.push('/fEducation')">
-          <i class="iconGFY icon-cap"></i>
-          <span>家庭教育</span>
-        </div>
+        </div> -->
+
         <div @click="$router.push(`/specialExer`)">
           <i class="iconGFY icon-res-plus"></i>
           <span>专项练习</span>
-            <span @click="$toast.fail('敬请期待')">专项练习</span>
-        </div> -->
+        </div>
       </div>
     </div>
   </section>
@@ -328,8 +319,8 @@ export default {
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
           if (['T04'].includes(item.tastType)) {
-            localStorage.setItem('materialDetail',JSON.stringify(res.data[0].courseware))
-            this.$router.push({ path: '/materialDetail'})
+            localStorage.setItem('materialDetail', JSON.stringify(res.data[0].courseware))
+            this.$router.push({ path: '/materialDetail' })
           } else if (['T06'].includes(item.tastType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
           } else if (['T01', 'T02'].includes(item.taskType)) {
@@ -372,11 +363,11 @@ export default {
                     //跳转到任务统计页面时自动将第一个班级设置为选中状态
                     obj.active = true
                   }
-                  if(classMap[obj.classId] && classMap[obj.classId].className) {
+                  if (classMap[obj.classId] && classMap[obj.classId].className) {
                     obj['className'] = classMap[obj.classId].className
-                  }else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
+                  } else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
                     obj['className'] = hisClassMap[obj.classId].className
-                  }else {
+                  } else {
                     obj['className'] = "--"
                   }
                 })
@@ -435,11 +426,11 @@ export default {
                   const index = gradeList.findIndex(v => v.classGrade === obj.classGrade)
                   obj.teacherInfoList.forEach(s => {
                     if (gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
-                      if(s.teacherType === 'T01') {
+                      if (s.teacherType === 'T01') {
                         const tIndex = gradeList[index].teacherInfoList.findIndex(sub => sub.subjectType === s.subjectType)
                         gradeList[index].teacherInfoList[tIndex].teacherType = 'T01'
                       }
-                    }else {
+                    } else {
                       gradeList[index].teacherInfoList.push(s)
                     }
                   })
@@ -488,7 +479,7 @@ export default {
 
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
-          this.$store.commit('setClassIndex',Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
+          this.$store.commit('setClassIndex', Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap', schoolMap)
@@ -664,7 +655,7 @@ export default {
                     bookList.push({
                       textBookId: item.textBookId,
                       textBookName: item.textBookName,
-                      subjectType:item.subjectType
+                      subjectType: item.subjectType
                     })
                   }
                   if (!termMap[item.gradeTermInfo.term]) {
