@@ -447,6 +447,7 @@ export default {
           //设置班级名称
           if (localStorage.getItem("classMap")) {
             let classMap = JSON.parse(localStorage.getItem("classMap"))
+            let hisClassMap = localStorage.getItem("hisClassMap") ? JSON.parse(localStorage.getItem("hisClassMap")) : {}
             this.courseTaskList.forEach(item => {
               let finishCount = 0
               let allCount = 0
@@ -458,11 +459,15 @@ export default {
                   }
                   finishCount += obj.finshCount
                   allCount += obj.allCount
-                  if (!classMap[obj.classId] || !classMap[obj.classId].className) {
-                    obj['className'] = "--"
-                  } else {
+
+                  if(classMap[obj.classId] && classMap[obj.classId].className) {
                     obj['className'] = classMap[obj.classId].className
+                  }else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
+                    obj['className'] = hisClassMap[obj.classId].className
+                  }else {
+                    obj['className'] = "--"
                   }
+                  
                 })
               }
               item.finishCount = finishCount

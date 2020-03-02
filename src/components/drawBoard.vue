@@ -123,18 +123,21 @@ export default {
       rotateIndex: 0,
       lastLeft: 0,
       lastTop: 0,
-      isIphone: false
+      isIphone: false,
+      drawFlag: false, //是否涂鸦过
+      changeImg: null,
     }
   },
-  props: ['imgUrl', 'isPen', 'isRubber', 'text'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
+  props: ['imgUrl', 'isPen', 'isRubber', 'text','stuIndex'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
   watch: {
     imgUrl() {
       // $('.clearButton').trigger('click')
       this.clearScreen()
+      this.drawFlag = false
       this.canvasHistory = []
       this.rotateIndex = 0
       this.rotate = 0
-
+      this.changeImg = null
       //对于文字+图片和纯图片之间的切换 需要重新计算canvas高度,
       this.$nextTick(() => {
         this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
@@ -182,21 +185,23 @@ export default {
       this.scale = this.swordEle.scaleX = this.swordEle.scaleY = scale
     },
     clearScreen() {
-      console.log('clearScreen()');
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清除涂鸦画布内容
       this.offCtx.clearRect(0, 0, this.canvas.width, this.canvas.height); // 清除背景图画布内容
     },
     drawImg(changeValue) {
-      console.log('drawImg()');
       let a = this.$refs['canvas'].width
       let b = this.$refs['canvas'].height
       this.offCtx.clearRect(0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height); // 先清除画布
-      let changeImg = new Image();
-      changeImg.setAttribute("crossOrigin", 'anonymous');
-      // changeImg.src = changeValue + '&' + Math.random();
-      changeImg.src = changeValue;
-      changeImg.onload = () => {
-        this.offCtx.drawImage(changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
+      this.changeImg = new Image();
+      this.changeImg.setAttribute("crossOrigin", 'anonymous');
+      // this.changeImg.src = changeValue + '&' + Math.random();
+      this.changeImg.src = changeValue;
+      this.changeImg.onload = () => {
+        console.log(changeValue);
+        this.offCtx.drawImage(this.changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
+      };
+      this.changeImg.onerror = () => {
+        this.$toast('图片加载失败')
       };
     },
     exit() {
@@ -317,6 +322,11 @@ export default {
     },
     // 绘制直线
     drawLine(context, x1, y1, x2, y2, /*optional*/ lineWidth, /*optional*/ strokeColor) {
+      /**
+       * 有过涂鸦就需要发请求提交,没有则不用
+       */
+      if(!this.drawFlag) this.drawFlag = true
+
       console.log('drawLine()');
       context.beginPath();
       context.lineTo(x1, y1);
@@ -683,6 +693,8 @@ export default {
         multipointEnd: function () {
         },
         tap: function () {
+          if (_this.isPen || _this.isRubber) return
+          _this.$emit('tap')
         },
         doubleTap: function () {
         },
@@ -713,13 +725,13 @@ export default {
 
         },
         pressMove: function (evt) {
-          // if (_this.isPen || _this.isRubber) return
-          // let widthDiff = bwidth - swidth;
-          // let heightDiff = bheight - sheight;
-          // // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
-          // // } else {
-          // _this.swordEle.translateX += evt.deltaX;
-          // _this.swordEle.translateY += evt.deltaY;
+          if (_this.isPen || _this.isRubber) return
+          let widthDiff = bwidth - swidth;
+          let heightDiff = bheight - sheight;
+          // if (((evt.deltaX>0)&&(swordEle.translateX >= widthDiff))||((evt.deltaY>0)&&(swordEle.translateY >= heightDiff))||((swordEle.translateX<0)&&((evt.deltaX<0)))||((swordEle.translateY<0)&&((evt.deltaY<0)))) {
+          // } else {
+          _this.swordEle.translateX += evt.deltaX;
+          _this.swordEle.translateY += evt.deltaY;
           // }
         },
         swipe: function (evt) {
@@ -835,7 +847,7 @@ export default {
     this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
 
     this.figure()
-    this.containerFigure()
+    // this.containerFigure()
 
     console.log("zheshi ");
     console.log(this.canvas.width);

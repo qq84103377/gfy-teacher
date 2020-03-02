@@ -2,7 +2,7 @@
   <div class="correct-wrap" id="correct-wrap">
     <div class="correct-wrap__header" v-show="!isFold">
       <van-icon @click="$router.back()" name="arrow-left"/>
-      <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}</span>
+      <span>{{getStudentName(stuArr[stuIndex].accountNo,classId)}}({{stuArr[stuIndex].rewardScore}})</span>
       <span>题号:{{$route.params.examNum}}{{info.groupExamList.length?`(${aswIndex+1})`:``}}</span>
       <span>进度：{{progress}}/{{stuArr.length}}</span>
       <i @click="zoom(1)" class="iconGFY icon-enlarge"></i>
@@ -77,8 +77,8 @@
       <div class="correct-wrap__body__draw" :style="{flex: stuArr[stuIndex].answer[aswIndex].text? '0 0 80%':'1'}"
            v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
         <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
-        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="toggle(1)"
-                    :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
+        <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="handleSubmit" @tap="isFold=!isFold"
+                   :stuIndex="stuIndex" :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
       </div>
       <div class="correct-wrap__body__undo"
            v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
@@ -110,7 +110,7 @@
 
     <!--    阅卷情况-->
     <van-popup
-      :overlay="false"
+      :overlay="true"
       v-model="stuInfo"
       position="right">
       <div class="stu-info-wrap">
@@ -206,7 +206,6 @@
         commentWord: '你是老师最值得骄傲的学生',
         isShowTitle: true, //是否查看原题弹窗
         commentText: '',
-        commonWord: ['你做的很不错,继续加油!', '理解的很好,可以毕业', '做得很差,明天不用来上课'],
         comment: '',
         stuName: '',
         stuInfo: false,
@@ -232,7 +231,8 @@
         scale: 1,
         timer: null,
         // filterStuList: [],
-        autoSubmit: true
+        autoSubmit: true,
+        selectScoreFlag: false, //是否选择过分数
       }
     },
     watch: {
@@ -291,6 +291,11 @@
       this.figure()
     },
     methods: {
+      handleSubmit() {
+        //更新涂鸦后的图片
+        this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '&' + Math.random()
+        this.toggle(1)
+      },
       rotateLeft() {
         this.$refs['drawBoard'].rotateLeft()
       },
@@ -348,7 +353,8 @@
             this.stuArr[this.stuIndex].answer[this.aswIndex].score = studentScore
             // if(!this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) this.toggle(1)
 
-            if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+            if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length && this.$refs['drawBoard'].drawFlag) {
+              //有图片并且涂鸦过才提交
               this.$refs['drawBoard'].save()
             }else {
               this.toggle(1)
@@ -369,8 +375,16 @@
       },
       async submit() {
         if (!this.stuArr[this.stuIndex].answer[this.aswIndex].value && this.stuArr[this.stuIndex].answer[this.aswIndex].value !== 0 && this.stuArr[this.stuIndex].answer[this.aswIndex].isMark === 'I02') return this.$toast('还没选择分数')
-        this.$store.commit('setVanLoading', true)
-       await this.examResultScroe()
+
+        if(this.selectScoreFlag) {
+          this.$store.commit('setVanLoading', true)
+          await this.examResultScroe()
+        }else if (this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length && this.$refs['drawBoard'].drawFlag) {
+          this.$refs['drawBoard'].save()
+        }
+        else {
+          this.toggle(1)
+        }
 
       },
       clickComment() {
@@ -454,6 +468,7 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(type === 'T01' ? '加分成功' : '减分成功')
+            this.stuArr[this.stuIndex].rewardScore = this.stuArr[this.stuIndex].rewardScore * 1 + (type === 'T01'?1:-1)
           } else {
             this.$toast(res.msg)
           }
@@ -478,12 +493,14 @@
             //下一个图片
             this.imgIndex++
             this.scale = 1
+            this.selectScoreFlag = false
           } else {
             if (this.aswIndex < this.stuArr[this.stuIndex].answer.length - 1) {
               //下一个小题
               this.aswIndex++
               this.imgIndex = 0
               this.scale = 1
+              this.selectScoreFlag = false
             } else {
               //下一个学生
               if (this.stuIndex < this.stuArr.length - 1) {
@@ -491,6 +508,7 @@
                 this.aswIndex = 0
                 this.imgIndex = 0
                 this.scale = 1
+                this.selectScoreFlag = false
               } else {
                 this.$dialog.confirm({
                   title: "",
@@ -511,17 +529,20 @@
             //上一个图片
             this.imgIndex--
             this.scale = 1
+            this.selectScoreFlag = false
           } else {
             if (this.aswIndex > 0) {
               this.aswIndex--
               this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
               this.scale = 1
+              this.selectScoreFlag = false
             } else {
               if (this.stuIndex > 0) {
                 this.stuIndex--
                 this.aswIndex = this.stuArr[this.stuIndex].answer.length ? this.stuArr[this.stuIndex].answer.length - 1 : 0
                 this.imgIndex = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length ? this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length - 1 : 0
                 this.scale = 1
+                this.selectScoreFlag = false
               } else {
                 this.$toast('最前啦')
               }
@@ -669,7 +690,9 @@
         })
       },
      async selectScore(i, score, asw) {
-        console.log(asw.value);
+       if (this.vanLoading) return
+       console.log(asw.value);
+        this.selectScoreFlag = true
         this.$refs['menuItem' + i][0].toggle(false)
         // this.value1 = `${index}分`
         this.$set(asw, 'value', score)

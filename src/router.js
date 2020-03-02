@@ -697,6 +697,26 @@ export default new Router({
           name: 'beforeClassTask',
           component: () => import('./views/teachStat/beforeClassTask.vue')
         },
+        {
+          path: "/teacherToClass",
+          name: "teacherToClass",
+          component: () => import("./views/qrCodeToClass/teacherToClass.vue")
+        },
+        {
+          path: "/studentToClass",
+          name: "studentToClass",
+          component: () => import("./views/qrCodeToClass/studentToClass.vue")
+        },
+        {
+          path: "/statusPage",
+          name: "statusPage",
+          component: () => import("./views/qrCodeToClass/statusPage.vue")
+        },
+        {
+          path: "/setInfo",
+          name: "setInfo",
+          component: () => import("./views/qrCodeToClass/settings.vue")
+        },
       ]
     },
     {
@@ -713,6 +733,12 @@ export default new Router({
       path: "/resetPwd",
       name: "resetPwd",
       component: () => import("./views/login/resetPwd.vue")
-    }
+    },
+    // 扫码加入年级
+    {
+      path: "/qrCode",
+      name: "qrCode",
+      component: () => import("./views/qrCodeToClass/login.vue")
+    },
   ]
 })

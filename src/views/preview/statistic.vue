@@ -4,22 +4,26 @@
       <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll">
-      <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)" class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
+      <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)"
+           class="statistic-wrap__tab-scroll-item" :class="{'active':item.active}">{{item.className}}
       </div>
     </div>
-    <div style="flex: 1;overflow-y: auto">
+    <div style="flex: 1;overflow-y: auto" ref="body">
       <div class="statistic-wrap__pie-chart">
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" :class="{remind: isDisabled}" v-if="isTaskEnd" @click="sendTask">一键重发
           </van-button>
-          <van-button class="notice-btn" v-else :class="{remind: isDisabled || remind || (taskFinishInfo.studentUnfinishList&&taskFinishInfo.studentUnfinishList.length===0)}" @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
+          <van-button class="notice-btn" v-else
+                      :class="{remind: isDisabled || remind || (taskFinishInfo.studentUnfinishList&&taskFinishInfo.studentUnfinishList.length===0)}"
+                      @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
         </div>
         <div class="statistic-wrap__pie-chart-label divider" v-else>任务完成情况:
         </div>
         <div id="myChart1" ref="myChart1" class="pie-chart"></div>
       </div>
-      <div class="statistic-wrap__achievement" v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">
+      <div class="statistic-wrap__achievement"
+           v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">
         <div class="statistic-wrap__achievement-label divider">全班成绩概况:</div>
         <div class="statistic-wrap__achievement-score">
           <div>
@@ -47,44 +51,63 @@
         <div class="statistic-wrap__view-tab">
           <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="$route.query.taskType === 'T04'">学资源详情
           </div>
-          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="['T01','T02'].includes($route.query.taskType)">微课详情
+          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0"
+               v-if="['T01','T02'].includes($route.query.taskType)">微课详情
           </div>
           <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="['T06'].includes($route.query.taskType)">
             论题内容
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">学生心得详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
+               v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">学生心得详情
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">学生讨论详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
+               v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">学生讨论详情
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
+               v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
-          <div @click="viewStu" v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
+          <div @click="viewStu"
+               v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
           </div>
+          <i @click="showReplyTip=true" v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper"
+             class="iconGFY icon-tip"></i>
         </div>
 
-        <!--        学生心得-->
-        <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
-                 @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
-                 :classId="info.tchClassTastInfo.find(t => t.active).classId"
-                 v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
-                 :list="appraiseList" :disable="isDisabled">
-        </stu-exp>
+
+        <van-list v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper" v-show="tabIndex === 1"
+                  v-model="listLoading" :finished="finished" :finished-text="appraiseList.length>0?'没有更多了':''"
+                  @load="onLoad" :offset='80' :error.sync="error" error-text="请求失败，点击重新加载">
+          <!--        学生心得-->
+          <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
+                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" @delReply="delReply"
+                   :classId="info.tchClassTastInfo.find(t => t.active).classId" :currentPage="currentPage"
+                   :total="total" :finished="finished"
+                   v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
+                   :list="appraiseList" :disable="isDisabled">
+          </stu-exp>
+        </van-list>
+
 
         <!--        学资源/微课详情-->
         <div class="ware-detail" v-if="$route.query.taskType !== 'T06'" v-show="!isSpoken&&tabIndex === 0">
           <!-- <video v-if="type === 'mp4'" controls="controls"
                  controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></video> -->
-          <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline="" poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)' :src="wareDetail.courseware.srcUrl">
+          <video v-if="type === 'mp4'" webkit-playsinline playsinline x5-playsinline=""
+                 poster="../../assets/img/video-poster.png" @click='goVideoPage(wareDetail.courseware.srcUrl)'
+                 :src="wareDetail.courseware.srcUrl">
           </video>
 
-           <img class="audio" v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt="" @click='goVideoPage(wareDetail.courseware.srcUrl,1)'>
+          <img class="audio" v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl"
+               src="https://pubquanlang.oss-cn-shenzhen.aliyuncs.com/picture/201910/icon-mp3.png" alt=""
+               @click='goVideoPage(wareDetail.courseware.srcUrl,1)'>
 
           <!-- <audio v-else-if="type === 'mp3' && wareDetail.courseware.srcUrl" controls="controls" controlsList="nodownload" :src="wareDetail.courseware.srcUrl"></audio> -->
-          <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl" :src="wareDetail.courseware.srcUrl" />
+          <img v-else-if="type === 'img' && wareDetail.courseware.srcUrl" :src="wareDetail.courseware.srcUrl"/>
           <!--      <PDF v-else-if=" type === 'pdf' && info.srcUrl" :url="info.srcUrl"-->
           <!--           style="width: 100%;height: 60vh;overflow-y: scroll"></PDF>-->
           <!--      <iframe v-else-if=" type === 'pdf' && info.srcUrl && !vanLoading" :src="info.srcUrl"></iframe>-->
-          <iframe v-else-if=" (type === 'office'||type === 'pdf') && wareDetail.courseware.srcUrl && !loadWareFlag" :src="wareDetail.courseware.srcUrl"></iframe>
+          <iframe v-else-if=" (type === 'office'||type === 'pdf') && wareDetail.courseware.srcUrl && !loadWareFlag"
+                  :src="wareDetail.courseware.srcUrl"></iframe>
 
           <list-item class="mgt10" :itemTitle="wareDetail.courseware.coursewareName">
             <!--            <div slot="cover" class="cover"><i class="iconGFY" :class="iconType"></i><img-->
@@ -112,10 +135,13 @@
 
         <!--        主观题 客观题列表-->
         <div v-show="tabIndex === 1" v-if="$route.query.taskType !== 'T13'">
-          <div v-if="taskFinishInfo.paperDataList&&taskFinishInfo.paperDataList.some(v => v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length))">
+          <div
+            v-if="taskFinishInfo.paperDataList&&taskFinishInfo.paperDataList.some(v => v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length))">
             <div class="fs12 black statistic-wrap__view-label">主观题</div>
             <div class="statistic-wrap__view-subject">
-              <div class="statistic-wrap__view-subject-item" @click="viewSubjectList(item)" v-for="(item,index) in taskFinishInfo.paperDataList" :key="index" v-if="item.autoScoring === '0' && (item.groupExamList.some(g => g.autoScoring === '0') || !item.groupExamList.length)">
+              <div class="statistic-wrap__view-subject-item" @click="viewSubjectList(item)"
+                   v-for="(item,index) in taskFinishInfo.paperDataList" :key="index"
+                   v-if="item.autoScoring === '0' && (item.groupExamList.some(g => g.autoScoring === '0') || !item.groupExamList.length)">
                 <div class="pd5">
                   <div>第{{index + 1}}题</div>
                   <div>平均分: {{calcScore(item,'avg_score')}}</div>
@@ -138,7 +164,8 @@
                   <div>平均分: {{singleQuestionScore('avg_score')}}</div>
                   <div>总分:{{singleQuestionScore('total_score')}}</div>
                 </div>
-                <div class="status">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v => v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
+                <div class="status">{{taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').some(v =>
+                  v.student_finish_count > 0 && v.finish_count == v.student_finish_count)?
                   '已批改':'批改'}}
                 </div>
               </div>
@@ -146,8 +173,11 @@
           </div>
 
           <div>
-            <div v-show="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')" class="fs12 black statistic-wrap__view-label mgt10">客观题</div>
-<!--            <div id="myChart3" ref="myChart3" class="subject-pie"></div>-->
+            <div v-show="taskFinishInfo.examstat&&taskFinishInfo.examstat.some(v => v.auto_scoring === '1')"
+                 class="fs12 black statistic-wrap__view-label mgt10">客观题
+              <i @click="showPieTip=true" class="iconGFY icon-tip"></i>
+            </div>
+            <!--            <div id="myChart3" ref="myChart3" class="subject-pie"></div>-->
             <div class="objective-pie-group">
               <div v-for="(item,index) in objectiveList" :key="index" :id="`objectivePie${index}`"></div>
             </div>
@@ -155,24 +185,28 @@
         </div>
 
         <div v-if="$route.query.taskType === 'T13'">
-          <spoken-table type="statistic" :list="taskFinishInfo.finishResultBySplit" :classId="info.tchClassTastInfo.find(t => t.active).classId"></spoken-table>
+          <spoken-table type="statistic" :list="taskFinishInfo.finishResultBySplit"
+                        :classId="info.tchClassTastInfo.find(t => t.active).classId"></spoken-table>
         </div>
       </div>
     </div>
 
     <div class="statistic-wrap__footer" v-if="showFooter">
-      <van-button v-if="($route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03')" class="btn" :class="{'disabled':isDisabled}" type="info" @click="modifyScore">
+      <van-button v-if="($route.query.taskType === 'T13' || isTestPaper || $route.query.resourceType === 'R03')"
+                  class="btn" :class="{'disabled':isDisabled}" type="info" @click="modifyScore">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info"
+                  @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
         分享报告
       </van-button>
     </div>
 
     <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
       <div class="stat-dialog-wrap">
-        <div class="stat-dialog-wrap__header"><span class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}学生</span>
-          <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false" />
+        <div class="stat-dialog-wrap__header"><span
+          class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}学生</span>
+          <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false"/>
         </div>
         <div class="stat-dialog-wrap__body">
           <div v-for="(item,index) in stuStatInfo.stu" :key="index">{{item}}</div>
@@ -182,12 +216,29 @@
         <!--        </div>-->
       </div>
     </van-dialog>
+
+    <van-popup round v-model="showReplyTip">
+      <div class="pd10 fs16 tip-wrap">
+        <div style="text-align: center" class="fs18">讨论详情说明</div>
+        <div class="mgt5">1.点击评论区域的评论人名字可直接回复该评论个人</div>
+        <div class="mgt5">2.点击自己的名字可直接删除评论或回复</div>
+      </div>
+    </van-popup>
+    <van-popup round v-model="showPieTip">
+      <div class="pd10 fs16 tip-wrap">
+        <div style="text-align: center" class="fs18">发布范围</div>
+        <div class="mgt5"><span style="color: green">●</span> 错误率 = 答题错误人数/答题总人数</div>
+        <div class="mgt5"><span class="red">●</span> 正确率 = 答题正确人数/答题总人数</div>
+        <div class="mgt5">● 饼状图中间显示的是该题目的正确率</div>
+      </div>
+    </van-popup>
+
   </section>
 </template>
 
 <script>
-  import { mapMutations, mapGetters, mapState } from 'vuex'
-  import { pubApi } from '@/api/parent-GFY'
+  import {mapMutations, mapGetters, mapState} from 'vuex'
+  import {pubApi} from '@/api/parent-GFY'
   import listItem from '../../components/list-item'
   import spokenTable from '../../components/spokenTable'
   import echarts from "echarts";
@@ -207,19 +258,27 @@
     addPraise,
     topAppraise,
     untopAppraise,
-    statTaskStatV2
+    statTaskStatV2,
+    delReplyV2
   } from '@/api/index'
-  import { getStudentName, getFontSize } from '@/utils/filter'
+  import {getStudentName, getFontSize} from '@/utils/filter'
 
   export default {
     name: "statistic",
-    components: { stuExp, spokenTable, listItem },
+    components: {stuExp, spokenTable, listItem},
     data() {
       return {
+        showPieTip: false,
+        showReplyTip: false,
+        listLoading: false,
+        finished: true, //首次加载页面不需要触发列表滚动加载
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
         showFooter: true,
         appraiseList: [],
         type: '', //学资源类型
-        wareDetail: { courseware: { srcUrl: '' }, discussInfo: {} }, // 学资源详情
+        wareDetail: {courseware: {srcUrl: ''}, discussInfo: {}}, // 学资源详情
         iconType: '',
         // wareActive: false, //学资源详情tab选中状态
         // lessonActive: false, //微课详情tab选中状态
@@ -233,11 +292,13 @@
         },
         // info: JSON.parse(JSON.stringify(this.$route.query.info)),
         info: JSON.parse(localStorage.getItem('stat')),
-        taskFinishInfo: { examstat: [], studentStatList: [], paperDataList: [] },
+        taskFinishInfo: {examstat: [], studentStatList: [], paperDataList: []},
         remind: false,
         loadWareFlag: true,
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
-        objectiveList: []
+        objectiveList: [],
+        scrollTop: 0,
+        error: false,
       }
     },
     computed: {
@@ -251,22 +312,46 @@
         return localStorage.currentSubjectTypeName
       },
       isTaskEnd() {
-        return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g,"/")).getTime()
+        return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g, "/")).getTime()
       },
       isDisabled() {
         return this.$route.query.disabled == 1
       }
     },
     methods: {
-      modifyScore() {
-        if(this.isDisabled) return
-        this.$router.push({name:`addSubScore`,params:{info:this.taskFinishInfo,termType:this.$route.query.termType}})
+      delReply(replyId,replyIndex) {
+        this.$store.commit('setVanLoading', true)
+        delReplyV2({replyId}).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+           const index = this.appraiseList[replyIndex].replyList.findIndex(v => replyId === v.replyId)
+            if(index > -1) {
+              this.appraiseList[replyIndex].replyList.splice(index,1)
+            }
+          }else {
+            this.$toast(res.msg)
+          }
+        })
       },
-       goBack(){
-          this.common.goBack(this)
-        },
+      async onLoad() {
+        this.currentPage++
+        if (this.currentPage > this.total && this.currentPage > 1) {
+          return
+        }
+        this.getAppraise()
+      },
+      modifyScore() {
+        if (this.isDisabled) return
+        this.$router.push({
+          name: `addSubScore`,
+          params: {info: this.taskFinishInfo, termType: this.$route.query.termType}
+        })
+      },
+      goBack() {
+        this.common.goBack(this)
+      },
       sendTask() {
-         if(this.isDisabled) return
+        if (this.isDisabled) return
         let tchCourseInfo = JSON.parse(localStorage.taskTchCourseInfo)
         tchCourseInfo.tchClassCourseInfo = tchCourseInfo.tchClassCourseInfo.filter(v => v.classId === this.info.tchClassTastInfo.find(t => t.active).classId)
         this.$store.commit('setResourceInfo', this.info)
@@ -290,9 +375,9 @@
           }
         })
       },
-      goVideoPage(url,isAudio) {
+      goVideoPage(url, isAudio) {
         if (!url) return
-        this.$router.push({ name: 'videoPage', query: { src: url, title: this.info.taskName,isMp3: isAudio} })
+        this.$router.push({name: 'videoPage', query: {src: url, title: this.info.taskName, isMp3: isAudio}})
       },
       singleQuestionScore(key) {
         return this.taskFinishInfo.examstat.filter(v => v.auto_scoring === '0').reduce((t, v) => {
@@ -327,12 +412,19 @@
         // }else {
         this.$router.push({
           name: `examView`,
-          params: { info: this.taskFinishInfo, title: this.info.taskName, isSpoken: this.$route.query.taskType === 'T13', taskType: this.$route.query.taskType, termType:this.$route.query.termType, isDisabled:this.isDisabled?1:'' }
+          params: {
+            info: this.taskFinishInfo,
+            title: this.info.taskName,
+            isSpoken: this.$route.query.taskType === 'T13',
+            taskType: this.$route.query.taskType,
+            termType: this.$route.query.termType,
+            isDisabled: this.isDisabled ? 1 : ''
+          }
         })
         // }
       },
       saveDailyReminder() {
-        if (this.isDisabled || this.remind || this.taskFinishInfo.studentUnfinishList.length===0) return
+        if (this.isDisabled || this.remind || this.taskFinishInfo.studentUnfinishList.length === 0) return
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -342,10 +434,10 @@
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           "objectId": this.$route.query.taskId,
           "objectType": 'T01',
-          accountNoList: this.taskFinishInfo.studentUnfinishList.reduce((t,v) => {
-           t.push(...v.accountNoList)
+          accountNoList: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
+            t.push(...v.accountNoList)
             return t
-          },[])
+          }, [])
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -380,7 +472,7 @@
           }
         })
       },
-      handleComment(replyContent, item) {
+      handleComment(replyContent, item,parentReplyId) {
         if (!replyContent) return
         this.$store.commit('setVanLoading', true)
         let obj = {
@@ -392,7 +484,7 @@
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
           appraiseId: item.appraiseId,
           replyContent,
-          parentReplyId: 0,
+          parentReplyId: parentReplyId || 0,
         }
         addReply(obj).then(res => {
           this.$store.commit('setVanLoading', false)
@@ -435,7 +527,7 @@
 
             //更新this.taskFinishInfo.studentStatList的值 因为点赞/置顶/精华/加分/评论以后没有刷新this.taskFinishInfo.studentStatList
             const index = this.taskFinishInfo.studentStatList.findIndex(v => v.accountNo === item.appraiseAccountNo)
-            if(index>-1) {
+            if (index > -1) {
               this.taskFinishInfo.studentStatList[index].studentRewardScore = score
             }
           } else {
@@ -463,7 +555,16 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.topFlag === '1' ? '取消置顶' : '置顶成功')
+
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
@@ -489,7 +590,16 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.essFlag === '1' ? '取消精华' : '加精华成功')
+
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
@@ -520,23 +630,33 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.$toast(item.good ? '取消点赞' : '点赞成功')
+            /**
+             * 由于有分页,所以更新列表时需要计算pageSize,以便一个接口刷新当前已显示的列表
+             */
+            this.currentPage = 1
+            this.pageSize = this.appraiseList.length
             this.getAppraise()
+            //刷新数据以后pageSize和currentPage都要还原
+            this.currentPage = Math.ceil(this.pageSize / 10)
+            this.pageSize = 10
           } else {
             this.$toast(res.msg)
           }
         })
       },
       async getAppraise() {
+        const page = this.currentPage
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
           "interPwd": "25d55ad283aa400af464c76d713c07ad",
           classId: this.info.tchClassTastInfo.find(t => t.active).classId,
-          currPage: 1,
+          // currPage: 1,
+          "currPage": page,
           isAppendMode: true,
           objectId: this.$route.query.taskId,
           objectTypeCd: 'A01',
-          pageSize: 9999,
+          pageSize: this.pageSize,
           praiseType: 1,
           replyType: 1,
         }
@@ -544,7 +664,10 @@
           requestJson: JSON.stringify(obj)
         }
         await getAppraiseV2(params).then(res => {
+          this.listLoading = false
+          this.total = res.total
           this.$store.commit('setVanLoading', false)
+
           if (res.flag && res.data[0]) {
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
@@ -562,7 +685,7 @@
               v.videoArr = []
               dom.innerHTML = v.appraiseContent
               if (v.appraiseContent) {
-               this.handleAppraiseCtn(dom,v)
+                this.handleAppraiseCtn(dom, v)
               }
               v.text = dom.outerHTML
 
@@ -573,18 +696,28 @@
                 append.audioArr = []
                 append.videoArr = []
                 appendDom.innerHTML = append.appendContent
-                this.handleAppraiseCtn(appendDom,append)
+                this.handleAppraiseCtn(appendDom, append)
                 append.text = appendDom.outerHTML
               })
 
             })
-            this.appraiseList = res.data[0].appraiseListInfo
+            this.appraiseList = page === 1 ? res.data[0].appraiseListInfo : this.appraiseList.concat(res.data[0].appraiseListInfo)
+            if (page >= res.total) {
+              this.finished = true
+            } else {
+              this.finished = false
+            }
           } else {
-            this.appraiseList = []
+            this.appraiseList = page === 1 ? [] : this.appraiseList.concat([])
+            this.finished = true
           }
+        }).catch(err => {
+          this.error = true
+          this.listLoading = false
+          this.currentPage--
         })
       },
-      handleAppraiseCtn(dom,v) {
+      handleAppraiseCtn(dom, v) {
         const imgArr = dom.querySelectorAll('img')
         const audioArr = dom.querySelectorAll('audio')
         const videoArr = dom.querySelectorAll('video')
@@ -605,12 +738,11 @@
         }
       },
       rewardScore(accountNo) {
-         try {
-           const score = this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore
-           return score > 0 ? '+' + score : score
-         }catch {
-           console.log(accountNo,'有错啊');
-         }
+        try {
+          return this.taskFinishInfo.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
+        } catch {
+          console.log(accountNo, '有错啊');
+        }
       },
       getReply(appraiseId) {
         let obj = {
@@ -637,7 +769,7 @@
           'sysTypeCd': 'S03'
         }
         this.$store.commit('setVanLoading', true)
-        pubApi.checkUrlPermission({ requestJson: JSON.stringify(permissionParams) }).then((respone) => {
+        pubApi.checkUrlPermission({requestJson: JSON.stringify(permissionParams)}).then((respone) => {
           this.$store.commit('setVanLoading', false)
           if (respone.flag) {
             if (this.type == 'office' || this.type == 'pdf') {
@@ -725,11 +857,11 @@
       viewSubjectList(item) {
         let questionList = []
         if (this.$route.query.resourceType === 'R03') {
-          questionList.push({ examId: this.taskFinishInfo.resourceId, num: 1 })
+          questionList.push({examId: this.taskFinishInfo.resourceId, num: 1})
         } else {
           this.taskFinishInfo.paperDataList.forEach((v, i) => {
             if (v.autoScoring === '0' && (v.groupExamList.some(g => g.autoScoring === '0') || !v.groupExamList.length)) {
-              questionList.push({ ...v, num: i + 1 })
+              questionList.push({...v, num: i + 1})
             }
           })
         }
@@ -745,7 +877,7 @@
             // info: this.taskFinishInfo,
             termType: this.$route.query.termType,
             taskType: this.$route.query.taskType,
-            disabled: this.isDisabled?1:''
+            disabled: this.isDisabled ? 1 : ''
           }
         })
       },
@@ -784,6 +916,11 @@
           }
         })
       },
+      initPage() {
+        this.$refs["body"].scrollTop = 0
+        this.finished = true
+        this.currentPage = 1
+      },
       async handleSelectTab(item) {
         if (item.active) return
         this.$store.commit('setVanLoading', true)
@@ -791,6 +928,9 @@
           this.$set(v, 'active', false)
         })
         item.active = true
+
+        this.initPage()
+
         this.getDailyRemindStatus()
         await this.statTaskStat(item.classId)
         this.drawPie()
@@ -861,11 +1001,11 @@
                 data: [
                   {
                     value: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
-                      t += (v.accountNoList?v.accountNoList.length:0)
+                      t += (v.accountNoList ? v.accountNoList.length : 0)
                       return t
                     }, 0), name: '未完成'
                   },
-                  { value: this.taskFinishInfo.finshCount, name: '已完成' }
+                  {value: this.taskFinishInfo.finshCount, name: '已完成'}
                 ]
               }
             ],
@@ -890,7 +1030,7 @@
             this.stuStatInfo.title = params.name
             if (params.name === '未完成') {
               this.taskFinishInfo.studentUnfinishList.forEach(v => {
-                (v.accountNoList||[]).forEach(s => {
+                (v.accountNoList || []).forEach(s => {
                   const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                   this.stuStatInfo.stu.push(name)
                 })
@@ -952,7 +1092,7 @@
               }
             }
           ],
-          textStyle:{
+          textStyle: {
             fontSize: getFontSize(0.12),
           }
         };
@@ -966,7 +1106,7 @@
             // 单试题
             this.taskFinishInfo.examstat.forEach((v, i) => {
               if (v.auto_scoring === '1') {
-                this.objectiveList.push({ ...v, num: `1${this.taskFinishInfo.examstat.length > 1 ? `(${i + 1})` : ``}` })
+                this.objectiveList.push({...v, num: `1${this.taskFinishInfo.examstat.length > 1 ? `(${i + 1})` : ``}`})
               }
             })
           } else {
@@ -974,12 +1114,20 @@
             this.taskFinishInfo.paperDataList.forEach((v, i) => {
               if (v.autoScoring === '1' && !v.groupExamList.length) {
                 //客观题并且没有小题时才添加
-                this.objectiveList.push({ ...v, num: i + 1, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present })
+                this.objectiveList.push({
+                  ...v,
+                  num: i + 1,
+                  exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == v.examId).exam_present
+                })
               }
               let group = []
               v.groupExamList.forEach((g, gi) => {
                 if (g.autoScoring === '1') {
-                  group.push({ ...g, num: `${i + 1}(${gi + 1})`, exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present })
+                  group.push({
+                    ...g,
+                    num: `${i + 1}(${gi + 1})`,
+                    exam_present: this.taskFinishInfo.examstat.find(e => e.exam_id == g.examGroupId).exam_present
+                  })
                 }
               })
               this.objectiveList = this.objectiveList.concat(group)
@@ -1015,7 +1163,7 @@
                         }
                       },
                     },
-                    { value: 1 - correct, name: '错误率' }
+                    {value: 1 - correct, name: '错误率'}
                   ]
                 }]
               }
@@ -1044,56 +1192,69 @@
     },
     async mounted() {
       this.$store.commit('setVanLoading', true)
-      this.getDailyRemindStatus()
-      await this.statTaskStat()
+      try {
+        this.getDailyRemindStatus()
+        await this.statTaskStat()
 
-      this.drawPie()
-      if (this.isTestPaper) {
-        this.drawHistogram()
-      }
-      if (this.taskFinishInfo.examstat) {
-        this.drawObjectivePie()
-      }
-      if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
-        //如果是学资源则把tab设置为激活
-        // this.wareActive = true
-        if (!this.isTestPaper) {
-          this.getAppraise()
+        this.drawPie()
+        if (this.isTestPaper) {
+          this.drawHistogram()
         }
-        await this.getCourseTaskDetail()
-        if (this.$route.query.taskType !== 'T06') {
-          //讨论不需要鉴权
-          this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
-          this.checkUrlPermission()
+        if (this.taskFinishInfo.examstat) {
+          this.drawObjectivePie()
         }
+        if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
+          //如果是学资源则把tab设置为激活
+          // this.wareActive = true
+          if (!this.isTestPaper) {
+            this.getAppraise()
+          }
+          await this.getCourseTaskDetail()
+          if (this.$route.query.taskType !== 'T06') {
+            //讨论不需要鉴权
+            this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
+            this.checkUrlPermission()
+          }
+        }
+        this.$store.commit('setVanLoading', false)
+      }catch (e) {
+        this.$store.commit('setVanLoading', false)
+
       }
-      this.$store.commit('setVanLoading', false)
+
       // if (!this.isWk && !this.isSpoken) {
       // }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.scrollTop = this.$refs["body"].scrollTop
+      next()
     },
     beforeRouteEnter(to, from, next) {
       if (from.path === '/imgCorrect') {
         next(async vm => {
+          vm.$refs["body"].scrollTop = vm.scrollTop
           await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
+          vm.currentPage = 1
+          vm.pageSize = vm.appraiseList.length
           vm.getAppraise()
+          //刷新数据以后pageSize和currentPage都要还原
+          vm.currentPage = Math.ceil(vm.pageSize / 10)
+          vm.pageSize = 10
         })
-      }else if (from.path === '/examView') {
+      } else if (from.path === '/examView') {
         next(async vm => {
           await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
-      }
-      else if (from.path === '/addTask') {
+      } else if (from.path === '/addTask') {
         next(vm => {
           const index = vm.info.tchClassTastInfo.findIndex(v => v.active)
           vm.info.tchClassTastInfo[index].endDate = JSON.parse(localStorage.getItem('stat')).tchClassTastInfo[index].endDate
         })
-      }
-      else if (from.path === '/subjectList') {
+      } else if (from.path === '/subjectList') {
         next(async vm => {
           await vm.statTaskStat(vm.info.tchClassTastInfo.find(t => t.active).classId)
         })
-      }
-      else {
+      } else {
         next()
       }
     },
@@ -1160,11 +1321,9 @@
         /*}*/
 
         &.active {
-          background: linear-gradient(
-            0deg,
-            rgba(57, 240, 221, 1),
-            rgba(140, 247, 238, 1)
-          );
+          background: linear-gradient(0deg,
+          rgba(57, 240, 221, 1),
+          rgba(140, 247, 238, 1));
           color: #fff;
         }
       }
@@ -1236,11 +1395,13 @@
     .objective-pie-group {
       display: flex;
       flex-wrap: wrap;
-      >div{
+
+      > div {
         flex: 0 0 46px;
         height: 46px;
         margin-right: 10px;
         margin-bottom: 10px;
+
         &:nth-child(6n) {
           margin-right: 0;
         }
@@ -1294,6 +1455,7 @@
           width: 100%;
           // height: 350px;
         }
+
         > iframe {
           width: 100%;
           height: 350px;
@@ -1350,6 +1512,14 @@
       &-tab {
         display: flex;
         margin-bottom: 16px;
+        position: relative;
+
+        .icon-tip {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        }
 
         > div {
           background: #f5f6fa;
@@ -1507,10 +1677,14 @@
         }
       }
     }
+
     .disabled {
       background: #f5f6fa;
       color: #ccc;
       border: 1px solid #ccc;
+    }
+    .tip-wrap {
+      width: 280px;
     }
   }
 </style>

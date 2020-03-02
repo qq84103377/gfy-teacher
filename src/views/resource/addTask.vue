@@ -1039,6 +1039,7 @@
         this.$router.push(`/teamSelect?type=` + type)
       },
       selectTestPaper() {
+        if(this.form.comment) return
         this.filterShow = true;
         this.$refs.examFilter.getTeachCourseResDetail()
       },

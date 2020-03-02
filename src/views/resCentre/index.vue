@@ -1251,7 +1251,8 @@
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "subjectType": localStorage.getItem("currentSubjectType"),
-          classGrade: this.gradeTerm.split('|')[0],
+          // classGrade: this.gradeTerm.split('|')[0],
+          classGrade: '',
           termType: '',
           "pageSize": "999",
           "courseType": "C01,C02",
@@ -1265,6 +1266,13 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             this.courseList = res.data || []
+            let classGradeArr = [...new Set(this.courseList.map(v => v.tchCourseInfo.classGrade))].sort()
+            this.courseList = classGradeArr.map(g => {
+              return {
+                classGrade:g,
+                arr: this.courseList.filter(c => c.tchCourseInfo.classGrade === g)
+              }
+            })
           }
         })
       },

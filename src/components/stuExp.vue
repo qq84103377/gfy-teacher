@@ -2,7 +2,7 @@
   <section class="stu-exp-wrap">
     <div class="stu-exp-wrap__item" v-for="(item,index) in list" v-if="list.length" :key="index">
       <div class="stu-exp-wrap__item__content-wrap">
-        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score || 0}}</span>
+        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score > 0 ? '+' + item.score : item.score}}</span>
         </div>
 
         <div class="stu-answer">
@@ -29,7 +29,7 @@
           </div>
 
 <!--          追加内容-->
-          <div class="mgt10" v-for="append in item.pubAppendContentInfoList" :key="append.appendId">
+          <div class="mgt10" v-for="(append,appendIndex) in item.pubAppendContentInfoList" :key="append.appendId">
             <div>{{append.appendTime}}追加</div>
             <div v-html="append.text"></div>
             <div style="width: 100%;" v-if="append.audioArr&&append.audioArr.length">
@@ -49,7 +49,7 @@
             </div>
             <div class="img-wrap" :class="[{img4: append.imgArr.length==4},{img56:append.imgArr.length>4}]" v-if="append.imgArr&&append.imgArr.length">
 <!--              <div @click="imgCorrect(img,calImgIndex(index,item.imgArr.length,i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>-->
-              <div @click="imgCorrect(img,item.imgArr.length + i,index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
+              <div @click="imgCorrect(img,calImgIndex(item ,appendIndex, i),index)" v-for="(img,i) in append.imgArr" :key="i"><img :src="img" alt=""></div>
             </div>
           </div>
           <!--            <div class="ellipsis" v-else>{{item.answer}}</div>-->
@@ -74,9 +74,24 @@
         class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
       <div class="comment-wrap" v-if="item.showComment" >
-        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
+        <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" maxLength="500" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
         <van-button @click="$emit('comment',item.comment,item)" class="submit-btn" type="info">发表</van-button>
       </div>
+<!--      这部分要等后台改了才能用-->
+<!--      <div class="pd10 fs12 van-hairline&#45;&#45;top reply-wrap" v-if="!rep.parentReplyId" v-for="(rep,repIndex) in item.replyList" :key="rep.replyId">-->
+<!--          <div class="reply-wrap__name" @click="checkReplyAccount(rep,rep,index)">{{getStudentName(rep.replyAccount,classId)}}:</div>-->
+<!--          <div class="reply-wrap__ctn">-->
+<!--            <div class="click-active" @click="checkReplyAccount(rep,rep,index)">{{rep.replyContent}}</div>-->
+<!--            <div class="reply-wrap__ctn__group" v-if="item.replyList.some(v => v.parentReplyId > 0 && (v.parentReplyId === rep.replyAccount || v.replyAccount === rep.replyAccount))">-->
+<!--              <div class="mgb5 mgt5 click-active" @click="checkReplyAccount(child,rep,index)" v-if="child.parentReplyId>0 && (child.parentReplyId === rep.replyAccount || child.replyAccount === rep.replyAccount)" v-for="(child,ci) in item.replyList" :key="child.replyId"><span class="blue">{{getStudentName(child.replyAccount,classId)}}</span>回复<span class="blue">{{getStudentName(child.parentReplyId,classId)}}</span>:{{child.replyContent}}</div>-->
+<!--            </div>-->
+<!--            <van-field class="comment-input" v-if="rep.showComment" maxLength="500"  clearable v-model.trim="rep.comment" :placeholder="`回复${rep.placeholder}:`" >-->
+<!--              <van-button @click="handleReply(rep,item)" slot="button" size="small" type="info">回复</van-button>-->
+<!--            </van-field>-->
+<!--          </div>-->
+<!--      </div>-->
+
+<!--      这部分等后台改完以后要替换成上面那种-->
       <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{getStudentName(rep.replyAccount,classId)}}:
         {{rep.replyContent}}
       </div>
@@ -85,6 +100,16 @@
       <img style="width: 70%;" src="../assets/img/empty-1.png" alt />
       <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
     </div>
+
+
+    <van-action-sheet
+      get-container="#app"
+      v-model="delShow"
+      :actions="actions"
+      cancel-text="取消"
+      @cancel="delShow=false"
+      @select="delReply"
+    />
   </section>
 </template>
 
@@ -96,7 +121,7 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId','disable'],
+    props: ['list', 'classId','disable','currentPage','total','finished'],
     computed: {
       getStudentName() {
         return getStudentName
@@ -105,9 +130,53 @@
     data() {
       return {
         comment: '',
+        delShow: false,
+        actions: [
+          { name: '删除' },
+        ],
+        replyAccount: '',
+        replyId: '',
+        replyIndex: '',
       }
     },
     methods: {
+      handleReply(rep,item) {
+        this.$emit('comment',rep.comment,item,this.replyAccount)
+        this.$set(rep,'comment','')
+      },
+      delReply() {
+        //删除回复(后台暂无该接口)
+        this.delShow = false
+        this.$emit('delReply',this.replyId,this.replyIndex)
+      },
+      checkReplyAccount(item,parentItem,replyIndex) {
+        if(this.disable) return
+        if(item.replyAccount === this.$store.getters.getUserInfo.accountNo) {
+          //账号相同可删除
+          this.delShow = true
+          this.replyId = item.replyId
+          this.replyIndex = replyIndex
+        }else {
+          //账号不同可回复
+          this.$set(parentItem,'showComment',!parentItem.showComment)
+          this.$set(parentItem,'placeholder', getStudentName(item.replyAccount,this.classId))
+          //记录回复的账号
+          this.replyAccount = item.replyAccount
+        }
+      },
+      calImgIndex(item,appendIndex,i) {
+        let count = item.imgArr.length
+        for (let j = 0; j < item.pubAppendContentInfoList.length; j++) {
+          const itemElement =  item.pubAppendContentInfoList[j];
+          if(j<appendIndex) {
+            count += itemElement.imgArr.length
+          }else {
+            break
+          }
+        }
+        count += i
+        return count
+      },
       goVideoPage(url) {
         if (!url) return
         this.$router.push({ name: 'videoPage', query: { src: url} })
@@ -120,7 +189,10 @@
             stuIndex,
             classId:this.classId,
             taskId: this.$route.query.taskId,
-            termType: this.$route.query.termType
+            termType: this.$route.query.termType,
+            currentPage: this.currentPage,
+            total: this.total,
+            finished: this.finished,
           }})
       },
       handlePraise(item) {
@@ -155,6 +227,32 @@
       border: 1px solid #eee;
       border-radius: 5px;
       margin-bottom: 10px;
+      .reply-wrap {
+        display: flex;
+        word-break: break-all;
+        &__name{
+          flex: 0 0 15%;
+          color: @blue;
+          height: 20px;
+        }
+        &__ctn{
+          flex: 0 0 85%;
+          &__group{
+            background: #f5f6fa;
+            padding: 5px;
+            margin-top: 5px;
+          }
+          .comment-input {
+            background: #f5f6fa;
+            margin-top: 5px;
+            @{deep} &.van-field {
+              input {
+                background: #fff !important;
+              }
+            }
+          }
+        }
+      }
       .comment-wrap {
         display: flex;
         align-items: center;
@@ -384,6 +482,10 @@
         display: none;
       }
     }
-
+    .click-active {
+      &:active {
+        background: #ddd;
+      }
+    }
   }
 </style>
