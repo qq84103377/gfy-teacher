@@ -25,7 +25,7 @@
 <!--          <van-icon @click="fileSelect" class="add" name="add"/>-->
 <!--          <input type="file" id="fileSelect" accept="video/*" style="display: none;">-->
           <van-uploader
-            accept="video/*,audio/*" :before-read="read">
+            accept="video/*,audio/*" :before-read="read" result-type='file'>
             <van-icon @click="" class="add" name="add"/>
           </van-uploader>
         </div>
@@ -134,8 +134,11 @@
       this.getOSSKey();
     },
     methods: {
-      read(file, detail) {
-        console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
+      read(file, detail) { 
+        console.log(file.name, 'ffffffffffffffffffffffffffffffffffffff');
+        console.log( file.type, 'ffffffffffffffffffffffffffffffffffffff');
+        console.log( file, 'ffffffffffffffffffffffffffffffffffffff');
+        console.log( file.size, 'ffffffffffffffffffffffffffffffffffffff');
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             if(file.size > 0) {
               this.wareFile = file;
