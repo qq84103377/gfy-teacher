@@ -164,6 +164,9 @@ export default {
     } else if (this.showTime) {
       this.showTime = false
       next(false)
+    } else if (this.shareBarShow) {
+      this.shareBarShow = false
+      next(false)
     } else {
       next()
     }

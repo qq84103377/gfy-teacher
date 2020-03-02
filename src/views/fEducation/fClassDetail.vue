@@ -183,8 +183,8 @@ export default {
     if (this.visible) {
       this.visible = false
       next(false)
-    } else if (this.teacherGroupShow) {
-      this.teacherGroupShow = false
+    } else if (this.showTips) {
+      this.showTips = false
       next(false)
     } else {
       next();
