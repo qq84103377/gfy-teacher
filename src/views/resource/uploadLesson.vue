@@ -22,8 +22,8 @@
         <div slot="title" class="upload-lesson__body__cell-ctn mgl5">
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
-         <van-icon @click="fileSelect" class="add" name="add"/>
-         <input type="file" id="fileSelect" accept="video/*" style="display: none;">
+         <!-- <van-icon @click="fileSelect" class="add" name="add"/>
+         <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
           <van-uploader
             accept="video/*,audio/*" :before-read="read" result-type='file'>
             <van-icon @click="" class="add" name="add"/>
