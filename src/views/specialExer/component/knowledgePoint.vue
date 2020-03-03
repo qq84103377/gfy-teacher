@@ -91,6 +91,7 @@ export default {
       if (nv) {
         this.isChange = true
         if (this.active != 1) return
+        this.isChange = false
         this.list = []
         this.listIndex = 0
         this.isRecomment = false
