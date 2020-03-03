@@ -277,6 +277,8 @@ export default {
           console.log(res.msg)
           this.$toast(res.msg)
         }
+      }).catch(err => {
+        this.loginBtnLoading = false
       })
     },
 
@@ -332,6 +334,8 @@ export default {
           console.log(res.msg)
           this.$toast(res.msg)
         }
+      }).catch(err => {
+        this.loginBtnLoading = false
       })
     },
 
@@ -381,6 +385,8 @@ export default {
           console.log(res.msg)
           this.$toast(res.msg)
         }
+      }).catch(err => {
+        this.loginBtnLoading = false
       })
 
     },
