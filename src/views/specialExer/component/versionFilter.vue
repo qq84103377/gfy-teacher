@@ -114,7 +114,7 @@ export default {
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
         // "textBookId": this.textItem ? this.textItem.textBookId : '',
-        "textBookId": this.textBookId,
+        "textBookId": this.textItem.textBookId,
         "gradeTermId": this.gradeTermItem ? this.gradeTermItem.gradeTermId : '',
         "subjectType": localStorage.currentSubjectType,
         'nodeType': 'N00'
@@ -259,6 +259,7 @@ export default {
               this.index = a
               this.textItem = this.versionList.arr[a]
               this.$set(this.versionList.arr[a], 'active', true)
+               this.$emit('update:textBookId', this.textItem.textBookId)
 
               let b = this.versionList.arr[a].gradeList.findIndex(e => {
                 return (e.termType == termType) && (e.classGrade == classGrade)
@@ -283,7 +284,7 @@ export default {
                 this.getTextBookCourseInfo()
               }
 
-              this.$emit('update:textBookId', this.textItem.textBookId)
+             
             } else {
               this.textItem = this.versionList.arr[0]
               this.$set(this.versionList.arr[0], 'active', true)
