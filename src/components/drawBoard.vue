@@ -193,7 +193,7 @@ export default {
       let b = this.$refs['canvas'].height
       this.offCtx.clearRect(0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height); // 先清除画布
       this.changeImg = new Image();
-      this.changeImg.setAttribute("crossOrigin", 'anonymous');
+      // this.changeImg.setAttribute("crossOrigin", 'anonymous');
       // this.changeImg.src = changeValue + '&' + Math.random();
       this.changeImg.src = changeValue;
       this.changeImg.onload = () => {

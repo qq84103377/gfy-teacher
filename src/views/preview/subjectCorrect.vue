@@ -927,8 +927,10 @@
             border: 1px solid #ccc;
 
             &__content {
+              /*评论区域下拉*/
               height: 100%;
               overflow-y: auto;
+              max-height: 100%;
 
               .menu-wrap {
                 background: #fff;
@@ -1093,7 +1095,7 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-bottom: 50px;
+        padding-bottom: 52px;
 
         .dropdown-group {
           display: flex;
@@ -1147,7 +1149,6 @@
               right: 10px;
               max-height: 64px;
               left: auto;
-              z-index: 999;
 
               .van-cell {
                 padding: 0;
