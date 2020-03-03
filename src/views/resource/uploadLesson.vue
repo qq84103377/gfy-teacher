@@ -23,7 +23,8 @@
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
          <van-icon @click="fileSelect" class="add" name="add"/>
-         <input type="file" id="fileSelect" accept="video/*" style="display: none;">
+         <input type="file" name='files' id="fileSelect" accept="video/*" style="display: none;">
+          <input type="file" name='files1' id="files1" accept="video/*" >
           <van-uploader
             accept="video/*,audio/*" :before-read="read" result-type='file'>
             <van-icon @click="" class="add" name="add"/>
@@ -132,8 +133,16 @@
     mounted() {
       this.getOSSKey(1);
       this.getOSSKey();
+      document.getElementById('files1').addEventListener('change', this.handleFileSelect, false);
     },
     methods: {
+      handleFileSelect(evt){
+      var file = evt.target.files[0]; // FileList object
+        console.log(file.name, '000000000000000000');
+        console.log( file.type, '000000000000000000');
+        console.log( file, '0000000000000000');
+        console.log( file.size, '0000000000000000');
+      },
       read(file, detail) { 
         console.log(file.name, 'ffffffffffffffffffffffffffffffffffffff');
         console.log( file.type, 'ffffffffffffffffffffffffffffffffffffff');
@@ -214,7 +223,7 @@
 
         let e = e || window.event;
         let reader = new FileReader();
-        let rs = reader.readAsArrayBuffer(obj.curFile);
+        let rs = reader.readAsDataURL(obj.curFile);
         let blob = null;
         reader.onload = (e) => {
          
