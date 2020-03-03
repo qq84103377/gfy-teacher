@@ -25,7 +25,7 @@
          <!-- <van-icon @click="fileSelect" class="add" name="add"/>
          <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
           <van-uploader
-            accept="video/*,audio/*" :before-read="read" result-type='file'>
+            accept="video/*,audio/*" :before-read="read">
             <van-icon @click="" class="add" name="add"/>
           </van-uploader>
         </div>
