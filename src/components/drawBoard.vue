@@ -193,9 +193,9 @@ export default {
       let b = this.$refs['canvas'].height
       this.offCtx.clearRect(0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height); // 先清除画布
       this.changeImg = new Image();
-      // this.changeImg.setAttribute("crossOrigin", 'anonymous');
-      // this.changeImg.src = changeValue + '&' + Math.random();
-      this.changeImg.src = changeValue;
+      this.changeImg.setAttribute("crossOrigin", 'anonymous');
+      this.changeImg.src = changeValue + '&' + Math.random();
+      // this.changeImg.src = changeValue;
       this.changeImg.onload = () => {
         console.log(changeValue);
         this.offCtx.drawImage(this.changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
@@ -386,7 +386,12 @@ export default {
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
       Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
-        let compositeImg = compositeCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+        let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
+        if(compositeImg.length > 102400) {
+          //大于100kb需要压缩
+          compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.8).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
+        }
+
         await this.getOSSKey()
 
         let arr = compositeImg.split(","),

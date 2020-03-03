@@ -2,14 +2,23 @@
   <section class="team-select-wrap">
     <div class="team-select-wrap__body">
       <div class="class-select" v-if="$route.query.type === 'team'" v-for="(item,index) in list" :key="index">
-        <van-checkbox class="parent-checkbox" style="margin-left: 0;" v-model="item.check" :title="item.className" :disabled="!item.tchSubGroup || item.tchSubGroup.length==0 " @click="handleSelectGroupClass(item)">
-          <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
-          {{item.className}}
-        </van-checkbox>
-        <div class="team-select-wrap__body__group" v-if="!item.tchSubGroup || item.tchSubGroup.length==0">
+<!--        <van-checkbox class="parent-checkbox" style="margin-left: 0;" v-model="item.check" :title="item.className" :disabled="!item.tchSubGroup || item.tchSubGroup.length==0 " @click="handleSelectGroupClass(item)">-->
+<!--          <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>-->
+<!--          {{item.className}}-->
+<!--        </van-checkbox>-->
+
+        <div class="jcsb aic mgb10">
+          <van-checkbox class="parent-checkbox" style="margin-left: 0;" v-model="item.check" :title="item.className" :disabled="!item.tchSubGroup || item.tchSubGroup.length==0 " @click="handleSelectGroupClass(item)">
+            <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
+            {{item.className}}
+            <span class="mglt10">{{calStuNum(item)}}/{{calGroupNum(item.tchSubGroup)}}</span>
+          </van-checkbox>
+          <van-icon @click="$set(item,'open',!item.open)" class="mgr10" :name="item.open?'arrow-down':'arrow-up'" />
+        </div>
+        <div class="team-select-wrap__body__group" v-show="item.open" v-if="!item.tchSubGroup || item.tchSubGroup.length==0">
           此班级无分组
         </div>
-        <div class="team-select-wrap__body__group" v-else v-for="(g,gi) in item.tchSubGroup" :key="gi">
+        <div class="team-select-wrap__body__group" v-show="item.open" v-else v-for="(g,gi) in item.tchSubGroup" :key="gi">
           <van-checkbox class="gfy-checkbox" style="margin-left: 0;" v-model="g.check" @click="handleSelectParent(g,item)" :disabled="!g.tchClassSubGroupStudent.tchSubGroupStudent || g.tchClassSubGroupStudent.tchSubGroupStudent.length==0">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             {{g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName}}
@@ -29,18 +38,23 @@
       </div>
 
       <div class="team-select-wrap__body__group" v-if="$route.query.type === 'class'" v-for="(c,ci) in list" :key="ci">
-        <van-checkbox class="gfy-checkbox" style="margin-left: 0;" v-model="c.check" @click="handleSelectParent(c)" :disabled="c.disabled">
-          <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
-          {{c.className}}
-        </van-checkbox>
-        <div v-if="isfEducation!=='true'" class="team-select-wrap__body__group-wrap">
+        <div class="jcsb aic">
+          <van-checkbox class="gfy-checkbox" style="margin-left: 0;" v-model="c.check" @click="handleSelectParent(c)"
+                        :disabled="c.disabled">
+            <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
+            {{c.className}}
+            <span class="mglt10">{{calStuNum(c)}}/{{Object.keys(c.classStudent).length}}</span>
+          </van-checkbox>
+          <van-icon @click="$set(c,'open',!c.open)" class="mgr10" :name="c.open?'arrow-down':'arrow-up'" />
+        </div>
+        <div v-if="isfEducation!=='true'" v-show="c.open" class="team-select-wrap__body__group-wrap">
           <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
             <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>
             {{s.accountNo|getStudentName(c.classId)}}
           </div>
         </div>
 
-        <div v-else class="team-select-wrap__body__group-wrap">
+        <div v-else v-show="c.open" class="team-select-wrap__body__group-wrap">
           <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
             {{s.parentName?s.parentName:s.parentAccountNo}}
           </div>
@@ -82,6 +96,34 @@ export default {
     //this.list = JSON.parse(JSON.stringify(this.$store.getters.getTeamList))
   },
   methods: {
+    calGroupNum(groupList) {
+      return groupList.reduce((t,v) => {
+        if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+          t += v.tchClassSubGroupStudent.tchSubGroupStudent.length || 0
+        }
+        return t
+      },0)
+    },
+    calStuNum(item) {
+      if(this.$route.query.type === 'class') {
+        //按班
+        return Object.keys(item.classStudent).reduce((t,v) => {
+          if(item.classStudent[v].active) t++
+          return t
+        },0)
+      }else {
+        //按组
+        return item.tchSubGroup.reduce((total,v) => {
+          if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+            total += v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t,s) => {
+              if(s.active) t++
+              return t
+            },0)
+          }
+          return total
+        },0)
+      }
+    },
     handleConfirm() {
       this.$store.commit('setTeamList', this.list)
       this.$store.commit("setTaskClassInfo", JSON.stringify(this.list))
@@ -181,7 +223,7 @@ export default {
       padding-left: 10px;
       .parent-checkbox {
         margin-left: -10px !important;
-        margin-bottom: 8px;
+        /*margin-bottom: 8px;*/
       }
     }
 

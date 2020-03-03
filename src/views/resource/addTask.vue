@@ -130,6 +130,7 @@
                               :disabled="item.disabled" @click="handleCheckClass(item,index)">
                   <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
                   {{item.className}}
+                  <span class="mglt10">{{calStuNum(item)}}/{{form.object == 1?Object.keys(item.classStudent).length:calGroupNum(item.tchSubGroup)}}</span>
                 </van-checkbox>
                 <div class="select-wrap-desc" v-show="item.type!='none'">
                   <div v-if="form.object == 1 ">发布范围:
@@ -430,6 +431,34 @@
     },
 
     methods: {
+      calGroupNum(groupList) {
+        return groupList.reduce((t,v) => {
+          if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+            t += v.tchClassSubGroupStudent.tchSubGroupStudent.length || 0
+          }
+          return t
+        },0)
+      },
+      calStuNum(item) {
+        if(this.form.object == 1) {
+          //按班
+          return Object.keys(item.classStudent).reduce((t,v) => {
+            if(item.classStudent[v].active) t++
+            return t
+          },0)
+        }else {
+          //按组
+         return item.tchSubGroup.reduce((total,v) => {
+           if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+             total += v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
+               if (s.active) t++
+               return t
+             }, 0)
+           }
+            return total
+          },0)
+        }
+      },
       async getSubGroupParent(classId) {
         let obj = {
           "interUser": "runLfb",
