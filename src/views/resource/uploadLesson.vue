@@ -22,9 +22,8 @@
         <div slot="title" class="upload-lesson__body__cell-ctn mgl5">
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
-         <van-icon @click="fileSelect" class="add" name="add"/>
-         <input type="file" name='files' id="fileSelect" accept="video/*" style="display: none;">
-          <input type="file" name='files1' id="files1" accept="video/*" >
+         <!-- <van-icon @click="fileSelect" class="add" name="add"/>
+         <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
           <van-uploader
             accept="video/*,audio/*" :before-read="read" result-type='file'>
             <van-icon @click="" class="add" name="add"/>
@@ -133,38 +132,14 @@
     mounted() {
       this.getOSSKey(1);
       this.getOSSKey();
-      document.getElementById('files1').addEventListener('change', this.handleFileSelect, false);
     },
     methods: {
-      handleFileSelect(evt){
-      var file = evt.target.files[0]; // FileList object
-        console.log(file.name, '000000000000000000');
-        console.log( file.type, '000000000000000000');
-        console.log( file, '0000000000000000');
-        console.log( file.size, '0000000000000000');
-      },
       read(file, detail) { 
-        console.log(file.name, 'ffffffffffffffffffffffffffffffffffffff');
-        console.log( file.type, 'ffffffffffffffffffffffffffffffffffffff');
-        console.log( file, 'ffffffffffffffffffffffffffffffffffffff');
-        console.log( file.size, 'ffffffffffffffffffffffffffffffffffffff');
-        let e = e || window.event;
-        let reader = new FileReader();
-        let rs = reader.readAsArrayBuffer(file);
-        let blob = null;
-        reader.onload = (e) => {
-         
-             if (typeof e.target.result === 'object') {
-            blob = new Blob([e.target.result])
-          } else {
-            blob = e.target.result
-          }
-          
-          console.log(Object.prototype.toString.call(blob),"-----------------");
-          console.log(blob,"-----------------");
-          console.log(blob.size,"-----------------");
-        }
-        console.log("-----------------11");
+        console.log(file.name, 'file.name');
+        console.log( file.type, 'file.type');
+        console.log( file, 'file');
+        console.log( file.size, 'file.size');
+     
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             if(file.size > 0) {
               this.wareFile = file;
@@ -216,28 +191,10 @@
       },
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
-           console.log(obj.curFile.name, '1111111111');
-        console.log( obj.curFile.type, '111111111111');
-        console.log( obj.curFile, '111111111');
-        console.log( obj.curFile.size, '1111111111');
-
-        let e = e || window.event;
-        let reader = new FileReader();
-        let rs = reader.readAsDataURL(obj.curFile);
-        let blob = null;
-        reader.onload = (e) => {
-         
-             if (typeof e.target.result === 'object') {
-            blob = new Blob([e.target.result])
-          } else {
-            blob = e.target.result
-          }
-          
-          console.log(Object.prototype.toString.call(blob),"-----------------");
-          console.log(blob,"-----------------");
-          console.log(blob.size,"-----------------");
-        }
-        console.log("-----------------22");
+          console.log(obj.curFile.name, 'file.name');
+        console.log( obj.curFile.type, 'file.type');
+        console.log( obj.curFile, 'file');
+        console.log( obj.curFile.size, 'file.size');
 
           const fileType = obj.curFile.name.substr(obj.curFile.name.lastIndexOf('.'))
           console.log(fileType,'ttttttttttttttttttttttttt');
