@@ -51,7 +51,7 @@ import { getTestPaperInfoList } from '@/api/index'
 
 export default {
   name: "reviewTest",
-  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore', 'active', 'toggleNum','onRefresh'],
+  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore', 'active', 'toggleNum', 'onRefresh'],
   data() {
     return {
       testList: [],
@@ -189,6 +189,7 @@ export default {
 
       if (!this.without) {
         console.log("onLoad1");
+        this.isChange = false
         this.currentPage++
         if (this.currentPage > this.totalPage && this.currentPage > 1) {
           this.listLoading = false
