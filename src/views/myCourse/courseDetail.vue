@@ -3,23 +3,23 @@
     <van-nav-bar :title="currCourse.tchCourseInfo.courseName" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="course-detail__body">
-      <van-cell class="fs16" @click="gotoPreview" :title="`预习(${currCourse.resourceCount.find(v => v.resourceType === 'R11').resourceCount})`" is-link />
+      <van-cell class="fs16" @click="gotoPreview" :title="`预习(${handleCount('R11')})`" is-link />
       <van-collapse v-model="activeNames">
-        <van-collapse-item v-if='!isfEducation' :title="`课中(${currCourse.resourceCount.find(v => v.resourceType === 'R12').resourceCount})`" name="1">
-          <van-cell :title="`讲义(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C01')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C01').resourceCount:0})`" @click="goInClass('/lectureList')" is-link />
-          <van-cell :title="`白板(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C02')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C02').resourceCount:0})`" @click="goInClass('/boardClassList')" is-link />
-          <van-cell :title="`堂测统计(${currCourse.resourceCount.find(v => v.resourceType === 'R12_C03')?currCourse.resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`" @click="goInClass('/classStatSelectList')" is-link />
+        <van-collapse-item v-if='!isfEducation' :title="`课中(${handleCount('R12')})`" name="1">
+          <van-cell :title="`讲义(${handleCount('R12_C01')})`" @click="goInClass('/lectureList')" is-link />
+          <van-cell :title="`白板(${handleCount('R12_C02')})`" @click="goInClass('/boardClassList')" is-link />
+          <van-cell :title="`堂测统计(${handleCount('R12_C03')})`" @click="goInClass('/classStatSelectList')" is-link />
         </van-collapse-item>
-        <van-collapse-item :title="`资源(${currCourse.resourceCount.find(v => v.resourceType === 'R00').resourceCount})`" name="2">
-          <van-cell :title="`微课(${currCourse.resourceCount.find(v => v.resourceType === 'R01_1')?currCourse.resourceCount.find(v => v.resourceType === 'R01_1').resourceCount:0})`" @click="gotoResource('/lessonList')" is-link />
-          <van-cell :title="`素材(${currCourse.resourceCount.find(v => v.resourceType === 'R01_2')?currCourse.resourceCount.find(v => v.resourceType === 'R01_2').resourceCount:0})`" @click="gotoResource('/materialList')" is-link />
-          <van-cell :title="`试卷(${currCourse.resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" @click="gotoResource('/examList')" is-link />
-          <van-cell :title="`试题(${currCourse.resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" @click="gotoResource('/questionList')" is-link />
-          <van-cell :title="`讨论(${currCourse.resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" @click="gotoResource('/discussList')" is-link />
-          <van-cell v-if="currentSubjectType === 'S03' &&!isfEducation" :title="`口语(${currCourse.resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" @click="gotoResource('/spokenList')" is-link />
+        <van-collapse-item :title="`资源(${handleCount('R00')})`" name="2">
+          <van-cell :title="`微课(${handleCount('R01_1')})`" @click="gotoResource('/lessonList')" is-link />
+          <van-cell :title="`素材(${handleCount('R01_2')})`" @click="gotoResource('/materialList')" is-link />
+          <van-cell :title="`试卷(${handleCount('R02')})`" @click="gotoResource('/examList')" is-link />
+          <van-cell :title="`试题(${handleCount('R03')})`" @click="gotoResource('/questionList')" is-link />
+          <van-cell :title="`讨论(${handleCount('R4')})`" @click="gotoResource('/discussList')" is-link />
+          <van-cell v-if="currentSubjectType === 'S03' &&!isfEducation" :title="`口语(${handleCount('R08')})`" @click="gotoResource('/spokenList')" is-link />
         </van-collapse-item>
       </van-collapse>
-      <van-cell v-if='!isfEducation' class="fs16" @click="viewLayer" :title="`分层(${currCourse.resourceCount.find(v => v.resourceType === 'R13').resourceCount})`" is-link />
+      <van-cell v-if='!isfEducation' class="fs16" @click="viewLayer" :title="`分层(${handleCount('R13')})`" is-link />
     </div>
   </section>
 </template>
@@ -50,6 +50,9 @@ export default {
     }
   },
   methods: {
+    handleCount(resourceType) {
+      return this.currCourse.resourceCount.find(v => v.resourceType === resourceType)?this.currCourse.resourceCount.find(v => v.resourceType === resourceType).resourceCount:0
+    },
     viewLayer() {
       this.$store.commit("setTchCourseInfo", this.currCourse.tchCourseInfo)
       this.$router.push(`/layerTaskList?tchCourseId=${this.$route.query.tchCourseId}&courseName=${this.currCourse.tchCourseInfo.courseName}&classGrade=${this.currCourse.tchCourseInfo.classGrade}&sysCourseId=${this.currCourse.tchCourseInfo.sysCourseId}&relationCourseId=${this.currCourse.tchCourseInfo.relationCourseId}`)
