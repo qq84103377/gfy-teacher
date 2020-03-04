@@ -879,7 +879,7 @@
         })
       },
       viewAnalyse() {
-        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}&isfEducation=${this.isfEducation}`)
+        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}${this.isfEducation?'&isfEducation=true':''}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
         let obj = {
