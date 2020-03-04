@@ -82,7 +82,7 @@
     },
     methods: {
       onClickLeft() {
-        this.$router.replace("/qrCode");
+        this.$router.back();
       },
       changeInput() {
         // 过滤掉除数字、字母、汉字以外的所有字符
