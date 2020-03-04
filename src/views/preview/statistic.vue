@@ -1224,6 +1224,14 @@
     },
     beforeRouteLeave(to, from, next) {
       this.scrollTop = this.$refs["body"].scrollTop
+      if(window.stop !== undefined)
+      {
+        window.stop();
+      }
+      else if(document.execCommand !== undefined)
+      {
+        document.execCommand("Stop", false);
+      }
       next()
     },
     beforeRouteEnter(to, from, next) {
