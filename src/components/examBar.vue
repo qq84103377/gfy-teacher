@@ -240,6 +240,7 @@
           "pageSize": "999",
           "courseType": "C01",
           "currentPage": 1,
+          'isFinish': 4
         }
         if(this.$route.query.isRes) {
           obj.termType = this.$route.query.termType

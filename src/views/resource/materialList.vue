@@ -42,7 +42,7 @@
 
     </div>
     <div class="material-list-wrap__footer">
-      <van-button type="info" :class="['btn']" @click="gotoUpload">上传课件</van-button>
+      <van-button type="info" :class="['btn',{disabled:!isIOS}]" @click="gotoUpload">上传课件</van-button>
       <van-button type="info" class="btn" @click="$router.push({path:'uploadImg',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传图片</van-button>
     </div>
   </section>
@@ -80,13 +80,13 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-       if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
-      this.$refs['listItem'][this.clickIndex].close()
-      next(false)
-    }else{
-      this.scrollTop = this.$refs["body"].scrollTop
-      next()
-    }
+      if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+        this.$refs['listItem'][this.clickIndex].close()
+        next(false)
+      }else{
+        this.scrollTop = this.$refs["body"].scrollTop
+        next()
+      }
     },
     beforeRouteEnter(to, from, next) {
       localStorage.removeItem('materialDetail')
@@ -116,15 +116,15 @@
     },
     methods: {
       gotoUpload() {
-        // if(this.isIOS) {
+        if(this.isIOS) {
           this.$router.push({path:'uploadWare',query:{tchCourseId:this.$route.query.tchCourseId,sysCourseId:this.$route.query.sysCourseId,relationCourseId:this.$route.query.relationCourseId,subjectType:this.$route.query.subjectType,classId:this.$route.query.classId,tchClassCourseInfo:this.$route.query.tchClassCourseInfo}})
-        // }else {
-        //   return this.$toast('暂不支持课件上传')
-        // }
+        }else {
+          return this.$toast('暂不支持课件上传')
+        }
       },
       clickDel(index){
-      this.clickIndex=index
-    },
+        this.clickIndex=index
+      },
       updateCourseWareCount(item) {
         let obj = {
           "interUser": "runLfb",

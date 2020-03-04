@@ -392,9 +392,9 @@ export default {
       Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
 
         let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
-        if(compositeImg.length > 102400) {
-          //大于100kb需要压缩
-          compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.9).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
+        if(compositeImg.length > 307200) {
+          //大于300kb需要压缩
+          compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
         }
 
         await this.getOSSKey()
