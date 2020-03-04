@@ -252,9 +252,11 @@
             }
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
             localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
-            if (res.data[0].isJustCreated) {
+
+
+            if (res.data[0].isJustCreated || res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A01') {
               // 新创建的用户
-              console.log('新用户');
+              console.log('新用户或没修改过用户名');
               this.$router.push({name: 'setInfo', params: {roleType: this.roleType}})
             } else {
               if (this.roleType == 'A02') {
@@ -363,11 +365,17 @@
           if (res.flag) {
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
             localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
-            if (this.roleType == 'A02') {
-              this.$router.replace('/teacherToClass')
-            } else if (this.roleType == 'A03') {
-              this.$router.replace('/studentToClass')
+            if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A01') {
+              console.log('没修改过用户名');
+              this.$router.push({name: 'setInfo', params: {roleType: this.roleType}})
+            } else {
+              if (this.roleType == 'A02') {
+                this.$router.replace('/teacherToClass')
+              } else if (this.roleType == 'A03') {
+                this.$router.replace('/studentToClass')
+              }
             }
+
           } else {
             this.$toast(res.msg)
           }

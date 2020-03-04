@@ -126,6 +126,7 @@ export default {
       isIphone: false,
       drawFlag: false, //是否涂鸦过
       changeImg: null,
+      imgOnload: false, //图片是否加载完成
     }
   },
   props: ['imgUrl', 'isPen', 'isRubber', 'text','stuIndex'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
@@ -138,6 +139,7 @@ export default {
       this.rotateIndex = 0
       this.rotate = 0
       this.changeImg = null
+      this.imgOnload = false
       //对于文字+图片和纯图片之间的切换 需要重新计算canvas高度,
       this.$nextTick(() => {
         this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
@@ -199,6 +201,7 @@ export default {
       this.changeImg.onload = () => {
         console.log(changeValue);
         this.offCtx.drawImage(this.changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
+        this.imgOnload = true
       };
       this.changeImg.onerror = () => {
         this.$toast('图片加载失败')
@@ -343,6 +346,7 @@ export default {
       context.stroke();
     },
     save() {
+      if(!this.imgOnload) return
       console.log('save()');
       this.$store.commit('setVanLoading', true)
       this.canvasHistory = []
@@ -386,6 +390,7 @@ export default {
         document.getElementsByClassName('offImgs')[0].appendChild(img)
       })
       Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
+
         let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
         if(compositeImg.length > 102400) {
           //大于100kb需要压缩
@@ -631,6 +636,7 @@ export default {
       _this.swordEle.rotateZ = _this.rotate
       var af = new AlloyFinger(_this.swordEle, {
         touchStart: function (event) {
+          if(!_this.imgOnload) return;
           if (!_this.isPen && !_this.isRubber) return
           console.log('touchStart()');
           console.log(event, 'touchStart() event');
@@ -642,6 +648,7 @@ export default {
           // swordEle.style.translateX += evt.deltaX;
           // swordEle.style.translateY += evt.deltaY;
           // evt.preventDefault();
+          if(!_this.imgOnload) return;
           if (!_this.isPen && !_this.isRubber) return
           console.log('touchMove()');
           _this.point = { x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY };
@@ -698,6 +705,7 @@ export default {
         multipointEnd: function () {
         },
         tap: function () {
+          if(!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           _this.$emit('tap')
         },
@@ -708,11 +716,13 @@ export default {
         singleTap: function () {
         },
         rotate: function (evt) {
+          if(!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           // swordEle.rotateZ += evt.angle;
         },
         pinch(evt) {
           console.log("捏合start");
+          if(!_this.imgOnload) return;
           clearTimeout(_this.timer)
           _this.isPinch = true
           _this.timer = setTimeout(() => {
@@ -730,6 +740,7 @@ export default {
 
         },
         pressMove: function (evt) {
+          if(!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           let widthDiff = bwidth - swidth;
           let heightDiff = bheight - sheight;

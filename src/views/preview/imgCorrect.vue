@@ -37,7 +37,7 @@
       </i>
       <van-icon class="close" name="cross" @click="isHide=false;isPen=false;isRubber=false;"></van-icon>
     </div>
-    <div v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
+    <div ref="swipe" v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
         <div class="img-wrap">
           <img :class="{active:item.active}" v-lazy="item.src" alt="">
@@ -134,6 +134,7 @@
         currentPage: this.$route.params.currentPage,
         total: this.$route.params.total,
         finished: this.$route.params.finished,
+        studentStatList: this.$route.params.studentStatList,
         listLoading: false,
       }
     },
@@ -142,8 +143,9 @@
 
     },
     mounted() {
-      console.log(this.imgArr, 'imgArrimgArr');
       this.figure()
+      const index = this.imgArr.findIndex(v => v.active)
+      this.$refs['swipe'].scrollLeft = this.$refs.swipe.firstElementChild.offsetWidth * index
     },
     beforeDestroy() {
       screen.orientation.lock('portrait')
@@ -253,6 +255,13 @@
           }
         });
       },
+      rewardScore(accountNo) {
+        try {
+          return this.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
+        } catch {
+          console.log(accountNo, '有错啊');
+        }
+      },
       async getAppraise() {
         const page = this.currentPage
         this.$store.commit('setVanLoading', true)
@@ -281,6 +290,7 @@
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
               v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
+              v.score = this.rewardScore(v.appraiseAccountNo)
               let dom = document.createElement('div')
               v.imgArr = []
               v.audioArr = []
