@@ -5,6 +5,7 @@
     <div class="form">
       <div class="form-cell" v-if="roleType == 'A03'">
         <label>
+          <span class="requireTips">*</span>
           <span>学</span>
           <span>生</span>
           <span>姓</span>
@@ -12,9 +13,12 @@
         </label>：
         <van-field class="custom-input" placeholder="请输入学生真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
                    v-model.trim="username" clearable/>
+<!--        <span class="numTips" >剩2字</span>-->
+
       </div>
       <div class="form-cell" v-if="roleType == 'A02'">
         <label>
+          <span class="requireTips">*</span>
           <span>老</span>
           <span>师</span>
           <span>姓</span>
@@ -22,9 +26,11 @@
         </label>：
         <van-field class="custom-input" placeholder="请输入老师真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
                    v-model.trim="username" clearable/>
+<!--        <span class="numTips" >剩2字</span>-->
+
       </div>
       <div class="form-cell">
-        <label>
+        <label class="loginName">
           <span>用</span>
           <span>户</span>
           <span>名</span>
@@ -33,7 +39,8 @@
       </div>
       <div class="form-cell">
         <label>
-          <span>密</span>
+          <span><span class="requireTips">*</span>
+密</span>
           <span>码</span>
         </label>：
         <van-field class="custom-input" @input.native="checkPwd" v-model="setPwd" clearable type="password"
@@ -42,6 +49,7 @@
       </div>
       <div class="form-cell">
         <label>
+          <span class="requireTips">*</span>
           <span>确</span>
           <span>认</span>
           <span>密</span>
@@ -94,7 +102,7 @@
           this.isComplete = true;
           return;
         } else {
-          if (this.setPwd &&!this.isDifferent && !this.isUnAvailable) {
+          if (this.setPwd && !this.isDifferent && !this.isUnAvailable) {
             this.isComplete = false;
           } else {
             this.isComplete = true;
@@ -196,6 +204,7 @@
     },
     mounted() {
       this.roleType = this.$route.params.roleType;
+      // this.roleType = 'A02';
       let schoolInfo = JSON.parse(window.localStorage.getItem('schoolInfo'));
       this.accountPrefix = schoolInfo.accountPrefix;
     }
@@ -234,10 +243,16 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
+          &.loginName{
+            padding-left: 6px;
+          }
 
           span {
             position: static;
             font-size: 16px;
+            &.requireTips{
+              color: #f00;
+            }
           }
         }
 
