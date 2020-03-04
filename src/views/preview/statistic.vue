@@ -642,6 +642,7 @@
       },
       async getAppraise() {
         const page = this.currentPage
+        const pageSize = this.pageSize
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -652,7 +653,7 @@
           isAppendMode: true,
           objectId: this.$route.query.taskId,
           objectTypeCd: 'A01',
-          pageSize: this.pageSize,
+          pageSize,
           praiseType: 1,
           replyType: 1,
         }
@@ -661,7 +662,11 @@
         }
         await getAppraiseV2(params).then(res => {
           this.listLoading = false
-          this.total = res.total
+          if(pageSize > 10) {
+            this.total = Math.ceil(res.totalNum / 10)
+          }else {
+            this.total = res.total
+          }
           this.$store.commit('setVanLoading', false)
 
           if (res.flag && res.data[0]) {

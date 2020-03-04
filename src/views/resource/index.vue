@@ -21,12 +21,12 @@
         </div>
       </div>
       <div v-if="courseList.length || firstFlag">
-        <van-cell class="fs16" :title="`微课(${resourceCount.find(v => v.resourceType === 'R01_1')?resourceCount.find(v => v.resourceType === 'R01_1').resourceCount:0})`" is-link @click="goto('/lessonList')" />
-        <van-cell class="fs16" :title="`素材(${resourceCount.find(v => v.resourceType === 'R01_2')?resourceCount.find(v => v.resourceType === 'R01_2').resourceCount:0})`" is-link @click="goto('/materialList')" />
-        <van-cell class="fs16" :title="`试卷(${resourceCount.find(v => v.resourceType === 'R02').resourceCount})`" is-link @click="goto('/examList')" />
-        <van-cell class="fs16" :title="`试题(${resourceCount.find(v => v.resourceType === 'R03').resourceCount})`" is-link @click="goto('/questionList')" />
-        <van-cell class="fs16" :title="`讨论(${resourceCount.find(v => v.resourceType === 'R04').resourceCount})`" is-link @click="goto('/discussList')" />
-        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${resourceCount.find(v => v.resourceType === 'R08').resourceCount})`" is-link @click="goto('/spokenList')" />
+        <van-cell class="fs16" :title="`微课(${handleCount('R01_1')})`" is-link @click="goto('/lessonList')" />
+        <van-cell class="fs16" :title="`素材(${handleCount('R01_2')})`" is-link @click="goto('/materialList')" />
+        <van-cell class="fs16" :title="`试卷(${handleCount('R02')})`" is-link @click="goto('/examList')" />
+        <van-cell class="fs16" :title="`试题(${handleCount('R03')})`" is-link @click="goto('/questionList')" />
+        <van-cell class="fs16" :title="`讨论(${handleCount('R04')})`" is-link @click="goto('/discussList')" />
+        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${handleCount('R08')})`" is-link @click="goto('/spokenList')" />
       </div>
     </div>
   </section>
@@ -91,6 +91,9 @@ export default {
     //   this.courseName = data
     //   this.dropdownRefresh()
     // },
+    handleCount(resourceType) {
+     return this.resourceCount.find(v => v.resourceType === resourceType)?this.resourceCount.find(v => v.resourceType === resourceType).resourceCount:0
+    },
     getCourseInfoResourceCount() {
       this.$store.commit('setVanLoading', true)
       let obj = {

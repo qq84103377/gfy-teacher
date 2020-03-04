@@ -882,7 +882,7 @@ export default {
             res.data[0].tchSubjectCourse.shareType = this.form.share
             this.$emit('update:editCourseInfo', res.data[0].tchSubjectCourse)
           } else {
-            this.$toast(res.flag)
+            this.$toast(res.msg)
           }
         } else {
           this.$toast("修改失败")

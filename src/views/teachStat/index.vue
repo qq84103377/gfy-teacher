@@ -630,7 +630,14 @@
         })
         this.gradeSubjectList = arr
       // }
-
+      //从班级列表找出对应的班级
+      const grade = this.gradeSubjectList[this.gradeIndex].classGrade
+      for(let k in this.classList) {
+        if(this.classList[k].classGrade === grade) {
+          this.classIndex = k
+          break
+        }
+      }
 
       //先找出哪个年级有班主任
       this.gradeSubjectList.forEach(g => {

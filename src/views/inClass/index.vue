@@ -15,13 +15,13 @@
       </div>
       <div v-if="courseList.length || firstFlag">
         <van-cell class="fs16"
-                  :title="`讲义(${resourceCount.find(v => v.resourceType === 'R12_C01')?resourceCount.find(v => v.resourceType === 'R12_C01').resourceCount:0})`"
+                  :title="`讲义(${handleCount('R12_C01')})`"
                   is-link @click="goto('/lectureList')"/>
         <van-cell class="fs16"
-                  :title="`白板(${resourceCount.find(v => v.resourceType === 'R12_C02')?resourceCount.find(v => v.resourceType === 'R12_C02').resourceCount:0})`"
+                  :title="`白板(${handleCount('R12_C02')})`"
                   is-link @click="goto('/boardClassList')"/>
         <van-cell class="fs16"
-                  :title="`堂测统计(${resourceCount.find(v => v.resourceType === 'R12_C03')?resourceCount.find(v => v.resourceType === 'R12_C03').resourceCount:0})`"
+                  :title="`堂测统计(${handleCount('R12_C03')})`"
                   is-link @click="goto('/classStatSelectList')"/>
       </div>
     </div>
@@ -76,12 +76,15 @@
       this.$refs['dropdown'].showDrop = false
       this.$refs['dropdown'].close()
       next(false)
-    } else{  
+    } else{
     next();
     }
   },
-    
+
     methods: {
+      handleCount(resourceType) {
+        return this.resourceCount.find(v => v.resourceType === resourceType)?this.resourceCount.find(v => v.resourceType === resourceType).resourceCount:0
+      },
       getCount(tchCourseIdSelect) {
         this.$store.commit('setVanLoading', true)
         let obj = {
