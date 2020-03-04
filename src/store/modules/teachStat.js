@@ -18,6 +18,8 @@ const teachStat = {
     gradeIndex: 0,
     subjectIndex: 0,
     classIndex: localStorage.getItem("classMap") ? Object.keys(JSON.parse(localStorage.getItem("classMap")))[0] : '',
+    interlGradeList:"",
+    interlClassIndex:0
   },
 
   mutations: {
@@ -36,7 +38,13 @@ const teachStat = {
     setClassIndex: (state, index) => {
       state.classIndex = index
     },
-
+    setInterlGradeList: (state, data) => {
+      state.interlGradeList = data
+    },
+    setInterlClassIndex: (state, index) => {
+      state.interlClassIndex = index
+    },
+    
   },
   actions: {}
 }

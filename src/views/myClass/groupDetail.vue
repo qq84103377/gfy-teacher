@@ -3,7 +3,7 @@
     <van-nav-bar :title="groupList[curIndex].tchClassSubGroupStudent.tchClassSubGroup.subgroupName" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="group-detail-wrap__body">
-      <div class="mgb10" :class="{disabled:isAdd}" style="position: relative;">
+      <div v-if='!isClassParent' class="mgb10" :class="{disabled:isAdd}" style="position: relative;">
         <van-cell title="组员" />
         <van-cell v-for="(item,index) in groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent" :key="index">
           <div @click="$set(item,'check',!item.check);stuInfo=item" class="aic" slot="title">
@@ -13,6 +13,7 @@
                 {{item.studentName}}
                 <span v-if="item.cadreType === 'T02'" class="class-leader-badge">班</span><span v-if="item.identityType === 'I02'" class="group-leader-badge">组</span>
               </div>
+
             </div>
           </div>
           <div class="aic" @click="stuInfo=item;visible=true" style="justify-content: flex-end;height: 100%;">
@@ -26,9 +27,29 @@
         </div>
         <div class="disabled-mask"></div>
       </div>
+
+      <div v-else class="mgb10" :class="{disabled:isAdd}" style="position: relative;">
+        <van-cell title="组员" />
+        <van-cell v-for="(item,index) in groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent" v-if='item.parentAccountNo' :key="index">
+          <div @click="$set(item,'check',!item.check);stuInfo=item" class="aic" slot="title">
+            <div class="aic">
+              <div class="check-box" :class="{'is-active':item.check}"></div>
+              <div class="aic">
+                {{item.parentName?item.parentName:item.parentAccountNo}} <span class="fs14" style="color:#999;"> —— {{item.studentName}}</span>
+              </div>
+            </div>
+          </div>
+        </van-cell>
+        <div v-if="(!groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent&& !vanLoading)||((!groupList[curIndex].tchClassSubGroupStudent.tchSubGroupStudent.some(v => v.parentAccountNo)) && !vanLoading)" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
+          <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
+          <div class="pd10">当前没有组员!</div>
+        </div>
+        <div class="disabled-mask"></div>
+
+      </div>
       <div style="position: relative;" :class="{disabled: isDel}">
-        <van-cell title="添加学生" />
-        <div>
+        <van-cell :title="isClassParent?'添加家长':'添加学生'" />
+        <div v-if='!isClassParent'>
           <div v-if="gi !== curIndex" v-for="(g,gi) in groupList" :key="gi">
             <van-cell :title="g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName" />
             <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si">
@@ -44,9 +65,20 @@
             </van-cell>
           </div>
         </div>
+        <div v-else>
+          <div v-if="gi !== curIndex" v-for="(g,gi) in groupList" :key="gi">
+            <van-cell :title="g.tchClassSubGroupStudent.tchClassSubGroup.subgroupName" />
+            <van-cell v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" v-if='s.parentAccountNo' :key="si">
+              <div @click="$set(s,'check',!s.check)" class="aic" slot="title">
+                <div class="check-box" :class="{'is-active':s.check}"></div>
+                <div class="aic">{{s.parentName?s.parentName:s.parentAccountNo}} <span class="fs14" style="color:#999;"> —— {{s.studentName}}</span></div>
+              </div>
+            </van-cell>
+          </div>
+        </div>
         <div v-if="groupList.filter((v,i) => i !== curIndex).length === 0 && !vanLoading" class="empty-page pdt10" style="background: #fff;margin-top: 0;">
           <img style="width: 70%;" src="../../assets/img/empty-1.png" alt />
-          <div class="pd10">当前没有学生!</div>
+          <div class="pd10">当前没有{{isClassParent?'家长':'学生'}}!</div>
         </div>
         <div class="disabled-mask"></div>
       </div>
@@ -60,7 +92,7 @@
 
 <script>
 import settingDialog from './components/settingDialog'
-import { getSubGroupStudent, addSubGroupStudentByBatch, delSubGroupStudentByBatch } from '@/api/index'
+import { getSubGroupStudent, addSubGroupStudentByBatch, delSubGroupStudentByBatch, getSubGroupParent } from '@/api/index'
 import { mapMutations, mapGetters, mapState } from 'vuex'
 export default {
   name: "groupDetail",
@@ -110,13 +142,14 @@ export default {
       groupList: JSON.parse(JSON.stringify(this.$route.params.groupList)),
       curIndex: this.$route.params.curIndex,
       visible: false,
-      stuInfo: {}
+      stuInfo: {},
+      isClassParent: this.$route.params.isClassParent,
     }
   },
   methods: {
-     goBack(){
-          this.common.goBack(this)
-        },
+    goBack() {
+      this.common.goBack(this)
+    },
     modifyByBatch() {
       if (!this.isAdd && !this.isDel) return this.$toast('请选择学生')
       this.$store.commit('setVanLoading', true)
@@ -124,7 +157,7 @@ export default {
         if (v.tchClassSubGroupStudent.tchSubGroupStudent && (this.isAdd ? (this.curIndex !== i) : (this.curIndex === i))) {
           let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
             if (s.check) {
-              t.push({ accountNo: s.accountNo, oldSubGroupId: s.subgroupId })
+              t.push({ accountNo: this.isClassParent ? s.studentAccountNo : s.accountNo, oldSubGroupId: v.tchClassSubGroupStudent.tchClassSubGroup.subgroupId })
             }
             return t
           }, [])
@@ -148,7 +181,11 @@ export default {
         this.$store.commit('setVanLoading', false)
         if (res.flag) {
           this.$toast(this.isAdd ? '添加成功' : '删除成功')
-          this.getSubGroupStudent()
+          if (this.isClassParent) {
+            this.getSubGroupParent()
+          } else {
+            this.getSubGroupStudent()
+          }
         } else {
           this.$toast(res.msg)
         }
@@ -176,7 +213,31 @@ export default {
           this.$toast(res.msg)
         }
       })
-    }
+    },
+    async getSubGroupParent() {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "accountNo": this.$store.getters.getUserInfo.accountNo,
+        "classId": this.$route.params.classId,
+        "subjectType": 'S20',
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getSubGroupParent(params).then(res => {
+        console.log(res, 'getSubGroupParent res')
+        if (res.flag && res.data.length) {
+          this.groupList = []
+          res.data.forEach(ele => {
+            ele.tchSubGroupStudent = ele.tchSubGroupParent
+            this.groupList.push({ 'tchClassSubGroupStudent': ele })
+          })
+        }
+      })
+    },
   }
 }
 </script>

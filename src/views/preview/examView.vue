@@ -11,12 +11,12 @@
     </div>
     <div class="exam-view-wrap__body">
       <score-table :examScore="info.testPaperScore" @jump="jump" :list="classList" :classView="true"
-                   v-show="classView"></score-table>
+                   v-show="classView" :isfEducation="isfEducation"></score-table>
       <score-table :examScore="info.testPaperScore" @jump="jump" :list="groupList" :classView="false"
-                   v-show="!classView"></score-table>
+                   v-show="!classView" :isfEducation="isfEducation"></score-table>
       <div v-if="!classList.length" class="empty-page">
         <img src="../../assets/img/empty-1.png" alt/>
-        <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
+        <div>当前还没有{{isfEducation?'家长':'学生'}}完成任务,快去提醒{{isfEducation?'家长':'学生'}}完成任务吧!</div>
       </div>
     </div>
     <div class="exam-view-wrap__footer">
@@ -27,7 +27,7 @@
 
 <script>
   import scoreTable from '../../components/scoreTable'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
   import {statTaskStatV2, statTaskStat} from '@/api/index'
 
   export default {
@@ -40,6 +40,7 @@
         isSpoken: this.$route.params.isSpoken,
         taskType: this.$route.params.taskType,
         termType: this.$route.params.termType,
+        isfEducation: this.$route.params.isfEducation,
         isDisabled: this.$route.params.isDisabled,
       }
     },
@@ -49,7 +50,7 @@
           if (this.info.finishStudent.includes(v.accountNo)) {
             t.push({
               ...v,
-              name: getStudentName(v.accountNo, this.info.classId),
+              name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
               duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
             })
           }
@@ -63,7 +64,7 @@
             const index = t.findIndex(g => g.groupId === v.groupId)
             const item = {
               ...v,
-              name: getStudentName(v.accountNo, this.info.classId),
+              name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
               duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
             }
             if (index > -1) {
@@ -144,9 +145,9 @@
       addSubScore() {
          if(this.isDisabled) return
         if(this.classView) {
-        this.$router.push({name:`addSubScore`,params:{info:this.info,termType:this.termType}})
+        this.$router.push({name:`addSubScore`,params:{info:this.info,termType:this.termType,isfEducation:this.isfEducation}})
         }else {
-          this.$router.push({name:`addSubGroupScore`,params:{info:this.info,termType:this.termType}})
+          this.$router.push({name:`addSubGroupScore`,params:{info:this.info,termType:this.termType,isfEducation:this.isfEducation}})
         }
       },
       //冒泡排序

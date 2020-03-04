@@ -65,7 +65,8 @@
         currentPage: 0,
         total: 0,
         accessUrl: '',
-        clickIndex:0
+        clickIndex:0,
+        isfEducation: this.$route.query.isfEducation        
       }
     },
     computed: {
@@ -350,7 +351,7 @@
         console.log("发任务：", obj.coursewareName)
         this.$store.commit('setResourceInfo', obj)
         this.$store.commit("setTaskClassInfo", '')
-        this.$router.push(`/addTask?type=material&_t=new`)
+        this.$router.push(`/addTask?type=material&_t=new${this.isfEducation?'&isfEducation=true':''}`)
       },
     }
   }

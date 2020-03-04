@@ -4,7 +4,7 @@
     <div class="header">
       <span class="header-item team-col" v-if="!classView">组名</span>
       <span class="header-item average" v-if="!classView">平均分</span>
-      <span class="header-item">学生姓名</span>
+      <span class="header-item">{{isfEducation?'家长':'学生'}}姓名</span>
       <span class="header-item">用时</span>
       <span class="header-item score">测试得分</span>
     </div>
@@ -47,7 +47,7 @@
 <script>
   export default {
     name: "scoreTable",
-    props: ['classView', 'list','examScore'], //examScore试卷总分
+    props: ['classView', 'list','examScore',"isfEducation"], //examScore试卷总分
     data() {
       return {
 

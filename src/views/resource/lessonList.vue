@@ -59,14 +59,15 @@ export default {
       currentPage: 0,
       total: 0,
       scrollTop: 0,
-      clickIndex:0
+      clickIndex: 0,
+      isfEducation: this.$route.query.isfEducation
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+    if (this.$refs['listItem'] && this.$refs['listItem'][this.clickIndex] && this.$refs['listItem'][this.clickIndex].showDialog) {
       this.$refs['listItem'][this.clickIndex].close()
       next(false)
-    }else{
+    } else {
       this.scrollTop = this.$refs["body"].scrollTop
       next()
     }
@@ -96,8 +97,8 @@ export default {
     }
   },
   methods: {
-    clickDel(index){
-      this.clickIndex=index
+    clickDel(index) {
+      this.clickIndex = index
     },
     handleIcon(item) {
       let t = item.srcUrl.substring(item.srcUrl.lastIndexOf('.') + 1).toLowerCase()
@@ -240,7 +241,7 @@ export default {
       console.log("发任务：", obj.coursewareName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
-      this.$router.push(`/addTask?type=lesson&_t=new`)
+      this.$router.push(`/addTask?type=lesson&_t=new${this.isfEducation?'&isfEducation=true':''}`)
     }
   }
 }

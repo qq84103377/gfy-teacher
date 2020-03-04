@@ -99,7 +99,8 @@ export default {
       firstFlag: true,
       tchCourseInfo: '',
       showDrop:false,
-      clickIndex:0
+      clickIndex:0,
+      isfEducation: this.$route.query.isfEducation 
     }
   },
   mounted() {
@@ -157,7 +158,8 @@ export default {
     viewResource() {
       this.$router.push({        path: `/resource`, query: {
           from: 'preview',
-          currCourse: this.courseList[this.courseIndex]
+          currCourse: this.courseList[this.courseIndex],
+          isfEducation: this.isfEducation
         }      })
     },
     open() {
@@ -221,7 +223,8 @@ export default {
             subjectType: localStorage.currentSubjectType,
             classGrade: this.classGrade,
             title: item.testPaperName,
-            fromTask: 1
+            fromTask: 1,
+            isfEducation: this.isfEducation
           }
         })
       } else if (item.taskType === 'T03') {
@@ -285,6 +288,7 @@ export default {
           resourceType: item.resourceType,
           courseName: this.courseName,    // 重发任务需要用到
           from: 'preview',
+          isfEducation: this.isfEducation
         }
       })
       localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.tchCourseInfo))
@@ -370,12 +374,12 @@ export default {
         // "belongSchoolId": this.$store.getters.schoolId,
         "operateRoleType": "A02",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "subjectType": localStorage.getItem("currentSubjectType"),
+        "subjectType": this.isfEducation?'S20':localStorage.getItem("currentSubjectType"),
         "classGrade": this.$route.query.fltGrade || '',
         "termType": this.$route.query.fltTerm || '',
         "classId": this.$route.query.fltClassId || '',
         "pageSize": "20",
-        "courseType": "C01",
+        "courseType": this.isfEducation?'C02':"C01",
         "currentPage": page
       }
       let params = {
@@ -619,6 +623,7 @@ export default {
           resourceType: item.resourceType,
           isEdit: true,
           from: 'preview',
+          isfEducation: this.isfEducation,
         }
       })
     },

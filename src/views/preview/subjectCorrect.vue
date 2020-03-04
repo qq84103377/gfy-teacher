@@ -78,7 +78,7 @@
            v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">
         <!--      <div class="correct-wrap__body__draw" v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">-->
         <draw-board ref="drawBoard" :text="commentText" :isPen="isPen" :isRubber="isRubber" @submitCb="handleSubmit" @tap="isFold=!isFold"
-                    :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
+                   :stuIndex="stuIndex" :imgUrl="stuArr[stuIndex].answer[aswIndex].imgArr[imgIndex]"></draw-board>
       </div>
       <div class="correct-wrap__body__undo"
            v-if="!stuArr[stuIndex].answer[aswIndex].result || stuArr[stuIndex].answer[aswIndex].result == '<p></p>'">
@@ -690,7 +690,8 @@
         })
       },
      async selectScore(i, score, asw) {
-        console.log(asw.value);
+       if (this.vanLoading) return
+       console.log(asw.value);
         this.selectScoreFlag = true
         this.$refs['menuItem' + i][0].toggle(false)
         // this.value1 = `${index}分`
@@ -926,8 +927,10 @@
             border: 1px solid #ccc;
 
             &__content {
+              /*评论区域下拉*/
               height: 100%;
               overflow-y: auto;
+              max-height: 100%;
 
               .menu-wrap {
                 background: #fff;
@@ -1092,6 +1095,7 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
+        padding-bottom: 52px;
 
         .dropdown-group {
           display: flex;

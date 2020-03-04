@@ -626,6 +626,21 @@ export default new Router({
           }
         },
         {
+          path: "/fEducation",
+          name: 'fEducation',
+          component: () => import("./views/fEducation/index.vue"),
+        },
+        {
+          path: '/fClassDetail',
+          name: 'fClassDetail',
+          component: () => import('./views/fEducation/fClassDetail.vue')
+        },
+        {
+          path: '/changeScore',
+          name: 'changeScore',
+          component: () => import('./views/fEducation/changeScore.vue')
+        },
+        {
           path: '/reportDetail',
           name: 'reportDetail',
           component: () => import('./views/teachStat/reportDetail.vue')
@@ -716,6 +731,29 @@ export default new Router({
           path: "/setInfo",
           name: "setInfo",
           component: () => import("./views/qrCodeToClass/settings.vue")
+        },
+        {
+          path: "/integralStat",
+          name: "integralStat",
+          component: () => import("./views/teachStat/integralStat.vue"),
+
+          children: [{
+              path: '/',
+              name: 'integralStat',
+              component: () => import('./views/teachStat/integralStatList.vue'),
+            },
+            {
+              path: '/integralDetail',
+              name: 'integralDetail',
+              component: () => import('./views/teachStat/integralDetail.vue'),
+            },
+
+          ]
+        },
+        {
+          path: '/integralOrigin',
+          name: 'integralOrigin',
+          component: () => import('./views/teachStat/integralOrigin.vue')
         },
       ]
     },

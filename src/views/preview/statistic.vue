@@ -57,17 +57,14 @@
           <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="['T06'].includes($route.query.taskType)">
             论题内容
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
-               v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">学生心得详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}心得详情
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
-               v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">学生讨论详情
+          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}讨论详情
           </div>
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
                v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
-          <div @click="viewStu"
-               v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按学生查看
+          <div @click="viewStu" v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按{{isfEducation?'家长':'学生'}}查看
           </div>
           <i @click="showReplyTip=true" v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper"
              class="iconGFY icon-tip"></i>
@@ -76,14 +73,14 @@
 
         <van-list v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper" v-show="tabIndex === 1"
                   v-model="listLoading" :finished="finished" :finished-text="appraiseList.length>0?'没有更多了':''"
-                  @load="onLoad" :offset='80'>
+                  @load="onLoad" :offset='80' :error.sync="error" error-text="请求失败，点击重新加载">
           <!--        学生心得-->
           <stu-exp @focus="showFooter=false" @blur="showFooter=true" @comment="handleComment"
-                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise"
+                   @score="handleScore" @ess="handleEss" @top="handleTop" @praise="handlePraise" @delReply="delReply"
                    :classId="info.tchClassTastInfo.find(t => t.active).classId" :currentPage="currentPage"
                    :total="total" :finished="finished"
                    v-show="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper&&tabIndex === 1"
-                   :list="appraiseList" :disable="isDisabled">
+                   :list="appraiseList" :disable="isDisabled"  :isfEducation='isfEducation'>
           </stu-exp>
         </van-list>
 
@@ -196,8 +193,7 @@
                   class="btn" :class="{'disabled':isDisabled}" type="info" @click="modifyScore">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info"
-                  @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId}})">
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId,isfEducation:isfEducation}})">
         分享报告
       </van-button>
     </div>
@@ -258,7 +254,8 @@
     addPraise,
     topAppraise,
     untopAppraise,
-    statTaskStatV2
+    statTaskStatV2,
+    delReplyV2
   } from '@/api/index'
   import {getStudentName, getFontSize} from '@/utils/filter'
 
@@ -297,6 +294,8 @@
         isFromClassStatList: this.$route.query.from == 'classStatList' ? true : false,
         objectiveList: [],
         scrollTop: 0,
+        error: false,
+        isfEducation: this.$route.query.isfEducation
       }
     },
     computed: {
@@ -317,6 +316,20 @@
       }
     },
     methods: {
+      delReply(replyId,replyIndex) {
+        this.$store.commit('setVanLoading', true)
+        delReplyV2({replyId}).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+           const index = this.appraiseList[replyIndex].replyList.findIndex(v => replyId === v.replyId)
+            if(index > -1) {
+              this.appraiseList[replyIndex].replyList.splice(index,1)
+            }
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       async onLoad() {
         this.currentPage++
         if (this.currentPage > this.total && this.currentPage > 1) {
@@ -325,11 +338,8 @@
         this.getAppraise()
       },
       modifyScore() {
-        if (this.isDisabled) return
-        this.$router.push({
-          name: `addSubScore`,
-          params: {info: this.taskFinishInfo, termType: this.$route.query.termType}
-        })
+        if(this.isDisabled) return
+        this.$router.push({name:`addSubScore`,params:{info:this.taskFinishInfo,termType:this.$route.query.termType,isfEducation:this.isfEducation}})
       },
       goBack() {
         this.common.goBack(this)
@@ -356,6 +366,7 @@
             taskFinishInfo: this.taskFinishInfo,
             courseName: this.$route.query.courseName,
             from: this.$route.query.from,
+            isfEducation: this.$route.query.isfEducation,
           }
         })
       },
@@ -402,7 +413,8 @@
             isSpoken: this.$route.query.taskType === 'T13',
             taskType: this.$route.query.taskType,
             termType: this.$route.query.termType,
-            isDisabled: this.isDisabled ? 1 : ''
+            isDisabled: this.isDisabled ? 1 : '',
+          isfEducation:this.isfEducation
           }
         })
         // }
@@ -506,7 +518,7 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             const score = item.score * 1 + (type === 'T01' ? 1 : -1)
-            item.score = score > 0 ? '+' + score : score
+            item.score = score
             this.$toast(`${type === 'T01' ? '加' : '减'}分成功`)
 
             //更新this.taskFinishInfo.studentStatList的值 因为点赞/置顶/精华/加分/评论以后没有刷新this.taskFinishInfo.studentStatList
@@ -695,6 +707,10 @@
             this.appraiseList = page === 1 ? [] : this.appraiseList.concat([])
             this.finished = true
           }
+        }).catch(err => {
+          this.error = true
+          this.listLoading = false
+          this.currentPage--
         })
       },
       handleAppraiseCtn(dom, v) {
@@ -857,12 +873,13 @@
             // info: this.taskFinishInfo,
             termType: this.$route.query.termType,
             taskType: this.$route.query.taskType,
-            disabled: this.isDisabled ? 1 : ''
+            disabled: this.isDisabled?1:'',
+            isfEducation: this.isfEducation
           }
         })
       },
       viewAnalyse() {
-        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}`)
+        this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}${this.isfEducation?'&isfEducation=true':''}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
         let obj = {
@@ -1172,35 +1189,49 @@
     },
     async mounted() {
       this.$store.commit('setVanLoading', true)
-      this.getDailyRemindStatus()
-      await this.statTaskStat()
+      try {
+        this.getDailyRemindStatus()
+        await this.statTaskStat()
 
-      this.drawPie()
-      if (this.isTestPaper) {
-        this.drawHistogram()
-      }
-      if (this.taskFinishInfo.examstat) {
-        this.drawObjectivePie()
-      }
-      if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
-        //如果是学资源则把tab设置为激活
-        // this.wareActive = true
-        if (!this.isTestPaper) {
-          this.getAppraise()
+        this.drawPie()
+        if (this.isTestPaper) {
+          this.drawHistogram()
         }
-        await this.getCourseTaskDetail()
-        if (this.$route.query.taskType !== 'T06') {
-          //讨论不需要鉴权
-          this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
-          this.checkUrlPermission()
+        if (this.taskFinishInfo.examstat) {
+          this.drawObjectivePie()
         }
+        if (['T01', 'T02', 'T04', 'T06'].includes(this.$route.query.taskType)) {
+          //如果是学资源则把tab设置为激活
+          // this.wareActive = true
+          if (!this.isTestPaper) {
+            this.getAppraise()
+          }
+          await this.getCourseTaskDetail()
+          if (this.$route.query.taskType !== 'T06') {
+            //讨论不需要鉴权
+            this.type = this.getUrlSuffix(this.wareDetail.courseware.srcUrl)
+            this.checkUrlPermission()
+          }
+        }
+        this.$store.commit('setVanLoading', false)
+      }catch (e) {
+        this.$store.commit('setVanLoading', false)
+
       }
-      this.$store.commit('setVanLoading', false)
+
       // if (!this.isWk && !this.isSpoken) {
       // }
     },
     beforeRouteLeave(to, from, next) {
       this.scrollTop = this.$refs["body"].scrollTop
+      if(window.stop !== undefined)
+      {
+        window.stop();
+      }
+      else if(document.execCommand !== undefined)
+      {
+        document.execCommand("Stop", false);
+      }
       next()
     },
     beforeRouteEnter(to, from, next) {

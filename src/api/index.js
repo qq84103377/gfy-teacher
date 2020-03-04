@@ -525,7 +525,36 @@ export const updateCourseWareCount =(params)=>{
 export const getTaskInfoList =(params)=>{
   return axios.post('teachNew/getTaskInfoList', qs.stringify(params))
 }
+//获取家长分组信息
+export const getSubGroupParent =(params)=>{
+  return axios.post('teach/getSubGroupParent', qs.stringify(params))
+}
+//获取单个班级家长列表信息
+export const getParentRelationStudent =(params)=>{
+  return axios.post('school/getParentRelationStudent', qs.stringify(params))
+}
+//删除班级分组
+export const deleteClassSubGroupForce =(params)=>{
+  return axios.post('teach/deleteClassSubGroupForce', qs.stringify(params))
+}
+//家长积分调整:加分/减分
+export const saveParentRewardScore =(params)=>{
+  return axios.post('teach/saveParentRewardScore', qs.stringify(params))
+}
+//获取班级学生/家长积分明细列表
+export const statClassCounterByOrigin =(params)=>{
+  return axios.post('counter/statClassCounterByOrigin', qs.stringify(params))
+}
+//获取班级学生/家长积分明细来源列表
+export const getUserCounterOriginDetail =(params)=>{
+  return axios.post('counter/getUserCounterOriginDetail', qs.stringify(params))
+}
 //新建课根据年级学期编号、学科查询版本
 export const getTextBookVersionByGradeTerm =(params)=>{
   return axios.post('resource/getTextBookVersionByGradeTerm', qs.stringify(params))
 }
+//删除评论回复
+export const delReplyV2 =(params)=>{
+  return axios.post('public/delReplyV2', qs.stringify(params))
+}
+

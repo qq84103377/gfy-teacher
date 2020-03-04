@@ -79,11 +79,11 @@
       </div>
 <!--      这部分要等后台改了才能用-->
 <!--      <div class="pd10 fs12 van-hairline&#45;&#45;top reply-wrap" v-if="!rep.parentReplyId" v-for="(rep,repIndex) in item.replyList" :key="rep.replyId">-->
-<!--          <div class="reply-wrap__name" @click="checkReplyAccount(rep,rep)">{{getStudentName(rep.replyAccount,classId)}}:</div>-->
+<!--          <div class="reply-wrap__name" @click="checkReplyAccount(rep,rep,index)">{{getStudentName(rep.replyAccount,classId)}}:</div>-->
 <!--          <div class="reply-wrap__ctn">-->
-<!--            <div class="click-active" @click="checkReplyAccount(rep,rep)">{{rep.replyContent}}</div>-->
+<!--            <div class="click-active" @click="checkReplyAccount(rep,rep,index)">{{rep.replyContent}}</div>-->
 <!--            <div class="reply-wrap__ctn__group" v-if="item.replyList.some(v => v.parentReplyId > 0 && (v.parentReplyId === rep.replyAccount || v.replyAccount === rep.replyAccount))">-->
-<!--              <div class="mgb5 mgt5 click-active" @click="checkReplyAccount(child,rep)" v-if="child.parentReplyId>0 && (child.parentReplyId === rep.replyAccount || child.replyAccount === rep.replyAccount)" v-for="(child,ci) in item.replyList" :key="child.replyId"><span class="blue">{{getStudentName(child.replyAccount,classId)}}</span>回复<span class="blue">{{getStudentName(child.parentReplyId,classId)}}</span>:{{child.replyContent}}</div>-->
+<!--              <div class="mgb5 mgt5 click-active" @click="checkReplyAccount(child,rep,index)" v-if="child.parentReplyId>0 && (child.parentReplyId === rep.replyAccount || child.replyAccount === rep.replyAccount)" v-for="(child,ci) in item.replyList" :key="child.replyId"><span class="blue">{{getStudentName(child.replyAccount,classId)}}</span>回复<span class="blue">{{getStudentName(child.parentReplyId,classId)}}</span>:{{child.replyContent}}</div>-->
 <!--            </div>-->
 <!--            <van-field class="comment-input" v-if="rep.showComment" maxLength="500"  clearable v-model.trim="rep.comment" :placeholder="`回复${rep.placeholder}:`" >-->
 <!--              <van-button @click="handleReply(rep,item)" slot="button" size="small" type="info">回复</van-button>-->
@@ -98,7 +98,7 @@
     </div>
     <div v-if="!list.length" class="empty-page">
       <img style="width: 70%;" src="../assets/img/empty-1.png" alt />
-      <div>当前还没有学生完成任务,快去提醒学生完成任务吧!</div>
+      <div>当前还没有{{isfEducation?'家长':'学生'}}完成任务,快去提醒{{isfEducation?'家长':'学生'}}完成任务吧!</div>
     </div>
 
 
@@ -121,7 +121,7 @@
   export default {
     name: "stuExp",
     components: {videoPlayer},
-    props: ['list', 'classId','disable','currentPage','total','finished'],
+    props: ['list', 'classId','disable','currentPage','total','finished','isfEducation'],
     computed: {
       getStudentName() {
         return getStudentName
@@ -135,6 +135,8 @@
           { name: '删除' },
         ],
         replyAccount: '',
+        replyId: '',
+        replyIndex: '',
       }
     },
     methods: {
@@ -145,12 +147,15 @@
       delReply() {
         //删除回复(后台暂无该接口)
         this.delShow = false
+        this.$emit('delReply',this.replyId,this.replyIndex)
       },
-      checkReplyAccount(item,parentItem) {
+      checkReplyAccount(item,parentItem,replyIndex) {
         if(this.disable) return
         if(item.replyAccount === this.$store.getters.getUserInfo.accountNo) {
           //账号相同可删除
           this.delShow = true
+          this.replyId = item.replyId
+          this.replyIndex = replyIndex
         }else {
           //账号不同可回复
           this.$set(parentItem,'showComment',!parentItem.showComment)
@@ -188,6 +193,7 @@
             currentPage: this.currentPage,
             total: this.total,
             finished: this.finished,
+            studentStatList: this.$parent.$parent.taskFinishInfo.studentStatList
           }})
       },
       handlePraise(item) {

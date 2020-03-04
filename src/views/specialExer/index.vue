@@ -191,18 +191,18 @@ export default {
     },
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$refs['gradeSubject']&&this.$refs['gradeSubject'].showChangeDialog) {
+    if (this.$refs['gradeSubject'] && this.$refs['gradeSubject'].showChangeDialog) {
       this.$refs['gradeSubject'].showChangeDialog = false
       this.$refs['gradeSubject'].close()
       next(false)
-    } else if (this.$refs['yearSubject']&&this.$refs['yearSubject'].showChangeDialog) {
+    } else if (this.$refs['yearSubject'] && this.$refs['yearSubject'].showChangeDialog) {
       this.$refs['yearSubject'].showChangeDialog = false
       this.$refs['yearSubject'].close()
       next(false)
     } else if (this.areaFilterShow) {
       this.areaFilterShow = false
       next(false)
-    }else if (this.typeSubjectFilterShow) {
+    } else if (this.typeSubjectFilterShow) {
       this.typeSubjectFilterShow = false
       next(false)
     } else if (this.versionFilterShow) {
@@ -413,6 +413,7 @@ export default {
 
     // 获取更多年份列表
     getYearList() {
+      if (this.yearList.length) return
       let d = new Date()
       let nowYear = +d.getFullYear() + 2;
       for (var i = 0; i < 7; i++) {

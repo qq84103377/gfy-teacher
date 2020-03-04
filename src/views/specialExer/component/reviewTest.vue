@@ -186,6 +186,7 @@ export default {
     },
     onLoad() {
       console.log("onLoad");
+      this.isChange=false
 
       if (!this.without) {
         console.log("onLoad1");

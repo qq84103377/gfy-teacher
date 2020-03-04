@@ -22,8 +22,8 @@
         <div slot="title" class="upload-lesson__body__cell-ctn mgl5">
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
-<!--          <van-icon @click="fileSelect" class="add" name="add"/>-->
-<!--          <input type="file" id="fileSelect" accept="video/*" style="display: none;">-->
+         <!-- <van-icon @click="fileSelect" class="add" name="add"/>
+         <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
           <van-uploader
             accept="video/*,audio/*" :before-read="read">
             <van-icon @click="" class="add" name="add"/>
@@ -134,8 +134,12 @@
       this.getOSSKey();
     },
     methods: {
-      read(file, detail) {
-        console.log(file.name, file.type, file, 'ffffffffffffffffffffffffffffffffffffff');
+      read(file, detail) { 
+        console.log(file.name, 'file.name');
+        console.log( file.type, 'file.type');
+        console.log( file, 'file');
+        console.log( file.size, 'file.size');
+     
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             if(file.size > 0) {
               this.wareFile = file;
@@ -187,6 +191,10 @@
       },
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
+          console.log(obj.curFile.name, 'file.name');
+        console.log( obj.curFile.type, 'file.type');
+        console.log( obj.curFile, 'file');
+        console.log( obj.curFile.size, 'file.size');
 
           const fileType = obj.curFile.name.substr(obj.curFile.name.lastIndexOf('.'))
           console.log(fileType,'ttttttttttttttttttttttttt');

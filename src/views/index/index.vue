@@ -62,8 +62,7 @@
           </div>
         </div>
         <div v-else v-for="(item,index) in taskList" :key="item.taskId" class="index-content-wrap__body__unfinish-wrap">
-          <list-item ref='listItem' @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo"
-                     :can-slide="true" @del="delTask(item,index)" @clickDel='clickDel(index)'>
+          <list-item ref='listItem' @clickTo="goto(item)" :fold="item.fold" :itemTitle="item.tastName" :test-paper-id="item.testPaperId" :taskType="item.tastType" :class-info-list="item.tchCourseClassInfo" :can-slide="true" @del="delTask(item,index)" @clickDel='clickDel(index)'>
             <div slot="btn" class="btn-group van-hairline--top">
               <div @click="item.tchCourseClassInfo.length>2?$set(item,'fold',!item.fold):''">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseClassInfo.length>2,'icon-arrow-grey':item.tchCourseClassInfo.length<=2}"></i>
@@ -95,7 +94,15 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
+        <!-- <div v-if='showfEduction' @click="$router.push('/fEducation')">
+          <i class="iconGFY icon-cap"></i>
+          <span>家庭教育</span>
+        </div> -->
 
+        <div @click="$router.push(`/specialExer`)">
+          <i class="iconGFY icon-special"></i>
+          <span>专项练习</span>
+        </div>
       </div>
     </div>
   </section>
@@ -104,7 +111,7 @@
 <script>
 import listItem from '../../components/list-item'
 import {  getUnFinishCourseTask, getMySchoolInfo, getClassStudent, getSubGroupStudent, getGradeTermInfo, getPublishByRole,
-  getClassTeacherCourseDeploy, getCourseTaskDetail, deleteCourseTask} from '@/api/index'
+  getClassTeacherCourseDeploy, getCourseTaskDetail, deleteCourseTask, getSubGroupParent} from '@/api/index'
 import { pubApi } from '@/api/parent-GFY'
 import eventBus from "@/utils/eventBus";
 
@@ -120,7 +127,11 @@ export default {
       currentSubjectType: '',
       loading: true,
       publishList: [],
-      clickIndex:0
+      clickIndex: 0,
+      showfEduction: false,
+      parentClassList: {},
+      parentList: {},
+      nowFileName: ''
     }
   },
   activated() {
@@ -141,17 +152,72 @@ export default {
       this.getUnFinishCourseTask()
     })
   },
-  beforeRouteLeave (to, from, next) {
-    if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+  beforeRouteLeave(to, from, next) {
+    if (this.$refs['listItem'] && this.$refs['listItem'][this.clickIndex] && this.$refs['listItem'][this.clickIndex].showDialog) {
       this.$refs['listItem'][this.clickIndex].close()
       next(false)
-    }else{
+    } else {
       next()
     }
   },
   methods: {
-    clickDel(index){
-      this.clickIndex=index
+    async getSubGroupParent(classId) {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "accountNo": this.$store.getters.getUserInfo.accountNo,
+        // "tchCourseId": this.tchCourseInfo.tchCourseId,
+        "classId": classId,
+        subjectType: 'S20',
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      await getSubGroupParent(params).then(res => {
+        console.log(res, 'getSubGroupParent res')
+        if (res.flag && res.data.length) {
+          this.parentClassList[classId].groupInfo = [...res.data]
+        }
+      })
+    },
+    async getfEducationParents() {
+      let cl = localStorage.getItem("classMap")
+      if (cl) {
+        for (let k in JSON.parse(cl)) {
+          if (JSON.parse(cl)[k].teacherInfoList.some(v => v.subjectType === 'S20')) {
+            this.parentClassList[k] = JSON.parse(cl)[k]
+          }
+        }
+        for (let key in this.parentClassList) {
+          await this.getSubGroupParent(this.parentClassList[key].classId)
+        }
+        if (Object.keys(this.parentClassList).length > 0) {
+          for (let key in this.parentClassList) {
+            this.parentClassList[key].classStudent = {}
+            this.parentClassList[key].groupInfo.forEach(e => {
+              if (e.tchSubGroupParent !== null) {
+                e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
+                  if (i.parentAccountNo) {
+                    return i
+                  }
+                })
+                if (e.tchSubGroupStudent.length) {
+                  e.tchSubGroupStudent.forEach(s => {
+                    this.parentClassList[key].classStudent[s.parentAccountNo] = s
+                  })
+                }
+              }
+
+            })
+          }
+          localStorage.setItem('parentClassList', JSON.stringify(this.parentClassList))
+        }
+      }
+    },
+    clickDel(index) {
+      this.clickIndex = index
     },
     delTask(item, index) {
       let obj = {
@@ -203,7 +269,7 @@ export default {
           taskId: item.taskId,
           taskType: item.tastType,
           resourceType: item.resourceType,
-          courseName:item.courseName
+          courseName: item.courseName
         }
       })
     },
@@ -253,8 +319,8 @@ export default {
       getCourseTaskDetail(params).then(res => {
         if (res.flag) {
           if (['T04'].includes(item.tastType)) {
-            localStorage.setItem('materialDetail',JSON.stringify(res.data[0].courseware))
-            this.$router.push({ path: '/materialDetail'})
+            localStorage.setItem('materialDetail', JSON.stringify(res.data[0].courseware))
+            this.$router.push({ path: '/materialDetail' })
           } else if (['T06'].includes(item.tastType)) {
             this.$router.push({ path: `/discussDetail`, query: { data: res.data[0].discussInfo } })
           } else if (['T01', 'T02'].includes(item.taskType)) {
@@ -297,11 +363,11 @@ export default {
                     //跳转到任务统计页面时自动将第一个班级设置为选中状态
                     obj.active = true
                   }
-                  if(classMap[obj.classId] && classMap[obj.classId].className) {
+                  if (classMap[obj.classId] && classMap[obj.classId].className) {
                     obj['className'] = classMap[obj.classId].className
-                  }else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
+                  } else if (hisClassMap[obj.classId] && hisClassMap[obj.classId].className) {
                     obj['className'] = hisClassMap[obj.classId].className
-                  }else {
+                  } else {
                     obj['className'] = "--"
                   }
                 })
@@ -360,11 +426,11 @@ export default {
                   const index = gradeList.findIndex(v => v.classGrade === obj.classGrade)
                   obj.teacherInfoList.forEach(s => {
                     if (gradeList[index].teacherInfoList.some(sub => sub.subjectType === s.subjectType)) {
-                      if(s.teacherType === 'T01') {
+                      if (s.teacherType === 'T01') {
                         const tIndex = gradeList[index].teacherInfoList.findIndex(sub => sub.subjectType === s.subjectType)
                         gradeList[index].teacherInfoList[tIndex].teacherType = 'T01'
                       }
-                    }else {
+                    } else {
                       gradeList[index].teacherInfoList.push(s)
                     }
                   })
@@ -379,6 +445,9 @@ export default {
 
                     if (obj2.subjectType != 'S20') {
                       that.subjectTypeList[obj2.subjectType] = obj2.subjectName
+                    } else {
+                      this.showfEduction = true
+                      this.getfEducationParents()
                     }
                   })
                 }
@@ -410,7 +479,7 @@ export default {
 
           console.log(that.currentSubjectType)
           localStorage.setItem("classMap", JSON.stringify(classMap))
-          this.$store.commit('setClassIndex',Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
+          this.$store.commit('setClassIndex', Object.keys(JSON.parse(localStorage.getItem("classMap")))[0])
           localStorage.setItem("hisClassMap", JSON.stringify(hisClassMap))
           // localStorage.setItem("schoolMap", JSON.stringify(schoolMap))
           this.$store.commit('setSchoolMap', schoolMap)
@@ -420,6 +489,17 @@ export default {
           //获取班级学生信息
 
           //获取班级分组信息
+          let schoolList = res.data[0].schoolList;
+          let postList = []
+          let length = schoolList.length;
+
+          // 获取老师科目列表，去重后
+          for (let i = 0; i < length; i++) {
+            // 职务
+            postList = Array.from(new Set([...postList, schoolList[i].postType]));
+          }
+          console.log(postList, 'postList')
+          localStorage.setItem('postList', JSON.stringify(postList))
 
         } else {
           this.$toast(res.msg)
@@ -575,7 +655,7 @@ export default {
                     bookList.push({
                       textBookId: item.textBookId,
                       textBookName: item.textBookName,
-                      subjectType:item.subjectType
+                      subjectType: item.subjectType
                     })
                   }
                   if (!termMap[item.gradeTermInfo.term]) {
@@ -840,8 +920,10 @@ export default {
     .icon-group {
       display: flex;
       padding-left: 10px;
+      flex-wrap: wrap;
       > div {
         margin-right: 15px;
+        margin-bottom: 15px;
         font-size: 12px;
         color: #666;
         display: flex;

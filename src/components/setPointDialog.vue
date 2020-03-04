@@ -36,8 +36,8 @@
     },
     methods: {
       confirm() {
-        if(this.point === '') {
-          return this.$toast('请输入分数')
+        if(this.point === '' || this.point <= 0) {
+          return this.$toast('分数有误,请重新输入')
         }
         this.visible = false;
         this.$emit('confirm', this.point)

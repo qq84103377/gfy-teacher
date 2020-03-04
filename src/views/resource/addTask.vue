@@ -130,11 +130,12 @@
                               :disabled="item.disabled" @click="handleCheckClass(item,index)">
                   <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
                   {{item.className}}
+                  <span class="mglt10">{{calStuNum(item)}}/{{form.object == 1?Object.keys(item.classStudent).length:calGroupNum(item.tchSubGroup)}}</span>
                 </van-checkbox>
                 <div class="select-wrap-desc" v-show="item.type!='none'">
                   <div v-if="form.object == 1 ">发布范围:
-                    <span v-show="item.type=='all'">全部学生</span>
-                    <span v-show="item.type=='part'">部分学生</span>
+                    <span v-show="item.type=='all'">全部{{isfEducation?'家长':'学生'}}</span>
+                    <span v-show="item.type=='part'">部分{{isfEducation?'家长':'学生'}}</span>
 
                   </div>
 
@@ -236,7 +237,7 @@
   import examFilter from '../../components/examFilter'
   import filterPanel from '../../components/filterPanel'
   import {
-    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo, addTeachCourseRes
+    createCourseTask, modifyCourseTask, redoCourseTask, getClassTeachCourseInfo, addTeachCourseRes,getSubGroupParent
   } from '@/api/index'
   import eventBus from "@/utils/eventBus";
 
@@ -286,6 +287,8 @@
         isReinforce: this.$route.query.isReinforce,
         classId: this.$route.query.classId,
         accountNo: this.$route.query.accountNo,
+        isfEducation: this.$route.query.isfEducation,
+        parentList: {}
       }
     },
      beforeRouteLeave(to, from, next) {
@@ -428,6 +431,74 @@
     },
 
     methods: {
+      calGroupNum(groupList) {
+        return groupList.reduce((t,v) => {
+          if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+            t += v.tchClassSubGroupStudent.tchSubGroupStudent.length || 0
+          }
+          return t
+        },0)
+      },
+      calStuNum(item) {
+        if(this.form.object == 1) {
+          //按班
+          return Object.keys(item.classStudent).reduce((t,v) => {
+            if(item.classStudent[v].active) t++
+            return t
+          },0)
+        }else {
+          //按组
+         return item.tchSubGroup.reduce((total,v) => {
+           if(v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
+             total += v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
+               if (s.active) t++
+               return t
+             }, 0)
+           }
+            return total
+          },0)
+        }
+      },
+      async getSubGroupParent(classId) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          // "tchCourseId": this.tchCourseInfo.tchCourseId,
+          "classId": classId,
+          "subjectType": 'S20',
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        await getSubGroupParent(params).then(res => {
+          console.log(res, 'getSubGroupParent res')
+          if (res.flag && res.data.length) {
+            this.parentList[classId] = [...res.data]
+          }
+        })
+      },
+      addTeachCourseRes(resourceType) {
+        let obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "operateRoleType": "A02",
+          "tchCourseId": this.tchCourseInfo.tchCourseId,
+          "sysCourseId": this.tchCourseInfo.sysCourseId,
+          "relationSeqId": this.tchCourseInfo.relationCourseId,
+          resourceType,
+          resourceId: this.form.resourceId,
+          "statusCd": "S04"
+        }
+        let params = {
+          requestJson: JSON.stringify(obj)
+        }
+        addTeachCourseRes(params)
+      },
       addTeachCourseRes(resourceType) {
         let obj = {
           "interUser": "runLfb",
@@ -518,7 +589,7 @@
         this.tchCourseInfo = item.tchCourseInfo
         this.courseList = JSON.parse(JSON.stringify(this.tempList))
       },
-      initClass() {
+      async initClass() {
         //课程信息
         if (!this.isReinforce) {
           this.tchCourseInfo = this.$store.getters.getTchCourseInfo
@@ -562,7 +633,48 @@
           this.classList = this.tchCourseInfo.tchClassCourseInfo
           let subjectType = this.tchCourseInfo.subjectType
 
+        if (this.isfEducation) {
+          for (let i = 0; i < this.classList.length; i++) {
+            await this.getSubGroupParent(this.classList[i].classId)
+          }
+          console.log(this.parentList, 'parentList')
+          this.classList.forEach(ele => {
+            ele.classStudent = {}
+            ele.tchSubGroup = []
+            this.parentList[ele.classId].forEach(element => {
+              if (element.tchSubGroupParent!==null) {
+                element.tchSubGroupStudent = element.tchSubGroupParent = element.tchSubGroupParent.filter(i => {
+                 if (i.parentAccountNo) {
+                  return i
+                 }
+                })
+                //  console.log(element.tchSubGroupStudent, 'newArr')
+                if (element.tchSubGroupStudent&&element.tchSubGroupStudent.length) {
+                  element.tchSubGroupStudent.forEach(s => {
+                    this.$set(s, 'active', true)
+                    ele.classStudent[s.parentAccountNo] = s
+                  })
+                }
+                if (element.tchClassSubGroup.subgroupName != '未分组') {
+                  ele.tchSubGroup.push({
+                   check: true,
+                   tchClassSubGroupStudent: { ...element }
+                  })
+                }
+              }
+            })
 
+            if (Object.keys(ele.classStudent).length) {
+              this.$set(ele, 'type', "all")
+              this.$set(ele, 'check', true)
+            } else {
+              this.$set(ele, 'check', false)
+              this.$set(ele, 'disabled', false)
+              this.$set(ele, 'type', "none")
+            }
+          })
+
+        } else {
           this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
           //获取分组信息
           this.classList.forEach(item => {
@@ -656,14 +768,14 @@
                 this.$set(item, 'type', "none")
               }
             }
-            if (!this.isEdit) {
-            }
+
             item.startDate = this.form.time1
             item.endDate = this.form.time2
             console.log("classlist//////////////", this.classList);
           })
           // return
           this.$store.commit('setTeamList', this.form.class)
+        }
 
 
           console.log(this.classList, "classlist是什么");
@@ -761,28 +873,37 @@
                         this.$set(item, 'type', "part")
                       }
                     } else {
-                      element.accountNo.forEach(i => {
-                        if (key == i) {
-                          this.$set(item.classStudent[key], 'active', true)
-                          item.classStudent[key].active = true
-                        }
-                      })
+                      if (element.accountNo.some(account => account == key)) {
+                        this.$set(item.classStudent[key], 'active', true)
+                        item.classStudent[key].active = true
+                      } else {
+                        //只要有一个学生不在未完成列表里面 就证明不是全选
+                        this.$set(item, 'type', "part")
+                      }
+                      // element.accountNo.forEach(i => {
+                      //   if (key == i) {
+                      //     this.$set(item.classStudent[key], 'active', true)
+                      //     item.classStudent[key].active = true
+                      //   }
+                      // })
                     }
                   }
 
                   item.tchSubGroup.forEach((ele, index) => {
                     this.$set(ele, 'check', false)
-                    if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
-                      ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                        s.active = false
-                        this.$set(s, 'active', false)
-                        element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
-                          if (s.subgroupId == i) {
-                            s.active = true
-                          }
-                        })
-                      })
-                    }
+                    //============这段要检查影响===============================================================
+                    // if (ele.tchClassSubGroupStudent.tchSubGroupStudent && ele.tchClassSubGroupStudent.tchSubGroupStudent.length != 0) {
+                    //   ele.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                    //     s.active = false
+                    //     this.$set(s, 'active', false)
+                    //     element.tchClassSubGroup && element.tchClassSubGroup.forEach(i => {
+                    //       if (s.subgroupId == i.subgroupId) {
+                    //         s.active = true
+                    //       }
+                    //     })
+                    //   })
+                    // }
+                    //============这段要检查影响===============================================================
                     if (element.tchClassSubGroup) {
                       element.tchClassSubGroup.forEach(i => {
                         if (ele.tchClassSubGroupStudent && ele.tchClassSubGroupStudent.tchClassSubGroup && ele.tchClassSubGroupStudent.tchClassSubGroup.subgroupId == i) {
@@ -955,7 +1076,8 @@
         if (this.form.time == "1") {
           if (type == "begin") {
             if(this.isEdit) {
-              this.minDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
+              // this.minDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
+              this.minDate = new Date()
               this.currentDate = this.form.time1 ? new Date(this.form.time1.replace(/-/g, "/")) : new Date()
             }else {
               this.minDate = new Date()
@@ -979,7 +1101,8 @@
           if (type == 'begin') {//开始时间
 
             if(this.isEdit) {
-              this.minDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
+              // this.minDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
+              this.minDate = new Date()
               this.currentDate = this.classList[index].startDate ? new Date(this.classList[index].startDate.replace(/-/g, "/")) : new Date()
             }else {
               this.minDate = new Date()
@@ -1036,9 +1159,10 @@
         //设置学生
         this.$store.commit("setTaskClassInfo", JSON.stringify(this.classList))
         let type = this.form.object == 1 ? 'class' : 'team'
-        this.$router.push(`/teamSelect?type=` + type)
+        this.$router.push(`/teamSelect?type=` + type + '&isfEducation=' + this.isfEducation)
       },
       selectTestPaper() {
+        if(this.form.comment) return
         this.filterShow = true;
         this.$refs.examFilter.getTeachCourseResDetail()
       },
@@ -1150,73 +1274,86 @@
           }
         }
 
-        let obj = {
-          "interUser": "runLfb",
-          "interPwd": "25d55ad283aa400af464c76d713c07ad",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
-          "tchCourseId": this.currentTchCourseId,
-          "tastOrigin": "T03",
-          "taskName": this.form.name,
-          "tastType": taskType,
-          "resourceType": resourceType,
-          "resourceId": this.form.resourceId,
-          "statusCd": "S01",
-          "isRedo": "I01",
-          "duration": this.form.duration,
-          "accountNo": this.$store.getters.getUserInfo.accountNo,
-          "desc": this.form.desc,
-          "courseType": "C01",
-          "isDrag": isDrag,
-          "testPaperId": this.testPaperId,
-          "modifyAfterSubmit": modifyAfterSubmit,
-          "sysTypeCd": "S02",
-          "layerStatus": this.form.layer ? 'L02' : 'L01'
-        };
-        //发布任务的学生
-        let classListSelect = []
-        if (this.form.object == "2") {
-          //按照分组
-          let index = 1
-          this.classList.forEach((item) => {
-            if (item.check) {
-              let subgroupIdList = []
-              let accountNoList = []
-              classListSelect.push(item.classId)
-              item.tchSubGroup.forEach(group => {
-                if (group.check) {
-                  subgroupIdList.push(group.tchClassSubGroupStudent.tchClassSubGroup.subgroupId)
-                  group.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                    if (s.active) {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        "tchCourseId": this.currentTchCourseId,
+        "tastOrigin": "T03",
+        "taskName": this.form.name,
+        "tastType": taskType,
+        "resourceType": resourceType,
+        "resourceId": this.form.resourceId,
+        "statusCd": "S01",
+        "isRedo": "I01",
+        "duration": this.form.duration,
+        "accountNo": this.$store.getters.getUserInfo.accountNo,
+        "desc": this.form.desc,
+        "courseType": "C01",
+        "isDrag": isDrag,
+        "testPaperId": this.testPaperId,
+        "modifyAfterSubmit": modifyAfterSubmit,
+        "sysTypeCd": "S02",
+        "layerStatus": this.form.layer ? 'L02' : 'L01'
+      };
+
+      if (this.isfEducation) {
+        obj.courseType = this.tchCourseInfo.courseType
+      }
+      //发布任务的学生
+      let classListSelect = []
+      if (this.form.object == "2") {
+        //按照分组
+        let index = 1
+        this.classList.forEach((item) => {
+          if (item.check) {
+            let subgroupIdList = []
+            let accountNoList = []
+            classListSelect.push(item.classId)
+            item.tchSubGroup.forEach(group => {
+              if (group.check) {
+                subgroupIdList.push(group.tchClassSubGroupStudent.tchClassSubGroup.subgroupId)
+                group.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                  if (s.active) {
+                    if (this.isfEducation) {
+                      console.log(s.parentAccountNo, 's.parentAccountNo')
+                      accountNoList.push(s.parentAccountNo)
+                    } else {
                       accountNoList.push(s.accountNo)
                     }
-                  })
-                }
-              })
-              // obj['subgroupIdList' + index] = subgroupIdList.join("|")
-              obj['accountNoList' + index] = accountNoList.join("|")
-              index++
-            }
-          });
+                  }
+                })
+              }
+            })
+            obj['subgroupIdList' + index] = subgroupIdList.join("|")
+            obj['accountNoList' + index] = accountNoList.join("|")
+            index++
+          }
+        });
 
           obj['classCount'] = classListSelect.length
 
-        } else if (this.form.object === "1") {
-          //按照班级
-          let index = 1
-          this.classList.forEach((item) => {
-            if (item.check) {
-              let accountNoList = []
-              classListSelect.push(item.classId)
-              for (let k in item.classStudent) {
-                if (item.classStudent[k].active) {
+      } else if (this.form.object === "1") {
+        //按照班级
+        let index = 1
+        this.classList.forEach((item) => {
+          if (item.check) {
+            let accountNoList = []
+            classListSelect.push(item.classId)
+            for (let k in item.classStudent) {
+              if (item.classStudent[k].active) {
+                if (this.isfEducation) {
+                  accountNoList.push(item.classStudent[k].parentAccountNo)
+                } else {
                   accountNoList.push(item.classStudent[k].accountNo)
                 }
               }
-              obj['accountNoList' + index] = accountNoList.join("|")
-              index++
             }
-          });
+            obj['accountNoList' + index] = accountNoList.join("|")
+            index++
+          }
+        });
 
           obj['classCount'] = classListSelect.length
 
@@ -1254,47 +1391,48 @@
           return
         }
 
-        console.log(obj)
-        let params = {
-          requestJson: JSON.stringify(obj)
-        }
-        this.showLoading = true
-        createCourseTask(params).then(res => {
-          if (res) {
-            this.showLoading = false
-            if (res.flag) {
-              eventBus.$emit("indexEditTask")
-              eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
-              this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo=' + this.$store.getters.getUserInfo.accountNo + '&subjectTypeName=' + localStorage.currentSubjectTypeName)
-              let taskInfo = {
-                taskName: this.form.name,
-                desc: this.form.desc,
-                examCount: this.examCount,
-                duration: this.form.duration,
-                taskType: taskType
-              };
-              this.$store.commit('setSendTaskInfo', taskInfo)
-            } else {
-              this.$toast(res.msg)
-            }
-          } else {
-            this.showLoading = false
-            this.$toast("请求错误")
-            return
-          }
-        }, error => {
+      console.log(obj, 'obj')
+
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+      this.showLoading = true
+      createCourseTask(params).then(res => {
+        if (res) {
           this.showLoading = false
-        })
-      },
-      modifyTask() {
-        if (!this.currentTchCourseId) {
-          this.$toast("课程信息错误,请重新选择课程")
+          if (res.flag) {
+            eventBus.$emit("indexEditTask")
+            eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
+            this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo=' + this.$store.getters.getUserInfo.accountNo + '&subjectTypeName=' + localStorage.currentSubjectTypeName)
+            let taskInfo = {
+              taskName: this.form.name,
+              desc: this.form.desc,
+              examCount: this.examCount,
+              duration: this.form.duration,
+              taskType: taskType
+            };
+            this.$store.commit('setSendTaskInfo', taskInfo)
+          } else {
+            this.$toast(res.msg)
+          }
+        } else {
+          this.showLoading = false
+          this.$toast("请求错误")
           return
         }
-        if (!this.form.name) {
-          this.$toast("请输入任务名称")
-          return
-        }
+      }, error => {
+        this.showLoading = false
+      })
+    },
+    modifyTask() {
+      if (!this.currentTchCourseId) {
+        this.$toast("课程信息错误,请重新选择课程")
+        return
+      }
+      if (!this.form.name) {
+        this.$toast("请输入任务名称")
+        return
+      }
 
         if (!this.form.duration) {
           this.$toast("请输入任务时长")
@@ -1365,96 +1503,108 @@
           }
         }
 
-        let obj
-        if (this.$route.query.isResend) {
-          obj = {
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "taskId": this.$route.query.taskId,
-            "classId": this.classList[0].classId,
-            "tchCourseId": this.currentTchCourseId,
-            "subjectType": this.tchCourseInfo.subjectType,
-            "courseName": this.$route.query.courseName,
-            "tastType": taskType,
-            "taskType": "cs",
-            "taskName": this.form.name,
-            accountNoList: '',
-            "endTime": ""
-          }
-        } else {
-          obj = {
-            "interUser": "runLfb",
-            "interPwd": "25d55ad283aa400af464c76d713c07ad",
-            "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-            "belongSchoolId": this.$store.getters.schoolId,
-            "tchCourseId": this.currentTchCourseId,
-            "taskName": this.form.name,
-            "tastType": taskType,
-            "resourceType": resourceType,
-            "resourceId": this.form.resourceId,
-            "statusCd": "S01",
-            "isRedo": "I01",
-            "duration": this.form.duration,
-            "accountNo": this.$store.getters.getUserInfo.accountNo,
-            "desc": this.form.desc,
-            "courseType": "C01",
-            "isDrag": isDrag,
-            "testPaperId": this.testPaperId,
-            "modifyAfterSubmit": modifyAfterSubmit,
-            "taskId": this.$route.query.taskId,
-            "layerStatus": this.form.layer ? 'L02' : 'L01',
-          };
+      let obj
+      if (this.$route.query.isResend) {
+        obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "taskId": this.$route.query.taskId,
+          "classId": this.classList[0].classId,
+          "tchCourseId": this.currentTchCourseId,
+          "subjectType": this.tchCourseInfo.subjectType,
+          "courseName": this.$route.query.courseName,
+          "tastType": taskType,
+          "taskType": "cs",
+          "taskName": this.form.name,
+          accountNoList: '',
+          "endTime": ""
         }
-        //发布任务的学生
-        let classListSelect = []
-        if (this.form.object == "2") {
-          //按照分组
-          let index = 1
-          this.classList.forEach((item) => {
-            if (item.check) {
-              let subgroupIdList = []
-              let accountNoList = []
-              classListSelect.push(item.classId)
-              item.tchSubGroup.forEach(group => {
-                if (group.check) {
-                  subgroupIdList.push(group.tchClassSubGroupStudent.tchClassSubGroup.subgroupId)
-                  group.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
-                    if (s.active) {
+      } else {
+        obj = {
+          "interUser": "runLfb",
+          "interPwd": "25d55ad283aa400af464c76d713c07ad",
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+          "belongSchoolId": this.$store.getters.schoolId,
+          "tchCourseId": this.currentTchCourseId,
+          "taskName": this.form.name,
+          "tastType": taskType,
+          "resourceType": resourceType,
+          "resourceId": this.form.resourceId,
+          "statusCd": "S01",
+          "isRedo": "I01",
+          "duration": this.form.duration,
+          "accountNo": this.$store.getters.getUserInfo.accountNo,
+          "desc": this.form.desc,
+          "courseType": "C01",
+          "isDrag": isDrag,
+          "testPaperId": this.testPaperId,
+          "modifyAfterSubmit": modifyAfterSubmit,
+          "taskId": this.$route.query.taskId,
+          "layerStatus": this.form.layer ? 'L02' : 'L01',
+        };
+      }
+      if (this.isfEducation) {
+        obj.courseType = this.tchCourseInfo.courseType
+      }
+      //发布任务的学生
+      let classListSelect = []
+      if (this.form.object == "2") {
+        //按照分组
+        let index = 1
+        this.classList.forEach((item) => {
+          if (item.check) {
+            let subgroupIdList = []
+            let accountNoList = []
+            classListSelect.push(item.classId)
+            item.tchSubGroup.forEach(group => {
+              if (group.check) {
+                subgroupIdList.push(group.tchClassSubGroupStudent.tchClassSubGroup.subgroupId)
+                group.tchClassSubGroupStudent.tchSubGroupStudent.forEach(s => {
+                  if (s.active) {
+                    if (this.isfEducation) {
+                      console.log(s.parentAccountNo, 's.parentAccountNo')
+                      accountNoList.push(s.parentAccountNo)
+                    } else {
                       accountNoList.push(s.accountNo)
                     }
-                  })
-                }
-              })
-              // obj['subgroupIdList' + index] = subgroupIdList.join("|")
-              obj['accountNoList' + index] = accountNoList.join("|")
-              index++
-            }
-          });
+                  }
+                })
+              }
+            })
+            obj['subgroupIdList' + index] = subgroupIdList.join("|")
+            obj['accountNoList' + index] = accountNoList.join("|")
+            index++
+          }
+        });
 
           obj['classCount'] = classListSelect.length
 
-        } else if (this.form.object === "1") {
-          //按照班级
-          let index = 1
-          this.classList.forEach((item) => {
-            if (item.check) {
-              let accountNoList = []
-              classListSelect.push(item.classId)
-              for (let k in item.classStudent) {
-                if (item.classStudent[k].active) {
+      } else if (this.form.object === "1") {
+        //按照班级
+        let index = 1
+        this.classList.forEach((item) => {
+          if (item.check) {
+            let accountNoList = []
+            classListSelect.push(item.classId)
+            for (let k in item.classStudent) {
+              if (item.classStudent[k].active) {
+                if (this.isfEducation) {
+                  accountNoList.push(item.classStudent[k].parentAccountNo)
+                } else {
                   accountNoList.push(item.classStudent[k].accountNo)
                 }
               }
-              if (this.$route.query.isResend) {
-                obj.accountNoList = accountNoList.join("|")
-              } else {
-                obj['accountNoList' + index] = accountNoList.join("|")
-                index++
-              }
             }
-          });
+            if (this.$route.query.isResend) {
+              obj.accountNoList = accountNoList.join("|")
+            } else {
+              obj['accountNoList' + index] = accountNoList.join("|")
+              index++
+            }
+          }
+        });
 
           obj['classCount'] = classListSelect.length
 

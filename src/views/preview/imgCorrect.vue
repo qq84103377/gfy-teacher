@@ -57,7 +57,7 @@
             <textarea v-model="comment" maxlength="500" placeholder="请输入评论" rows="4"></textarea>
             <span class="limit-tip">{{comment.length}}/500</span>
           </div>
-          <div class="comment-dialog__body__new-comment" v-if="!isDelNewComment && list[stuIndex].replyList.some(v => v.replyAccount === $store.getters.getUserInfo.accountNo)">
+          <div class="comment-dialog__body__new-comment" v-if="!delReplyId && list[stuIndex].replyList.some(v => v.replyAccount === $store.getters.getUserInfo.accountNo)">
             <div class="grey9">您的最新评论:</div>
             <div class="comment-dialog__body__new-comment__scroll">
               <div class="new">{{getNewComment(stuIndex)}}</div>
@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="comment-dialog__footer van-hairline--top">
-          <van-button class="cancel" @click="commentShow=false;comment='';isDelNewComment=false">取消</van-button>
+          <van-button class="cancel" @click="commentShow=false;comment='';delReplyId=''">取消</van-button>
           <van-button class="confirm" type="info" @click="handleComment">确定</van-button>
         </div>
       </div>
@@ -89,6 +89,7 @@
     saveRewardScore,
     addReply,
     getAppraiseV2,
+    delReplyV2,
   } from '@/api/index'
   import AlloyFinger from 'alloyfinger'
   import 'alloyfinger/transformjs/transform'
@@ -98,7 +99,7 @@
     name: "imgCorrect",
     data() {
       return {
-        isDelNewComment: false,
+        delReplyId: '',
         isHide: false,
         isPen: false,
         isRubber: false,
@@ -133,6 +134,7 @@
         currentPage: this.$route.params.currentPage,
         total: this.$route.params.total,
         finished: this.$route.params.finished,
+        studentStatList: this.$route.params.studentStatList,
         listLoading: false,
       }
     },
@@ -159,8 +161,25 @@
       }
     },
     methods: {
+      delReply() {
+        this.$store.commit('setVanLoading', true)
+        delReplyV2({replyId:this.delReplyId}).then(res => {
+          this.$store.commit('setVanLoading', false)
+          if(res.flag) {
+            const index = this.list[this.stuIndex].replyList.findIndex(v => this.delReplyId === v.replyId)
+            if(index > -1) {
+              this.list[this.stuIndex].replyList.splice(index,1)
+            }
+            this.commentShow = false
+            this.delReplyId = ''
+          }else {
+            this.$toast(res.msg)
+          }
+        })
+      },
       delComment() {
-        this.isDelNewComment = true
+        const item = this.list[this.stuIndex].replyList.find(v => v.replyAccount === this.$store.getters.getUserInfo.accountNo)
+        this.delReplyId = item ? item.replyId : ''
       },
       getNewComment(stuIndex) {
         const item = this.list[stuIndex].replyList.find(v => v.replyAccount === this.$store.getters.getUserInfo.accountNo)
@@ -235,6 +254,13 @@
           }
         });
       },
+      rewardScore(accountNo) {
+        try {
+          return this.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
+        } catch {
+          console.log(accountNo, '有错啊');
+        }
+      },
       async getAppraise() {
         const page = this.currentPage
         this.$store.commit('setVanLoading', true)
@@ -263,6 +289,7 @@
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
               v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
+              v.score = this.rewardScore(v.appraiseAccountNo)
               let dom = document.createElement('div')
               v.imgArr = []
               v.audioArr = []
@@ -403,6 +430,17 @@
         this.$refs['drawBoard'].rotateRight()
       },
       handleComment() {
+        if(this.delReplyId) {
+          //有删除评论的操作
+          this.delReply()
+          if(this.comment) {
+            this.addReply()
+          }
+        }else {
+          this.addReply()
+        }
+      },
+      addReply() {
         if (!this.comment) return this.$toast('请输入评论')
         this.$store.commit('setVanLoading', true)
         let obj = {
@@ -422,9 +460,8 @@
             this.$toast('评论成功')
             this.commentShow = false
             this.comment = ''
-            this.isDelNewComment = false
-            // item.comment = ''
-            // item.replyList.unshift(res.data[0].pubReplyInfo)
+            this.delReplyId = ''
+            this.list[this.stuIndex].replyList.unshift(res.data[0].pubReplyInfo)
           } else {
             this.$toast(res.msg)
           }

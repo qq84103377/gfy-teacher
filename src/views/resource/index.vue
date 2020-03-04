@@ -68,6 +68,7 @@ export default {
       currentTchCourseInfo: {},
       index: 0, //选中的课程index
       currCourse: this.$route.query.currCourse ? JSON.parse(JSON.stringify(this.$route.query.currCourse)) : '',  //预习跳过来才有的
+      isfEducation: this.$route.query.isfEducation
     }
   },
   computed: {
@@ -160,7 +161,7 @@ export default {
     goto(path) {
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
       const { tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, courseName } = this
-      this.$router.push({ path, query: { tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, courseName } })
+      this.$router.push({ path, query: { tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, courseName , isfEducation:this.isfEducation} })
 
     },
     selectCourse(tchCourseInfo, index, resourceCount) {
@@ -204,11 +205,11 @@ export default {
         // "belongSchoolId": this.$store.getters.schoolId,
         "operateRoleType": "A02",
         "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "subjectType": localStorage.getItem("currentSubjectType"),
+        "subjectType": this.isfEducation?'S20':localStorage.getItem("currentSubjectType"),
         "classGrade": "",
         "termType": "",
         "pageSize": "20",
-        "courseType": "C01",
+        "courseType":this.isfEducation?'C02': "C01",
         "classId": "",
         "currentPage": page
       }
@@ -222,7 +223,8 @@ export default {
         this.dropdownTotal = res.total
         if (res.flag && res.data && res.data[0]) {
           if (this.$route.query.from === 'preview') {
-            const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.currCourse.tchCourseId && v.tchCourseInfo.sysCourseId == this.currCourse.sysCourseId)
+            const index = res.data.findIndex(v => v.tchCourseInfo.tchCourseId == this.currCourse.tchCourseInfo.tchCourseId && v.tchCourseInfo.sysCourseId == this.currCourse.tchCourseInfo.sysCourseId)
+            console.log(index,"index")
             if (index > -1) {
               res.data.splice(index, 1)
             }

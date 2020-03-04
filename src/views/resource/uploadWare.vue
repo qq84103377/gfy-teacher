@@ -65,10 +65,31 @@
           </van-radio-group>
         </div>
       </van-cell>
+      <div class="pd10"><span class="red">*</span>
+      上传课件时请选择从wps office中选择文件
+        <span class="blue mglt10" @click="tipShow=true">查看具体步骤</span>
+      </div>
     </div>
     <div class="upload-ware__footer">
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
+
+    <van-popup
+      v-model="tipShow"
+      closeable
+      position="bottom"
+      :style="{ height: '93%' }">
+      <div class="tip-wrap">
+        <div>1. 点击“添加课件”</div>
+        <img src="../../assets/img/upload-ware-tip1.png" alt="">
+        <div>2. 点击图中按钮，选择课件</div>
+        <img src="../../assets/img/upload-ware-tip2.png" alt="">
+        <div>3. 选择从WPS Office中选择课件，<span class="red">如没有出现WPS Office选项，请在手机中安装WPS Office软件。</span></div>
+        <img src="../../assets/img/upload-ware-tip3.png" alt="">
+        <div>4. 在WPS Office的文件列表中，选择想要上传的课件，如没有在列表中找到自己想要的上传的课件，则点击最上方的“打开”，浏览所有文件。</div>
+        <img src="../../assets/img/upload-ware-tip4.png" alt="">
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -79,6 +100,14 @@
 
   export default {
     name: "uploadWare",
+    beforeRouteLeave(to, from, next) {
+      if (this.tipShow) {
+        this.tipShow=false
+        next(false)
+      } else {
+        next()
+      }
+    },
     data() {
       return {
         form: {
@@ -92,6 +121,7 @@
         wareUrl: '',
         wareSize: '',
         oSSObject: null,
+        tipShow: false,
       }
     },
     created() {
@@ -159,7 +189,7 @@
             this.$toast('请选择office文档或pdf')
           }
         } else {
-          this.$toast('请选择有效文件')
+          this.$toast('当前文件为无效文件，请从WPS Office中选择文件')
         }
       },
       getOSSKey() {
@@ -319,7 +349,12 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
-
+    .tip-wrap {
+      padding: 40px 10px 10px;
+      img{
+        width: 100%;
+      }
+    }
     &__body {
       flex: 1;
       overflow-y: auto;

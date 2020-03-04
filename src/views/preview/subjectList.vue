@@ -41,7 +41,7 @@
           </div>
           <div class="row" v-for="(item,index) in stuArr" :key="index">
             <div class="name">
-              <span>{{getStudentName(item.accountNo,$route.query.classId)}}</span>
+              <span>{{isfEducation?getParentName(item.accountNo, $route.query.classId):getStudentName(item.accountNo,$route.query.classId)}}</span>
               <span class="blue">({{item.rewardScore > 0 ? '+' + item.rewardScore : item.rewardScore}})</span>
               <span class="red">{{stuScore(item)}}分</span>
             </div>
@@ -87,18 +87,32 @@
   import analyseWrap from '../../components/analyseWrap'
   import 'video.js/dist/video-js.css'
   import {getExamItemDetail, getExamFinishInfo, statTaskStatV2, statTaskStat} from '@/api/index'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
 
   import {videoPlayer} from 'vue-video-player'
 
   export default {
     name: "subjectList",
     components: {analyseWrap, videoPlayer},
+    beforeRouteLeave(to, from, next) {
+      if(window.stop !== undefined)
+      {
+        window.stop();
+      }
+      else if(document.execCommand !== undefined)
+      {
+        document.execCommand("Stop", false);
+      }
+      next()
+    },
     mounted() {
     },
     computed: {
       getStudentName() {
         return getStudentName
+      },
+      getParentName() {
+        return getParentName
       }
     },
     data() {
@@ -124,6 +138,7 @@
         stuArr: [],
         examNum: '', // 大题题号
         examId: this.$route.query.examId,
+        isfEducation:this.$route.query.isfEducation
       }
     },
     async activated() {
@@ -316,7 +331,6 @@
                 dom[0].controlsList="nodownload"
               }
             })
-            console.log(stuArr, 'dllddldlld');
           } else {
             this.$toast(res.msg)
           }

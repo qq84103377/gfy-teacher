@@ -123,6 +123,10 @@
     <!--<div class="mask"  v-show="showMask"></div>-->
 
     <course-filter ref="courseFilter" v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+
+    <van-dialog @confirm="handleEditClass" v-model="showAlert" show-cancel-button>
+      <div slot="title" class="fs14 grey6 pd10">{{message}}</div>
+    </van-dialog>
   </section>
 </template>
 
@@ -169,6 +173,8 @@ export default {
       isSelect: true,
       term: '',
       shareFlag: false,
+      showAlert: false,
+      message: '',
     }
   },
   computed: {
@@ -193,7 +199,7 @@ export default {
       },
     },
     'form.name'(v) {
-      if(!v.length) {
+      if (!v.length) {
         this.shareCourseList = []
         this.form.course = 0;
         if(!this.isEdit) this.result = []
@@ -208,7 +214,7 @@ export default {
   components: { courseFilter },
 
   beforeRouteLeave(to, from, next) {
-    if (this.$refs['courseFilter']&&this.$refs['courseFilter'].showChangeDialog) {
+    if (this.$refs['courseFilter'] && this.$refs['courseFilter'].showChangeDialog) {
       this.$refs['courseFilter'].close()
       next(false)
     } else if (this.filterShow) {
@@ -217,21 +223,34 @@ export default {
     } else if (this.showTime) {
       this.showTime = false
       next(false)
-    } else{
+    } else {
       next();
     }
 
   },
   mounted() {
-    //班级信息
-    let cl = localStorage.getItem("classMap")
-    if (cl) {
-      for (let k in JSON.parse(cl)) {
-        if(JSON.parse(cl)[k].teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
-          this.classMap[k] = JSON.parse(cl)[k]
+    if (this.$route.query.from == 'fEducation') {
+      //班级信息
+      let cl = localStorage.getItem("classMap")
+      if (cl) {
+        for (let k in JSON.parse(cl)) {
+          if (JSON.parse(cl)[k].teacherInfoList.some(v => v.subjectType === 'S20')) {
+            this.classMap[k] = JSON.parse(cl)[k]
+          }
+        }
+      }
+    } else {
+      //班级信息
+      let cl = localStorage.getItem("classMap")
+      if (cl) {
+        for (let k in JSON.parse(cl)) {
+          if (JSON.parse(cl)[k].teacherInfoList.some(v => v.subjectType === localStorage.currentSubjectType)) {
+            this.classMap[k] = JSON.parse(cl)[k]
+          }
         }
       }
     }
+
     if (this.isEdit) {
       console.log("编辑课程信息", this.editCourseInfo);
       this.form.name = this.editCourseInfo.courseName
@@ -293,7 +312,7 @@ export default {
       this.form.radio = "2"
       let defaultGrade = ''
       for (let m in this.classMap) {
-        if(!defaultGrade) {
+        if (!defaultGrade) {
           defaultGrade = this.classMap[m].classGrade
         }
 
@@ -301,8 +320,8 @@ export default {
         let now = new Date()
         now.setDate(now.getDate() + 3)
         this.classMap[m]['endDate'] = generateTimeReqestNumber(now)
-        if(defaultGrade === this.classMap[m].classGrade) {
-          this.result.push(m*1)
+        if (defaultGrade === this.classMap[m].classGrade) {
+          this.result.push(m * 1)
         }
       }
       let date = new Date()
@@ -377,7 +396,7 @@ export default {
       } else {
       }
     },
-    initData(classGrade,term) {
+    initData(classGrade, term) {
       this.currentShareCourse.classGrade = classGrade
       this.term = term
     },
@@ -469,7 +488,10 @@ export default {
         "accountNo": this.$store.getters.getUserInfo.accountNo,
         "subjectList": [localStorage.getItem("currentSubjectType")],
         "keyWord": this.form.name
-      };
+      }
+      if (this.$route.query.from === 'fEducation') {
+        obj.subjectList = ["S20"]
+      }
       let params = {
         requestJson: JSON.stringify(obj)
       }
@@ -515,7 +537,10 @@ export default {
         "pageSize": "100",
         "termType": this.term,
         "currentPage": "1"
-      };
+      }
+      if (this.$route.query.from === 'fEducation') {
+        obj.subjectType = "S20"
+      }
       let params = {
         requestJson: JSON.stringify(obj)
       }
@@ -537,7 +562,7 @@ export default {
               }
             }
 
-          }else {
+          } else {
             this.$toast('没有共享课程')
           }
         } else {
@@ -590,9 +615,9 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        "relationSeqId":  this.shareCourseList.length?this.shareCourseList[this.form.course].sysCourseId:0,
-        "sysCourseId": this.shareCourseList.length?this.shareCourseList[this.form.course].sysCourseId:0,
-        "shareTchCourseId":this.shareCourseList.length?this.shareCourseList[this.form.course].tchCourseId:0,
+        "relationSeqId": this.shareCourseList.length ? this.shareCourseList[this.form.course].sysCourseId : 0,
+        "sysCourseId": this.shareCourseList.length ? this.shareCourseList[this.form.course].sysCourseId : 0,
+        "shareTchCourseId": this.shareCourseList.length ? this.shareCourseList[this.form.course].tchCourseId : 0,
         "courseName": this.form.name,
         "subjectType": localStorage.currentSubjectType,
         "courseType": "C01",
@@ -601,7 +626,11 @@ export default {
         "accountNo": this.$store.getters.getUserInfo.accountNo,
         "classCount": this.result.length,
         "desc": this.form.desc,
-      };
+      }
+      if (this.$route.query.from === 'fEducation') {
+        obj.subjectType = "S20"
+        obj.courseType = "C02"
+      }
       if (this.form.radio == '2') {
         //统一设置
         this.result.forEach((item, index) => {
@@ -677,7 +706,7 @@ export default {
                   bookList.push({
                     textBookId: item.textBookId,
                     textBookName: item.textBookName,
-                    subjectType:item.subjectType
+                    subjectType: item.subjectType
                   })
                 }
                 if (!termMap[item.gradeTermInfo.term]) {
@@ -774,7 +803,21 @@ export default {
         this.$toast("请选择班级")
         return
       }
-
+      let removeClass = ''
+      this.editCourseInfo.tchClassCourseInfo.forEach(v => {
+        if(!this.result.includes(v.classId)) {
+          //如果原本课程选择的班级被手动移除
+          removeClass += (removeClass.length?'、':'') + v.className
+        }
+      })
+      if(removeClass.length) {
+        this.showAlert = true
+        this.message = `${removeClass}下的所有任务都会被删除,确认移除班级?`
+      }else {
+        this.handleEditClass()
+      }
+    },
+    handleEditClass() {
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
@@ -837,7 +880,7 @@ export default {
             this.$toast('修改成功')
             this.$emit('onFinish', this.form.name)
             res.data[0].tchSubjectCourse.shareType = this.form.share
-            this.$emit('update:editCourseInfo',res.data[0].tchSubjectCourse)
+            this.$emit('update:editCourseInfo', res.data[0].tchSubjectCourse)
           } else {
             this.$toast(res.flag)
           }

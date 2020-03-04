@@ -4,6 +4,7 @@
     <van-cell title="任务统计" @click="$router.push(`/taskStat`)" is-link/>
     <van-cell title="学情" @click="$router.push(`/studySituation`)" is-link/>
     <van-cell title="家庭报告" @click="$router.push(`/familyReport`)" is-link/>
+    <!-- <van-cell title="积分统计" @click="$router.push(`/integralStat`)" is-link/> -->
   </div>
 </template>
 
