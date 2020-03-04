@@ -94,6 +94,17 @@
   export default {
     name: "subjectList",
     components: {analyseWrap, videoPlayer},
+    beforeRouteLeave(to, from, next) {
+      if(window.stop !== undefined)
+      {
+        window.stop();
+      }
+      else if(document.execCommand !== undefined)
+      {
+        document.execCommand("Stop", false);
+      }
+      next()
+    },
     mounted() {
     },
     computed: {
