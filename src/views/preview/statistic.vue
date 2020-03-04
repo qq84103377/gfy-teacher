@@ -306,7 +306,7 @@
         vanLoading: state => state.setting.vanLoading
       }),
       subjectTypeName() {
-        return localStorage.currentSubjectTypeName
+        return this.isfEducation?'家庭教育':localStorage.currentSubjectTypeName
       },
       isTaskEnd() {
         return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g, "/")).getTime()
