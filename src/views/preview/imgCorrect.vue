@@ -37,7 +37,7 @@
       </i>
       <van-icon class="close" name="cross" @click="isHide=false;isPen=false;isRubber=false;"></van-icon>
     </div>
-    <div v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
+    <div ref="swipe" v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
         <div class="img-wrap">
           <img :class="{active:item.active}" v-lazy="item.src" alt="">
@@ -143,8 +143,9 @@
 
     },
     mounted() {
-      console.log(this.imgArr, 'imgArrimgArr');
       this.figure()
+      const index = this.imgArr.findIndex(v => v.active)
+      this.$refs['swipe'].scrollLeft = this.$refs.swipe.firstElementChild.offsetWidth * index
     },
     beforeDestroy() {
       screen.orientation.lock('portrait')
