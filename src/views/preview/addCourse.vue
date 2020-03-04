@@ -123,6 +123,10 @@
     <!--<div class="mask"  v-show="showMask"></div>-->
 
     <course-filter ref="courseFilter" v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+
+    <van-dialog @confirm="handleEditClass" v-model="showAlert" show-cancel-button>
+      <div slot="title" class="fs14 grey6 pd10">{{message}}</div>
+    </van-dialog>
   </section>
 </template>
 
@@ -169,6 +173,8 @@ export default {
       isSelect: true,
       term: '',
       shareFlag: false,
+      showAlert: false,
+      message: '',
     }
   },
   computed: {
@@ -797,7 +803,21 @@ export default {
         this.$toast("请选择班级")
         return
       }
-
+      let removeClass = ''
+      this.editCourseInfo.tchClassCourseInfo.forEach(v => {
+        if(!this.result.includes(v.classId)) {
+          //如果原本课程选择的班级被手动移除
+          removeClass += (removeClass.length?'、':'') + v.className
+        }
+      })
+      if(removeClass.length) {
+        this.showAlert = true
+        this.message = `${removeClass}下的所有任务都会被删除,确认移除班级?`
+      }else {
+        this.handleEditClass()
+      }
+    },
+    handleEditClass() {
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
