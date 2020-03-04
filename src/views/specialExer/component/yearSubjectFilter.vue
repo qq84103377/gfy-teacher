@@ -242,10 +242,10 @@ export default {
             this.$emit('update:subjectType', item.subjectType)
 
 
-            if (this.active == 0) {
-              this.getExamSectionTypeRelation(item.subjectType)
+            // if (this.active == 0) {
+            //   this.getExamSectionTypeRelation(item.subjectType)
 
-            }
+            // }
           }
         }
         localStorage.setItem("currentSubjectTypeName", item.subjectName);
