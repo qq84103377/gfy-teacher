@@ -518,7 +518,7 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
             const score = item.score * 1 + (type === 'T01' ? 1 : -1)
-            item.score = score > 0 ? '+' + score : score
+            item.score = score
             this.$toast(`${type === 'T01' ? '加' : '减'}分成功`)
 
             //更新this.taskFinishInfo.studentStatList的值 因为点赞/置顶/精华/加分/评论以后没有刷新this.taskFinishInfo.studentStatList

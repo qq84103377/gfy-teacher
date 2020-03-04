@@ -134,6 +134,7 @@
         currentPage: this.$route.params.currentPage,
         total: this.$route.params.total,
         finished: this.$route.params.finished,
+        studentStatList: this.$route.params.studentStatList,
         listLoading: false,
       }
     },
@@ -253,6 +254,13 @@
           }
         });
       },
+      rewardScore(accountNo) {
+        try {
+          return this.studentStatList.find(v => v.accountNo === accountNo).studentRewardScore || 0
+        } catch {
+          console.log(accountNo, '有错啊');
+        }
+      },
       async getAppraise() {
         const page = this.currentPage
         this.$store.commit('setVanLoading', true)
@@ -281,6 +289,7 @@
             res.data[0].appraiseListInfo.forEach(async v => {
               // 本账号是否有点过赞
               v.good = v.praiseList.some(p => p.accountNo === JSON.parse(localStorage.userInfo).accountNo)
+              v.score = this.rewardScore(v.appraiseAccountNo)
               let dom = document.createElement('div')
               v.imgArr = []
               v.audioArr = []

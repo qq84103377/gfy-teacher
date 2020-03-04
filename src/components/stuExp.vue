@@ -193,6 +193,7 @@
             currentPage: this.currentPage,
             total: this.total,
             finished: this.finished,
+            studentStatList: this.$parent.$parent.taskFinishInfo.studentStatList
           }})
       },
       handlePraise(item) {
