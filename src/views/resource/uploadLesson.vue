@@ -134,12 +134,12 @@
       this.getOSSKey();
     },
     methods: {
-      read(file, detail) { 
+      read(file, detail) {
         console.log(file.name, 'file.name');
         console.log( file.type, 'file.type');
         console.log( file, 'file');
         console.log( file.size, 'file.size');
-     
+
           if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             if(file.size > 0) {
               this.wareFile = file;
@@ -338,9 +338,9 @@
         let obj = {
           "interUser": "runLfb",
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
-          "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongAccountNo": this.$store.getters.getUserInfo.accountNo,
-          "belongSchoolId": this.$store.getters.schoolId,
+          "operateAccountNo": this.$store.getters.getUserInfo.accountNo + '',
+          "belongAccountNo": this.$store.getters.getUserInfo.accountNo + '',
+          "belongSchoolId": this.$store.getters.schoolId + '',
           "belongAreaCode": this.$store.getters.getUserInfo.areaCode,
           taskType: 'T04',
           fileName: this.wareUrl.split(this.wareOSSObject.key)[1],
@@ -354,7 +354,7 @@
           // "sourceUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
           // "dstUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
           "shareType":this.form.share,
-          resourceId,
+          resourceId: resourceId + '',
           "resourceType":"R01"
         }
         let params = {
