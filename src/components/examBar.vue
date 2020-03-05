@@ -97,12 +97,15 @@
       </div>
     </van-popup>
 
-    <filter-panel :visible.sync="filterShow" title="添加" :list="tempList" @filter="handleFilter"></filter-panel>
+<!--    <filter-panel :visible.sync="filterShow" title="添加" :list="tempList" @filter="handleFilter"></filter-panel>-->
+
+    <select-course :isNone="true" :visible.sync="filterShow" :list="tempList" @filter="handleFilter"></select-course>
   </section>
 </template>
 
 <script>
   import filterPanel from './filterPanel'
+  import selectCourse from './selectCourse'
   import {generateTimeReqestNumber} from '@/utils/filter'
   import {Dialog} from 'vant';
   import {addTestPaper, addTeachCourseRes, addTestPaperExamInfo, getClassTeachCourseInfo} from '@/api/index'
@@ -112,7 +115,7 @@
   export default {
     props: ['type', 'selectList', 'canSelect', 'canAddCourse', 'length','qesTypeName','knowledgePoint'], //length是type为task时需要判断试卷内是否有试题,若无则不能发任务. qesTypeName题型专项进来的题型名字
     name: "examBar",
-    components: {filterPanel},
+    components: {filterPanel,selectCourse},
     model: {
       prop: 'selectList',
       event: 'change'
@@ -128,7 +131,8 @@
         }, 0)
       },
       courseName() {
-        return this.courseList.find(v => v.check).tchCourseInfo.courseName
+        // return this.courseList.find(v => v.check).tchCourseInfo.courseName
+        return this.listIndex !== '' ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.courseName : '无'
       }
     },
     data() {
@@ -145,9 +149,12 @@
         },
         tempList: [],
         selectCourse: '',
-        courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
+        // courseList: [{tchCourseInfo:{courseName:'无',sysCourseId:''},check:true}],
+        courseList: [],
         // isRevert: false, //是否显示返回按钮
-        knowledgePointIndex:1
+        knowledgePointIndex:1,
+        listIndex: '',
+        radioIndex: '',
       }
     },
     watch: {
@@ -171,7 +178,7 @@
             }
             if(!this.$route.query.isPri) {
               let  testPaperIndex = 1
-              const courseId = (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
+              const courseId = (this.canAddCourse && !this.isRevert) ? (this.listIndex===''?'':this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.tchCourseId) : this.$route.query.tchCourseId
               if(localStorage.courseIdMap) {
                 testPaperIndex = JSON.parse(localStorage.courseIdMap)[courseId]?JSON.parse(localStorage.courseIdMap)[courseId]+1:1
               }
@@ -253,10 +260,27 @@
           this.$store.commit('setVanLoading',false)
           if(res.flag) {
             this.courseList = res.data || []
+
+            let classGradeArr = [...new Set(this.courseList.map(v => v.tchCourseInfo.classGrade))].sort()
+            // if(this.listIndex === 0 || this.listIndex > 0)
+            this.courseList = classGradeArr.map((g,i) => {
+              return {
+                classGrade:g,
+                arr: this.courseList.filter(c => c.tchCourseInfo.classGrade === g),
+                radio: this.listIndex === i ? this.radioIndex: ''
+              }
+            })
+
             if(this.$route.path === '/examDetail' && this.canAddCourse) {
-              this.courseList.length ? this.$set(this.courseList[0],'check',true) : ''
+              // this.courseList.length ? this.$set(this.courseList[0],'check',true) : ''
             }else {
-              this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
+              if(!this.courseList.some(v => v.radio !== '')) {
+                this.listIndex = this.courseList.length
+                this.radioIndex = 0
+              }
+              this.courseList.push({arr:[{tchCourseInfo:{courseName:'无',sysCourseId:''}}],classGrade:'',radio:this.courseList.some(v => v.radio !== '')?'':0})
+              // this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
+
             }
           }
         })
@@ -306,7 +330,7 @@
           if (res.flag) {
             //先判断canAddCourse能否选择加入课
             if((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint){
-              if(this.courseList.find(v => v.check).tchCourseInfo.sysCourseId) {
+              if(this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.sysCourseId) {
                 // 有选择加入的课程
                 this.addTeachCourseRes(res.testPaperInfo.testPaperId, res.testPaperInfo.testPaperName,res.testPaperInfo)
               }else {
@@ -332,9 +356,9 @@
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
           "operateRoleType": "A02",
-          "tchCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
-          "sysCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
-          "relationSeqId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList.find(v => v.check).tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
+          "tchCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.tchCourseId : this.$route.query.tchCourseId,
+          "sysCourseId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.sysCourseId : this.$route.query.sysCourseId,
+          "relationSeqId": ((this.canAddCourse && !this.isRevert)||this.qesTypeName||this.knowledgePoint) ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.relationCourseId : this.$route.query.relationCourseId,
           "resourceType": "R02",
           resourceId,
           "statusCd": "S04"
@@ -493,7 +517,7 @@
       },
       setTestPaperNameIndex() {
         let courseIdMap
-        const courseId = (this.canAddCourse && !this.isRevert) ? this.courseList.find(v => v.check).tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
+        const courseId = (this.canAddCourse && !this.isRevert) ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.tchCourseId : this.$route.query.tchCourseId
         if(localStorage.courseIdMap) {
           courseIdMap = JSON.parse(localStorage.courseIdMap)
           if(courseIdMap[courseId]) {
@@ -520,7 +544,9 @@
           });
         }
       },
-      handleFilter(item) {
+      handleFilter(listIndex,radioIndex,item) {
+        this.radioIndex = radioIndex
+        this.listIndex = listIndex
         if(this.type === 'task') {
           this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
           this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)

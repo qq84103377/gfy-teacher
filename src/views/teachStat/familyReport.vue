@@ -1,6 +1,6 @@
 <template>
   <section class="family-report-wrap">
-    <div>
+    <div class="family-report-wrap__filter">
       <van-cell title="查看范围" style="background: #f5f5f5;color: #999"/>
       <van-cell @click="openGradePop" title="年级" is-link>
         <div class="blue">{{gradeSubjectList[gradeIndex].gradeName}}</div>
@@ -276,7 +276,9 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
-
+    &__filter{
+      flex: 0 0 176px;
+    }
     .grade-pop-wrap {
       display: flex;
       flex-direction: column;

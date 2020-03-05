@@ -23,12 +23,14 @@
         <div slot="title" class="aic">
           <div><span class="red">*</span>课件:</div>
           <div class="pdlt10" style="flex:1">{{wareName||'可添加office文件或pdf'}}</div>
-<!--          <van-uploader-->
-<!--            accept="application/vnd.ms-powerpoint,application/vnd.ms-excel,application/vnd.ms-works,application/vnd.ms-works,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.spreadsheetml.template.potx,application/vnd.openxmlformats-officedocument.presentationml.template.ppsx,application/vnd.openxmlformats-officedocument.presentationml.slideshow.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation.sldx,application/vnd.openxmlformats-officedocument.presentationml.slide.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document.dotx,application/vnd.openxmlformats-officedocument.wordprocessingml.template.xlsm,application/vnd.ms-excel.addin.macroEnabled.12.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12"-->
-<!--            :before-read="read">-->
-            <van-icon @click="getFile" class="add" name="add"/>
-          <input type="file" id="upload" style="display: none">
-<!--          </van-uploader>-->
+<!--                      accept="application/vnd.ms-powerpoint,application/vnd.ms-excel,application/vnd.ms-works,application/vnd.ms-works,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.spreadsheetml.template.potx,application/vnd.openxmlformats-officedocument.presentationml.template.ppsx,application/vnd.openxmlformats-officedocument.presentationml.slideshow.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation.sldx,application/vnd.openxmlformats-officedocument.presentationml.slide.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document.dotx,application/vnd.openxmlformats-officedocument.wordprocessingml.template.xlsm,application/vnd.ms-excel.addin.macroEnabled.12.xlsb,application/vnd.ms-excel.sheet.binary.macroEnabled.12"
+-->
+          <van-uploader
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            :before-read="read">
+            <van-icon @click="" class="add" name="add"/>
+<!--          <input type="file" id="upload" style="display: none">-->
+          </van-uploader>
         </div>
       </van-cell>
       <van-cell class="upload-ware__body__cell">
@@ -65,7 +67,7 @@
           </van-radio-group>
         </div>
       </van-cell>
-      <div class="pd10"><span class="red">*</span>
+      <div class="pd10" v-if="!isIOS"><span class="red">*</span>
       上传课件时请选择从wps office中选择文件
         <span class="blue mglt10" @click="tipShow=true">查看具体步骤</span>
       </div>
@@ -75,6 +77,7 @@
     </div>
 
     <van-popup
+      v-if="!isIOS"
       v-model="tipShow"
       closeable
       position="bottom"
@@ -124,6 +127,16 @@
         tipShow: false,
       }
     },
+    computed: {
+      isIOS() {
+        if('cordova' in window) {
+          var platform = device.platform;
+          return platform === 'iOS'
+        }else {
+          return true
+        }
+      }
+    },
     created() {
       this.getOSSKey()
     },
@@ -142,6 +155,7 @@
         return p;
       },
       getFile() {
+        console.log('getFile');
         this.fileSelect('upload').then(file => {
           this.read(file)
           console.log(file.name);
@@ -176,11 +190,18 @@
             this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
             filetime + '_' +
             randomStr + suffix
+
+           let name = curFile.name.substr(0,curFile.name.lastIndexOf('.'))
+          if(name.length > 64) {
+           name = name.substr(0,64)
+          }
+          this.form.name = name
         }).catch(err => {
           this.$store.commit('setVanLoading', false)
         })
       },
       read(file, detail) {
+        console.log(file,'===');
         if (file.type) {
           if (['.pdf', '.ppt', '.pptx', '.doc', '.docx', '.xls', '.xlsx'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
             this.wareSize = file.size
