@@ -106,7 +106,6 @@ export default {
   beforeRouteLeave(to, from, next) {
     if (to.path !== '/index') {
       this.filterShow = false
-      this.filterShow2 = false
       this.addExam = false
       this.selectPop = false
       next()
@@ -131,7 +130,7 @@ export default {
       if (to.path === '/index') {
         //去首页 需要清空储存的值
         this.$store.commit('setErrorBookCourse', [])
-        this.$store.commit('se tErrorBookSelected', [])
+        this.$store.commit('setErrorBookSelected', [])
         this.$store.commit('setErrorFilterParams', {})
       }
       next()

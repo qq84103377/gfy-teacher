@@ -699,7 +699,14 @@
             })
           })
         })
-      }else {
+      }
+      else if (from.path === '/addTask' && to.query.flag==1) {
+        //资源中心进入的试卷详情,点击发任务选择了课程后,进入到发任务页面,但没有发任务,而是返回试卷详情,此时需要清空课程信息,不然再次点击发任务不能重新选择课程
+        next(vm => {
+          vm.$store.commit('setTchCourseInfo', {})
+        });
+      }
+      else {
         next();
       }
     },

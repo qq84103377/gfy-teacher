@@ -253,7 +253,11 @@
           this.$store.commit('setVanLoading',false)
           if(res.flag) {
             this.courseList = res.data || []
-            this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
+            if(this.$route.path === '/examDetail' && this.canAddCourse) {
+              this.courseList.length ? this.$set(this.courseList[0],'check',true) : ''
+            }else {
+              this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
+            }
           }
         })
       },

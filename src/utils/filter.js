@@ -192,6 +192,12 @@ let getSubjectName = (subjectType)=>{
     case 'S09':
       subjectName = "地理"
       break
+    case 'S10':
+      subjectName = "文综"
+      break
+    case 'S11':
+      subjectName = "理综"
+      break
     case 'S19':
       subjectName = "体育"
       break
@@ -202,10 +208,28 @@ let getSubjectName = (subjectType)=>{
       subjectName = "教育学习"
       break
     case 'S22':
-      subjectName = "名著导读"
+      subjectName = "计算机信息技术"
       break
     case 'S23':
       subjectName = "在线家课"
+      break
+    case 'S24':
+      subjectName = "班会课"
+      break
+    case 'S26':
+      subjectName = "美术"
+      break
+    case 'S27':
+      subjectName = "音乐"
+      break
+    case 'S28':
+      subjectName = "综合"
+      break
+    case 'S29':
+      subjectName = "思想品德"
+      break
+    case 'S99':
+      subjectName = "全部学科"
       break
   }
   return subjectName
