@@ -67,7 +67,8 @@ import {
   slider,
   Lazyload,
   Sticky,
-  Switch
+  Switch,
+  Image,
 } from 'vant'
 // import AlloyFinger from 'alloyfinger'
 // import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger_vue'
@@ -82,7 +83,7 @@ Vue.use(Navigation, {
   router
 })
 Vue.use(VueCropper)
-Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay).use(Switch)
+Vue.use(Button).use(Field).use(Dialog).use(Loading).use(NavBar).use(Overlay).use(Switch).use(Image)
   .use(Tabbar).use(TabbarItem).use(Icon).use(Toast).use(ActionSheet).use(CheckboxGroup).use(Checkbox)
   .use(NumberKeyboard).use(DropdownMenu).use(DropdownItem).use(Tab).use(Uploader).use(RadioGroup).use(Radio)
   .use(Tabs).use(Swipe).use(SwipeItem).use(Cell).use(CellGroup).use(Collapse).use(CollapseItem)

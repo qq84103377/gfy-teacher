@@ -66,7 +66,7 @@
         total: 0,
         accessUrl: '',
         clickIndex:0,
-        isfEducation: this.$route.query.isfEducation        
+        isfEducation: this.$route.query.isfEducation
       }
     },
     computed: {
@@ -80,13 +80,13 @@
       }
     },
     beforeRouteLeave(to, from, next) {
-       if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
-      this.$refs['listItem'][this.clickIndex].close()
-      next(false)
-    }else{
-      this.scrollTop = this.$refs["body"].scrollTop
-      next()
-    }
+      if (this.$refs['listItem']&&this.$refs['listItem'][this.clickIndex]&&this.$refs['listItem'][this.clickIndex].showDialog) {
+        this.$refs['listItem'][this.clickIndex].close()
+        next(false)
+      }else{
+        this.scrollTop = this.$refs["body"].scrollTop
+        next()
+      }
     },
     beforeRouteEnter(to, from, next) {
       localStorage.removeItem('materialDetail')
@@ -123,8 +123,8 @@
         }
       },
       clickDel(index){
-      this.clickIndex=index
-    },
+        this.clickIndex=index
+      },
       updateCourseWareCount(item) {
         let obj = {
           "interUser": "runLfb",

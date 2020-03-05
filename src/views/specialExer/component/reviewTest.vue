@@ -170,9 +170,15 @@ export default {
       }
     },
   },
-
+  activated() {
+    if (this.$route.path === '/specialExer') {
+      this.$store.commit('setTchCourseInfo', {})
+    }
+  },
   methods: {
     go(item) {
+      this.$store.commit('setResourceInfo', item)
+      this.$store.commit("setTaskClassInfo", '')
       this.$router.push({
         path: `/examDetail`, query: {
           flag: 1,

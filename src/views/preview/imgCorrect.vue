@@ -37,10 +37,10 @@
       </i>
       <van-icon class="close" name="cross" @click="isHide=false;isPen=false;isRubber=false;"></van-icon>
     </div>
-    <div v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
+    <div ref="swipe" v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
         <div class="img-wrap">
-          <img :class="{active:item.active}" v-lazy="item.src" alt="">
+          <van-image :show-loading="false" :show-error="false" @error="handleError(item)" :class="{active:item.active}" lazy-load :src="item.src" alt=""></van-image>
           <span :class="{active:item.active}">{{index + 1}}</span>
         </div>
         <div>{{getStudentName(item.accountNo,classId)}}</div>
@@ -143,8 +143,11 @@
 
     },
     mounted() {
-      console.log(this.imgArr, 'imgArrimgArr');
       this.figure()
+      const index = this.imgArr.findIndex(v => v.active)
+      setTimeout(() => {
+        this.$refs['swipe'].scrollLeft = this.$refs.swipe.firstElementChild.offsetWidth * index
+      }, 1000);
     },
     beforeDestroy() {
       screen.orientation.lock('portrait')
@@ -161,6 +164,9 @@
       }
     },
     methods: {
+      handleError(item) {
+        this.$set(item,'fail',true)
+      },
       delReply() {
         this.$store.commit('setVanLoading', true)
         delReplyV2({replyId:this.delReplyId}).then(res => {
@@ -598,6 +604,10 @@
           v.active = false
         })
         item.active = true
+        if(item.fail) {
+          item.fail = false
+          item.src = item.src + '1'
+        }
         this.stuIndex = this.list.findIndex(v => v.appraiseAccountNo === item.accountNo)
       }
     },
@@ -725,18 +735,21 @@
           position: relative;
           height: 20px;
           margin-bottom: 2px;
-
-          img {
+          @{deep} .van-image {
+            width: 100%;
+            height: 100%;
             border-radius: 3px;
             border: 1.5px solid #ccc;
-            width: 100%;
-            height: 20px;
-            margin-bottom: 1px;
-
+            img {
+              width: 100%;
+              height: 100%;
+              margin-bottom: 1px;
+            }
             &.active {
-              border: 1.5px solid @blue;
+                border: 1.5px solid @blue;
             }
           }
+
 
           span {
             position: absolute;
