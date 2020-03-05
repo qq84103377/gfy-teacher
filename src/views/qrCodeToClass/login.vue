@@ -60,7 +60,7 @@
           <!--          <span class="van-hairline&#45;&#45;left" @click="$toast.fail('敬请期待')">随便看看</span>-->
           <!--          <span class="van-hairline&#45;&#45;left grey9">版本号V{{version}}</span>-->
         </div>
-        <div class="fs10" v-if="!isApp" style="text-align: center">
+        <div class="fs10" style="text-align: center">
           <!-- <p>Copyright<img src="../../assets/img/c.png" alt="">2017 高分云版权所有 </p> -->
           <p>Copyright© 2017 高分云版权所有 </p>
           <p>广州高分云教育科技有限公司 <a href="http://www.beian.miit.gov.cn">粤ICP备17113230号</a></p>
@@ -147,19 +147,14 @@
         schoolId: ''
       }
     },
-    computed: {
-      isApp() {
-        return "cordova" in window;
-      },
-    },
-    created() {
-      if (localStorage.loginInfo) {
-        const loginInfo = JSON.parse(localStorage.loginInfo)
-        this.username = loginInfo.userName
-        this.password = loginInfo.pwd
-        this.loginDisabled2 = false
-      }
-    },
+    // created() {
+    //   if (localStorage.loginInfo) {
+    //     const loginInfo = JSON.parse(localStorage.loginInfo)
+    //     this.username = loginInfo.userName
+    //     this.password = loginInfo.pwd
+    //     this.loginDisabled2 = false
+    //   }
+    // },
     activated() {
       this.getQrcodeInfo()
     },

@@ -72,7 +72,7 @@
         <div class="container">
           <div>学校：{{schoolName}}</div>
           <div>年级：{{classGrade|getGradeName}}</div>
-          <div>学科：{{subjectType|getSubjectName}}</div>
+          <div>学科：{{subjectTypeName}}</div>
           <div class="submitInfo">
             <div>
               班级：
@@ -139,6 +139,7 @@
       return {
         subjectType: '0',
         version: '0',
+        subjectTypeName:'',
         classResult: [],
         postResult: [],
         classList: [],
@@ -168,6 +169,12 @@
           this.$toast.fail('请选择科目！');
           return;
         }
+
+        if (this.version == '00') {
+          this.$toast.fail('该科目未配置教材版本，请重新选择科目！');
+          return;
+        }
+
         if (this.qrCodeType == 'Q01') {
           // 年级二维码
           if (this.classResult.length == 0) {
@@ -309,6 +316,10 @@
         if (val == '0') {
           return;
         }
+        this.subjectTypeName = this.subjectList.filter(item=>{
+          return item.value == val
+        })[0].text;
+
         this.getVersionList(val)
       },
       // 获取学科列表
@@ -352,14 +363,24 @@
           })
         };
         getVersionBySubjectType(json).then(res => {
-          if (res.flag && res.data) {
-            this.versionList = res.data.map(function (item) {
-              return {
-                text: item.textBookName,
-                value: item.textBookId
-              };
-            });
-            this.version = this.versionList[0].value;
+          if (res.flag) {
+            if (res.data && res.data.length > 0) {
+              this.versionList = res.data.map(function (item) {
+                return {
+                  text: item.textBookName,
+                  value: item.textBookId
+                };
+              });
+              this.version = this.versionList[0].value;
+            } else {
+              this.versionList = [
+                {text: '未配置教材版本', value: '00'}
+              ]
+              this.version = this.versionList[0].value;
+            }
+
+          } else {
+            this.$toast.fail(res.msg);
           }
         });
       },

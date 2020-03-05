@@ -13,7 +13,7 @@
         </label>：
         <van-field class="custom-input" placeholder="请输入学生真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
                    v-model.trim="username" clearable/>
-<!--        <span class="numTips" >剩2字</span>-->
+        <span class="numTips" >{{wordsNum}}</span>
 
       </div>
       <div class="form-cell" v-if="roleType == 'A02'">
@@ -26,7 +26,7 @@
         </label>：
         <van-field class="custom-input" placeholder="请输入老师真实姓名" @blur="handleBlur" maxlength="6" @input="changeInput"
                    v-model.trim="username" clearable/>
-<!--        <span class="numTips" >剩2字</span>-->
+        <span class="numTips" >{{wordsNum}}</span>
 
       </div>
       <div class="form-cell">
@@ -82,7 +82,8 @@
         isUnAvailable: false,
         roleType: '',
         accountPrefix: '',  //账号前缀
-        num: 0
+        num: 0,
+        wordsNum:6
       };
     },
     created() {
@@ -95,6 +96,7 @@
       changeInput() {
         // 过滤掉除数字、字母、汉字以外的所有字符
         this.username = this.username.replace(/[^A-Za-z0-9\u4e00-\u9fa5]/g, "");
+        this.wordsNum = 6 - this.username.length;
       },
       handleBlur() {
         this.num = 0;
@@ -287,6 +289,11 @@
 
           &.correct {
             color: #43b75f;
+          }
+          &.numTips{
+            top: 5px;
+            left: 290px;
+            color: #ff3737;
           }
         }
       }
