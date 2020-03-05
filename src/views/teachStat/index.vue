@@ -4,7 +4,7 @@
       v-if="$route.path === '/teachStat/'"
       title="教学统计">
     </van-nav-bar>
-    <div>
+    <div class="teach-stat-wrap__filter">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
       <van-cell v-if="!isMaster" @click="openGradePop" title="年级学科" is-link>
         <div class="blue">{{gradeSubjectList[gradeIndex].gradeName}}{{gradeSubjectList[gradeIndex].teacherInfoList[subjectIndex].subjectName}}</div>
@@ -680,7 +680,9 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
-
+    &__filter {
+      flex: 0 0 176px;
+    }
 
     &__body {
       flex: 1;
