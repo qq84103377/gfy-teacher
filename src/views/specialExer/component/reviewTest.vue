@@ -2,11 +2,15 @@
   <section class="review-test-wrap">
     <van-list v-model="listLoading" :finished="finished" @load="onLoad" :finished-text="testList.length>0?'没有更多了':'本地区无相关套卷'" :offset='80'>
       <van-cell title="试卷" class="fs16" style="background: #f5f5f5;color: #999" />
-      <div class="null-box" v-if="!testList || testList.length==0">
+      <div class="null-box" v-if="!testList.length&&!recommendList.length">
         <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
         <p class="fs12" style="text-align: center;color: #999999">本地区无相关套卷</p>
       </div>
-      <div v-else>
+      <div class="null-box" v-if="!testList.length&&recommendList.length">
+        <!-- <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt /> -->
+        <p class="fs12" style="text-align: center;color: #999999">本地区无相关套卷，为您推荐以下：</p>
+      </div>
+      <div v-if="testList.length">
         <van-cell v-for='item in testList' :key='item.testPaperId' @click='go(item)'>
           <template slot="title">
             <div class="fs18">{{item.testPaperName}}</div>
@@ -18,18 +22,18 @@
           </template>
         </van-cell>
       </div>
-      <van-cell v-if="!testList.length" class="mgt10" style="background: #f5f5f5;color: #999">
+      <van-cell v-if="!testList.length&&recommendList.length" class="mgt10" style="background: #f5f5f5;color: #999">
         <template slot="title">
-          <span class="fs16">为您推荐</span>
+          <!-- <span class="fs16">为您推荐</span> -->
           <img class="light" v-if='totalNumber' src="../../../assets/img/icon-light.png" alt="">
           <span class="red fs12" v-if='totalNumber'>
             已推荐<span>{{totalNumber}}</span>套同教材复习套卷
           </span>
         </template>
       </van-cell>
-      <div class="null-box" v-if="!testList.length&&!recommendList.length">
+      <!-- <div class="null-box" v-if="!testList.length&&!recommendList.length">
         <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
-      </div>
+      </div> -->
       <div v-if="!testList.length&&recommendList.length">
         <van-cell v-for='item in recommendList' :key='item.testPaperId' @click='go(item)'>
           <template slot="title">
@@ -254,6 +258,7 @@ export default {
       let response = await getTestPaperInfoList(obj)
       console.log(response, 'getTestPaperInfoList response');
       this.listLoading = false
+      this.recommendList = []
       if (this.currentPage === 1) {
         this.testList = []
       }
@@ -270,6 +275,7 @@ export default {
         this.totalPage = response.total
         this.testList = this.testList.concat(response.data)
       }
+
     },
 
     // 获取试卷推荐列表信息

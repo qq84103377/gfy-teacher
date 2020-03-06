@@ -2,7 +2,7 @@
   <section class="knowledge-point-wrap">
     <van-cell title="总复习" class="fs16" style="background: #f5f5f5;color: #999" />
     <div class="null-box" v-if="isRecomment&&list.length">
-      <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt />
+      <!-- <img class="null-tips" src="../../../assets/img/preview/class_stat_empty.png" alt /> -->
       <p class="fs12" style="text-align: center;color: #999999">本地区无相关知识点，推荐使用以下知识点</p>
     </div>
     <div class="null-box" v-if="isRecomment&&!list.length">
