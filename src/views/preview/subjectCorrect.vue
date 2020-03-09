@@ -65,10 +65,10 @@
       <div class="correct-wrap__body__text" ref="text"
            :class="{ellipsis:stuArr[stuIndex].answer[aswIndex].imgArr.length}"
            v-if="stuArr[stuIndex].answer[aswIndex].text">
-        <div style="word-break: break-all" class="text-area" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
-        <div class="more-btn" @click="viewSubject = true;isShowTitle=false"
-             v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案
-        </div>
+          <div style="word-break: break-all" class="text-area" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
+          <div class="more-btn" @click="viewSubject = true;isShowTitle=false"
+               v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案
+          </div>
       </div>
       <div class="correct-wrap__body__audio" v-if="stuArr[stuIndex].answer[aswIndex].audioArr.length && !stuArr[stuIndex].answer[aswIndex].text">
         <i class="iconGFY icon-circle-logo"></i>
@@ -476,6 +476,7 @@
       },
       zoom(type) {
         if(this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+          this.scale = this.$refs['drawBoard'].scale
           this.scale += type ? 0.1 : -0.1
           this.$refs['drawBoard'].handleZoom(this.scale)
         }
@@ -1233,15 +1234,16 @@
 
       &__text {
         display: flex;
-        align-items: center;
+        align-items: end;
         justify-content: space-between;
         /*width: calc(100% - 100px);*/
         padding: 33px 105px 10px 10px;
         font-size: 10px;
         min-height: 40px;
-
+        overflow-y: auto;
         &.ellipsis {
           flex: 0 0 20%;
+          overflow-y: initial;
 
           .text-area {
             overflow: hidden;

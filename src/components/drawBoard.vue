@@ -1,9 +1,12 @@
 <template>
-  <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0;" id="container">
-    <div class="wrapper" id="test">
-      <canvas class="offCanvas"></canvas>
-      <canvas ref="canvas" class="canvas"></canvas>
-    </div>
+  <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0" id="container">
+      <div id="layout">
+        <div class="wrapper" id="test">
+          <canvas class="offCanvas"></canvas>
+          <canvas ref="canvas" class="canvas"></canvas>
+        </div>
+      </div>
+
     <!--    <div class="footer">-->
     <!--      <div class="control-button">-->
     <!--        <div class="item colorButton"><img src="" alt=""><span>黑色</span></div>-->
@@ -142,6 +145,7 @@ export default {
       this.imgOnload = false
       //对于文字+图片和纯图片之间的切换 需要重新计算canvas高度,
       this.$nextTick(() => {
+        document.getElementById('layout').className = ''
         this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
         this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
         this.drawImg(this.imgUrl); // 画图
@@ -197,11 +201,72 @@ export default {
       this.changeImg = new Image();
       // this.changeImg.setAttribute("crossOrigin", 'anonymous');
       // this.changeImg.src = changeValue + '&' + Math.random();
+      // this.changeImg.src = 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/17493_1583462496_SoBss.png?x-oss-process=style/max_width_1000';
       this.changeImg.src = changeValue;
       this.changeImg.onload = () => {
-        console.log(changeValue);
+
+        let scaleRange = 1   // 缩放显示比例
+
+        //获取原图的宽高,若宽或高超过屏幕,则按比例缩放显示
+        const maxWidth = window.document.body.offsetWidth
+        const maxHeight = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+        let tempWidth, tempHeight
+        if (this.changeImg.width/this.changeImg.height >= maxWidth/maxHeight) {
+          if (this.changeImg.width > maxWidth) {
+            tempWidth = maxWidth;
+            // 按原图片的比例进行缩放
+            tempHeight = (this.changeImg.height * maxWidth) / this.changeImg.width;
+            //原图宽度超过屏幕宽度时,计算缩放比例
+            scaleRange = maxWidth / this.changeImg.width
+          } else {
+            // 按原图片的大小进行缩放
+            tempWidth = this.changeImg.width;
+            tempHeight = this.changeImg.height;
+          }
+        } else {// 原图片的高度必然 > 宽度
+          if (this.changeImg.height > maxHeight) {
+            tempHeight = maxHeight;
+            // 按原图片的比例进行缩放
+            tempWidth = (this.changeImg.width * maxHeight) / this.changeImg.height;
+            //原图高度超过屏幕高度时,计算缩放比例
+            scaleRange = maxHeight / this.changeImg.height
+          } else {
+            // 按原图片的大小进行缩放
+            tempWidth = this.changeImg.width;
+            tempHeight = this.changeImg.height;
+          }
+        }
+
+        //canvas按原图宽高进行设置,然后通过缩放比例显示
+        this.offCanvas.width = this.changeImg.width
+        this.offCanvas.style.width = this.changeImg.width + 'px'
+        this.offCanvas.height = this.changeImg.height
+        this.offCanvas.style.height = this.changeImg.height + 'px'
+        this.canvas.width = this.changeImg.width
+        this.canvas.style.width = this.changeImg.width + 'px'
+        this.canvas.height = this.changeImg.height
+        this.canvas.style.height = this.changeImg.height + 'px'
+        document.getElementById('test').style.width = this.changeImg.width + 'px'
+        document.getElementById('test').style.height = this.changeImg.height + 'px'
+
         this.offCtx.drawImage(this.changeImg, 0, 0, this.$refs['canvas'].width, this.$refs['canvas'].height);
         this.imgOnload = true
+
+        //*************************************************************************//
+        //用来计算旋转后的描点位置
+        this.rotate = 90
+        this.swordEle.rotateZ = 90
+        let bbox = this.swordEle.getBoundingClientRect();
+        this.lastLeft = bbox.left
+        this.lastTop = bbox.top
+        this.rotate = 0
+        this.swordEle.rotateZ = 0
+        //*************************************************************************//
+
+        //调整缩放比例
+        this.swordEle.scaleX = this.swordEle.scaleY = this.scale = scaleRange
+        //居中显示canvas
+        document.getElementById('layout').className = 'center-box'
       };
       this.changeImg.onerror = () => {
         this.$toast('图片加载失败')
@@ -794,11 +859,11 @@ export default {
     },
     handleResize() {
       console.log('handleResize()xxxxxx');
-      this.offCanvas.width = window.document.body.offsetWidth
-      this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
-      // offCanvas.height = $(window).height() - footerHeight;
-      this.canvas.width = window.document.body.offsetWidth
-      this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+      // this.offCanvas.width = window.document.body.offsetWidth
+      // this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+      // // offCanvas.height = $(window).height() - footerHeight;
+      // this.canvas.width = window.document.body.offsetWidth
+      // this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
       console.log(this.canvas.width);
       console.log(this.canvas.height);
       // canvas.height = $(window).height() - footerHeight;
@@ -816,20 +881,6 @@ export default {
       //   // console.log(this.canvas.width);
       //   // console.log(this.canvas.height);
       // }
-      this.rotate = 90
-      this.swordEle.rotateZ = 90
-      console.log(this.swordEle, 'this.swordEle2');
-      let bbox = this.swordEle.getBoundingClientRect();
-      console.log(bbox, '初始旋转的bbox2');
-      console.log(bbox.width, '初始旋转的bbox2');
-      console.log(bbox.top, '初始旋转的bbox2');
-      this.lastLeft = bbox.left
-      this.lastTop = bbox.top
-      console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop2');
-
-      this.rotate = 0
-      this.swordEle.rotateZ = 0
-      // }
     }
   },
   mounted() {
@@ -839,6 +890,7 @@ export default {
       this.isIphone = true
     }
     window.addEventListener('resize', this.handleResize)
+    this.figure()
 
     let _this = this
     this.offCanvas = document.getElementsByClassName('offCanvas')[0] //$('.offCanvas')[0]; // 用于更换背景图
@@ -846,7 +898,7 @@ export default {
     this.canvas = document.getElementsByClassName('canvas')[0] //$('.canvas')[0]; // 用于涂鸦
     this.ctx = this.canvas.getContext('2d');
     this.clearScreen()
-    this.drawImg(this.imgUrl); // 画图
+    // this.drawImg(this.imgUrl); // 画图
     // let lastLineWidth = -1; // 用于线光滑过度
     // let sizeWidth = 30; // 中笔触计算值
     // let strokeColor = '#000'; // 笔触颜色默认黑色
@@ -857,33 +909,13 @@ export default {
     // let footerHeight = $('.footer').height(); // 获取底部高度
     //
 
-    this.offCanvas.width = window.document.body.offsetWidth
-    this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
-    this.canvas.width = window.document.body.offsetWidth
-    this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+    // this.offCanvas.width = window.document.body.offsetWidth
+    // this.offCanvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
+    // this.canvas.width = window.document.body.offsetWidth
+    // this.canvas.height = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
 
-    this.figure()
     // this.containerFigure()
 
-    console.log("zheshi ");
-    console.log(this.canvas.width);
-    console.log(this.canvas.height);
-
-    this.rotate = 90
-    this.swordEle.rotateZ = 90
-
-    console.log(this.swordEle, 'this.swordEle');
-
-    let bbox = this.swordEle.getBoundingClientRect();
-    console.log(bbox, '初始旋转的bbox');
-    console.log(bbox.width, '初始旋转的bbox');
-    console.log(bbox.top, '初始旋转的bbox');
-    this.lastLeft = bbox.left
-    this.lastTop = bbox.top
-    console.log(this.lastLeft, this.lastTop, '初始旋转的this.lastLeft,this.lastTop');
-
-    this.rotate = 0
-    this.swordEle.rotateZ = 0
 
 
     this.$store.commit('setVanLoading', true)
@@ -1082,7 +1114,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 @import "../utils/canvas/base.css";
 @import "../utils/canvas/handWriting.css";
+  .center-box{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+  }
 </style>
