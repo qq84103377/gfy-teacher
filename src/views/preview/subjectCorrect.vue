@@ -1241,6 +1241,7 @@
         font-size: 10px;
         min-height: 40px;
         overflow-y: auto;
+        z-index: 1;
         &.ellipsis {
           flex: 0 0 20%;
           overflow-y: initial;
