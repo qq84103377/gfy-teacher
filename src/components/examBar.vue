@@ -87,7 +87,7 @@
               <div class="fs15" style="flex: 1;word-break: break-all">{{courseName}}</div>
               <van-icon @click="showFilter" name="add" class="add"></van-icon>
             </div>
-            <div class="red fs12 mgt10">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
+            <div v-if="$route.path === '/errorQuestionDetail' || $route.path === '/errorBook'" class="red fs12 mgt10">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
           </div>
         </van-cell>
         <div class="add-exam-wrap__footer">
@@ -99,7 +99,7 @@
 
 <!--    <filter-panel :visible.sync="filterShow" title="添加" :list="tempList" @filter="handleFilter"></filter-panel>-->
 
-    <select-course :isNone="true" :visible.sync="filterShow" :list="tempList" @filter="handleFilter"></select-course>
+    <select-course :visible.sync="filterShow" :list="tempList" @filter="handleFilter"></select-course>
   </section>
 </template>
 
@@ -132,7 +132,12 @@
       },
       courseName() {
         // return this.courseList.find(v => v.check).tchCourseInfo.courseName
-        return this.listIndex !== '' ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.courseName : '无'
+        // return this.listIndex !== '' ? this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.courseName : '无'
+        try{
+          return this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.courseName
+        }catch{
+          return '无'
+        }
       }
     },
     data() {
@@ -153,8 +158,8 @@
         courseList: [],
         // isRevert: false, //是否显示返回按钮
         knowledgePointIndex:1,
-        listIndex: '',
-        radioIndex: '',
+        listIndex: 0,
+        radioIndex: 0,
       }
     },
     watch: {
@@ -178,7 +183,9 @@
             }
             if(!this.$route.query.isPri) {
               let  testPaperIndex = 1
-              const courseId = (this.canAddCourse && !this.isRevert) ? (this.listIndex===''?'':this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.tchCourseId) : this.$route.query.tchCourseId
+              const courseId = (this.canAddCourse && !this.isRevert) ?
+                (this.courseList.length?this.courseList[this.listIndex].arr[this.radioIndex].tchCourseInfo.tchCourseId:'')
+                : this.$route.query.tchCourseId
               if(localStorage.courseIdMap) {
                 testPaperIndex = JSON.parse(localStorage.courseIdMap)[courseId]?JSON.parse(localStorage.courseIdMap)[courseId]+1:1
               }
@@ -243,16 +250,18 @@
           "operateRoleType": "A02",
           "accountNo": this.$store.getters.getUserInfo.accountNo,
           "subjectType": localStorage.getItem("currentSubjectType"),
-          ...this.$store.getters.getErrorFilterParams,
           "pageSize": "999",
           "courseType": "C01",
           "currentPage": 1,
           'isFinish': 4
         }
-        if(this.$route.query.isRes) {
-          obj.termType = this.$route.query.termType
-          obj.classGrade = this.$route.query.classGrade
+        if(this.$route.path === '/errorQuestionDetail' || this.$route.path === '/errorBook') {
+          obj = {...obj,...this.$store.getters.getErrorFilterParams}
         }
+          // if(this.$route.query.isRes) {
+        //   obj.termType = this.$route.query.termType
+        //   obj.classGrade = this.$route.query.classGrade
+        // }
         let params = {
           requestJson: JSON.stringify(obj)
         }
@@ -271,16 +280,12 @@
               }
             })
 
-            if(this.$route.path === '/examDetail' && this.canAddCourse) {
-              // this.courseList.length ? this.$set(this.courseList[0],'check',true) : ''
-            }else {
-              if(!this.courseList.some(v => v.radio !== '')) {
-                this.listIndex = this.courseList.length
-                this.radioIndex = 0
-              }
+            if(this.$route.path === '/errorQuestionDetail' || this.$route.path === '/errorBook') {
               this.courseList.push({arr:[{tchCourseInfo:{courseName:'无',sysCourseId:''}}],classGrade:'',radio:this.courseList.some(v => v.radio !== '')?'':0})
-              // this.courseList.push({tchCourseInfo:{courseName:'无',sysCourseId:''},check:true})
-
+              // if(!this.courseList.some(v => v.radio !== '')) {
+              //   this.listIndex = this.courseList.length
+              //   this.radioIndex = 0
+              // }
             }
           }
         })
@@ -294,6 +299,10 @@
           return this.$toast('请添加试题')
         }
         // }
+        if(((this.canAddCourse && !this.isRevert)||(this.qesTypeName)||(this.knowledgePoint)) && !this.courseList.length) {
+          //可以选择添加的课程 但课程列表为空
+          return this.$toast('请选择课程')
+        }
         this.form.btnLoading = true
         let obj = {
           "interUser": "runLfb",

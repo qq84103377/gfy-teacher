@@ -34,6 +34,7 @@
             <div class="fs12 red pdlt10">如没有进行添加到具体课程，则自动添加到「资源中心」-「私人资源」-「试卷」</div>
           </div>
         </div>
+        <div style="text-align: center" v-if="!list.length">当前全部课程已过期，请新建课程</div>
 
 <!--        <div class="pdlt10">-->
 <!--          <van-radio @click="clickNone" v-model="none" name="1" class="mgr10 mgb15">-->
@@ -60,8 +61,7 @@
     props: ['visible', 'list'],
     data() {
       return {
-        listIndex: '',
-        none: ''
+        listIndex: 0,
       }
     },
     computed: {
@@ -73,6 +73,13 @@
           this.$emit('update:visible', false)
         }
       },
+    },
+    watch: {
+      show(v) {
+        if(v) {
+          this.listIndex = this.$parent.listIndex
+        }
+      }
     },
     methods: {
       // clickNone() {
@@ -92,7 +99,8 @@
         this.listIndex = index
       },
       submit() {
-        if(this.listIndex === '' && this.none === '') return this.$toast('请选择课程')
+        // if(this.listIndex === '') return this.$toast('请选择课程')
+        if(!this.list.length) return this.$toast('请选择课程')
         this.show = false
           this.$emit('filter',this.listIndex,this.list[this.listIndex].radio,this.list[this.listIndex].arr[this.list[this.listIndex].radio])
       }

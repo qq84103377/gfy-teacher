@@ -23,6 +23,7 @@
             </van-radio>
           </van-radio-group>
         </div>
+        <div style="text-align: center" v-if="!list.length">当前全部课程已过期，请新建课程</div>
       </div>
       <div class="add-course-pop__footer">
         <van-button type="info" class="btn" @click="submit">确定</van-button>

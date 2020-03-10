@@ -222,7 +222,7 @@
     </van-popup>
     <van-popup round v-model="showPieTip">
       <div class="pd10 fs16 tip-wrap">
-        <div style="text-align: center" class="fs18">发布范围</div>
+        <div style="text-align: center" class="fs18">客观题说明</div>
         <div class="mgt5"><span style="color: green">●</span> 错误率 = 答题错误人数/答题总人数</div>
         <div class="mgt5"><span class="red">●</span> 正确率 = 答题正确人数/答题总人数</div>
         <div class="mgt5">● 饼状图中间显示的是该题目的正确率</div>
