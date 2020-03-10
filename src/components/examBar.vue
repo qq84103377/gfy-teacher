@@ -281,6 +281,10 @@
             })
 
             if(this.$route.path === '/errorQuestionDetail' || this.$route.path === '/errorBook') {
+              if(!this.courseList.length) {
+                this.listIndex = 0
+                this.radio = 0
+              }
               this.courseList.push({arr:[{tchCourseInfo:{courseName:'无',sysCourseId:''}}],classGrade:'',radio:this.courseList.some(v => v.radio !== '')?'':0})
               // if(!this.courseList.some(v => v.radio !== '')) {
               //   this.listIndex = this.courseList.length
@@ -301,7 +305,7 @@
         // }
         if(((this.canAddCourse && !this.isRevert)||(this.qesTypeName)||(this.knowledgePoint)) && !this.courseList.length) {
           //可以选择添加的课程 但课程列表为空
-          return this.$toast('请选择课程')
+          return this.$toast('当前全部课程已过期，请新建课程')
         }
         this.form.btnLoading = true
         let obj = {
