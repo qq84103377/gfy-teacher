@@ -2,7 +2,7 @@
   <section class="question-list">
     <van-nav-bar :title="title" left-arrow @click-left="goBack" class="title" />
 
-    <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;" />
+    <van-overlay class-name="mask" :show="tab.questionType||tab.difficult||tab.type||tab.sort||tab.share" @click="tab.questionType=false;tab.difficult=false;tab.type=false;tab.sort=false;tab.share=false;" />
     <div class="question-list__tab">
       <div v-if='!isQuestionType'>
         <div class="dropdown__title" @click="tab.questionType=!tab.questionType" >
@@ -54,6 +54,17 @@
           </div>
         </div>
       </div>
+      <div v-if='!isQuestionType && !isKnowledgePoint && !isfEducation && !$route.query.isPri'>
+        <div class="dropdown__title" @click="tab.share=!tab.share">
+          <div class="ellipsis">{{tab.shareList.find(v => v.active)?tab.shareList.find(v => v.active).name:'全部'}}</div>
+          <!--          <van-icon :name="tab.sort?'arrow-up':'arrow-down'"/>-->
+          <span :class="['triangle',{up:tab.share}]"></span>
+        </div>
+        <div v-show="tab.share" class="dropdown-menu">
+          <div class="dropdown-menu-item" @click="selectMenu(item,'shareList')" :class="{active:item.active}" v-for="(item,index) in tab.shareList" :key="index">{{item.name}}
+          </div>
+        </div>
+      </div>
     </div>
     <div class="question-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
@@ -91,6 +102,7 @@ export default {
       isQuestionType: this.$route.query.isQuestionType,
       isKnowledgePoint: this.$route.query.isKnowledgePoint,
       qesTypeName: this.$route.query.item?this.$route.query.item.examTypeName:'',
+      isfEducation: this.$route.query.isfEducation,
       knowledgePoint:'',
       selectList: [], //添加的试题列表
       addInfo: {},
@@ -101,6 +113,7 @@ export default {
         difficult: false,
         type: false,
         sort: false,
+        share: false,
         sortList: [ { name: '综合排序', value: 'T05' }, { name: '时间', value: 'T01' }, {
           name: '使用量',
           value: 'T02'
@@ -110,7 +123,8 @@ export default {
           value: 'd03'
         }],
         questionTypeList: [{ examTypeName: '全部' }],
-        typeList: [{ dictValue: '全部' }]
+        typeList: [{ dictValue: '全部' }],
+        shareList: [{ name: '全部',value: '' },{ name: '共享',value: 'S03' },{ name: '校内',value: 'S02' },{ name: '个人',value: 'S01' }],
       },
       list: [],
       listLoading: false,
@@ -122,12 +136,12 @@ export default {
         "titleType": "",//题型
         "titleDegree": "", //难度
         "belongType": "", //类型
-        "orderByType": "T05"//排序类型 T05综合排序，T01:时间排序，T02：使用量，T03：收藏量
+        "orderByType": "T05",//排序类型 T05综合排序，T01:时间排序，T02：使用量，T03：收藏量
+        "shareType": this.$route.query.shareType || '',
       },
       scrollTop: 0,
       removeQuestionList: [], //试卷详情跳转到资源中心试题列表时,移除的试题需要记录起来,返回到试卷详情时要把移除的题目清理掉
       clickItem:'',
-      isfEducation: this.$route.query.isfEducation
     }
   },
   watch: {
@@ -150,6 +164,11 @@ export default {
   },
   async created() {
     this.$store.commit('setVanLoading', true)
+    if(this.$route.query.isRes && !this.$route.query.isPri) {
+      //平台资源进入试题列表
+      const index = this.tab.shareList.findIndex(v => v.value === this.$route.query.shareType)
+      this.$set(this.tab.shareList[index],'active',true)
+    }
 
     Promise.all([this.getExamSectionTypeRelation(), this.getSysDictList()]).then(res => {
       this.$store.commit('setVanLoading', false)
@@ -198,7 +217,7 @@ export default {
     }
     next();
     }
-  
+
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -298,6 +317,7 @@ export default {
       this.tab.difficult = false;
       this.tab.type = false;
       this.tab.sort = false;
+      this.tab.share = false;
       if (item.active) return
       this.$store.commit('setVanLoading', true)
       this.tab[key].forEach(v => {
@@ -313,6 +333,8 @@ export default {
         this.filterParam.belongType = item.dictKey
       } else if (key === 'sortList') {
         this.filterParam.orderByType = item.value
+      } else if (key === 'shareList') {
+        this.filterParam.shareType = item.value
       }
       // this.$refs['body'].scrollTo(0, 0)
       this.$refs['body'].scrollTop = 0
@@ -468,7 +490,8 @@ export default {
             "filterParam": {
               "titleDegree": this.filterParam.titleDegree,
               "belongType": this.filterParam.belongType,
-              "titleType": this.filterParam.titleType
+              "titleType": this.filterParam.titleType,
+              "shareType": this.filterParam.shareType,
             }
           }
           let params = {
@@ -641,7 +664,7 @@ export default {
           "sysCourseId": this.$route.query.sysCourseId,
           "relationSeqId": this.$route.query.relationCourseId,
           "resourceType": 'R03',
-          "shareType": '',
+          "shareType": this.filterParam.shareType,
           "sourceName": "",
           "pageSize": "10",
           "currentPage": page,

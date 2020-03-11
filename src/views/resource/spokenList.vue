@@ -1,5 +1,8 @@
 <template>
   <section class="spoken-list">
+    <div class="spoken-list__tab">
+      <div @click="changeTab(item)" :class="{active:item.active}" v-for="(item,index) in tabList" :key="index">{{item.name}}</div>
+    </div>
     <div class="spoken-list__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
@@ -139,7 +142,18 @@ export default {
       currentPage: 0,
       total: 0,
       scrollTop: 0,
-      clickIndex:0
+      clickIndex:0,
+      tabList: [
+        {name:'全部',value:'',active:true},
+        {name:'共享',value:'S03',active:false},
+        {name:'校内',value:'S02',active:false},
+        {name:'个人',value:'S01',active:false},
+      ],
+    }
+  },
+  computed: {
+    shareType() {
+      return this.tabList.find(v => v.active).value
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -160,6 +174,15 @@ export default {
     });
   },
   methods: {
+    changeTab(item) {
+      if(item.active) return
+      this.$store.commit('setVanLoading', true)
+      this.tabList.forEach(v => {
+        v.active = false
+      })
+      item.active = true
+      this.onRefresh()
+    },
     clickDel(index){
       this.clickIndex=index
     },
@@ -356,7 +379,7 @@ export default {
         "sysCourseId": this.$route.query.sysCourseId,
         "relationSeqId": this.$route.query.relationCourseId,
         "resourceType": 'R08',
-        "shareType": '',
+        "shareType": this.shareType,
         "sourceName": "",
         "pageSize": "10",
         "currentPage": page
@@ -365,6 +388,7 @@ export default {
         requestJson: JSON.stringify(obj)
       }
       teachApi.getTeachCourseResDetail(params).then(res => {
+        this.$store.commit('setVanLoading', false)
         this.listLoading = false
         this.refLoading = false
         this.total = res.total
@@ -399,6 +423,28 @@ export default {
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
+  &__tab {
+    background: #fff;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+
+    > div {
+      flex: 1;
+      color: #333;
+      font-size: 16px;
+      text-align: center;
+      line-height: 44px;
+      border-left: 1px solid #eee;
+
+      &.active {
+        color: @blue;
+      }
+      &:first-child{
+        border: none;
+      }
+    }
+  }
 
   .spoken-pop {
     &__title {

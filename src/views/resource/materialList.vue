@@ -1,5 +1,8 @@
 <template>
   <section class="material-list-wrap">
+    <div class="material-list-wrap__tab">
+      <div @click="changeTab(item)" :class="{active:item.active}" v-for="(item,index) in tabList" :key="index">{{item.name}}</div>
+    </div>
     <div class="material-list-wrap__body" ref="body">
       <van-pull-refresh v-model="refLoading" @refresh="onRefresh">
         <div v-if="!listLoading && list.length==0" style="text-align: center;color: #999999">
@@ -66,7 +69,13 @@
         total: 0,
         accessUrl: '',
         clickIndex:0,
-        isfEducation: this.$route.query.isfEducation
+        isfEducation: this.$route.query.isfEducation,
+        tabList: [
+          {name:'全部',value:'',active:true},
+          {name:'共享',value:'S03',active:false},
+          {name:'校内',value:'S02',active:false},
+          {name:'个人',value:'S01',active:false},
+        ],
       }
     },
     computed: {
@@ -77,6 +86,9 @@
         }else {
           return true
         }
+      },
+      shareType() {
+        return this.tabList.find(v => v.active).value
       }
     },
     beforeRouteLeave(to, from, next) {
@@ -115,6 +127,15 @@
       }
     },
     methods: {
+      changeTab(item) {
+        if(item.active) return
+        this.$store.commit('setVanLoading', true)
+        this.tabList.forEach(v => {
+          v.active = false
+        })
+        item.active = true
+        this.onRefresh()
+      },
       gotoUpload() {
         // if(this.isIOS) {
           this.$router.push({path:'uploadWare',query:{tchCourseId:this.$route.query.tchCourseId,sysCourseId:this.$route.query.sysCourseId,relationCourseId:this.$route.query.relationCourseId,subjectType:this.$route.query.subjectType,classId:this.$route.query.classId,tchClassCourseInfo:this.$route.query.tchClassCourseInfo}})
@@ -323,7 +344,7 @@
           "sysCourseId": this.$route.query.sysCourseId,
           "relationSeqId": this.$route.query.relationCourseId,
           "resourceType": 'R01',
-          "shareType": '',
+          "shareType": this.shareType,
           "sourceName": "",
           "pageSize": "10",
           "coursewareClassify": 'C03',
@@ -333,6 +354,7 @@
           requestJson: JSON.stringify(obj)
         }
         teachApi.getTeachCourseResDetail(params).then(res => {
+          this.$store.commit('setVanLoading', false)
           this.listLoading = false
           this.refLoading = false
           this.total = res.total
@@ -362,6 +384,28 @@
     display: flex;
     flex-direction: column;
     background: #f5f5f5;
+    &__tab {
+      background: #fff;
+      flex: 0 0 44px;
+      display: flex;
+      align-items: center;
+
+      > div {
+        flex: 1;
+        color: #333;
+        font-size: 16px;
+        text-align: center;
+        line-height: 44px;
+        border-left: 1px solid #eee;
+
+        &.active {
+          color: @blue;
+        }
+        &:first-child{
+          border: none;
+        }
+      }
+    }
     &__body {
       flex: 1;
       overflow-y: auto;

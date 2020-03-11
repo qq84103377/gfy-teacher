@@ -45,6 +45,16 @@
           <van-icon class="fs15" name="arrow"/>
         </div>
       </van-cell>
+      <van-cell class="res-centre-wrap__body__cell" v-show="!tabIndex">
+        <div slot="title" @click="shareFilterShow=true" class="aic jcsb">
+          <div style="flex: 0 0 15%" class="fs16">共享</div>
+          <!--          <div style="flex: 0 0 80%;justify-content: flex-end" class="fs15 aic">-->
+          <!--          </div>-->
+          <div style="flex: 1;width: 50px;text-align: right" class="van-ellipsis"><span class="blue mgr10">{{shareLabel}}</span>
+          </div>
+          <van-icon class="fs15" name="arrow"/>
+        </div>
+      </van-cell>
 
       <div class="sticky-wrap" ref="sticky-wrap" v-if="isIOS">
         <div class="res-centre-wrap__body__title">资源类型</div>
@@ -410,6 +420,7 @@
                     :resName="resName"
                     :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm"
                     :visible.sync="addCourseShow"></add-course-pop>
+    <share-filter :label.sync="shareLabel" :visible.sync="shareFilterShow" @filter="v => shareType = v"></share-filter>
   </section>
 </template>
 
@@ -420,6 +431,7 @@
   import areaFilter from './component/areaFilter'
   import resCourseFilter from './component/resCourseFilter'
   import addCoursePop from './component/addCoursePop'
+  import shareFilter from './component/shareFilter'
   import {
     getResCourseWareInfo,
     delCollectInfo,
@@ -438,7 +450,7 @@
   export default {
     name: "index",
     props: ['canBack'],
-    components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter, addCoursePop},
+    components: {listItem, subjectFilter, versionFilter, areaFilter, resCourseFilter, addCoursePop, shareFilter},
     data() {
       return {
         resourceIndex: 1,
@@ -452,11 +464,13 @@
         subjectFilterShow: false,
         versionFilterShow: false,
         areaFilterShow: false,
+        shareFilterShow: false,
         resCourseFilterShow: false,
         addCourseShow: false,
         subjectLabel: '',
         versionLabel: '',
         areaLabel: '',
+        shareLabel: '全部',
         courseLabel: '',
         filter: {
           area: '',
@@ -466,6 +480,7 @@
         },
         courseId: '',
         areaCode: '',
+        shareType: '',
         gradeTerm: '', //年级学期
         lessonList: [],
         lessonListPage: 0,
@@ -593,6 +608,10 @@
         if (this.canBack) return
         eventBus.$emit('hideNav', !v)
       },
+      shareFilterShow(v) {
+        if (this.canBack) return
+        eventBus.$emit('hideNav', !v)
+      },
       addCourseShow(v) {
         if (this.canBack) return
         eventBus.$emit('hideNav', !v)
@@ -644,6 +663,20 @@
         this[`${this.curKey}Init`] = true
         if (!this.tabIndex) this.onRefresh()
         this.courseList = []
+      },
+      shareType() {
+        this.lessonListInit = false
+        this.lessonListPage = 0
+        this.lessonListTotal = 0
+        this.materialListInit = false
+        this.materialListPage = 0
+        this.materialListTotal = 0
+        this.examListInit = false
+        this.examListPage = 0
+        this.examListTotal = 0
+        this[`${this.curKey}Init`] = true
+        if (!this.tabIndex) this.onRefresh()
+        // this.courseList = []
       },
     },
     beforeRouteLeave(to, from, next) {
@@ -1020,7 +1053,7 @@
           if (this.tabIndex) {
             this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSection()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
           } else {
-            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
+            this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}&shareType=${this.shareType}`)
           }
         }
 
@@ -1174,7 +1207,8 @@
           sysCourseIdList: [this.courseId],
           "pageSize": "10",
           "currentPage": page,
-          "orderByType": "T05"
+          "orderByType": "T05",
+          "shareType": this.shareType,
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -1426,7 +1460,7 @@
           "orderByType": "T05",
           "pageSize": "10",
           "currentPage": page,
-          "filterParam": {"shareType": "", "courseWareType": ""}
+          "filterParam": {"shareType": this.shareType, "courseWareType": ""}
         }
         let params = {
           requestJson: JSON.stringify(obj)
