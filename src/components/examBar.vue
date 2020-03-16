@@ -199,7 +199,7 @@
 
             if(this.knowledgePoint) {
               this.getClassTeachCourseInfo()
-              this.form.name = `《${this.knowledgePoint+this.knowledgePointIndex}》`
+              this.form.name = `${this.knowledgePoint+this.knowledgePointIndex}`
             }
 
           }else if (this.$route.path === '/examDetail') {
