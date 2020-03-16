@@ -240,7 +240,6 @@ export default {
   &__tab {
     width: 100%;
     position: relative;
-    overflow-x: scroll;
 
     &__wrap {
       height: 100%;
