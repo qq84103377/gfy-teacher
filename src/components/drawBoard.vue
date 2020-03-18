@@ -870,7 +870,6 @@ export default {
       this.clearScreen()
       this.drawImg(this.imgUrl); // 画图
 
-
       // if (this.isApp) {
       // if (this.isIphone) {
       //   // var heightA = this.canvas.width

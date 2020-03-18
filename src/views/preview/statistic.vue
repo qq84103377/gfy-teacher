@@ -967,7 +967,7 @@
             //   trigger: 'item',
             //   formatter: "{a} <br/>{b} : {c} ({d}%)"
             // },
-            color: ['#FB5522', '#2BFF93'],
+            color: ['#FFB346','#FB5522','#2BFF93'],
             series: [
               {
                 name: '文言文全章复习与巩固',
@@ -1001,13 +1001,15 @@
                   }
                 },
                 data: [
-                  {
-                    value: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
-                      t += (v.accountNoList ? v.accountNoList.length : 0)
-                      return t
-                    }, 0), name: '未完成'
-                  },
-                  {value: this.taskFinishInfo.finshCount, name: '已完成'}
+                  // {
+                  //   value: this.taskFinishInfo.studentUnfinishList.reduce((t, v) => {
+                  //     t += (v.accountNoList ? v.accountNoList.length : 0)
+                  //     return t
+                  //   }, 0), name: '未完成'
+                  // },
+                  {value: this.taskFinishInfo.runningCount, name: '进行中'},
+                  {value: this.taskFinishInfo.notStartCount, name: '未开始'},
+                  {value: this.taskFinishInfo.finshCount, name: '已完成'},
                 ]
               }
             ],
@@ -1030,19 +1032,26 @@
           myChart.on('click', params => {
             this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name
-            if (params.name === '未完成') {
+            if (params.name === '未开始') {
               this.taskFinishInfo.studentUnfinishList.forEach(v => {
-                (v.accountNoList || []).forEach(s => {
+                (v.noStartList || []).forEach(s => {
                   const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                   this.stuStatInfo.stu.push(name)
                 })
               })
-            } else {
+            } else if (params.name === '已完成') {
               this.taskFinishInfo.finishStudent.reduce((t, v) => {
                 const name = getStudentName(v, this.info.tchClassTastInfo.find(t => t.active).classId)
                 t.push(name)
                 return t
               }, this.stuStatInfo.stu)
+            } else if (params.name === '进行中') {
+              // this.taskFinishInfo.studentUnfinishList.forEach(v => {
+              //   (v.runningList || []).forEach(s => {
+              //     const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
+              //     this.stuStatInfo.stu.push(name)
+              //   })
+              // })
             }
 
             this.stuStatInfo.statDialog = true
