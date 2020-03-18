@@ -5,8 +5,8 @@
         <div slot="title" class="upload-img__body__cell">
           <div class="aic">
             <div class="fs15"><span class="red">*</span>图片:</div>
-<!--            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>-->
-<!--            <van-icon @click="showSheet" class="add" name="add"/>-->
+            <!--            <div class="pdlt10 fz10 grey9" @click="showSheet" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>-->
+            <!--            <van-icon @click="showSheet" class="add" name="add"/>-->
             <div class="pdlt10 fz10 grey9" @click="getPic" style="flex:1">轻触此可添加多张图片(点击图片名可改名)</div>
             <van-icon @click="getPic" class="add" name="add"/>
 
@@ -70,13 +70,13 @@
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
 
-<!--    <van-action-sheet-->
-<!--      v-model="showActionSheet"-->
-<!--      :actions="actions"-->
-<!--      cancel-text="取消"-->
-<!--      @select="handleSelect"-->
-<!--      @cancel="showActionSheet=false"-->
-<!--    />-->
+    <!--    <van-action-sheet-->
+    <!--      v-model="showActionSheet"-->
+    <!--      :actions="actions"-->
+    <!--      cancel-text="取消"-->
+    <!--      @select="handleSelect"-->
+    <!--      @cancel="showActionSheet=false"-->
+    <!--    />-->
   </section>
 </template>
 
@@ -125,14 +125,14 @@
     },
     methods: {
       getPic() {
-          ImagePicker.getPictures((result) => {
-            if(this.imgList.length + result.images.length > 9) {
-              return this.$toast('不能超过9张图片')
-            }
-            this.multipleUpload(result)
-          }, (err) => {
-            // alert(err);
-          });
+        ImagePicker.getPictures((result) => {
+          if(this.imgList.length + result.images.length > 9) {
+            return this.$toast('不能超过9张图片')
+          }
+          this.multipleUpload(result)
+        }, (err) => {
+          // alert(err);
+        });
       },
       previewImg(startPosition) {
         ImagePreview({
@@ -201,23 +201,23 @@
         formData.append('success_action_status', '200')
         return uploadApi.doUpLoad(this.oSSObject.host, formData)
           .then(data => {
-          // this.$store.commit('setVanLoading', false)
-          console.log('doUpLoad', data);
-          var imgUrl =
-            this.oSSObject.host +
-            "/" +
-            this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
-            filetime + '_' +
-            randomStr + ".jpeg";
-          var imgObj = {
-            src: imgUrl,
-            name: 'img' + (this.imgList.length + 1),
-            size: curFile.size
-          };
-          this.imgList.push(imgObj);
-        }).catch(err => {
-          this.$store.commit('setVanLoading', false)
-        })
+            // this.$store.commit('setVanLoading', false)
+            console.log('doUpLoad', data);
+            var imgUrl =
+              this.oSSObject.host +
+              "/" +
+              this.oSSObject.key + this.$store.getters.getUserInfo.accountNo + '_' +
+              filetime + '_' +
+              randomStr + ".jpeg";
+            var imgObj = {
+              src: imgUrl,
+              name: 'img' + (this.imgList.length + 1),
+              size: curFile.size
+            };
+            this.imgList.push(imgObj);
+          }).catch(err => {
+            this.$store.commit('setVanLoading', false)
+          })
       },
       handleSelect(item, index) {
         // index 0 相册  1 拍照
@@ -274,7 +274,7 @@
         let courseWareList = []
         this.imgList.forEach(v => {
           // let arr = [{name:'haha'}]
-        // arr.forEach(v => {
+          // arr.forEach(v => {
           courseWareList.push({
             knowledgePointId: this.$route.query.sysCourseId,
             coursewareName: v.name,
@@ -367,7 +367,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       return  addTeachCourseResList(params)
+        return  addTeachCourseResList(params)
         //  .then(res => {
         //   debugger
         //   if (res.flag) {
@@ -408,7 +408,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       return  createCourseSummitInfoList(params)
+        return  createCourseSummitInfoList(params)
         //  .then(res => {
         //   if (res.flag) {
         //     // this.$toast('添加成功')
