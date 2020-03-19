@@ -1046,12 +1046,12 @@
                 return t
               }, this.stuStatInfo.stu)
             } else if (params.name === '进行中') {
-              // this.taskFinishInfo.studentUnfinishList.forEach(v => {
-              //   (v.runningList || []).forEach(s => {
-              //     const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
-              //     this.stuStatInfo.stu.push(name)
-              //   })
-              // })
+              this.taskFinishInfo.studentUnfinishList.forEach(v => {
+                (v.runningList || []).forEach(s => {
+                  const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
+                  this.stuStatInfo.stu.push(name)
+                })
+              })
             }
 
             this.stuStatInfo.statDialog = true
