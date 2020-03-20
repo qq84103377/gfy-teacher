@@ -10,6 +10,7 @@
     </div>
     <div style="flex: 1;overflow-y: auto" ref="body">
       <div class="statistic-wrap__pie-chart">
+        <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip psa"></i>
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
           <van-button class="notice-btn" :class="{remind: isDisabled}" v-if="isTaskEnd" @click="sendTask">一键重发
           </van-button>
@@ -228,7 +229,14 @@
         <div class="mgt5">● 饼状图中间显示的是该题目的正确率</div>
       </div>
     </van-popup>
-
+    <van-popup round v-model="showTip">
+      <div class="pd10 fs16 tip-wrap">
+        <div style="text-align: center" class="fs18">任务完成情况说明</div>
+        <div class="mgt5">●未开始:学生还没有开始进行作答</div>
+        <div class="mgt5">●进行中:学生正在作答中</div>
+        <div class="mgt5">●已完成:学生已完成作答</div>
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -295,6 +303,7 @@
         objectiveList: [],
         scrollTop: 0,
         error: false,
+        showTip: false,
         isfEducation: this.$route.query.isfEducation
       }
     },
@@ -1351,6 +1360,12 @@
     &__pie-chart {
       background: #fff;
       padding: 15px 10px;
+      position: relative;
+      .icon-tip.psa{
+        position: absolute;
+        left: 100px;
+        top: 3px;
+      }
 
       &-label {
         font-size: 15px;

@@ -22,11 +22,7 @@ export default new Router({
         {
           path: '/preview',
           name: 'preview',
-          component: () => import('./views/preview/index.vue'),
-          meta: {
-            isShowHeader: true,
-            title: '预习'
-          }
+          component: () => import('./views/preview/index.vue')
         },
         {
           path: '/addCourse',

@@ -1,5 +1,8 @@
 <template>
   <section class="preview-wrap">
+    <van-nav-bar @click-left="goBack" left-arrow>
+      <div slot="title">预习 <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i></div>
+    </van-nav-bar>
     <dropdown-header ref='dropdown' v-show="courseList.length || firstFlag" :list="courseList" :course-name="courseName" :tch-course-id="tchCourseId" :refLoading.sync="dropdownRefLoading" :listLoading.sync="dropdownListLoading" :finished="dropdownFinish" @onLoad="dropdownOnLoad" @refresh="dropdownRefresh" @selectCourse="selectCourse">
       <div v-if="$route.query.from==='course'" slot="left" class="fs14" style="color: #16AAB7" @click="changeCourse(0)">上一课</div>
       <div v-else slot="left" class="btn-left" @click="$router.push(`/addCourse`)">+ 新建课</div>
@@ -32,7 +35,7 @@
               </div>
               <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
-                <span>{{item.finishCount}}/{{item.allCount}}</span>
+                <span>{{item.notStartCount}}/{{item.runningCount}}/{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>
@@ -47,7 +50,11 @@
       <van-button class="add-mission" type="info" @click="viewResource">新建任务</van-button>
     </div>
 
-    <!--    <edit-course></edit-course>-->
+    <van-popup v-model="showTip">
+      <div class="pd10 fs14" style="white-space: nowrap">
+        <i class="iconGFY icon-statistics mgr10"></i>未开始/进行中/已完成/总人数
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -71,6 +78,7 @@ export default {
   components: { listItem, dropdownHeader, editCourse },
   data() {
     return {
+      showTip: false,
       renderFlag: true,
       show: false,
       courseList: [],
@@ -100,7 +108,7 @@ export default {
       tchCourseInfo: '',
       showDrop:false,
       clickIndex:0,
-      isfEducation: this.$route.query.isfEducation 
+      isfEducation: this.$route.query.isfEducation
     }
   },
   mounted() {
@@ -152,6 +160,9 @@ export default {
     });
   },
   methods: {
+    goBack() {
+      this.common.goBack(this)
+    },
     clickDel(index){
       this.clickIndex=index
     },
@@ -453,6 +464,8 @@ export default {
             let classMap = JSON.parse(localStorage.getItem("classMap"))
             let hisClassMap = localStorage.getItem("hisClassMap") ? JSON.parse(localStorage.getItem("hisClassMap")) : {}
             this.courseTaskList.forEach(item => {
+              let notStartCount = 0
+              let runningCount = 0
               let finishCount = 0
               let allCount = 0
               if (item.tchClassTastInfo) {
@@ -461,6 +474,8 @@ export default {
                     //跳转到任务统计页面时自动将第一个班级设置为选中状态
                     obj.active = true
                   }
+                  notStartCount += obj.notStartCount
+                  runningCount += obj.runningCount
                   finishCount += obj.finshCount
                   allCount += obj.allCount
 
@@ -471,9 +486,11 @@ export default {
                   }else {
                     obj['className'] = "--"
                   }
-                  
+
                 })
               }
+              item.notStartCount = notStartCount
+              item.runningCount = runningCount
               item.finishCount = finishCount
               item.allCount = allCount
             })
