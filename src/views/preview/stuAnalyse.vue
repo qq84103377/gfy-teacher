@@ -5,7 +5,7 @@
       @click-left="goBack"
       left-arrow>
     </van-nav-bar>
-    <analyse-wrap @toggle="toggleQuestion">
+    <analyse-wrap  class="analyse-wrap" @toggle="toggleQuestion">
       <div class="scroll-tab" slot="tab">
         <div class="scroll-tab__item" @click="toggleTab(item,index)" v-for="(item,index) in info.questionList"
              :key="index">
@@ -164,6 +164,15 @@
     display: flex;
     flex-direction: column;
 
+     .van-nav-bar {
+    flex: 0 0 45px;
+  }
+
+  .analyse-wrap {
+    flex: 1 !important;
+    overflow: hidden;
+  }
+
     .scroll-tab {
       flex: 0 0 71px;
 
@@ -218,8 +227,9 @@
     }
 
     &__body {
-      height: 100%;
-      font-size: 12px;
+    height: 100%;
+    font-size: 12px;
+    overflow-y: scroll;
 
       &-top {
         margin-bottom: 10px;
