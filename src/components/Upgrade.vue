@@ -236,7 +236,6 @@ export default {
     }
   },
   mounted() {
-    return
     var _this = this;
     document.addEventListener(
       "deviceready",
