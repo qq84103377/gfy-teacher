@@ -1,11 +1,11 @@
 <template>
   <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0" id="container">
-      <div id="layout">
-        <div class="wrapper" id="test">
-          <canvas class="offCanvas"></canvas>
-          <canvas ref="canvas" class="canvas"></canvas>
-        </div>
+    <div id="layout">
+      <div class="wrapper" id="test">
+        <canvas class="offCanvas"></canvas>
+        <canvas ref="canvas" class="canvas"></canvas>
       </div>
+    </div>
 
     <!--    <div class="footer">-->
     <!--      <div class="control-button">-->
@@ -130,9 +130,10 @@ export default {
       drawFlag: false, //是否涂鸦过
       changeImg: null,
       imgOnload: false, //图片是否加载完成
+      initTime: 0, //初始化次数为1的时候不赋值lastLeft&lastTop
     }
   },
-  props: ['imgUrl', 'isPen', 'isRubber', 'text','stuIndex'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
+  props: ['imgUrl', 'isPen', 'isRubber', 'text', 'stuIndex'],  //isPen 判断是否画笔  //isRubber  判断是否橡皮擦  //text 评语
   watch: {
     imgUrl() {
       // $('.clearButton').trigger('click')
@@ -204,14 +205,14 @@ export default {
       // this.changeImg.src = 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/17493_1583462496_SoBss.png?x-oss-process=style/max_width_1000';
       this.changeImg.src = changeValue;
       this.changeImg.onload = () => {
-
+        this.initTime++
         let scaleRange = 1   // 缩放显示比例
 
         //获取原图的宽高,若宽或高超过屏幕,则按比例缩放显示
         const maxWidth = window.document.body.offsetWidth
         const maxHeight = window.document.body.offsetHeight - (this.$parent.$refs['text'] ? this.$parent.$refs['text'].offsetHeight : 0)
         let tempWidth, tempHeight
-        if (this.changeImg.width/this.changeImg.height >= maxWidth/maxHeight) {
+        if (this.changeImg.width / this.changeImg.height >= maxWidth / maxHeight) {
           if (this.changeImg.width > maxWidth) {
             tempWidth = maxWidth;
             // 按原图片的比例进行缩放
@@ -256,9 +257,16 @@ export default {
         //用来计算旋转后的描点位置
         this.rotate = 90
         this.swordEle.rotateZ = 90
-        let bbox = this.swordEle.getBoundingClientRect();
-        this.lastLeft = bbox.left
-        this.lastTop = bbox.top
+        // let bbox = this.swordEle.getBoundingClientRect();
+        let bbox = this.canvas.getBoundingClientRect();
+        console.log(bbox, 'bbox')
+        console.log(bbox.left, 'bbox.left')
+        console.log(bbox.top, 'bbox.top')
+        //初始化是会触发两次 所以在次数为2的时候拒绝赋值
+        if (this.initTime !== 2) {
+          this.lastLeft = bbox.left
+          this.lastTop = bbox.top
+        }
         this.rotate = 0
         this.swordEle.rotateZ = 0
         //*************************************************************************//
@@ -393,7 +401,7 @@ export default {
       /**
        * 有过涂鸦就需要发请求提交,没有则不用
        */
-      if(!this.drawFlag) this.drawFlag = true
+      if (!this.drawFlag) this.drawFlag = true
 
       console.log('drawLine()');
       context.beginPath();
@@ -411,7 +419,7 @@ export default {
       context.stroke();
     },
     save() {
-      if(!this.imgOnload) return
+      if (!this.imgOnload) return
       console.log('save()');
       this.$store.commit('setVanLoading', true)
       this.canvasHistory = []
@@ -457,7 +465,7 @@ export default {
       Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
 
         let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
-        if(compositeImg.length > 307200) {
+        if (compositeImg.length > 307200) {
           //大于300kb需要压缩
           compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
         }
@@ -701,7 +709,7 @@ export default {
       _this.swordEle.rotateZ = _this.rotate
       var af = new AlloyFinger(_this.swordEle, {
         touchStart: function (event) {
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           if (!_this.isPen && !_this.isRubber) return
           console.log('touchStart()');
           console.log(event, 'touchStart() event');
@@ -713,7 +721,7 @@ export default {
           // swordEle.style.translateX += evt.deltaX;
           // swordEle.style.translateY += evt.deltaY;
           // evt.preventDefault();
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           if (!_this.isPen && !_this.isRubber) return
           console.log('touchMove()');
           _this.point = { x: event.targetTouches[0].clientX, y: event.targetTouches[0].clientY };
@@ -770,7 +778,7 @@ export default {
         multipointEnd: function () {
         },
         tap: function () {
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           _this.$emit('tap')
         },
@@ -781,13 +789,13 @@ export default {
         singleTap: function () {
         },
         rotate: function (evt) {
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           // swordEle.rotateZ += evt.angle;
         },
         pinch(evt) {
           console.log("捏合start");
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           clearTimeout(_this.timer)
           _this.isPinch = true
           _this.timer = setTimeout(() => {
@@ -805,7 +813,7 @@ export default {
 
         },
         pressMove: function (evt) {
-          if(!_this.imgOnload) return;
+          if (!_this.imgOnload) return;
           if (_this.isPen || _this.isRubber) return
           let widthDiff = bwidth - swidth;
           let heightDiff = bheight - sheight;
@@ -1116,10 +1124,10 @@ export default {
 <style lang="less" scoped>
 @import "../utils/canvas/base.css";
 @import "../utils/canvas/handWriting.css";
-  .center-box{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-  }
+.center-box {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
