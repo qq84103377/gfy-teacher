@@ -204,7 +204,7 @@ export default {
       // this.changeImg.src = changeValue + '&' + Math.random();
       // this.changeImg.src = 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/17493_1583462496_SoBss.png?x-oss-process=style/max_width_1000';
       this.changeImg.src = changeValue;
-      this.changeImg.onload = () => {
+      this.changeImg.onload = () => { 
         this.initTime++
         let scaleRange = 1   // 缩放显示比例
 
