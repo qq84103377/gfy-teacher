@@ -204,7 +204,7 @@ export default {
       // this.changeImg.src = changeValue + '&' + Math.random();
       // this.changeImg.src = 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/17493_1583462496_SoBss.png?x-oss-process=style/max_width_1000';
       this.changeImg.src = changeValue;
-      this.changeImg.onload = () => {
+      this.changeImg.onload = () => { 
         this.initTime++
         let scaleRange = 1   // 缩放显示比例
 
@@ -263,7 +263,10 @@ export default {
         console.log(bbox.left, 'bbox.left')
         console.log(bbox.top, 'bbox.top')
         //初始化是会触发两次 所以在次数为2的时候拒绝赋值
-        if (this.initTime !== 2) {
+        if (this.isApp && this.initTime !== 2) {
+          this.lastLeft = bbox.left
+          this.lastTop = bbox.top
+        } else {
           this.lastLeft = bbox.left
           this.lastTop = bbox.top
         }
