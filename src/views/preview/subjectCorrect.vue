@@ -30,7 +30,7 @@
         </div>
       </div>
       <div class="correct-wrap__side-center">
-        <div v-for="(asw,ai) in stuArr[stuIndex].answer" :key="ai" class="dropdown-group"><span>1{{info.groupExamList.length?`(${ai+1})`:``}}</span>
+        <div v-for="(asw,ai) in stuArr[stuIndex].answer" :key="ai" class="dropdown-group"><span>{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}</span>
           <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value || asw.isMark==='I01'}" :overlay="false">
             <van-dropdown-item :disabled="ai !== aswIndex" :ref="'menuItem' + ai"
                                :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">
