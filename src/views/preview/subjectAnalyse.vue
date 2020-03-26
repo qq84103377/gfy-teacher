@@ -76,7 +76,7 @@
           this.$set(v, 'active', false)
         })
         this.$set(item, 'active', true)
-        this.getExamItemDetail(item.examId||item.examGroupId, item.groupId)
+        this.getExamItemDetail(item.examId||item.examGroupId || item.exam_id, item.groupId||item.group_id)
       },
       getExamItemDetail(examId, groupId) {
         this.$store.commit('setVanLoading', true)
