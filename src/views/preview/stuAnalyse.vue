@@ -17,13 +17,23 @@
       </div>
       <div class="stu-analyse__body" v-if="info.questionList[curIndex]">
         <div class="stu-analyse__body-top html-img">
-          <div v-if="info.questionList[curIndex].isRight" style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].score}}分</div>
+          <div v-if="info.questionList[curIndex].examQuestion.isRight" style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].examQuestion.score}}分</div>
           <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
-          <div v-html="info.questionList[curIndex].title"></div>
-          <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].answer"></span></div>
-          <div>学生答案: <span class="blue" v-html="info.questionList[curIndex].studentAnswer"></span></div>
+          <div v-html="info.questionList[curIndex].examQuestion.title"></div>
+          <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>
+          <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">学生答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.studentAnswer"></span></div>
           <div>答案解析:</div>
-          <div v-html="info.questionList[curIndex].examExplain"></div>
+          <div v-html="info.questionList[curIndex].examQuestion.examExplain"></div>
+          <div v-for="(item,index) in info.questionList[curIndex].testPaperExamGroup" :key="index">
+            <div v-html="item.groupExamInfo.title"></div>
+            <div>正确答案: <span class="blue" v-html="item.groupExamInfo.answer"></span></div>
+            <div>学生答案: <span class="blue" v-html="item.groupExamInfo.studentAnswer"></span></div>
+            <div>答案解析:</div>
+            <div v-html="item.groupExamInfo.examExplain"></div>
+          </div>
+
+
+
         </div>
       </div>
     </analyse-wrap>
@@ -42,6 +52,7 @@
       return {
         info: {examQuestionInfo: {}, testPaperInfo: [], questionList: []},
         curIndex: 0,
+        resourceType: '',
       }
     },
     created() {
@@ -103,32 +114,37 @@
           this.$store.commit('setVanLoading', false)
           if (res.flag && res.data[0]) {
             let arr = []
+            this.resourceType = res.data[0].resourceType
             if (res.data[0].resourceType === 'R03') {
               if (res.data[0].examQuestionInfo.groupExamList.length) {
                 //单题有小题
-                res.data[0].examQuestionInfo.groupExamList.forEach((v, i) => {
-                  if (i === 0) v.active = true
-                  v.title = res.data[0].examQuestionInfo.title + v.title
-                  arr.push(v)
-                })
+                // res.data[0].examQuestionInfo.groupExamList.forEach((v, i) => {
+                //   if (i === 0) v.active = true
+                //   v.title = res.data[0].examQuestionInfo.title + v.title
+                //   arr.push(v)
+                // })
+                arr.push({examQuestion:res.data[0].examQuestionInfo,testPaperExamGroup: res.data[0].examQuestionInfo.groupExamList.map(v => {
+                    return {groupExamInfo:v}
+                  }),active:true})
               } else {
                 //单题无小题
-                res.data[0].examQuestionInfo.active = true
-                arr.push(res.data[0].examQuestionInfo)
+                arr.push({examQuestion:res.data[0].examQuestionInfo,testPaperExamGroup:[],active:true})
               }
             } else {
               res.data[0].testPaperInfo.forEach((v, index) => {
                 v.sectionExam.forEach((s, i) => {
-                  if (s.testPaperExamGroup.length) {
-                    s.testPaperExamGroup.forEach((t, ti) => {
-                      if (i === 0 && index === 0 && ti === 0) this.$set(t.groupExamInfo, 'active', true)
-                      t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
-                      arr.push(t.groupExamInfo)
-                    })
-                  } else {
-                    if (i === 0 && index === 0) this.$set(s.examQuestion, 'active', true)
-                    arr.push(s.examQuestion)
-                  }
+                  // if (s.testPaperExamGroup.length) {
+                  //   s.testPaperExamGroup.forEach((t, ti) => {
+                  //     if (i === 0 && index === 0 && ti === 0) this.$set(t.groupExamInfo, 'active', true)
+                  //     t.groupExamInfo.title = s.examQuestion.title + t.groupExamInfo.title
+                  //     arr.push(t.groupExamInfo)
+                  //   })
+                  // } else {
+                  //   if (i === 0 && index === 0) this.$set(s.examQuestion, 'active', true)
+                  //   arr.push(s.examQuestion)
+                  // }
+                  if (i === 0 && index === 0) s.active = true
+                  arr.push(s)
                 })
               })
             }
@@ -141,14 +157,27 @@
         })
       },
       handleStyle(item) {
-        const status = item.isRight
+        let status = item.examQuestion.isRight
+        if(item.testPaperExamGroup.length) {
+          //单道试题有小题
+          if((item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I03') && item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I01')) || item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I02')){
+            item.examQuestion.isRight = 'I02'
+            status = 'I02'
+          }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I03')) {
+            item.examQuestion.isRight = 'I03'
+            status = 'I03'
+          }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I01')) {
+            item.examQuestion.isRight = 'I01'
+            status = 'I01'
+          }
+         }
         if (status == 'I02') {
           return 'somewhat'
         } else if (status == 'I03') {
           return 'error'
         } else if (status == 'I01') {
           return 'correct'
-        } else if (item.studentAnswer === '') {
+        } else if ((!item.testPaperExamGroup.length && item.examQuestion.studentAnswer === '') || (item.testPaperExamGroup.length && item.testPaperExamGroup.some(v => v.groupExamInfo.studentAnswer === ''))) {
           return 'undo'
         } else {
           return 'uncrt'
