@@ -263,7 +263,10 @@ export default {
         console.log(bbox.left, 'bbox.left')
         console.log(bbox.top, 'bbox.top')
         //初始化是会触发两次 所以在次数为2的时候拒绝赋值
-        if (this.initTime !== 2) {
+        if (this.isApp && this.initTime !== 2) {
+          this.lastLeft = bbox.left
+          this.lastTop = bbox.top
+        } else {
           this.lastLeft = bbox.left
           this.lastTop = bbox.top
         }
