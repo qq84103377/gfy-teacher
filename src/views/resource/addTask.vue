@@ -232,21 +232,21 @@
           当前已存在学生提交的答案数据，修改后，已有的学生答案数据将清空
           <p>当前删除情况如下：</p>
         </div>
-        <div class="delLists" v-show="finishCount>0" v-for="(item, key) in delStuId" :key="key">
+        <div class="delLists" v-show="finishCount>0" v-for="(item, key,index) in delStuId" :key="key">
           <div v-if="!item.idList || item.idList.length>0">
             <span>{{item.className}}：</span>
             <span v-if="item.idList === null">全班已删除</span>
             <span v-else>删除 <b>{{item.idList.length}}</b> 条学生作答数据</span>
           </div>
         </div>
-        <div class="delLists" v-show="finishCount>0" v-for="(item, key) in delGroId" :key="key">
+        <div class="delLists" v-show="finishCount>0" v-for="(item, key,index) in delGroId" :key="key">
           <div v-if="!item.idList || item.idList.length>0">
             <span>{{item.className}}：</span>
             <span v-if="item.idList === null">全班已删除</span>
             <span v-else>删除 <b>{{item.idList.length}}</b> 个分组作答数据</span>
           </div>
         </div>
-        <p v-show="classCount>10">
+        <p >
           *为了数据可以更加准确的统计，发任务时请不要超过10个班级
         </p>
         <div class="boldText" v-if='!isEdit'> 是否继续发布任务？</div>
@@ -2028,6 +2028,7 @@
         padding: 10px 20px;
 
         .title {
+          color: #666;
           p {
             margin-top: 5px;
           }
@@ -2035,14 +2036,15 @@
 
         .delLists {
           margin: 5px 0;
-
+          color: #666;
           span {
             b {
-              color: #39f0dd;
+              /*color: #39f0dd;*/
+              font-weight: normal;
             }
 
             &:first-child {
-              font-weight: bold;
+              /*font-weight: bold;*/
             }
           }
         }
@@ -2054,6 +2056,7 @@
         }
 
         > p {
+          font-size: 14px;
           color: #f00;
         }
       }
