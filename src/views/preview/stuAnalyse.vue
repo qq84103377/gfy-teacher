@@ -9,15 +9,15 @@
       <div class="scroll-tab" slot="tab">
         <div class="scroll-tab__item" @click="toggleTab(item,index)" v-for="(item,index) in info.questionList"
              :key="index">
-          <div class="scroll-tab__item-icon" :class="handleStyle(item)"><i
-            v-if="handleStyle(item) != 'undo' || handleStyle(item) != 'uncrt'" class="iconGFY"
-            :class="'icon-'+handleStyle(item)"></i></div>
+          <div class="scroll-tab__item-icon" :class="handleStyle(index)"><i
+            v-if="handleStyle(index) != 'undo' || handleStyle(index) != 'uncrt'" class="iconGFY"
+            :class="'icon-'+handleStyle(index)"></i></div>
           <div class="black fs10" :class="{blue:item.active}">第{{index + 1}}题</div>
         </div>
       </div>
       <div class="stu-analyse__body" v-if="info.questionList[curIndex]">
         <div class="stu-analyse__body-top html-img">
-          <div v-if="info.questionList[curIndex].examQuestion.isRight" style="color: #e90707;text-align: right;" class="fs18">{{info.questionList[curIndex].examQuestion.score}}分</div>
+          <div v-if="bigExamList.bigExamAnswerList[curIndex].score" style="color: #e90707;text-align: right;" class="fs18">{{bigExamList.bigExamAnswerList[curIndex].score}}分</div>
           <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
           <div v-html="info.questionList[curIndex].examQuestion.title"></div>
           <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>
@@ -53,6 +53,7 @@
         info: {examQuestionInfo: {}, testPaperInfo: [], questionList: []},
         curIndex: 0,
         resourceType: '',
+        bigExamList: JSON.parse(JSON.stringify(this.$route.query.bigExam))
       }
     },
     created() {
@@ -156,32 +157,48 @@
           }
         })
       },
-      handleStyle(item) {
-        let status = item.examQuestion.isRight
-        if(item.testPaperExamGroup.length) {
-          //单道试题有小题
-          if((item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I03') && item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I01')) || item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I02')){
-            item.examQuestion.isRight = 'I02'
-            status = 'I02'
-          }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I03')) {
-            item.examQuestion.isRight = 'I03'
-            status = 'I03'
-          }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I01')) {
-            item.examQuestion.isRight = 'I01'
-            status = 'I01'
-          }
-         }
+      handleStyle(index) {
+        const item = this.bigExamList.bigExamAnswerList[index]
+        const status = item.is_rigth
         if (status == 'I02') {
           return 'somewhat'
         } else if (status == 'I03') {
           return 'error'
         } else if (status == 'I01') {
           return 'correct'
-        } else if ((!item.testPaperExamGroup.length && item.examQuestion.studentAnswer === '') || (item.testPaperExamGroup.length && item.testPaperExamGroup.some(v => v.groupExamInfo.studentAnswer === ''))) {
-          return 'undo'
-        } else {
+        }
+        // else if (item.studentAnswer === '') {
+        //   return 'undo'
+        // }
+        else {
           return 'uncrt'
         }
+        //
+        // let status = item.examQuestion.isRight
+        // if(item.testPaperExamGroup.length) {
+        //   //单道试题有小题
+        //   if((item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I03') && item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I01')) || item.testPaperExamGroup.some(v => v.groupExamInfo.isRight === 'I02')){
+        //     item.examQuestion.isRight = 'I02'
+        //     status = 'I02'
+        //   }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I03')) {
+        //     item.examQuestion.isRight = 'I03'
+        //     status = 'I03'
+        //   }else if (item.testPaperExamGroup.every(v => v.groupExamInfo.isRight === 'I01')) {
+        //     item.examQuestion.isRight = 'I01'
+        //     status = 'I01'
+        //   }
+        //  }
+        // if (status == 'I02') {
+        //   return 'somewhat'
+        // } else if (status == 'I03') {
+        //   return 'error'
+        // } else if (status == 'I01') {
+        //   return 'correct'
+        // } else if ((!item.testPaperExamGroup.length && item.examQuestion.studentAnswer === '') || (item.testPaperExamGroup.length && item.testPaperExamGroup.some(v => v.groupExamInfo.studentAnswer === ''))) {
+        //   return 'undo'
+        // } else {
+        //   return 'uncrt'
+        // }
       },
     }
   }

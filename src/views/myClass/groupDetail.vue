@@ -152,7 +152,6 @@ export default {
     },
     modifyByBatch() {
       if (!this.isAdd && !this.isDel) return this.$toast('请选择学生')
-      this.$store.commit('setVanLoading', true)
       const studentList = this.groupList.reduce((total, v, i) => {
         if (v.tchClassSubGroupStudent.tchSubGroupStudent && (this.isAdd ? (this.curIndex !== i) : (this.curIndex === i))) {
           let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
@@ -165,6 +164,11 @@ export default {
         }
         return total
       }, [])
+      if(this.groupList[this.curIndex].tchClassSubGroupStudent.tchSubGroupStudent && this.isAdd && (this.groupList[this.curIndex].tchClassSubGroupStudent.tchSubGroupStudent.length + studentList.length > 10)) {
+        return this.$toast('小组人数不得超过10人')
+      }
+
+      this.$store.commit('setVanLoading', true)
       let obj = {
         "interUser": "runLfb",
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
