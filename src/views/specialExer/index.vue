@@ -152,9 +152,9 @@ export default {
         { name: '真题', value: 'T01', active: false },
         { name: '模拟题', value: 'T02', active: false },
         { name: '预测', value: 'T31', active: false },
-        { name: '期中', value: '[M03]', type: true, active: false },
-        { name: '期末', value: '[M04]', type: true, active: false },
-        { name: '练习卷', value: '[M01,M02]', type: true, active: false },
+        { name: '期中', value: '["M03"]', type: true, active: false },
+        { name: '期末', value: '["M04"]', type: true, active: false },
+        { name: '练习卷', value: '["M01","M02"]', type: true, active: false },
       ],
       yearList: [], //复习套卷-年段list
       reviewMoreLable: '', // 复习套卷-类型list
