@@ -134,6 +134,7 @@ export default {
           }
           return total
         }, [])
+        if(studentList.length > 10) return this.$toast('小组人数不得超过10人')
         if (studentList.length) {
           this.createClassSubGroup(studentList)
         } else {

@@ -29,16 +29,16 @@
           <div>得分率</div>
         </div>
         <div class="scroll-content">
-          <div v-for="(item,index) in scoreInfo[0].exam.arr" :key="index" class="col" :class="{'one-item':scoreInfo[0].exam.arr.length==1}">
+          <div v-for="(item,index) in scoreInfo[0].bigExamAnswerList" :key="index" class="col" :class="{'one-item':scoreInfo[0].bigExamAnswerList.length==1}">
             <div @click="handleCharts(index,item,1)" :class="{blue:item.active}">第{{index+1}}题</div>
-            <div v-for="(a,i) in scoreInfo" :key="i">{{a.exam.arr[index].score}}</div>
+            <div v-for="(a,i) in scoreInfo" :key="i">{{a.bigExamAnswerList[index].score||'0.00'}}</div>
             <div>{{averagePoint(index)}}</div>
             <div>{{scoreRate(index)}}</div>
           </div>
         </div>
         <div class="col">
           <div>总分</div>
-          <div v-for="(item,index) in scoreInfo" :key="index">{{item.total}}</div>
+          <div v-for="(item,index) in scoreInfo" :key="index">{{item.score}}</div>
           <div>-</div>
           <div>-</div>
         </div>
@@ -57,7 +57,7 @@
 
 <script>
 import echarts from "echarts";
-import { getTestPaperAnalysis, getTestPaperScoreAnalysis } from '@/api/index'
+import { getTestPaperAnalysisV2, getTestPaperScoreAnalysisV2, getTestPaperExamInfoV2 } from '@/api/index'
 import { getStudentName, getFontSize } from '@/utils/filter'
 
 export default {
@@ -68,6 +68,7 @@ export default {
       scoreChartShow: false,
       stuIndex: 0,
       examIndex: 0,
+      examList: [],
       examInfo: {
         knowledgePointInfos: [],
         knowMap: {},
@@ -86,9 +87,23 @@ export default {
     this.getTestPaperScoreAnalysis()
   },
   methods: {
+    getTestPaperExamInfoV2() {
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        testPaperId: this.$route.query.testPaperId,
+        taskId: this.$route.query.taskId
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+     return getTestPaperExamInfoV2(params)
+    },
     scoreRate(index) {
       const hasPoint = this.scoreInfo.reduce((t, v) => {
-        if (v.exam.arr[index].score > 0) {
+        if (v.bigExamAnswerList[index].score > 0) {
           t++
         }
         return t
@@ -101,7 +116,7 @@ export default {
     },
     averagePoint(index) {
       const totalScore = this.scoreInfo.reduce((t, v) => {
-        t += v.exam.arr[index].score
+        t += v.bigExamAnswerList[index].score*1
         return t
       }, 0)
       if (this.scoreInfo.length) {
@@ -125,22 +140,25 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
-      getTestPaperScoreAnalysis(params).then(res => {
+      getTestPaperScoreAnalysisV2(params).then(res => {
         this.$store.commit('setVanLoading', false)
         if (res.flag) {
-          const finishStu = Object.keys(res.data[0].student).filter(v => this.finishStudent.includes(v) )
-          this.scoreInfo = finishStu.map(v => {
-            return {
-              name: getStudentName(v, this.$route.query.classId),
-              total: res.data[0].student[v].reduce((t, value, i) => {
-                // value.average = this.averagePoint(i)
-                t += value.score
-                return t
-              }, 0),
-              exam: {
-                arr: res.data[0].student[v]
-              }
-            }
+          // const finishStu = Object.keys(res.data[0].student).filter(v => this.finishStudent.includes(v) )
+          // this.scoreInfo = finishStu.map(v => {
+          //   return {
+          //     name: getStudentName(v, this.$route.query.classId),
+          //     total: res.data[0].student[v].reduce((t, value, i) => {
+          //       // value.average = this.averagePoint(i)
+          //       t += value.score
+          //       return t
+          //     }, 0),
+          //     exam: {
+          //       arr: res.data[0].student[v]
+          //     }
+          //   }
+          // })
+          this.scoreInfo = (res.data[0].studentStatList || []).map(v => {
+            return {...v,name:getStudentName(v.accountNo, this.$route.query.classId)}
           })
           console.log(this.scoreInfo);
         } else {
@@ -155,12 +173,13 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        testPaperId: this.$route.query.testPaperId
+        testPaperId: this.$route.query.testPaperId,
+        taskId: this.$route.query.taskId
       }
       let params = {
         requestJson: JSON.stringify(obj)
       }
-      await getTestPaperAnalysis(params).then(res => {
+      await getTestPaperAnalysisV2(params).then(res => {
         this.$store.commit('setVanLoading', false)
         if (res.flag) {
           this.examInfo = res.data[0]
@@ -178,13 +197,13 @@ export default {
       this.scoreChartShow = true
       if (flag) {
         //点击题目 this.scoreInfo[0].exam.arr[this.examIndex]
-        this.$set(this.scoreInfo[0].exam.arr[this.examIndex], 'active', false)
+        this.$set(this.scoreInfo[0].bigExamAnswerList[this.examIndex], 'active', false)
         this.$set(this.scoreInfo[this.stuIndex], 'active', false)
         this.examIndex = index
       } else {
         //点击学生
         this.$set(this.scoreInfo[this.stuIndex], 'active', false)
-        this.$set(this.scoreInfo[0].exam.arr[this.examIndex], 'active', false)
+        this.$set(this.scoreInfo[0].bigExamAnswerList[this.examIndex], 'active', false)
         this.stuIndex = index
       }
       this.$set(item, 'active', true)
@@ -194,16 +213,16 @@ export default {
           let scoreArr = []
           let averageArr = []
           this.scoreInfo.forEach(v => {
-            xArr.push(getStudentName(v.exam.arr[index].accountNo, this.$route.query.classId))
-            scoreArr.push(v.exam.arr[index].score)
+            xArr.push(v.name)
+            scoreArr.push(v.bigExamAnswerList[index].score*1)
             averageArr.push(this.averagePoint(index))
           })
           this.drawHistogramScore(xArr, scoreArr, averageArr)
         } else {
           let scoreArr = []
           let averageArr = []
-          const xArr = item.exam.arr.map((v, i) => {
-            scoreArr.push(v.score)
+          const xArr = item.bigExamAnswerList.map((v, i) => {
+            scoreArr.push(v.score*1)
             averageArr.push(this.averagePoint(i))
             return `第${i + 1}题`
           })
@@ -293,6 +312,17 @@ export default {
     },
     drawHistogramY() {
       var myChart = echarts.init(document.getElementById('myChart2'));
+      let newKngArr = [] //合并重复的知识点名称
+      this.examInfo.knowledgePointInfos.forEach(v => {
+        const index = newKngArr.findIndex(k => k.knowledgePointName === v.knowledgePointName)
+        if(index > -1) {
+          //有重复的知识点名称
+          newKngArr[index].value += this.examInfo.knowMap[v.knowledgePointId]
+        }else {
+          //没有重复
+          newKngArr.push({...v,value:this.examInfo.knowMap[v.knowledgePointId]})
+        }
+      })
       var contentOption = {
         grid: {
           top: '5%',
@@ -307,7 +337,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: this.examInfo.knowledgePointInfos.map(v => v.knowledgePointName),
+          data: newKngArr.map(v => v.knowledgePointName),
           axisLabel: {
             interval: 0,
             rotate: 30,//倾斜度 -90 至 90 默认为0
@@ -320,8 +350,8 @@ export default {
           {
             name: '知识点分布',
             type: 'bar',
-            barWidth: this.examInfo.knowledgePointInfos.length>5?'50%':`${this.examInfo.knowledgePointInfos.length}0%`,
-            data: Object.keys(this.examInfo.knowMap).map(v => this.examInfo.knowMap[v])
+            barWidth: newKngArr.length>5?'50%':`${newKngArr}0%`,
+            data: newKngArr.map(v => v.value)
           }
         ],
         dataZoom: [
@@ -329,7 +359,7 @@ export default {
             type: 'inside',
             xAxisIndex: [0],
             start: 0,
-            end: this.examInfo.knowledgePointInfos.length>5?(5/this.examInfo.knowledgePointInfos.length)*100:100,
+            end: newKngArr.length>5?(5/newKngArr.length)*100:100,
           }
         ],
         textStyle:{
@@ -341,6 +371,12 @@ export default {
     },
     drawHistogramX() {
       var myChart = echarts.init(document.getElementById('myChart3'));
+      let newUseArr = []
+      this.examList.forEach(v => {
+        const strArr = this.examInfo.useMap[v.examQuestion.examId].split('_')
+        newUseArr.push({useCount:strArr[0],rate:strArr[1],diff:v.examQuestion.titleDegree})
+      })
+
       var goalOption = {
         legend: {
           data: ['使用次数', '正确率']
@@ -350,7 +386,7 @@ export default {
             type: 'inside',
             xAxisIndex: [0],
             start: 0,
-            end: this.examInfo.useCount.length>5?(5/this.examInfo.useCount.length)*100:100,
+            end: newUseArr.length>5?(5/newUseArr.length)*100:100,
           }
         ],
         grid: {
@@ -366,7 +402,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: this.examInfo.useCount.map((v, i) => `第${i + 1}题`),
+            data: newUseArr.map((v, i) => `第${i + 1}题`),
             axisPointer: {
               type: 'shadow'
             },
@@ -409,14 +445,29 @@ export default {
           {
             name: '使用次数',
             type: 'bar',
-            barWidth: this.examInfo.useCount.length>5?'50%':`${this.examInfo.useCount.length}0%`,
-            data: this.examInfo.useCount.map(v => v.value),
+            barWidth: newUseArr.length>5?'50%':`${newUseArr.length}0%`,
+            data: newUseArr.map(v => v.useCount),
+            itemStyle: {
+              normal: {
+                color: function (params){
+                  if (newUseArr[params.dataIndex].diff =='D01'){
+                    return '#7fea68'
+                  } else if (newUseArr[params.dataIndex].diff =='D02') {
+                    return '#d6897c'
+                  } else if (newUseArr[params.dataIndex].diff =='D03'){
+                    return '#ea1e25'
+                  } else {
+                    return '#fff638'
+                  }
+                }
+              }
+            }
           },
           {
             name: '正确率',
             type: 'line',
             yAxisIndex: 1,
-            data: this.examInfo.accuracy,
+            data: newUseArr.map(v => v.rate),
             itemStyle: {
               color: '#F2C760'
             },
@@ -528,10 +579,22 @@ export default {
     },
   },
   async mounted() {
-    await this.getTestPaperAnalysis()
-    this.drawPie()
-    this.drawHistogramY()
-    this.drawHistogramX()
+    this.$store.commit('setVanLoading', true)
+    let res = await this.getTestPaperExamInfoV2()
+    if(res.flag && res.testPaperSectionList && res.testPaperSectionList.length) {
+      // sectionExamList
+      this.examList = [];
+      res.testPaperSectionList.forEach(v => {
+        this.examList.push(...v.sectionExamList)
+      })
+      await this.getTestPaperAnalysis()
+      this.drawPie()
+      this.drawHistogramY()
+      this.drawHistogramX()
+    }else {
+      this.$toast(res.msg)
+    }
+
     // this.drawHistogramScore()
   }
 }

@@ -17,7 +17,7 @@
           <div class="mgb5">答案为<span class="inline html-img blue" v-html="item.answer"></span>的同学:</div>
           <div style="display: flex;flex-wrap: wrap;" class="pdlt10">
             <div v-for="(stu,stuIndex) in item.studentsNew" :key="stuIndex" class="stu-error">
-              {{getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?(stu.percent*100+'%'):'--'}})</span>
+              {{getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?((stu.percent*100).toFixed(2)+'%'):'--'}})</span>
             </div>
           </div>
         </div>

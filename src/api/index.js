@@ -230,12 +230,12 @@ export const getExamItemDetail =(params)=>{
   return axios.post('teach/getExamItemDetail', qs.stringify(params))
 }
 //试卷分析
-export const getTestPaperAnalysis =(params)=>{
-  return axios.post('teach/getTestPaperAnalysis', qs.stringify(params))
+export const getTestPaperAnalysisV2 =(params)=>{
+  return axios.post('teach/getTestPaperAnalysisV2', qs.stringify(params))
 }
 //得分分析
-export const getTestPaperScoreAnalysis =(params)=>{
-  return axios.post('teach/getTestPaperScoreAnalysis', qs.stringify(params))
+export const getTestPaperScoreAnalysisV2 =(params)=>{
+  return axios.post('teach/getTestPaperScoreAnalysisV2', qs.stringify(params))
 }
 //加分/减分
 export const saveRewardScore =(params)=>{
@@ -556,5 +556,9 @@ export const getTextBookVersionByGradeTerm =(params)=>{
 //删除评论回复
 export const delReplyV2 =(params)=>{
   return axios.post('public/delReplyV2', qs.stringify(params))
+}
+//试卷分析获取试卷详情
+export const getTestPaperExamInfoV2 =(params)=>{
+  return axios.post('teachNew/getTestPaperExamInfo', qs.stringify(params))
 }
 

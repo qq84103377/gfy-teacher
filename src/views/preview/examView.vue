@@ -185,9 +185,10 @@
             params: {type: 'personal', info, classId: this.info.classId, index: 0}
           })
         } else {
+          const bigExam = this.info.studentStatList.find(v => v.accountNo == item.accountNo)
           this.$router.push({
             path: '/stuAnalyse',
-            query: {accountNo: item.accountNo, classId: this.info.classId, taskType: this.taskType}
+            query: {accountNo: item.accountNo, classId: this.info.classId, taskType: this.taskType,bigExam:bigExam||{}}
           })
         }
       },

@@ -267,8 +267,22 @@
           if (res.flag) {
             this.examNum = this.tabList.find(v => v.active).num
             let stuArr = []
+            let groupFinishList = []
             const key = res.data[0].groupExamList.length ? 'groupFinishMap' : 'finishMap'
-            Object.keys(res.data[0][key]).sort().forEach(k => {
+
+            if(key === 'groupFinishMap'){
+              res.data[0].groupExamList.forEach(v => {
+                Object.keys(res.data[0][key]).sort().forEach(k => {
+                  if(k.indexOf(v.examGroupId+'_')>-1) {
+                    groupFinishList.push(k)
+                  }
+                })
+              })
+            }else {
+              groupFinishList = Object.keys(res.data[0][key]).sort()
+            }
+
+            groupFinishList.forEach(k => {
               let examId = k.split('_')[0],
                 accountNo = k.split('_')[1],
                 errorArr = [],
