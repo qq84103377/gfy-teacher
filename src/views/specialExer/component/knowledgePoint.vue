@@ -11,7 +11,7 @@
     </div>
     <div class="knowledge-point-wrap__tab" v-if='list.length'>
       <div class="knowledge-point-wrap__tab__wrap">
-        <span v-for='(item,index) in list' :key='item.nodeName' class='mglt10 mgr10' :class="{knowledgeActive:item.active}" @click="toggleTab(item,index)">{{item.nodeName}}</span>
+        <div v-for='(item,index) in list' :key='item.nodeName' class='mglt10 mgr10' :class="{knowledgeActive:item.active}" @click="toggleTab(item,index)">{{item.nodeName}}</div>
       </div>
       <div class="knowledge-point-wrapp__tab__content">
         <myCollapse v-if='list[listIndex].child.length' :data.sync='list[listIndex]' @goPage='go'></myCollapse>
@@ -151,7 +151,7 @@ export default {
             return
           }
 
-           if (!res.data[0].resultList.length) {
+          if (!res.data[0].resultList.length) {
             this.isRecomment = true
             return
           }
@@ -212,6 +212,18 @@ export default {
       })
       this.$set(item, 'active', true)
       this.listIndex = index
+      this.classIndex = -1
+      const that = this
+      function addClass(data, cIndex) {
+        if (data.child) {
+          cIndex++
+          data.child.forEach((element, index) => {
+            element.cName = that.classList[cIndex]
+            addClass(element, cIndex)
+          })
+        }
+      }
+      addClass(this.list[this.listIndex], this.classIndex)
     },
     go(item, index) {
       this.$router.push({
@@ -242,22 +254,25 @@ export default {
     position: relative;
 
     &__wrap {
+      flex: 0 0 35px;
       height: 100%;
-      overflow-x: scroll;
+      width: 100%;
+      overflow-x: auto;
       white-space: nowrap;
       display: flex;
       height: 35px;
       line-height: 35px;
       margin-top: 5px;
 
-      > span {
+      > div {
+        display: inline-block;
         height: 24px;
         line-height: 24px;
         font-size: 16px;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 0 10px;
         border-radius: 24px;
         background-color: #fff;
+        margin-left: 10px;
       }
     }
 
