@@ -266,7 +266,7 @@ export default {
         if (this.isApp && this.initTime !== 2) {
           this.lastLeft = bbox.left
           this.lastTop = bbox.top
-        } else {
+        }  else if (!this.isApp) {
           this.lastLeft = bbox.left
           this.lastTop = bbox.top
         }
