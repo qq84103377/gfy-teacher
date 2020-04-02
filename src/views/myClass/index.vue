@@ -23,9 +23,6 @@
 </template>
 
 <script>
-import {
- getSubGroupParent
-} from '@/api/index'
 
 export default {
   name: "index",
@@ -35,29 +32,7 @@ export default {
       activeNames: ['1']
     }
   },
-  mounted() {
-    this.getSubGroupParent()
-  },
-  methods: {
-    async getSubGroupParent(classId) {
-      let obj = {
-        "interUser": "runLfb",
-        "interPwd": "25d55ad283aa400af464c76d713c07ad",
-        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
-        "belongSchoolId": this.$store.getters.schoolId,
-        "accountNo": this.$store.getters.getUserInfo.accountNo,
-        "tchCourseId": '',
-        "classId": '',
-        "subjectType": 'S20',
-      }
-      let params = {
-        requestJson: JSON.stringify(obj)
-      }
-      await getSubGroupParent(params).then(res => {
-        console.log(res, 'getSubGroupParent res')
-      })
-    },
-  }
+
 }
 </script>
 

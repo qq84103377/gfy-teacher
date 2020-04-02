@@ -26,12 +26,12 @@
 </template>
 
 <script>
-import { getKnowledgeCatalogInfo } from '@/api/index'
+import { getTextBookCourseInfo,getKnowledgeCatalogInfo } from '@/api/index'
 import myCollapse from './myCollapse'
 
 export default {
   name: "knowledgePoint",
-  props: ['start', 'classGrade', 'areaCode', 'courseIds', 'active', 'textBookId', 'gradeTermId', 'toggleNum', 'onRefresh'],
+  props: ['start', 'classGrade', 'areaCode', 'courseIds' ,'active', 'textBookId', 'gradeTermId', 'toggleNum', 'onRefresh'],
   data() {
     return {
       list: [],
@@ -40,14 +40,15 @@ export default {
       classIndex: -1,
       toggleFirst: false,
       isRecomment: false,
-      isChange: false
+      isChange: false,
+      courseIds2:[]
     }
   },
   components: {
     myCollapse
   },
   watch: {
-    start(nv, ov) {
+    async start(nv, ov) {
       console.log("start nv", nv);
       console.log("start ov", ov);
       if (nv) {
@@ -57,7 +58,8 @@ export default {
           this.isChange = false
 
           this.toggleFirst = true
-          this.getKnowledgeCatalogInfo()
+          await this.getTextBookCourseInfo()
+          await this.getKnowledgeCatalogInfo()
 
           this.$emit('update:start', false)
         } else {
@@ -67,7 +69,8 @@ export default {
             this.listIndex = 0
             this.isRecomment = false
             this.classIndex = -1
-            this.getKnowledgeCatalogInfo()
+            await this.getTextBookCourseInfo()
+            await this.getKnowledgeCatalogInfo()
           }
           this.$emit('update:start', false)
           this.$parent.startKnowledge = false
@@ -80,28 +83,74 @@ export default {
       console.log("onRefresh2 ov", ov);
       if (nv) {
         this.isChange = false
+        await this.getTextBookCourseInfo()
         await this.getKnowledgeCatalogInfo()
         this.$emit('update:onRefresh', false)
         this.$parent.$parent.isLoading = false
       }
     },
-    courseIds(nv, ov) {
-      console.log("courseIds nv", nv);
-      console.log("courseIds ov", ov);
-      if (nv) {
-        this.isChange = true
-        if (this.active != 1) return
-        this.isChange = false
-        this.list = []
-        this.listIndex = 0
-        this.isRecomment = false
-        this.classIndex = -1
-        this.getKnowledgeCatalogInfo()
-      }
-    },
+    // courseIds(nv, ov) {
+    //   console.log("courseIds nv", nv);
+    //   console.log("courseIds ov", ov);
+    //   if (nv) {
+    //     this.isChange = true
+    //     if (this.active != 1) return
+    //     this.isChange = false
+    //     this.list = []
+    //     this.listIndex = 0
+    //     this.isRecomment = false
+    //     this.classIndex = -1
+    //     this.getKnowledgeCatalogInfo()
+    //   }
+    // },
 
   },
+  created() {
+    // console.log("没出现")
+    // this.getTextBookCourseInfo()
+  },
   methods: {
+    // 获取教材信息courseId
+    async getTextBookCourseInfo() {
+      this.$store.commit('setVanLoading', true)
+      this.unitIndex = 0
+      let obj = {
+        "interUser": "runLfb",
+        "interPwd": "25d55ad283aa400af464c76d713c07ad",
+        "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
+        "belongSchoolId": this.$store.getters.schoolId,
+        // "textBookId": this.textItem ? this.textItem.textBookId : '',
+        "textBookId": '3002',
+        "gradeTermId": '2007',
+        "subjectType": localStorage.currentSubjectType,
+        'nodeType': 'N00'
+      }
+      let params = {
+        requestJson: JSON.stringify(obj)
+      }
+
+      getTextBookCourseInfo(params).then(res => {
+        this.$store.commit('setVanLoading', false)
+        console.log("课程2：", res)
+        if (res.flag) {
+          if (res.resTextbookCourseInfoList && res.resTextbookCourseInfoList.length > 0) {
+            let textBookList = res.resTextbookCourseInfoList
+            let newArr = [];
+            textBookList.forEach(function (item) {
+              newArr.push(item.courseId)
+            })
+            newArr = newArr = Array.from(new Set(newArr))
+            // console.log(courseIds, 'courseIds');
+            this.courseIds2=newArr
+          }
+
+        } else {
+          this.courseIds2=[]
+        }
+        return
+      })
+    },
+
     // 获取知识点目录信息
     async getKnowledgeCatalogInfo() {
       this.$store.commit('setVanLoading', true)
@@ -111,8 +160,10 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "belongSchoolId": this.$store.getters.schoolId,
-        "textbookId": this.textBookId,
-        "gradeTermId": this.gradeTermId,
+        // "textbookId": this.textBookId,
+        "textbookId": '3002',
+        // "gradeTermId": this.gradeTermId,
+        "gradeTermId": '2007',
         "subjectType": localStorage.currentSubjectType,
       }
 
@@ -233,9 +284,11 @@ export default {
           'areaCode': this.areaCode,
           subjectType: localStorage.currentSubjectType,
           isKnowledgePoint: true,
-          'courseIds': this.courseIds,
+          // 'courseIds': this.courseIds,
+          'courseIds': this.courseIds2,
           'classGrade': this.classGrade ? this.classGrade.split('|')[0] : '',
-          gradeTermId: this.gradeTermId,
+          // gradeTermId: this.gradeTermId,
+          gradeTermId: '2007',
           from: 'knowledgePoint'
 
         }
