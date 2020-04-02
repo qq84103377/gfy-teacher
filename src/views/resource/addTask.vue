@@ -227,24 +227,20 @@
 
     <van-dialog v-model="beforeSubmitTips" title="提示信息" show-cancel-button confirmButtonColor="#39f0dd"
                 @confirm="confirmSubmit">
-      <div class="tipsInfo" >
+      <div class="tipsInfo">
         <div class="title" v-show="countNum>0">
           当前已存在学生提交的答案数据，修改后，已有的学生答案数据将清空
           <p>当前删除情况如下：</p>
         </div>
-        <div class="delLists" v-show="finishCount>0" v-for="(item, key) in delStuId" :key="key">
-          <div v-if="!item.idList || item.idList.length>0">
-            <span>{{item.className}}：</span>
-            <span v-if="item.idList === null">全班已删除</span>
-            <span v-else>删除 <b>{{item.idList.length}}</b> 条学生作答数据</span>
-          </div>
+        <div class="delLists" v-show="finishCount>0" v-for="(item, key,index) in delStuId" :key="key">
+          <span>{{index+1}}. {{item.className}}：</span>
+          <span v-if="item.idList === null">全班已删除</span>
+          <span v-else>删除 <b>{{item.idList.length}}</b> 条学生作答数据</span>
         </div>
-        <div class="delLists" v-show="finishCount>0" v-for="(item, key) in delGroId" :key="key">
-          <div v-if="!item.idList || item.idList.length>0">
-            <span>{{item.className}}：</span>
-            <span v-if="item.idList === null">全班已删除</span>
-            <span v-else>删除 <b>{{item.idList.length}}</b> 个分组作答数据</span>
-          </div>
+        <div class="delLists" v-show="finishCount>0" v-for="(item, key,index) in delGroId" :key="key">
+          <span>{{index+1}}. {{item.className}}：</span>
+          <span v-if="item.idList === null">全班已删除</span>
+          <span v-else>删除 <b>{{item.idList.length}}</b> 个分组作答数据</span>
         </div>
         <p v-show="classCount>10">
           *为了数据可以更加准确的统计，发任务时请不要超过10个班级
@@ -1702,6 +1698,7 @@
               if (this.tempClassObj[curClassInfo.classId]) {
                 if (this.tempClassObj[curClassInfo.classId].accountList.indexOf(parseInt(studentId)) === -1) {
                   this.delStuId[curClassInfo.classId].idList.push(studentId)
+                  // this.$set(this.delStuId[curClassInfo.classId],idList, this.delStuId)
                   this.countNum++
                 }
               } else {
@@ -1710,6 +1707,10 @@
                 this.delStuId[curClassInfo.classId].idList = null
               }
             })
+            // 删除  （未删除学生的对象）
+            if (this.delStuId[curClassInfo.classId].idList && this.delStuId[curClassInfo.classId].idList.length == 0) {
+              delete this.delStuId[curClassInfo.classId];
+            }
           })
           console.log('delStuId', this.delStuId);
         }
@@ -1731,6 +1732,9 @@
                 this.delGroId[curClassInfo.classId].idList = null
               }
             })
+            if (this.delGroId[curClassInfo.classId].idList && this.delGroId[curClassInfo.classId].idList.length == 0) {
+              delete this.delGroId[curClassInfo.classId];
+            }
           })
           console.log('delGroId', this.delGroId);
         }
@@ -1738,7 +1742,7 @@
         this.finishCount = this.resourceInfo.finishCount;  //任务完成个数
         console.log(this.classCount, this.countNum, this.finishCount)
         //若班级大于10，或删除大于0且this.finishCount!==0，且非重发任务需要弹框提示
-        if (!this.$route.query.isResend && (obj.classCount > 10 || (this.resourceInfo.finishCount !== 0 &&  this.countNum > 0))) {
+        if (!this.$route.query.isResend && (obj.classCount > 10 || (this.resourceInfo.finishCount !== 0 && this.countNum > 0))) {
           this.beforeSubmitTips = true;
         } else {
           this.confirmSubmit();
@@ -2028,6 +2032,8 @@
         padding: 10px 20px;
 
         .title {
+          color: #666;
+
           p {
             margin-top: 5px;
           }
@@ -2035,14 +2041,16 @@
 
         .delLists {
           margin: 5px 0;
+          color: #666;
 
           span {
             b {
-              color: #39f0dd;
+              /*color: #39f0dd;*/
+              font-weight: normal;
             }
 
             &:first-child {
-              font-weight: bold;
+              /*font-weight: bold;*/
             }
           }
         }
@@ -2054,6 +2062,7 @@
         }
 
         > p {
+          font-size: 14px;
           color: #f00;
         }
       }
