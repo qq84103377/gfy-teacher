@@ -55,7 +55,7 @@ import { getTestPaperInfoList } from '@/api/index'
 
 export default {
   name: "reviewTest",
-  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore', 'active', 'toggleNum','onRefresh'],
+  props: ['start', 'classGrade', 'areaCode', 'provinceCode', 'belongYear', 'reviewTypeItem', 'reviewType', 'termType', 'changeGradeSubject', 'changeMore', 'active', 'toggleNum', 'onRefresh'],
   data() {
     return {
       testList: [],
@@ -196,7 +196,7 @@ export default {
     },
     onLoad() {
       console.log("onLoad");
-      this.isChange=false
+      this.isChange = false
 
       if (!this.without) {
         console.log("onLoad1");
@@ -319,9 +319,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@deep: ~">>>";
 .fs18 {
   height: 44px;
   line-height: 44px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@{deep} .van-cell__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .fs14 {
   height: 30px;

@@ -3,7 +3,7 @@
     <van-row class="question-type-wrap__tit">
       <van-col span="8" :class="{ active: active == 0 }" @click="active = 0;changeTab(0)">题型专项</van-col>
       <van-col span="8" :class="{ active: active == 1 }" @click="active = 1;changeTab(1)">知识点专项</van-col>
-      <van-col span="8" :class="{ active: active == 2 }" @click="active = 2;changeTab(2)">复习套卷</van-col>
+      <van-col span="8" :class="{ active: active == 2 }" @click="$toast('敬请期待')">复习套卷</van-col>
     </van-row>
 
     <div class="question-type-wrap__body" ref="body">
@@ -13,7 +13,7 @@
         <div class="blue">{{areaLabel}}</div>
       </van-cell>
 
-      <van-cell v-if="active!=2" @click="typeSubjectFilterShow=true" title="科目" class="fs16" is-link>
+      <van-cell v-if="active!==2" @click="typeSubjectFilterShow=true" title="科目" class="fs16" is-link>
         <div class="blue">
           {{typeSubjectLabel}}
         </div>
@@ -31,13 +31,19 @@
         </div>
       </van-cell>
 
-      <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" class="fs16" is-link>
+      <van-cell v-if="active ==0" @click="versionFilterShow=true" title="教材" class="fs16" is-link>
         <div class="blue">
           {{versionLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-else @click="reviewMoreShow=true" title="更多" class="fs16" is-link>
+      <van-cell v-if="active ==1" title="教材" class="fs16">
+        <div class="blue">
+          中考总复习中考总复习
+        </div>
+      </van-cell>
+
+      <van-cell v-if="active ==2" @click="reviewMoreShow=true" title="更多" class="fs16" is-link>
         <div class="blue">{{reviewMoreLable}}</div>
       </van-cell>
 
