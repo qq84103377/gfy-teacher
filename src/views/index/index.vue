@@ -74,7 +74,7 @@
               </div>
               <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
-                <span>{{item.finishCount}}/{{item.allCount}}</span>
+                <span>{{item.notStartCount}}/{{item.runningCount}}/{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>

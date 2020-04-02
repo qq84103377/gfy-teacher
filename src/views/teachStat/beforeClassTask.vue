@@ -1,6 +1,7 @@
 <template>
   <section class="before-class-task-list">
-    <van-nav-bar :title="$route.query.teacherName + '课前任务'" @click-left="goBack" left-arrow>
+    <van-nav-bar @click-left="goBack" left-arrow>
+      <div slot="title">{{$route.query.teacherName + '课前任务'}} <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i></div>
     </van-nav-bar>
     <div class="before-class-task-list__filter">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
@@ -70,13 +71,19 @@
               </div>
               <div @click="viewStat(item)">
                 <i class="iconGFY icon-statistics"></i>
-                <span>{{item.finishCount}}/{{item.allCount}}</span>
+                <span>{{item.notStartCount}}/{{item.runningCount}}/{{item.finishCount}}/{{item.allCount}}</span>
               </div>
             </div>
           </list-item>
         </van-list>
       </van-pull-refresh>
     </div>
+
+    <van-popup v-model="showTip">
+      <div class="pd10 fs14" style="white-space: nowrap">
+        <i class="iconGFY icon-statistics mgr10"></i>未开始/进行中/已完成/总人数
+      </div>
+    </van-popup>
   </section>
 </template>
 
@@ -91,6 +98,7 @@
     components: {listItem},
     data() {
       return {
+        showTip: false,
         refLoading: false,
         listLoading: false,
         finished: false,
@@ -268,6 +276,8 @@
               let classMap = JSON.parse(localStorage.getItem("classMap"));
               let hisClassMap = localStorage.getItem("hisClassMap") ? JSON.parse(localStorage.getItem("hisClassMap")) : {}
               this.taskList.forEach(item => {
+                let notStartCount = 0
+                let runningCount = 0
                 let finishCount = 0
                 let allCount = 0
                 if (item.tchClassTastInfo) {
@@ -276,6 +286,8 @@
                       //跳转到任务统计页面时自动将第一个班级设置为选中状态
                       obj.active = true
                     }
+                    notStartCount += obj.notStartCount
+                    runningCount += obj.runningCount
                     finishCount += obj.finshCount
                     allCount += obj.allCount
                     if(classMap[obj.classId] && classMap[obj.classId].className) {
@@ -287,6 +299,8 @@
                     }
                   })
                 }
+                item.notStartCount = notStartCount
+                item.runningCount = runningCount
                 item.finishCount = finishCount
                 item.allCount = allCount
               });
