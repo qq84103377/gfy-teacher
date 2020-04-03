@@ -78,6 +78,7 @@
           console.log($event.target.src);
           ImagePreview({
             images: [$event.target.src],
+            className: 'img-preview-init',
             // startPosition: 1,
             onClose() {
               // do something
