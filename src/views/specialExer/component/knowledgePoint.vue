@@ -295,7 +295,7 @@ export default {
       this.$router.push({
         path: `/questionList`,
         query: {
-          'item': item,
+          'keyWord': item.knowledgeName,
           'areaCode': this.areaCode,
           subjectType: localStorage.currentSubjectType,
           isKnowledgePoint: true,
@@ -322,25 +322,25 @@ export default {
     position: relative;
 
     &__wrap {
-      flex: 0 0 35px;
-      height: 100%;
-      width: 100%;
-      overflow-x: auto;
-      white-space: nowrap;
+      flex: 0 0 52px;
+      background: #f5f5f5;
       display: flex;
-      height: 35px;
-      line-height: 35px;
-      margin-top: 5px;
+      overflow-x: auto;
+      width: 100%;
+      white-space: nowrap;
+      align-items: center;
+      margin-bottom: 10px;
 
       > div {
-        display: inline-block;
         height: 24px;
-        line-height: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-size: 16px;
-        padding: 0 10px;
+        padding: 0 8px;
+        line-height: 24px;
         border-radius: 24px;
         background-color: #fff;
-        margin-left: 10px;
       }
     }
 
@@ -368,6 +368,9 @@ export default {
       // transform: translateX(-50%);
       width: 60%;
     }
+  }
+  .fs16::after {
+    border-bottom: none;
   }
 }
 </style>
