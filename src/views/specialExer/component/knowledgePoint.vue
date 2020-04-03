@@ -26,12 +26,12 @@
 </template>
 
 <script>
-import { getTextBookCourseInfo,getKnowledgeCatalogInfo } from '@/api/index'
+import { getTextBookCourseInfo, getKnowledgeCatalogInfo } from '@/api/index'
 import myCollapse from './myCollapse'
 
 export default {
   name: "knowledgePoint",
-  props: ['start', 'classGrade', 'areaCode', 'courseIds' ,'active', 'textBookId', 'gradeTermId', 'toggleNum', 'onRefresh'],
+  props: ['start', 'classGrade', 'areaCode', 'courseIds', 'active', 'textBookId', 'gradeTermId', 'toggleNum', 'onRefresh', 'subjectType'],
   data() {
     return {
       list: [],
@@ -41,7 +41,7 @@ export default {
       toggleFirst: false,
       isRecomment: false,
       isChange: false,
-      courseIds2:[]
+      courseIds2: []
     }
   },
   components: {
@@ -103,6 +103,21 @@ export default {
     //     this.getKnowledgeCatalogInfo()
     //   }
     // },
+    async subjectType(nv, ov) {
+      console.log("subjectType nv", nv);
+      console.log("subjectType ov", ov);
+      if (nv) {
+        this.isChange = true
+        if (this.active != 1) return
+        this.isChange = false
+        this.list = []
+        this.listIndex = 0
+        this.isRecomment = false
+        this.classIndex = -1
+        await this.getTextBookCourseInfo()
+        this.getKnowledgeCatalogInfo()
+      }
+    },
 
   },
   created() {
@@ -141,11 +156,11 @@ export default {
             })
             newArr = newArr = Array.from(new Set(newArr))
             // console.log(courseIds, 'courseIds');
-            this.courseIds2=newArr
+            this.courseIds2 = newArr
           }
 
         } else {
-          this.courseIds2=[]
+          this.courseIds2 = []
         }
         return
       })

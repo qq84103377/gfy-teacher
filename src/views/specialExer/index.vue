@@ -51,7 +51,7 @@
 
         <question-type v-show="active == 0" :list='typesList' :active='active' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
 
-        <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :active='active' :toggleNum='toggleNum2' :onRefresh.sync='onRefresh2' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
+        <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :active='active' :toggleNum='toggleNum2' :subjectType.sync='subjectType' :onRefresh.sync='onRefresh2' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
 
         <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :toggleNum='toggleNum3' :onRefresh.sync='onRefresh3' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
       </van-pull-refresh>
