@@ -254,8 +254,8 @@
       },
     },
     mounted() {
-      // this.roleType = this.$route.params.roleType;
-      this.roleType = 'A02';
+      this.roleType = this.$route.params.roleType;
+      // this.roleType = 'A02';
       let schoolInfo = JSON.parse(window.localStorage.getItem('schoolInfo'));
       this.accountPrefix = schoolInfo.accountPrefix;
     }
