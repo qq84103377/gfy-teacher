@@ -258,6 +258,10 @@
         this.classPop = false
         next(false)
       } else {
+        if(['/index','/resCentre','/mine'].includes(to.path)) {
+          this.tempGradeIndex = 0
+          this.gradeIndex = 0
+        }
         next()
       }
     },

@@ -157,6 +157,7 @@
       previewImg(startPosition) {
           ImagePreview({
             images: this.imgList.map(v => v.url),
+            className: 'img-preview-init',
             startPosition,
             onClose() {
               // do something

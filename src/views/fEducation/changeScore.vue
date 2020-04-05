@@ -171,12 +171,10 @@ export default {
         return
       }
 
-      if (!this.isClassParent) {
-        // this.createClassSubGroup(studentList)
-      } else {
-        this.saveParentRewardScore(studentList.toString())
-        done()
-      }
+
+      this.saveParentRewardScore(studentList.toString())
+      done()
+
 
     },
     saveParentRewardScore(studentList) {

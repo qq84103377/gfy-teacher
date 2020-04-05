@@ -608,7 +608,7 @@ export default {
           queryType:'T02',
 
           "filterParam": {
-            "keyWord": '',
+            "keyWord": this.$route.query.keyWord,
             "titleType": this.filterParam.titleType,
             "titleDegree": this.filterParam.titleDegree,
             "belongType": this.filterParam.belongType,

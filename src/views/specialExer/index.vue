@@ -3,7 +3,7 @@
     <van-row class="question-type-wrap__tit">
       <van-col span="8" :class="{ active: active == 0 }" @click="active = 0;changeTab(0)">题型专项</van-col>
       <van-col span="8" :class="{ active: active == 1 }" @click="active = 1;changeTab(1)">知识点专项</van-col>
-      <van-col span="8" :class="{ active: active == 2 }" @click="active = 2;changeTab(2)">复习套卷</van-col>
+      <van-col span="8" :class="{ active: active == 2 }" @click="$toast('敬请期待')">复习套卷</van-col>
     </van-row>
 
     <div class="question-type-wrap__body" ref="body">
@@ -13,7 +13,7 @@
         <div class="blue">{{areaLabel}}</div>
       </van-cell>
 
-      <van-cell v-if="active!=2" @click="typeSubjectFilterShow=true" title="科目" class="fs16" is-link>
+      <van-cell v-if="active!==2" @click="typeSubjectFilterShow=true" title="科目" class="fs16" is-link>
         <div class="blue">
           {{typeSubjectLabel}}
         </div>
@@ -31,13 +31,19 @@
         </div>
       </van-cell>
 
-      <van-cell v-if="active != 2" @click="versionFilterShow=true" title="教材" class="fs16" is-link>
+      <van-cell v-if="active ==0" @click="versionFilterShow=true" title="教材" class="fs16" is-link>
         <div class="blue">
           {{versionLabel}}
         </div>
       </van-cell>
 
-      <van-cell v-else @click="reviewMoreShow=true" title="更多" class="fs16" is-link>
+      <van-cell v-if="active ==1" title="教材" class="fs16">
+        <div class="blue">
+          中考总复习中考总复习
+        </div>
+      </van-cell>
+
+      <van-cell v-if="active ==2" @click="reviewMoreShow=true" title="更多" class="fs16" is-link>
         <div class="blue">{{reviewMoreLable}}</div>
       </van-cell>
 
@@ -45,7 +51,7 @@
 
         <question-type v-show="active == 0" :list='typesList' :active='active' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm'></question-type>
 
-        <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :active='active' :toggleNum='toggleNum2' :onRefresh.sync='onRefresh2' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
+        <knowledge-point v-show="active == 1" :start.sync='startKnowledge' :active='active' :toggleNum='toggleNum2' :subjectType.sync='subjectType' :onRefresh.sync='onRefresh2' :areaCode='areaCode' :courseIds='courseIds' :classGrade='gradeTerm' :textBookId.sync='textBookId' :gradeTermId.sync='gradeTermId'></knowledge-point>
 
         <review-test v-show="active == 2" :start.sync='startReviewTest' :active='active' :toggleNum='toggleNum3' :onRefresh.sync='onRefresh3' :subjectType.sync='subjectType' :classGrade.sync='gradeItem' :areaCode.sync='areaCode' :provinceCode.sync='provinceCode' :belongYear.sync='yearItem' :reviewTypeItem.sync='reviewTypeItem' :reviewType.sync='reviewType' :termType.sync='termType' :changeGradeSubject.sync='changeGradeSubject' :changeMore.sync='changeMore'></review-test>
       </van-pull-refresh>
@@ -152,9 +158,9 @@ export default {
         { name: '真题', value: 'T01', active: false },
         { name: '模拟题', value: 'T02', active: false },
         { name: '预测', value: 'T31', active: false },
-        { name: '期中', value: '[M03]', type: true, active: false },
-        { name: '期末', value: '[M04]', type: true, active: false },
-        { name: '练习卷', value: '[M01,M02]', type: true, active: false },
+        { name: '期中', value: '["M03"]', type: true, active: false },
+        { name: '期末', value: '["M04"]', type: true, active: false },
+        { name: '练习卷', value: '["M01","M02"]', type: true, active: false },
       ],
       yearList: [], //复习套卷-年段list
       reviewMoreLable: '', // 复习套卷-类型list
