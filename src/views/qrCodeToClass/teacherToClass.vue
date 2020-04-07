@@ -269,7 +269,7 @@
             } else {
               // 不是班主任，跳到成功页面
               let tempObj = {
-                type: 'F03',
+                type: 'F04',
                 msg: '加入班级成功'
               }
               window.localStorage.setItem('statusType', JSON.stringify(tempObj));
