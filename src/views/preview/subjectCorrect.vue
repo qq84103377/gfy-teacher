@@ -29,19 +29,25 @@
              @click="selectScore(aswIndex,0,stuArr[stuIndex].answer[aswIndex])">零分
         </div>
       </div>
+      <div class="correct-wrap__side-step">
+        <div style="flex: 1">步长: </div><i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i>
+        <div @click="step=0.5" class="correct-wrap__side-step__btn" :class="{active:step===0.5}">0.5</div>
+        <div @click="step=1" class="correct-wrap__side-step__btn" :class="{active:step===1}">1</div>
+      </div>
       <div class="correct-wrap__side-center">
         <div v-for="(asw,ai) in stuArr[stuIndex].answer" :key="ai" class="dropdown-group"><span>{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}</span>
-          <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value || asw.isMark==='I01'}" :overlay="false">
-            <van-dropdown-item :disabled="ai !== aswIndex" :ref="'menuItem' + ai"
-                               :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">
-<!--              <div class="menu-wrap">-->
-                <div @click="selectScore(ai,score,asw)" class="menu-item"
-                     v-for="(score,scoreIndex) in  splitScore(asw.examScore || 5)"
-                     :key="scoreIndex">{{score}}分
-                </div>
-<!--              </div>-->
-            </van-dropdown-item>
-          </van-dropdown-menu>
+<!--          <van-dropdown-menu :class="{'is-check':asw.value === 0 || asw.value || asw.isMark==='I01'}" :overlay="false">-->
+<!--            <van-dropdown-item :disabled="ai !== aswIndex" :ref="'menuItem' + ai"-->
+<!--                               :title="((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'">-->
+<!--                <div @click="selectScore(ai,score,asw)" class="menu-item"-->
+<!--                     v-for="(score,scoreIndex) in  splitScore(asw.examScore || 5)"-->
+<!--                     :key="scoreIndex">{{score}}分-->
+<!--                </div>-->
+<!--            </van-dropdown-item>-->
+<!--          </van-dropdown-menu>-->
+          <div @click="scorePopShow(asw,ai)" class="select-score" :class="{'red':asw.value === 0 || asw.value || asw.isMark==='I01','disabled':ai !== aswIndex}">
+            {{((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'}}
+          </div>
         </div>
       </div>
       <div class="correct-wrap__side-bottom">
@@ -50,6 +56,23 @@
         <div class="submit fs10" @click="submit">提交</div>
       </div>
     </div>
+
+<!--    打分面板-->
+    <van-dialog
+      class="score-dialog"
+      v-model="scorePanel"
+      :show-confirm-button="false">
+      <div class="score-panel">
+        <div style="position: relative">选择分数<van-icon @click="scorePanel=false" name="cross"/>
+        </div>
+        <div class="score-panel__body">
+          <div @click="selectScore(0,item.value,aswItem)" :class="{active:item.active}" v-for="(item,index) in scoreList" :key="index">{{item.value}}</div>
+        </div>
+        <div class="score-panel__tip">*点击选择分数</div>
+      </div>
+    </van-dialog>
+
+
     <div class="correct-wrap__bottom" id="tools-bar">
       <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isPen=!isPen;isRubber=false"
          class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
@@ -121,7 +144,6 @@
           </div>
         </div>
         <div class="stu-info-wrap__body">
-<!--          <div class="stu-item" v-for="(stu,si) in filterStuList" :key="si">-->
           <div class="stu-item" v-if="getStudentName(stu.accountNo, classId).indexOf(stuName) > -1" v-for="(stu,si) in stuArr" :key="si">
             <div class="stu-item__name" @click="selectAnswer(si)">{{getStudentName(stu.accountNo,classId)}}</div>
             <div class="stu-item__score">
@@ -233,31 +255,16 @@
         // filterStuList: [],
         autoSubmit: true,
         selectScoreFlag: false, //是否选择过分数
+        scorePanel: false, //打分面板
+        scoreList: [],
+        step: 1, //步长
+        aswItem: {}, //答案item
       }
-    },
-    watch: {
-      // stuName() {
-      //   clearTimeout(this.timer)
-      //   this.timer = setTimeout(() => {
-      //     if (this.stuName) {
-      //       this.filterStuList = this.stuArr.filter(v => this.getStudentName(v.accountNo, this.classId).indexOf(this.stuName) > -1)
-      //     } else {
-      //       this.filterStuList = this.stuArr
-      //     }
-      //   }, 500)
-      // }
     },
     computed: {
       ...mapState({
         vanLoading: state => state.setting.vanLoading
       }),
-      filterStuList() {
-        if (this.stuName) {
-          return this.stuArr.filter(v => this.getStudentName(v.accountNo, this.classId).indexOf(this.stuName) > -1)
-        } else {
-          return this.stuArr
-        }
-      },
       progress() {
         return this.stuArr.reduce((t, v) => {
           if (v.answer.every(a => a.isMark === 'I01')) {
@@ -291,6 +298,31 @@
       this.figure()
     },
     methods: {
+      scorePopShow(asw,ai) {
+        if(ai !== this.aswIndex) return
+        this.aswItem = asw
+        let arr = []
+        // const total = (asw.examScore || 5) / this.step
+        for (let i = this.step; i <= (asw.examScore || 5); i+=this.step) {
+          let active = false
+          if(asw.value === 0 || asw.value || asw.isMark==='I01') {
+            //已打分
+           let value = ((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score))
+            if(value == i) {
+              active = true
+            }
+          }
+          arr.push({value:i,active})
+        }
+        if(arr.length>10 && (arr.length % 10 > 0)) {
+          const count = 10 - (arr.length % 10)
+          for (let i = 0; i < count; i++) {
+            arr.push({value:'--',active:false})
+          }
+        }
+        this.scoreList = arr
+        this.scorePanel = true
+      },
       handleSubmit() {
         //更新涂鸦后的图片
         this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '&' + Math.random()
@@ -318,8 +350,6 @@
           this.$store.commit('setVanLoading', false)
           if(res.flag) {
             this.stuArr[this.stuIndex].answer[this.aswIndex].qualityType = qualityType
-            // this.$set(this.filterStuList[this.stuIndex].answer[this.aswIndex],'qualityType',qualityType)
-            // this.filterStuList[this.stuIndex].answer[this.aswIndex].qualityType = qualityType
           }else {
             this.$toast(res.msg)
           }
@@ -691,11 +721,11 @@
         })
       },
      async selectScore(i, score, asw) {
-       if (this.vanLoading) return
+       if (this.vanLoading || score === '--') return
        console.log(asw.value);
         this.selectScoreFlag = true
-        this.$refs['menuItem' + i][0].toggle(false)
-        // this.value1 = `${index}分`
+        // this.$refs['menuItem' + i][0].toggle(false)
+       this.scorePanel = false
         this.$set(asw, 'value', score)
         if(this.autoSubmit) {
           this.$store.commit('setVanLoading', true)
@@ -844,12 +874,7 @@
         align-items: center;
         justify-content: center;
 
-        .van-icon-cross {
-          position: absolute;
-          right: 5px;
-          top: 50%;
-          transform: translateY(-50%);
-        }
+
       }
 
       &__body {
@@ -1091,18 +1116,55 @@
           }
         }
       }
-
+      &-step{
+        flex:0 0 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 7px;
+        margin-top: 5px;
+        .icon-tip{
+          flex:0 0 10px;
+          height: 10px;
+          margin-left: 3px;
+        }
+        &__btn{
+          flex:0 0 18px;
+          text-align: center;
+          line-height: 13px;
+          border-radius: 2px;
+          border: 1px solid #ccc;
+          background: #eee;
+          margin-left: 3px;
+          &.active{
+            background: #94f8ca;
+          }
+        }
+      }
       &-center {
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-bottom: 52px;
+        /*padding-bottom: 52px;*/
 
         .dropdown-group {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 5px 0;
+
+          .select-score {
+            height: 13px;
+            line-height: 13px;
+            border: 1px solid #ccc;
+            text-align: center;
+            background: #fff;
+            flex:0 0 65%;
+            font-size: 6px;
+            &.disabled{
+              background: #eee;
+            }
+          }
           @{deep} .van-dropdown-item__content {
             border: 1px solid #ccc;
           }
@@ -1319,6 +1381,46 @@
           margin-right: 0;
         }
       }
+    }
+    .score-dialog{
+      border-radius: 5px;
+      width: 800px;
+      max-width: 295px;
+      .score-panel{
+        text-align: center;
+        font-size: 10px;
+        padding: 5px 10px;
+        &__body{
+          margin-top: 5px;
+          display: flex;
+          flex-wrap: wrap;
+          overflow-y: auto;
+          max-height: 70px;
+          justify-content: center;
+          >div{
+            flex: 0 0 27px;
+            line-height: 13px;
+            border: 1px solid #ccc;
+            font-size: 8px;
+            text-align: center;
+            &.active{
+              background: @blue;
+            }
+          }
+        }
+        &__tip{
+          color: red;
+          font-size: 9px;
+          text-align: left;
+          margin-top: 5px;
+        }
+      }
+    }
+    .van-icon-cross {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
     }
   }
 </style>
