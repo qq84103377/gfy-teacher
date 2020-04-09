@@ -81,7 +81,9 @@ export default {
     return {
       analyseShow: false,
       tooltip: false,
-      collect: false
+      collect: false,
+      show:false,
+      images: []
     }
   },
   mounted() {
@@ -138,6 +140,7 @@ export default {
         ImagePreview({
           images: [$event.target.src],
           // startPosition: 1,
+          className: 'img-preview-init',
           onClose() {
             // do something
             console.log("close");

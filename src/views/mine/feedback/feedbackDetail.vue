@@ -395,7 +395,7 @@ export default {
       }else if (this.appraiseDialog) {
         this.appraiseDialog = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
@@ -406,6 +406,7 @@ export default {
         ImagePreview({
           images: [$event.target.src],
           // startPosition: 1,
+          className: 'img-preview-init',
           onClose() {
             // do something
             console.log("close");
