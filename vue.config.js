@@ -13,6 +13,7 @@ module.exports = {
     }
   },
   chainWebpack: (config) => {
+    //关闭预加载
     config.plugins.delete('prefetch')
 
     config.resolve.alias

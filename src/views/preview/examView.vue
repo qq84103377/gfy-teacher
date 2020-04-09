@@ -10,9 +10,9 @@
       <div @click="handleToggle(false)" :class="{active:!classView}">小组查看</div>
     </div>
     <div class="exam-view-wrap__body">
-      <score-table :examScore="info.testPaperScore" @jump="jump" :list="classList" :classView="true" :isWk="['T01','T02'].includes(info.taskType)"
+      <score-table :examScore="info.testPaperScore" @jump="jump" :list="classList" :classView="true" :isWk="['T01','T02'].includes(info.taskType)" :isTest="isTest"
                    v-show="classView" :isfEducation="isfEducation"></score-table>
-      <score-table :examScore="info.testPaperScore" @jump="jump" :list="groupList" :classView="false" :isWk="['T01','T02'].includes(info.taskType)"
+      <score-table :examScore="info.testPaperScore" @jump="jump" :list="groupList" :classView="false" :isWk="['T01','T02'].includes(info.taskType)" :isTest="isTest"
                    v-show="!classView" :isfEducation="isfEducation"></score-table>
       <div v-if="!classList.length" class="empty-page">
         <img src="../../assets/img/empty-1.png" alt/>
@@ -42,6 +42,7 @@
         termType: this.$route.params.termType,
         isfEducation: this.$route.params.isfEducation,
         isDisabled: this.$route.params.isDisabled,
+        isTest: this.$route.params.isTest,
       }
     },
     computed: {
@@ -51,8 +52,9 @@
             t.push({
               ...v,
               name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
-              duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`,
-              // tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate).getTime() - new Date(v.tvStartDate).getTime()) / 1000) : '--'
+              // duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`,
+              duration: formathms(v.duration),
+              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate).getTime() - new Date(v.tvStartDate).getTime()) / 1000) : '--'
             })
           }
           return t
@@ -66,7 +68,9 @@
             const item = {
               ...v,
               name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
-              duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
+              // duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
+              duration: formathms(v.duration),
+              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate).getTime() - new Date(v.tvStartDate).getTime()) / 1000) : '--'
             }
             if (index > -1) {
               // 已存在相同组

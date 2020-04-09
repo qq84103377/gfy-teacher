@@ -65,7 +65,7 @@
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
                v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
-          <div @click="viewStu" v-if="isTestPaper|| $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按{{isfEducation?'家长':'学生'}}查看
+          <div @click="viewStu" v-if="isTestPaper|| ['T01','T02','T13'].includes($route.query.taskType) || $route.query.resourceType === 'R03'">按{{isfEducation?'家长':'学生'}}查看
           </div>
           <i @click="showReplyTip=true" v-if="['T02','T04','T06'].includes($route.query.taskType)&&!isTestPaper"
              class="iconGFY icon-tip"></i>
@@ -423,7 +423,8 @@
             taskType: this.$route.query.taskType,
             termType: this.$route.query.termType,
             isDisabled: this.isDisabled ? 1 : '',
-          isfEducation:this.isfEducation
+          isfEducation:this.isfEducation,
+            isTest:(this.$route.query.testPaperId > 0 || this.$route.query.resourceType === 'R03')?1:0
           }
         })
         // }
