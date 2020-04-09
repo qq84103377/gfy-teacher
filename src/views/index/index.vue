@@ -94,14 +94,13 @@
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <!-- <div v-if='showfEduction' @click="$router.push('/fEducation')">
-          <i class="iconGFY icon-cap"></i>
-          <span>家庭教育</span>
-        </div> -->
-
         <div @click="$router.push(`/specialExer`)">
           <i class="iconGFY icon-special"></i>
           <span>专项练习</span>
+        </div>
+        <div v-if='showfEduction' @click="$router.push('/fEducation')">
+          <i class="iconGFY icon-cap"></i>
+          <span>家庭教育</span>
         </div>
       </div>
     </div>
