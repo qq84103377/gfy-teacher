@@ -388,7 +388,7 @@
                   parent.removeChild(audioArr[i])
                 }
               }
-              v.text = dom.outerText
+              v.text = dom.outerText === '|||' ? '' : dom.outerText
             })
             this.info = res.data[0]
           } else {

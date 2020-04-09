@@ -668,7 +668,7 @@
             let parent = audioArr[i].parentElement
             parent.removeChild(audioArr[i])
           }
-          this.$set(item, 'text', dom.outerText)
+          this.$set(item, 'text', dom.outerText==='|||'?'':dom.outerText)
         } else {
           this.$set(item, 'text', '')
         }
