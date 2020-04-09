@@ -1,6 +1,6 @@
 <template>
   <div class="statusPage">
-    <van-sticky>
+    <van-sticky class="header">
       <van-nav-bar title="" left-arrow @click-left="$router.back()">
       </van-nav-bar>
     </van-sticky>
@@ -52,13 +52,16 @@
 
 <style scoped lang="less">
   .statusPage{
+    display: flex;
+    flex-direction: column;
     .content{
-      height: calc(100% - 45px);
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      /*overflow-y: scroll;*/
       .status {
-        /*padding-top: 45px;*/
+        padding: 10px 0;
         &-img {
           width: 88px;
           height: 88px;
