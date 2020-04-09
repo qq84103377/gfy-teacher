@@ -149,7 +149,8 @@
             <div class="stu-item__score">
               <div class="stu-item__score-item" @click="selectAnswer(si,ai)" v-for="(asw,ai) in stu.answer" :key="ai">
                 <i v-if="asw.qualityType==='Q01'" class="iconGFY icon-good-active"></i>
-                <span>{{$route.params.examNum}}.{{info.groupExamList.length?`(${ai+1})`:``}} {{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
+                <span>第{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}题</span>
+                <span class="mglt10">{{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
               </div>
             </div>
           </div>
@@ -192,7 +193,7 @@
     <van-popup class="step-tip" v-model="showTip">
       <div class="step-tip__wrap">
         <div class="step-tip__wrap__title">步长说明</div>
-        <div>分数之间的间隔,如选择了0.5,则每两个分数之间的间隔差为0.5</div>
+        <div>步长:分数之间的间隔,如选择了0.5,则每两个分数之间的间隔差为0.5</div>
       </div>
     </van-popup>
   </div>
