@@ -13,6 +13,8 @@
         <div v-if="type!=='myCourse'&&type!=='fEducation'&&type!=='error'" class="course-filter-wrap__header-tab">
           <span>{{subjectName}}</span>
         </div>
+        <div v-if="type==='fEducation'" class="course-filter-wrap__header-tab">
+        </div>
         <van-icon v-if="type==='myCourse' || type==='error'|| type==='fEducation'" class="icon-close" @click="show=false" name="close" />
       </div>
       <div v-if="type==='myCourse' || type==='error'||type === 'fEducation'" class="course-filter-wrap__dropdown van-hairline--bottom">
