@@ -11,7 +11,7 @@
       </span>
       <span class="header-item" :style="{flex: !isWk||classView?'1':'0 0 16%'}">测试总<br v-if="isWk"/>用时</span>
 <!--      <span class="header-item" v-if="!isWk">用时</span>-->
-      <span class="header-item score" v-if="isTest>0">测试得分</span>
+      <span class="header-item" v-if="isTest>0" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}">测试得分</span>
     </div>
     <div v-if="classView">
       <div class="row" v-for="(item,index) in list" :key="index">
@@ -32,8 +32,8 @@
 <!--        <div class="row-item" v-if="!isWk">-->
 <!--          <div>{{item.duration}}</div>-->
 <!--        </div>-->
-        <div class="row-item score" v-if="isTest>0">
-          <div :class="[{red:examScore>0?(item.score/examScore)<0.6:true},{blue:examScore>0?(item.score/examScore)>=0.6:false}]" @click="$emit('jump',item)">{{item.score}} ></div>
+        <div class="row-item" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}" v-if="isTest>0">
+          <div :class="[{red:examScore>0?(item.score/examScore)<0.6:true},{blue:examScore>0?(item.score/examScore)>=0.6:false}]" @click="$emit('jump',item)">{{item.score}}></div>
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@
         <div class="row-item" :style="{flex: !isWk?'1':'0 0 16%'}">
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>
         </div>
-        <div class="row-item score" v-if="isTest>0">
+        <div class="row-item" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}" v-if="isTest>0">
           <div :class="[{red:examScore>0?(s.score/examScore)<0.6:true},{blue:examScore>0?(s.score/examScore)>=0.6:false}]" v-for="(s,index3) in item.stu" :key="index3" @click="$emit('jump',s)">{{s.score}}></div>
         </div>
       </div>

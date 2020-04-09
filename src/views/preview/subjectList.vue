@@ -324,7 +324,7 @@
                   parent.removeChild(audioArr[i])
                 }
               }
-              res.data[0][key][k].text = dom.outerText
+              res.data[0][key][k].text = dom.outerText === '|||' ? '' : dom.outerText
               if (index > -1) {
                 // 该学生已存在数组中
                 stuArr[index].answer.push({...res.data[0][key][k], error: errorPercent, examScore: examScore === null ? 5 : examScore})

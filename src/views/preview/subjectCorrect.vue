@@ -188,6 +188,13 @@
         </div>
       </div>
     </van-dialog>
+
+    <van-popup class="step-tip" v-model="showTip">
+      <div class="step-tip__wrap">
+        <div class="step-tip__wrap__title">步长说明</div>
+        <div>分数之间的间隔,如选择了0.5,则每两个分数之间的间隔差为0.6</div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -211,6 +218,7 @@
     },
     data() {
       return {
+        showTip: false,
         commentWordList: [
           {
             range: '优秀',
@@ -1422,5 +1430,17 @@
       top: 50%;
       transform: translateY(-50%);
     }
+    .step-tip{
+      border-radius: 5px;
+      &__wrap {
+        font-size: 8px;
+        padding: 5px 10px;
+        &__title{
+          text-align: center;
+          margin-bottom: 5px;
+        }
+      }
+    }
+
   }
 </style>
