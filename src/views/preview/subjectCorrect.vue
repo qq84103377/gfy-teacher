@@ -192,7 +192,7 @@
     <van-popup class="step-tip" v-model="showTip">
       <div class="step-tip__wrap">
         <div class="step-tip__wrap__title">步长说明</div>
-        <div>分数之间的间隔,如选择了0.5,则每两个分数之间的间隔差为0.6</div>
+        <div>分数之间的间隔,如选择了0.5,则每两个分数之间的间隔差为0.5</div>
       </div>
     </van-popup>
   </div>
