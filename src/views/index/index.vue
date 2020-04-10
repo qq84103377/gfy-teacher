@@ -195,17 +195,26 @@ export default {
         if (Object.keys(this.parentClassList).length > 0) {
           for (let key in this.parentClassList) {
             this.parentClassList[key].classStudent = {}
+            this.parentClassList[key].allClassStudent = {}
             this.parentClassList[key].groupInfo.forEach(e => {
               if (e.tchSubGroupParent !== null) {
+                e.alltchSubGroupParent=JSON.parse(JSON.stringify(e.tchSubGroupParent)) 
                 e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
                   if (i.parentAccountNo) {
                     return i
                   }
                 })
+                if (e.alltchSubGroupParent.length) {
+                  e.alltchSubGroupParent.forEach(s => {
+                    this.parentClassList[key].allClassStudent[s.parentAccountNo] = s
+                  })
+                }
                 if (e.tchSubGroupStudent.length) {
                   e.tchSubGroupStudent.forEach(s => {
                     this.parentClassList[key].classStudent[s.parentAccountNo] = s
                   })
+
+                  
                 }
               }
 

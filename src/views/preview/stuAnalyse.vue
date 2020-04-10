@@ -1,7 +1,7 @@
 <template>
   <section class="stu-analyse">
     <van-nav-bar
-      :title="getStudentName($route.query.accountNo,$route.query.classId) + '的做题情况'"
+      :title="isfEducation?getParentName($route.query.accountNo,$route.query.classId):getStudentName($route.query.accountNo,$route.query.classId) + '的做题情况'"
       @click-left="goBack"
       left-arrow>
     </van-nav-bar>
@@ -21,13 +21,13 @@
           <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
           <div v-html="info.questionList[curIndex].examQuestion.title"></div>
           <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>
-          <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">学生答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.studentAnswer"></span></div>
+          <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">{{isfEducation?'家长':'学生'}}答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.studentAnswer"></span></div>
           <div>答案解析:</div>
           <div v-html="info.questionList[curIndex].examQuestion.examExplain"></div>
           <div v-for="(item,index) in info.questionList[curIndex].testPaperExamGroup" :key="index">
             <div v-html="item.groupExamInfo.title"></div>
             <div>正确答案: <span class="blue" v-html="item.groupExamInfo.answer"></span></div>
-            <div>学生答案: <span class="blue" v-html="item.groupExamInfo.studentAnswer"></span></div>
+            <div>{{isfEducation?'家长':'学生'}}答案: <span class="blue" v-html="item.groupExamInfo.studentAnswer"></span></div>
             <div>答案解析:</div>
             <div v-html="item.groupExamInfo.examExplain"></div>
           </div>
@@ -43,7 +43,7 @@
 <script>
   import analyseWrap from '../../components/analyseWrap'
   import {getCourseTaskDetail, getCourseTaskDetailV2} from '@/api/index'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
 
   export default {
     name: "stuAnalyse",
@@ -53,7 +53,8 @@
         info: {examQuestionInfo: {}, testPaperInfo: [], questionList: []},
         curIndex: 0,
         resourceType: '',
-        bigExamList: JSON.parse(JSON.stringify(this.$route.query.bigExam))
+        bigExamList: JSON.parse(JSON.stringify(this.$route.query.bigExam)),
+        isfEducation:this.$route.query.isfEducation
       }
     },
     created() {
@@ -62,7 +63,11 @@
     computed: {
       getStudentName() {
         return getStudentName
-      }
+      },
+      getParentName() {
+        return getParentName
+      },
+
     },
     methods: {
        goBack(){

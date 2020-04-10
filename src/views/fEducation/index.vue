@@ -24,11 +24,11 @@
         </van-list>
       </van-pull-refresh>
       <div v-if="!listLoading && !list.length" class="empty-btn">
-        <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: {from:'fEducation' } })">新建课</van-button>
+        <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: {isfEducation:true } })">新建课</van-button>
       </div>
     </div>
     <div v-if="list.length" class="my-course-list__footer van-hairline--top">
-      <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: { from:'fEducation' } })">新建课</van-button>
+      <van-button class="add-course" type="info" @click="$router.push({ path: '/addCourse', query: { isfEducation:true } })">新建课</van-button>
     </div>
 
     <course-filter ref="courseFilter" @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="fEducation"></course-filter>

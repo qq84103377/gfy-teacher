@@ -39,7 +39,7 @@
       </van-pull-refresh>
     </div>
     <div class="lesson-list__footer">
-      <van-button type="info" class="upload-btn" @click="$router.push({path:'uploadLesson',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传微课</van-button>
+      <van-button type="info" class="upload-btn" @click="$router.push({path:'uploadLesson',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo,isfEducation:$route.query.isfEducation}})">上传微课</van-button>
     </div>
   </section>
 </template>

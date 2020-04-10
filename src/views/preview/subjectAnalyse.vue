@@ -17,7 +17,7 @@
           <div class="mgb5">答案为<span class="inline html-img blue" v-html="item.answer"></span>的同学:</div>
           <div style="display: flex;flex-wrap: wrap;" class="pdlt10">
             <div v-for="(stu,stuIndex) in item.studentsNew" :key="stuIndex" class="stu-error">
-              {{getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?((stu.percent*100).toFixed(2)+'%'):'--'}})</span>
+              {{isfEducation?getParentName(stu.accountNo,$route.query.classId):getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?((stu.percent*100).toFixed(2)+'%'):'--'}})</span>
             </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
 <script>
   import analyseWrap from '../../components/analyseWrap'
   import {getExamItemDetail} from '@/api/index'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
 
   export default {
     name: "subjectAnalyse",
@@ -37,12 +37,16 @@
     data() {
       return {
         list: JSON.parse(JSON.stringify(this.$route.query.questionList)),
-        info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}}
+        info: {examQuestionInfo: {}, statStudentAnswer: {stuAnswer: []}},
+        isfEducation: this.$route.query.isfEducation
       }
     },
     computed: {
       getStudentName() {
         return getStudentName
+      },
+      getParentName() {
+        return getParentName
       }
     },
     created() {

@@ -148,7 +148,7 @@
 
 export default {
   name: "courseFilter",
-  props: ['visible', 'sysCourseId', 'type'],
+  props: ['visible', 'sysCourseId', 'type','isfEducation'],
   data() {
     return {
       gradeDropdown: false,
@@ -163,7 +163,7 @@ export default {
       termTypeList: [],
       termIndex: ((new Date().getMonth() + 1) >= 2 && (new Date().getMonth() + 1) <= 7) ? 1 : 0,
       gradeTermList: this.$store.getters.getGradeTermInfo,
-      subjectName: localStorage.getItem("currentSubjectTypeName"),
+      subjectName: this.isfEducation?'家庭教育':localStorage.getItem("currentSubjectTypeName"),
       classGradeMap: [],
       gradeIndex: (this.type === 'myCourse') || (this.type === 'fEducation')  ? '' : 0,
       textBookList: [],
@@ -182,7 +182,8 @@ export default {
       classDropdown: false,
       // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
       classIndex: '',
-      showChangeDialog:false
+      showChangeDialog:false,
+
     }
   },
   computed: {
@@ -211,13 +212,25 @@ export default {
       if (localStorage.getItem("deployList")) {
         //先查出当前学科有哪些年级
         let gradeArr = []
-        for (let k in JSON.parse(localStorage.getItem("classMap"))) {
+
+        if (this.isfEducation) {
+          for (let k in JSON.parse(localStorage.getItem("classMap"))) {
+          if (JSON.parse(localStorage.getItem("classMap"))[k].teacherInfoList.some(s => s.subjectType === 'S20')) {
+            if (!gradeArr.includes(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)) {
+              gradeArr.push(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)
+            }
+          }
+        }
+        }else{
+          for (let k in JSON.parse(localStorage.getItem("classMap"))) {
           if (JSON.parse(localStorage.getItem("classMap"))[k].teacherInfoList.some(s => s.subjectType === localStorage.currentSubjectType)) {
             if (!gradeArr.includes(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)) {
               gradeArr.push(JSON.parse(localStorage.getItem("classMap"))[k].classGrade)
             }
           }
         }
+        }
+        
         //筛选对应的年级
         if (gradeArr.includes("G09")) {
           gradeArr.push("G09&1")
@@ -268,7 +281,7 @@ export default {
 
   },
   created() {
-    if (this.type === 'fEducation') {
+    if (this.type === 'fEducation' ||this.isfEducation) {
       this.subjectList.push({
         key: 'S20',
         value: '家庭教育',
@@ -304,7 +317,7 @@ export default {
         "interPwd": "25d55ad283aa400af464c76d713c07ad",
         "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
         "gradeTermId": gradeId,
-        "subjectType": localStorage.getItem("currentSubjectType")
+        "subjectType": this.isfEducation?'S20':localStorage.getItem("currentSubjectType")
       }
       let params = {
         requestJson: JSON.stringify(obj)
@@ -402,7 +415,7 @@ export default {
             "termType": this.termList[this.termIndex].value, //学期
             "classGrade": this.gradeList[this.gradeIndex] ? this.gradeList[this.gradeIndex].classGrade.split("&")[0] : '', //年级
             "classId": this.classIndex || '', //班级
-            "subjectType": localStorage.getItem("currentSubjectType") //科目
+            "subjectType": this.isfEducation?"S20":localStorage.getItem("currentSubjectType") //科目
           }
         } else {
           //年级计算
@@ -423,7 +436,7 @@ export default {
             "belongSchoolId": this.$store.getters.schoolId,
             "textBookId": this.bookInfoList[this.bookIndex].textBookId,
             "gradeTermId": gradeId,
-            "subjectType": localStorage.getItem("currentSubjectType")
+            "subjectType": this.isfEducation?"S20":localStorage.getItem("currentSubjectType")
           }
         }
         let params = {

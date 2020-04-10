@@ -202,7 +202,7 @@
     <van-dialog v-model="stuStatInfo.statDialog" :show-confirm-button="false">
       <div class="stat-dialog-wrap">
         <div class="stat-dialog-wrap__header"><span
-          class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}学生</span>
+          class="stat-dialog-wrap__header-title">{{stuStatInfo.title}}{{isfEducation?'家长':'学生'}}</span>
           <van-icon class="icon-close" name="clear" @click="stuStatInfo.statDialog=false"/>
         </div>
         <div class="stat-dialog-wrap__body">
@@ -265,7 +265,7 @@
     statTaskStatV2,
     delReplyV2
   } from '@/api/index'
-  import {getStudentName, getFontSize} from '@/utils/filter'
+  import {getStudentName, getParentName,getFontSize} from '@/utils/filter'
 
   export default {
     name: "statistic",
@@ -1043,25 +1043,54 @@
             this.stuStatInfo.stu = []
             this.stuStatInfo.title = params.name
             if (params.name === '未开始') {
-              this.taskFinishInfo.studentUnfinishList.forEach(v => {
+              if (this.isfEducation) {
+                 this.taskFinishInfo.studentUnfinishList.forEach(v => {
+                (v.noStartList || []).forEach(s => {
+                  const name = getParentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
+                  this.stuStatInfo.stu.push(name)
+                })
+              })
+              }else{
+                 this.taskFinishInfo.studentUnfinishList.forEach(v => {
                 (v.noStartList || []).forEach(s => {
                   const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                   this.stuStatInfo.stu.push(name)
                 })
               })
+              }
+             
             } else if (params.name === '已完成') {
-              this.taskFinishInfo.finishStudent.reduce((t, v) => {
+              if (this.isfEducation) {
+                 this.taskFinishInfo.finishStudent.reduce((t, v) => {
+                const name = getParentName(v, this.info.tchClassTastInfo.find(t => t.active).classId)
+                t.push(name)
+                return t
+              }, this.stuStatInfo.stu)
+              }else{
+                this.taskFinishInfo.finishStudent.reduce((t, v) => {
                 const name = getStudentName(v, this.info.tchClassTastInfo.find(t => t.active).classId)
                 t.push(name)
                 return t
               }, this.stuStatInfo.stu)
+              }
+             
             } else if (params.name === '进行中') {
-              this.taskFinishInfo.studentUnfinishList.forEach(v => {
+              if (this.isfEducation) {
+                this.taskFinishInfo.studentUnfinishList.forEach(v => {
+                (v.runningList || []).forEach(s => {
+                  const name = getParentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
+                  this.stuStatInfo.stu.push(name)
+                })
+              })
+              }else{
+                this.taskFinishInfo.studentUnfinishList.forEach(v => {
                 (v.runningList || []).forEach(s => {
                   const name = getStudentName(s, this.info.tchClassTastInfo.find(t => t.active).classId)
                   this.stuStatInfo.stu.push(name)
                 })
               })
+              }
+              
             }
 
             this.stuStatInfo.statDialog = true
@@ -1198,6 +1227,7 @@
                     taskId: this.info.taskId,
                     examId: this.$route.query.resourceType === 'R03' ? item.exam_id : (item.examId || item.examGroupId),
                     groupId: this.$route.query.resourceType === 'R03' ? item.group_id : item.groupId,
+                    isfEducation: this.isfEducation,
                     classId,
                     questionList: this.objectiveList,
                     resourceType: this.$route.query.resourceType

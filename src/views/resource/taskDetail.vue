@@ -4,7 +4,8 @@
     <div class="task-detail__body">
       <div class="task-detail__body__top" v-if="isApp">
         <div class="fs18 mgb10" style="font-weight: bold;">练习发布成功</div>
-        <div class="red fs10">您可以把练习分享给家长，督促{{isfEducation?'家长':'学生'}}及时完成练习</div>
+        <div class="red fs10" v-if='isfEducation'>家长请及时完成练习</div>
+        <div class="red fs10" v-else>您可以把练习分享给家长，督促学生及时完成练习</div>
       </div>
       <div class="task-detail__body__center">
         <van-cell>
@@ -101,6 +102,7 @@ export default {
       currentClassId: '',
       optionList: [],
       showClass: true,
+      isfEducation: this.$route.query.isfEducation,
     }
   },
   mounted() {

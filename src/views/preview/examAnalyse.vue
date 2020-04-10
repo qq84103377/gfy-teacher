@@ -58,7 +58,7 @@
 <script>
 import echarts from "echarts";
 import { getTestPaperAnalysisV2, getTestPaperScoreAnalysisV2, getTestPaperExamInfoV2 } from '@/api/index'
-import { getStudentName, getFontSize } from '@/utils/filter'
+import { getStudentName,getParentName, getFontSize } from '@/utils/filter'
 
 export default {
   name: "examAnalyse",
@@ -158,7 +158,7 @@ export default {
           //   }
           // })
           this.scoreInfo = (res.data[0].studentStatList || []).map(v => {
-            return {...v,name:getStudentName(v.accountNo, this.$route.query.classId)}
+            return {...v,name:this.isfEducation?getParentName(v.accountNo, this.$route.query.classId):getStudentName(v.accountNo, this.$route.query.classId)}
           })
           console.log(this.scoreInfo);
         } else {

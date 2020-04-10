@@ -122,7 +122,7 @@
     </div>
     <!--<div class="mask"  v-show="showMask"></div>-->
 
-    <course-filter ref="courseFilter" v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId"></course-filter>
+    <course-filter ref="courseFilter" v-if="!isEdit" @init="initData" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" :isfEducation='isfEducation'></course-filter>
 
     <van-dialog @confirm="handleEditClass" v-model="showAlert" show-cancel-button>
       <div slot="title" class="fs14 grey6 pd10">{{message}}</div>
@@ -175,6 +175,7 @@ export default {
       shareFlag: false,
       showAlert: false,
       message: '',
+      isfEducation: this.$route.query.isfEducation,
     }
   },
   computed: {
@@ -229,7 +230,7 @@ export default {
 
   },
   mounted() {
-    if (this.$route.query.from == 'fEducation') {
+    if (this.isfEducation) {
       //班级信息
       let cl = localStorage.getItem("classMap")
       if (cl) {
@@ -489,7 +490,7 @@ export default {
         "subjectList": [localStorage.getItem("currentSubjectType")],
         "keyWord": this.form.name
       }
-      if (this.$route.query.from === 'fEducation') {
+      if (this.isfEducation) {
         obj.subjectList = ["S20"]
       }
       let params = {
@@ -538,7 +539,7 @@ export default {
         "termType": this.term,
         "currentPage": "1"
       }
-      if (this.$route.query.from === 'fEducation') {
+      if (this.isfEducation) {
         obj.subjectType = "S20"
       }
       let params = {
@@ -627,7 +628,7 @@ export default {
         "classCount": this.result.length,
         "desc": this.form.desc,
       }
-      if (this.$route.query.from === 'fEducation') {
+      if (this.isfEducation) {
         obj.subjectType = "S20"
         obj.courseType = "C02"
       }

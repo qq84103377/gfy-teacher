@@ -102,7 +102,7 @@ let getParentName= (accountNo,classId) => {
   if (localStorage.getItem('parentClassList')) {
     let parentList = JSON.parse(localStorage.getItem('parentClassList'))[classId]
     if(parentList&&Object.keys(parentList).length>0){
-      let parent = parentList.classStudent[accountNo]
+      let parent = parentList.allClassStudent[accountNo]
       if (parent){
         return parent.parentName?parent.parentName:parent.parentAccountNo
       } else{

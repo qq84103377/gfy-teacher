@@ -36,7 +36,7 @@
             <span v-if='!isEdit' class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
             <span v-if='isEdit' class="pdlt10">{{this.resourceInfo.taskName}}</span>
           </div>
-          <van-checkbox class="allow-fast" v-model="form.allowFast"
+          <van-checkbox v-if='!isfEducation' class="allow-fast" v-model="form.allowFast"
                         v-show="['lesson'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T02')">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许快进
@@ -71,13 +71,13 @@
                         :class="{ccc:form.comment}" name="add"/>
             </div>
           </div>
-          <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="form.exam||isReinforce"
+          <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="(form.exam||isReinforce)&&!isfEducation"
                         :name="form.allowEdit">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许学生交卷后重新修改答案
           </van-checkbox>
           <van-checkbox class="allow-fast mgt10" v-model="form.layer"
-                        v-if="(form.exam||isReinforce)&&!$route.query.isResend" :name="form.layer">
+                        v-if="(form.exam||isReinforce)&&!$route.query.isResend&&!isfEducation" :name="form.layer">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             自动分层
           </van-checkbox>
@@ -131,7 +131,7 @@
                               :disabled="item.disabled" @click="handleCheckClass(item,index)">
                   <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
                   {{item.className}}
-                  <span class="mglt10">{{calStuNum(item)}}/{{form.object == 1?Object.keys(item.classStudent).length:calGroupNum(item.tchSubGroup)}}</span>
+                  <span class="mglt10" v-if='item.classStudent'>{{calStuNum(item)}}/{{form.object == 1?Object.keys(item.classStudent).length:calGroupNum(item.tchSubGroup)}}</span>
                 </van-checkbox>
                 <div class="select-wrap-desc" v-show="item.type!='none'">
                   <div v-if="form.object == 1 ">发布范围:
@@ -352,6 +352,7 @@
         // this.form.resourceId = this.resourceInfo.testPaperId
         // this.examCount = this.resourceInfo.objectiveItemNum + this.resourceInfo.subjectiveItemNum
       } else {
+        console.log(this.$store.getters.getResourceInfo,'this.$store.getters.getResourceInfo')
         this.resourceInfo = this.$store.getters.getResourceInfo
         if (this.resourceInfo && !this.isEdit) {
           console.log(this.$route.query.type, '/////////////////');
@@ -466,6 +467,7 @@
 
     methods: {
       calGroupNum(groupList) {
+        console.log(JSON.parse(JSON.stringify(groupList)),'groupList')
         return groupList.reduce((t, v) => {
           if (v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
             t += v.tchClassSubGroupStudent.tchSubGroupStudent.length || 0
@@ -474,15 +476,21 @@
         }, 0)
       },
       calStuNum(item) {
+        console.log(JSON.parse(JSON.stringify(item)) ,'item??')
         if (this.form.object == 1) {
           //按班
-          return Object.keys(item.classStudent).reduce((t, v) => {
+           console.log(JSON.parse(JSON.stringify(item.classStudent)) ,'item.classStudent??')
+          
+            return Object.keys(item.classStudent).reduce((t, v) => {
             if (item.classStudent[v].active) t++
             return t
           }, 0)
+          
+          
         } else {
           //按组
-          return item.tchSubGroup.reduce((total, v) => {
+         
+            return item.tchSubGroup.reduce((total, v) => {
             if (v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
               total += v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
                 if (s.active) t++
@@ -491,6 +499,8 @@
             }
             return total
           }, 0)
+          
+          
         }
       },
       async getSubGroupParent(classId) {
@@ -1795,7 +1805,7 @@
               if (res.flag) {
                 eventBus.$emit("indexEditTask")
                 eventBus.$emit(this.$route.query.from + "Refresh", true); // 试卷列表或试卷详情发完任务以后要刷新列表或详情,要将已发状态更新,不然会导致已发的试卷还能重复发任务
-                this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo=' + this.$store.getters.getUserInfo.accountNo + '&subjectTypeName=' + localStorage.currentSubjectTypeName)
+                this.$router.push('/taskDetail?tchCourseId=' + this.currentTchCourseId + '&taskId=' + res.data[0].taskId + '&accountNo=' + this.$store.getters.getUserInfo.accountNo + '&subjectTypeName=' + localStorage.currentSubjectTypeName+`${this.isfEducation?'&isfEducation=true':''}`)
                 let taskInfo = {
                   taskName: this.form.name,
                   desc: this.form.desc,

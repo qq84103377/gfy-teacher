@@ -193,7 +193,7 @@
           const bigExam = this.info.studentStatList.find(v => v.accountNo == item.accountNo)
           this.$router.push({
             path: '/stuAnalyse',
-            query: {accountNo: item.accountNo, classId: this.info.classId, taskType: this.taskType,bigExam:bigExam||{}}
+            query: {accountNo: item.accountNo, classId: this.info.classId, taskType: this.taskType,bigExam:bigExam||{},isfEducation:this.isfEducation}
           })
         }
       },
