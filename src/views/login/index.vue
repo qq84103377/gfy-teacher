@@ -316,8 +316,7 @@ export default {
         requestJson: JSON.stringify(json)
       }
       this.loginBtnLoading = true
-      MobclickAgent.onEvent('login')
-      MobclickAgent.onPageBegin('登录页')
+      try{MobclickAgent.onEvent('login')}catch(e){}
       doUserLogin(params).then(res => {
         this.loginBtnLoading = false
         console.log(res)

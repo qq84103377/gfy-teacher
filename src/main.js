@@ -125,6 +125,13 @@ Object.keys(calculate).forEach(key => {
 Vue.config.productionTip = false
 //
 router.beforeEach((to, from, next) => {
+  try{
+    console.log('onPageBegin');
+    MobclickAgent.onPageBegin(to.path)
+    MobclickAgent.onPageEnd(from.path)
+  }catch(e) {
+
+  }
   if (to.path == '/login') {
     if (localStorage.getItem('isLogin')) {
       next('/index')

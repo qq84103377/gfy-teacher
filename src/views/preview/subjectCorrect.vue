@@ -149,8 +149,8 @@
             <div class="stu-item__score">
               <div class="stu-item__score-item" @click="selectAnswer(si,ai)" v-for="(asw,ai) in stu.answer" :key="ai">
                 <i v-if="asw.qualityType==='Q01'" class="iconGFY icon-good-active"></i>
-                <span>第{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}题</span>
-                <span class="mglt10">{{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
+                <span style="margin-right: 20px;">第{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}题</span>
+                <span >{{asw.isMark==='I02'?'未批改':asw.score+'分'}}</span>
               </div>
             </div>
           </div>
@@ -824,19 +824,17 @@
 
             &__name {
               /*line-height: 15px;*/
+              flex: 0 0 45%;
             }
 
             &__score {
-              /*.icon-good-active {*/
-              /*  width: 10px;*/
-              /*  height: 7px;*/
-              /*  margin-right: 2px;*/
-              /*  vertical-align: sub;*/
-              /*}*/
+              flex: 1;
 
               &-item {
                 margin-bottom: 2px;
                 position: relative;
+                display: flex;
+                justify-content: space-between;
                 .icon-good-active {
                   position: absolute;
                   width: 10px;
