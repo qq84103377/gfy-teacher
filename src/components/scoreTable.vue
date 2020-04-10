@@ -9,9 +9,9 @@
       <span class="header-item" v-if="isWk" :style="{flex: classView?'1':'0 0 16%'}">看视频<br/>总用时
         <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i>
       </span>
-      <span class="header-item" :style="{flex: !isWk||classView?'1':'0 0 16%'}">测试总<br v-if="isWk"/>用时</span>
+      <span class="header-item" v-if="isTest>0" :style="{flex: !isWk||classView?'1':'0 0 16%'}">测试总<br v-if="isWk"/>用时</span>
 <!--      <span class="header-item" v-if="!isWk">用时</span>-->
-      <span class="header-item score" v-if="isTest>0">测试得分</span>
+      <span class="header-item" v-if="isTest>0" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}">测试得分</span>
     </div>
     <div v-if="classView">
       <div class="row" v-for="(item,index) in list" :key="index">
@@ -26,14 +26,14 @@
         <div class="row-item" style="text-align: center" v-if="isWk">
           <div>{{item.tvTime}}</div>
         </div>
-        <div class="row-item" style="text-align: center">
+        <div v-if="isTest>0" class="row-item" style="text-align: center">
           <div>{{item.duration}}</div>
         </div>
 <!--        <div class="row-item" v-if="!isWk">-->
 <!--          <div>{{item.duration}}</div>-->
 <!--        </div>-->
-        <div class="row-item score" v-if="isTest>0">
-          <div :class="[{red:examScore>0?(item.score/examScore)<0.6:true},{blue:examScore>0?(item.score/examScore)>=0.6:false}]" @click="$emit('jump',item)">{{item.score}} ></div>
+        <div class="row-item" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}" v-if="isTest>0">
+          <div :class="[{red:examScore>0?(item.score/examScore)<0.6:true},{blue:examScore>0?(item.score/examScore)>=0.6:false}]" @click="$emit('jump',item)">{{item.score}}></div>
         </div>
       </div>
     </div>
@@ -53,10 +53,10 @@
         <div class="row-item" style="flex: 0 0 16%" v-if="isWk">
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.tvTime}}</div>
         </div>
-        <div class="row-item" :style="{flex: !isWk?'1':'0 0 16%'}">
+        <div v-if="isTest>0" class="row-item" :style="{flex: !isWk?'1':'0 0 16%'}">
           <div v-for="(s,index2) in item.stu" :key="index2">{{s.duration}}</div>
         </div>
-        <div class="row-item score" v-if="isTest>0">
+        <div class="row-item" :style="{flex:!isWk?'0 0 20%':'0 0 10%'}" v-if="isTest>0">
           <div :class="[{red:examScore>0?(s.score/examScore)<0.6:true},{blue:examScore>0?(s.score/examScore)>=0.6:false}]" v-for="(s,index3) in item.stu" :key="index3" @click="$emit('jump',s)">{{s.score}}></div>
         </div>
       </div>
@@ -64,7 +64,7 @@
 
     <van-popup v-model="showTip" style="width: 60%;">
       <div class="pd10 fs14" style="">
-        {{isfEducation?"家长":"学生"}}在规定微课观看时间里，没有正确完成，且没有停留在答题页面，如：退出、关闭浏览器等，系统无法记录他的观看时长，则显示为“未记录”。
+        {{isfEducation?"家长":"学生"}}在规定微课观看时间里，没有正确完成，且没有停留在答题页面，如：退出、关闭浏览器等，系统无法记录他的观看时长，则显示为“--”。
       </div>
     </van-popup>
   </div>

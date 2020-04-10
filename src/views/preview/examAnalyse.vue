@@ -350,7 +350,7 @@ export default {
           {
             name: '知识点分布',
             type: 'bar',
-            barWidth: newKngArr.length>5?'50%':`${newKngArr}0%`,
+            barWidth: newKngArr.length>5?'50%':`${newKngArr.length}0%`,
             data: newKngArr.map(v => v.value)
           }
         ],
