@@ -46,7 +46,7 @@
     </div>
     <div class="material-list-wrap__footer">
       <van-button type="info" :class="['btn']" @click="gotoUpload">上传课件</van-button>
-      <van-button type="info" class="btn" @click="$router.push({path:'uploadImg',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo}})">上传图片</van-button>
+      <van-button type="info" class="btn" @click="$router.push({path:'uploadImg',query:{tchCourseId:$route.query.tchCourseId,sysCourseId:$route.query.sysCourseId,relationCourseId:$route.query.relationCourseId,subjectType:$route.query.subjectType,classId:$route.query.classId,tchClassCourseInfo:$route.query.tchClassCourseInfo,isfEducation:$route.query.isfEducation}})">上传图片</van-button>
     </div>
   </section>
 </template>
@@ -138,7 +138,7 @@
       },
       gotoUpload() {
         // if(this.isIOS) {
-          this.$router.push({path:'uploadWare',query:{tchCourseId:this.$route.query.tchCourseId,sysCourseId:this.$route.query.sysCourseId,relationCourseId:this.$route.query.relationCourseId,subjectType:this.$route.query.subjectType,classId:this.$route.query.classId,tchClassCourseInfo:this.$route.query.tchClassCourseInfo}})
+          this.$router.push({path:'uploadWare',query:{tchCourseId:this.$route.query.tchCourseId,sysCourseId:this.$route.query.sysCourseId,relationCourseId:this.$route.query.relationCourseId,subjectType:this.$route.query.subjectType,classId:this.$route.query.classId,tchClassCourseInfo:this.$route.query.tchClassCourseInfo,isfEducation:this.isfEducation}})
         // }else {
           // return this.$toast('暂不支持课件上传')
         // }

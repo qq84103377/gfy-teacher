@@ -33,7 +33,7 @@
     </div>
     <!--      type需要动态变化 设置分数/纠错/上下移/添加试题/设置分数 这些操作都需要改变type    -->
     <exam-bar ref="examBar" v-if="!$route.query.fromTask && !$route.query.fromLec" @addDone="addDone" v-model="selectList" @clear="clear" :length="list.length" :type="!isModify?'task':''"
-            :canAddCourse="$route.query.flag==1" :can-select="true"></exam-bar>
+            :canAddCourse="$route.query.flag==1" :can-select="true" :isfEducation='isfEducation'></exam-bar>
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
     <!--      设置分数-->
@@ -107,6 +107,7 @@
         examIndex: 0,  //大题
         isModify: false, //是否有修改过
         clickItem:'',
+        isfEducation:this.$route.query.isfEducation,
       }
     },
     methods: {

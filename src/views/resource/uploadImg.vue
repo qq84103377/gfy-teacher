@@ -50,7 +50,7 @@
           </van-radio-group>
         </div>
       </van-cell>
-      <van-cell class="upload-img__body__cell">
+      <van-cell class="upload-img__body__cell" v-if='!isfEducation'>
         <div slot="title" class="aic">
           <span class="mgr10"><span class="red">*</span>课中:</span>
           <van-radio-group style="display: flex;" v-model="form.relate">
@@ -118,6 +118,7 @@
         curFile: null,
         oSSObject: null,
         imgList: [],
+         isfEducation: this.$route.query.isfEducation,
       }
     },
     mounted() {

@@ -52,7 +52,7 @@
           </van-radio-group>
         </div>
       </van-cell>
-      <van-cell class="upload-ware__body__cell">
+      <van-cell class="upload-ware__body__cell" v-if='!isfEducation'>
         <div slot="title" class="aic">
           <span class="mgr10"><span class="red">*</span>课中:</span>
           <van-radio-group style="display: flex;" v-model="form.relate">
@@ -125,6 +125,7 @@
         wareSize: '',
         oSSObject: null,
         tipShow: false,
+        isfEducation: this.$route.query.isfEducation,
       }
     },
     computed: {

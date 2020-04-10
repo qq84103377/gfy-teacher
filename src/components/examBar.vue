@@ -210,7 +210,8 @@
       }
     },
     created() {
-
+      console.log(this.canSelect && this.$route.query.from !== 'examDetail'&&!this.isfEducation,'11111')
+      console.log( this.isRevert,'11111')
     },
     methods: {
       viewResCenter() {
@@ -477,6 +478,7 @@
                   subjectType: localStorage.currentSubjectType,
                   classGrade: this.$store.getters.getErrorFilterParams.classGrade,
                   title: name,
+                  isfEducation: this.isfEducation,
                 }
               })
             }else {
@@ -495,6 +497,7 @@
                       subjectType: localStorage.currentSubjectType,
                       classGrade: this.$route.query.classGrade,
                       title: name,
+                       isfEducation: this.isfEducation,
                     }
                   })
                 }
@@ -514,6 +517,7 @@
                       subjectType: localStorage.currentSubjectType,
                       classGrade: this.$route.query.classGrade,
                       title: name,
+                       isfEducation: this.isfEducation,
                     },
                   })
                 }
