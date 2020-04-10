@@ -81,7 +81,7 @@
     <!--  纠错弹窗-->
     <correct-pop :correctInfo="correctInfo" :show.sync="correctShow"></correct-pop>
 
-    <exam-bar ref="examBar"  @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName' :knowledgePoint='knowledgePoint' ></exam-bar>
+    <exam-bar ref="examBar"  @setQuestionSelect="clear" :can-add-course="isRes" v-model="selectList" @clear="clear" :can-select="isRes?false:true" :qesTypeName='qesTypeName' :knowledgePoint='knowledgePoint' :isfEducation='isfEducation'></exam-bar>
   </section>
 </template>
 
