@@ -25,6 +25,7 @@ const getters = {
   getClassIndex: state => state.teachStat.classIndex,
   getInterlGradeList: state => state.teachStat.interlGradeList,
   getInterlClassIndex: state => state.teachStat.interlClassIndex,
+  getTimeRangeActive: state => state.teachStat.timeRangeActive,
   ...parentGetters
 }
 export default getters

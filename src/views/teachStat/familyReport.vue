@@ -211,6 +211,7 @@
           v.active = false
         })
         this.rangeList[index].active = true
+        this.$store.commit('setTimeRangeActive',index)
         if (this.filterTime.type) {
           this.currentDate = new Date(this.filterTime.start)
         } else {

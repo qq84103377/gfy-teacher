@@ -194,7 +194,9 @@ export default {
       this.currentDate = new Date(this.filterTime.start)
       this.$store.commit('setTeachStatFilterTime', { start: this.filterTime.start, end: this.filterTime.end })
     }
-
+    this.rangeList.forEach((v,i) => {
+      v.active = this.$store.getters.getTimeRangeActive === i
+    })
     if (this.$store.getters.getInterlGradeList) {
       this.gradeSubjectList = JSON.parse(this.$store.getters.getInterlGradeList)
       const index = this.gradeSubjectList.findIndex(v => v.active)
@@ -356,6 +358,7 @@ export default {
         v.active = false
       })
       this.rangeList[index].active = true
+      this.$store.commit('setTimeRangeActive',index)
       if (this.filterTime.type) {
         this.currentDate = new Date(this.filterTime.start)
       } else {
