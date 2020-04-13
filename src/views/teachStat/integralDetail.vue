@@ -145,7 +145,8 @@ export default {
           originType: 'O50',
           accountName: item.accountName,
           accountNo: item.accountNo,
-          isShare: this.$route.query.isShare
+          isShare: this.$route.query.isShare,
+          isParent: this.isParent
         }
       })
     },

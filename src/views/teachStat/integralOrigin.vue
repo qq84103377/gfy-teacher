@@ -45,7 +45,7 @@ export default {
     },
     async getUserCounterOriginDetail() {
       this.$store.commit('setVanLoading', true)
-      const { operateAccountNo, belongSchoolId, startDate, endDate, originType, accountNo, classGrade, classId } = this.$route.query
+      const { operateAccountNo, belongSchoolId, startDate, endDate, originType, accountNo, classGrade, classId, isParent } = this.$route.query
       let obj = {
         interUser: "runLfb",
         interPwd: "25d55ad283aa400af464c76d713c07ad",
@@ -56,7 +56,8 @@ export default {
         endDate,
         originType,
         classGrade,
-        classId
+        classId,
+        roleType: isParent ? 'A04' : 'A03'
       };
       let params = {
         requestJson: JSON.stringify(obj)
@@ -100,7 +101,7 @@ export default {
     position: relative;
     margin: 15px 8px 15px;
     overflow-x: hidden;
-    
+
     .row,
     .col {
       display: flex;
