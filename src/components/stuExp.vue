@@ -2,7 +2,7 @@
   <section class="stu-exp-wrap">
     <div class="stu-exp-wrap__item" v-for="(item,index) in list" v-if="list.length" :key="index">
       <div class="stu-exp-wrap__item__content-wrap">
-        <div class="stu-name"><span>{{getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score > 0 ? '+' + item.score : item.score}}</span>
+        <div class="stu-name"><span>{{isfEducation?getParentName(item.appraiseAccountNo,classId):getStudentName(item.appraiseAccountNo,classId)}}</span><span class="red">{{item.score > 0 ? '+' + item.score : item.score}}</span>
         </div>
 
         <div class="stu-answer">
@@ -71,7 +71,7 @@
         <div @click="handleComment(item)"><i class="iconGFY icon-talk"></i>评论</div>
       </div>
       <div class="stu-exp-wrap__item__good-group" v-if="item.praiseList.length"><i class="iconGFY icon-good-active mgr10"></i><span
-        class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{getStudentName(p.accountNo,classId)}}<span
+        class="blue fs12" v-for="(p,pi) in item.praiseList" :key="pi">{{isfEducation?getParentName(p.accountNo,classId):getStudentName(p.accountNo,classId)}}<span
         v-if="pi<item.praiseList.length-1" class="black">,</span></span></div>
       <div class="comment-wrap" v-if="item.showComment" >
         <van-field @focus="$emit('focus')" @blur="$emit('blur')" style="flex: 1" maxLength="500" :border="false" clearable v-model.trim="item.comment" placeholder="请输入评论" />
@@ -92,7 +92,7 @@
 <!--      </div>-->
 
 <!--      这部分等后台改完以后要替换成上面那种-->
-      <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{getStudentName(rep.replyAccount,classId)}}:
+      <div class="pd10 fs12 van-hairline--top" v-for="(rep,repIndex) in item.replyList" :key="repIndex">{{isfEducation?getParentName(rep.replyAccount,classId):getStudentName(rep.replyAccount,classId)}}:
         {{rep.replyContent}}
       </div>
     </div>
@@ -116,7 +116,7 @@
 <script>
   import 'video.js/dist/video-js.css'
   import {videoPlayer} from 'vue-video-player'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
 
   export default {
     name: "stuExp",
@@ -125,6 +125,9 @@
     computed: {
       getStudentName() {
         return getStudentName
+      },
+      getParentName() {
+        return getParentName
       },
     },
     data() {
@@ -159,7 +162,11 @@
         }else {
           //账号不同可回复
           this.$set(parentItem,'showComment',!parentItem.showComment)
-          this.$set(parentItem,'placeholder', getStudentName(item.replyAccount,this.classId))
+          if (this.isfEducation) {
+            this.$set(parentItem,'placeholder', getParentName(item.replyAccount,this.classId))
+          }else{
+            this.$set(parentItem,'placeholder', getStudentName(item.replyAccount,this.classId))
+          }
           //记录回复的账号
           this.replyAccount = item.replyAccount
         }
