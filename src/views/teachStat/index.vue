@@ -360,6 +360,7 @@
           v.active = false
         })
         this.rangeList[index].active = true
+        this.$store.commit('setTimeRangeActive',index)
         if (this.filterTime.type) {
           this.currentDate = new Date(this.filterTime.start)
         } else {
@@ -674,6 +675,10 @@
         this.currentDate = new Date(this.filterTime.start)
         this.$store.commit('setTeachStatFilterTime', {start: this.filterTime.start, end: this.filterTime.end})
       }
+
+        this.rangeList.forEach((v,i) => {
+            v.active = this.$store.getters.getTimeRangeActive === i
+        })
     }
   }
 </script>

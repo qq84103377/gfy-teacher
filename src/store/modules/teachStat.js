@@ -19,7 +19,8 @@ const teachStat = {
     subjectIndex: 0,
     classIndex: localStorage.getItem("classMap") ? Object.keys(JSON.parse(localStorage.getItem("classMap")))[0] : '',
     interlGradeList:"",
-    interlClassIndex:0
+    interlClassIndex:0,
+    timeRangeActive: 1, //时间筛选默认选中
   },
 
   mutations: {
@@ -44,7 +45,10 @@ const teachStat = {
     setInterlClassIndex: (state, index) => {
       state.interlClassIndex = index
     },
-    
+    setTimeRangeActive: (state, index) => {
+      state.timeRangeActive = index
+    },
+
   },
   actions: {}
 }
