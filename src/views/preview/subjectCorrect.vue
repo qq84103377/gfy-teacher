@@ -334,7 +334,7 @@
       },
       handleSubmit() {
         //更新涂鸦后的图片
-        this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '&' + Math.random()
+        this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '?&' + Math.random()
         this.toggle(1)
       },
       rotateLeft() {
