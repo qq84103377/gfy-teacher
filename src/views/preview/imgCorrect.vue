@@ -357,7 +357,11 @@
         const audioArr = dom.querySelectorAll('audio')
         const videoArr = dom.querySelectorAll('video')
         for (let i = 0; i < imgArr.length; i++) {
-          v.imgArr.push(imgArr[i].src + '?&' + Math.random())
+          if (imgArr[i].src.indexOf('?')>-1) {
+            v.imgArr.push(imgArr[i].src + '&' + Math.random())
+          }else{
+            v.imgArr.push(imgArr[i].src + '?&' + Math.random())
+          }
           let parent = imgArr[i].parentElement
           parent.removeChild(imgArr[i])
         }
@@ -421,7 +425,12 @@
       submitCb() {
         this.isPen = false
         this.isRubber = false
-        this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '?&' + Math.random()
+         if (imgArr[i].src.indexOf('?')>-1) {
+            this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '&' + Math.random()
+         }else{
+            this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '?&' + Math.random()
+         }
+        
       },
       save() {
         this.$refs['drawBoard'].save()

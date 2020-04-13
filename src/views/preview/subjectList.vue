@@ -314,7 +314,12 @@
                 const imgArr = dom.querySelectorAll('img')
                 const audioArr = dom.querySelectorAll('audio')
                 for (let i = 0; i < imgArr.length; i++) {
-                  res.data[0][key][k].imgArr.push(imgArr[i].src + '?&' + Math.random())
+                  if (imgArr[i].src.indexOf('?')>-1) {
+                    res.data[0][key][k].imgArr.push(imgArr[i].src + '&' + Math.random())
+                  }else{
+                    res.data[0][key][k].imgArr.push(imgArr[i].src + '?&' + Math.random())
+                  }
+                  
                   let parent = imgArr[i].parentElement
                   parent.removeChild(imgArr[i])
                 }
