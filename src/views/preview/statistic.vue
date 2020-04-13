@@ -1,7 +1,7 @@
 <template>
   <section class="statistic-wrap">
     <van-nav-bar :title="info.taskName" @click-left="goBack" left-arrow>
-      <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper">试卷分析</div>
+      <div slot="right" class="fs12 blue" @click="viewAnalyse" v-if="isTestPaper&&!isfEducation">试卷分析</div>
     </van-nav-bar>
     <div class="statistic-wrap__tab-scroll">
       <div v-for="(item,index) in info.tchClassTastInfo" :key="index" @click="handleSelectTab(item)"
@@ -232,9 +232,9 @@
     <van-popup round v-model="showTip">
       <div class="pd10 fs16 tip-wrap">
         <div style="text-align: center" class="fs18">任务完成情况说明</div>
-        <div class="mgt5">●未开始:学生还没有开始进行作答</div>
-        <div class="mgt5">●进行中:学生正在作答中</div>
-        <div class="mgt5">●已完成:学生已完成作答</div>
+        <div class="mgt5">●未开始:{{isfEducation?'家长':'学生'}}还没有开始进行作答</div>
+        <div class="mgt5">●进行中:{{isfEducation?'家长':'学生'}}正在作答中</div>
+        <div class="mgt5">●已完成:{{isfEducation?'家长':'学生'}}已完成作答</div>
       </div>
     </van-popup>
   </section>

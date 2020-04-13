@@ -588,7 +588,7 @@
               await this.getClassTeachCourseInfo()
               this.showFilter()
             }else {
-              this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
+              this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}${this.isfEducation?'&isfEducation=true':''}`)
             }
           }
         } else if(this.$route.query.from === 'examDetail') {

@@ -716,6 +716,9 @@
                 this.$set(ele, 'disabled', false)
                 this.$set(ele, 'type', "none")
               }
+
+              ele.startDate = this.form.time1
+              ele.endDate = this.form.time2
             })
 
           } else {

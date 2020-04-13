@@ -625,7 +625,7 @@ export default {
     editTask(item) {
       console.log(item, 'editTask  item');
       this.$store.commit('setResourceInfo', item)
-      console.log(this.tchCourseInfo, 'this.tchCourseInfo');
+      console.log(JSON.parse(JSON.stringify(this.tchCourseInfo)), 'this.tchCourseInfo');
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
       this.$store.commit("setTaskClassInfo", '')
       this.$router.push({

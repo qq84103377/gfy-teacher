@@ -455,6 +455,7 @@ export default {
                       that.subjectTypeList[obj2.subjectType] = obj2.subjectName
                     } else {
                       this.showfEduction = true
+                      localStorage.setItem("showfEduction", 1)
                       this.getfEducationParents()
                     }
                   })

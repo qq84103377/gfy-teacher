@@ -9,7 +9,7 @@
             <div class="grey9 fs12">当前没有班级！</div>
           </div>
         </van-collapse-item>
-        <van-collapse-item title="家长信息" name="2">
+        <van-collapse-item title="家长信息" name="2" v-if='showfEduction'>
           <van-cell v-for="(value,key) in classList" :key="key" v-if="value.teacherInfoList.some(v => v.subjectType == 'S20')" :title="value.className" @click="$router.push(`/fClassDetail?classId=${key}&className=${value.className}&isClassParent=true`)" is-link />
           <div v-if="!Object.keys(classList).length" class="empty-page">
             <img src="../../assets/img/empty-2.png" alt />
@@ -29,7 +29,8 @@ export default {
   data() {
     return {
       classList: JSON.parse(localStorage.classMap),
-      activeNames: ['1']
+      activeNames: ['1'],
+      showfEduction:localStorage.getItem('showfEduction')
     }
   },
 

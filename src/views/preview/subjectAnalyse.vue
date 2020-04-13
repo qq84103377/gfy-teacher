@@ -14,7 +14,7 @@
           <div v-html="info.examQuestionInfo.examExplain"></div>
         </div>
         <div class="subject-analyse_active_body-bottom mgb10" v-for="(item,index) in info.statStudentAnswer.stuAnswer" :key="index">
-          <div class="mgb5">答案为<span class="inline html-img blue" v-html="item.answer"></span>的同学:</div>
+          <div class="mgb5">答案为<span class="inline html-img blue" v-html="item.answer"></span>的{{isfEducation?'家长':'同学'}}:</div>
           <div style="display: flex;flex-wrap: wrap;" class="pdlt10">
             <div v-for="(stu,stuIndex) in item.studentsNew" :key="stuIndex" class="stu-error">
               {{isfEducation?getParentName(stu.accountNo,$route.query.classId):getStudentName(stu.accountNo,$route.query.classId)}}<span style="color: #FF4141">(错误率: {{stu.percent?((stu.percent*100).toFixed(2)+'%'):'--'}})</span>

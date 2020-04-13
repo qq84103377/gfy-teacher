@@ -1,7 +1,7 @@
 <template>
   <section class="stu-analyse">
     <van-nav-bar
-      :title="isfEducation?getParentName($route.query.accountNo,$route.query.classId):getStudentName($route.query.accountNo,$route.query.classId) + '的做题情况'"
+      :title="isfEducation?getParentName($route.query.accountNo,$route.query.classId) + '的做题情况':getStudentName($route.query.accountNo,$route.query.classId) + '的做题情况'"
       @click-left="goBack"
       left-arrow>
     </van-nav-bar>

@@ -29,9 +29,9 @@
     </div>
     <div v-else class="class-detail-wrap__body">
       <div class="mgb10">
-        <van-cell class='fs16' title="家长信息" />
+        <van-cell class='fs16' title="家长分组信息" />
         <van-swipe-cell v-for="(item,index) in groupList" :key="index">
-          <van-cell class='pre-cell fs14' v-if="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupId>0" :title="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupName" @click="$router.push({name:'groupDetail',params:{curIndex:index,groupList,classId:$route.query.classId,isClassParent:$route.query.isClassParent}})" is-link />
+          <van-cell class='fs14' v-if="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupId>0" :title="item.tchClassSubGroupStudent.tchClassSubGroup.subgroupName" @click="$router.push({name:'groupDetail',params:{curIndex:index,groupList,classId:$route.query.classId,isClassParent:$route.query.isClassParent}})" is-link />
           <template slot="right">
             <van-button square type="danger" text="删除" @click="delClassGroup(item)" />
           </template>
@@ -42,8 +42,8 @@
         </div>
       </div>
       <div>
-        <van-cell class="fs16" title="未分组" />
-        <van-cell class='pre-cell fs14' v-if="groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent&&item.parentAccountNo"  v-for="(item,index) in groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent" :key="index" is-link>
+        <van-cell class="fs14" title="未分组" />
+        <van-cell class='pre-cell fs14' v-if="groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent&&item.parentAccountNo"  v-for="(item,index) in groupList[groupList.length - 1].tchClassSubGroupStudent.tchSubGroupStudent" :key="index" >
           <div slot="title" class="aic jcsb fs14">
             <div class="aic">{{item.parentName?item.parentName:item.parentAccountNo}} <span class="fs14" style="color:#999;"> —— {{item.studentName}}</span></div>
           </div>

@@ -165,16 +165,20 @@ export default {
         return
       }
 
+      if (this.form.score > 20 || this.form.score < 0) {
+        this.$toast('分值错误!')
+        done(false)
+        return
+      }
+
       if (!this.form.desc) {
         this.$toast('请输入原因!')
         done(false)
         return
       }
 
-
       this.saveParentRewardScore(studentList.toString())
       done()
-
 
     },
     saveParentRewardScore(studentList) {
