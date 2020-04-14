@@ -5,7 +5,7 @@
        @click="toggle(1)"></i>
     <div class="img-correct-wrap__header" v-show="!isHide">
       <van-icon @click="$router.back()" name="arrow-left"/>
-      <span>{{getStudentName(list[stuIndex].appraiseAccountNo,classId)}}({{list[stuIndex].score}})</span>
+      <span>{{isfEducation?getParentName(list[stuIndex].appraiseAccountNo,classId):getStudentName(list[stuIndex].appraiseAccountNo,classId)}}({{list[stuIndex].score}})</span>
       <span>{{currentImgIndex + 1}}/{{imgArr.length}}</span>
       <i class="iconGFY icon-rotate-left" @click="rotateLeft"></i>
       <i class="iconGFY icon-rotate-right" @click="rotateRight"></i>
@@ -43,7 +43,7 @@
           <van-image :show-loading="false" :show-error="false" @error="handleError(item)" :class="{active:item.active}" lazy-load :src="item.src" alt=""></van-image>
           <span :class="{active:item.active}">{{index + 1}}</span>
         </div>
-        <div>{{getStudentName(item.accountNo,classId)}}</div>
+        <div>{{isfEducation?getParentName(item.accountNo,classId):getStudentName(item.accountNo,classId)}}</div>
       </div>
     </div>
     <draw-board ref="drawBoard" @tap="isHide=!isHide" @submitCb="submitCb" :isPen="isPen" :isRubber="isRubber"
@@ -78,7 +78,7 @@
 <script>
   import {mapMutations, mapGetters, mapState} from 'vuex'
   import drawBoard from '../../components/drawBoard'
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
   import {
     delPraise,
     addPraise,
@@ -136,6 +136,7 @@
         finished: this.$route.params.finished,
         studentStatList: this.$route.params.studentStatList,
         listLoading: false,
+        isfEducation: this.$route.params.isfEducation,
       }
     },
     created() {
@@ -158,6 +159,9 @@
       }),
       getStudentName() {
         return getStudentName
+      },
+      getParentName() {
+        return getParentName
       },
       currentImgIndex() {
         return this.imgArr.findIndex(v => v.active)

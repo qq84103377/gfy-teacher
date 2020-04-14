@@ -17,7 +17,7 @@
       </div>
       <div class="stu-analyse__body" v-if="info.questionList[curIndex]">
         <div class="stu-analyse__body-top html-img">
-          <div v-if="bigExamList.bigExamAnswerList[curIndex].score" style="color: #e90707;text-align: right;" class="fs18">{{bigExamList.bigExamAnswerList[curIndex].score}}分</div>
+          <div v-if="bigExamList.bigExamAnswerList[curIndex].score||(bigExamList.bigExamAnswerList[curIndex].score===0)" style="color: #e90707;text-align: right;" class="fs18">{{bigExamList.bigExamAnswerList[curIndex].score}}分</div>
           <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
           <div v-html="info.questionList[curIndex].examQuestion.title"></div>
           <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>

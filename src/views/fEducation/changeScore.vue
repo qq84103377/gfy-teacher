@@ -122,7 +122,7 @@ export default {
         if (v.tchClassSubGroupStudent.tchSubGroupStudent) {
           let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
             if (s.check) {
-              t.push(this.isClassParent ? s.studentAccountNo : s.accountNo)
+              t.push(this.isClassParent ? s.parentAccountNo : s.studentAccountNo)
             }
             return t
           }, [])
@@ -145,7 +145,7 @@ export default {
         if (v.tchClassSubGroupStudent.tchSubGroupStudent) {
           let arr = v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
             if (s.check) {
-              t.push(this.isClassParent ? s.studentAccountNo : s.accountNo)
+              t.push(this.isClassParent ? s.parentAccountNo : s.studentAccountNo)
             }
             return t
           }, [])

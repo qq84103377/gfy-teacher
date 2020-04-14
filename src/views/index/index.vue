@@ -189,9 +189,11 @@ export default {
             this.parentClassList[k] = JSON.parse(cl)[k]
           }
         }
+        this.$store.commit('setVanLoading', true)
         for (let key in this.parentClassList) {
           await this.getSubGroupParent(this.parentClassList[key].classId)
         }
+        this.$store.commit('setVanLoading', false)
         if (Object.keys(this.parentClassList).length > 0) {
           for (let key in this.parentClassList) {
             this.parentClassList[key].classStudent = {}
@@ -200,13 +202,15 @@ export default {
               if (e.tchSubGroupParent !== null) {
                 e.alltchSubGroupParent=JSON.parse(JSON.stringify(e.tchSubGroupParent)) 
                 e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
-                  if (i.parentAccountNo) {
+                  if (i.parentAccountNo&&i.parentAccountNo!==null) {
                     return i
                   }
                 })
                 if (e.alltchSubGroupParent.length) {
                   e.alltchSubGroupParent.forEach(s => {
-                    this.parentClassList[key].allClassStudent[s.parentAccountNo] = s
+                    if (s.parentAccountNo&&s.parentAccountNo!==null) {
+                      this.parentClassList[key].allClassStudent[s.parentAccountNo] = s
+                    }
                   })
                 }
                 if (e.tchSubGroupStudent.length) {
@@ -455,8 +459,7 @@ export default {
                       that.subjectTypeList[obj2.subjectType] = obj2.subjectName
                     } else {
                       this.showfEduction = true
-                      localStorage.setItem("showfEduction", 1)
-                      this.getfEducationParents()
+                      localStorage.setItem("showfEduction", 1) 
                     }
                   })
                 }
@@ -509,6 +512,10 @@ export default {
           }
           console.log(postList, 'postList')
           localStorage.setItem('postList', JSON.stringify(postList))
+
+          if (this.showfEduction) {
+            this.getfEducationParents()
+          }
 
         } else {
           this.$toast(res.msg)

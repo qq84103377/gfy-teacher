@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import {getStudentName} from '@/utils/filter'
+  import {getStudentName,getParentName} from '@/utils/filter'
   import {saveRewardScore} from '@/api/index'
   import * as calculate from '@/utils/calculate'
 
@@ -84,6 +84,7 @@
           }]
         }
         ],
+        isfEducation:this.$route.params.isfEducation
       }
     },
     computed: {},
@@ -160,19 +161,19 @@
               //有分组
               const index = this.groupList.findIndex(g => g.groupId === v.groupId)
               if (index > -1) {
-                this.groupList[index].stuList.push({accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)})
+                this.groupList[index].stuList.push({accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)})
                 this.groupList[index].avgScore = calculate.div(calculate.add(v.score, this.groupList[index].avgScore), this.groupList[index].stuList.length)
               } else {
                 this.groupList.unshift({
                   groupName: v.groupName,
                   groupId: v.groupId,
                   avgScore: v.score,
-                  stuList: [{accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)}]
+                  stuList: [{accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)}]
                 })
               }
             } else {
               //未分组
-              this.groupList[this.groupList.length - 2].stuList.push({accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)})
+              this.groupList[this.groupList.length - 2].stuList.push({accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)})
             }
           } else {
             //未提交
@@ -180,18 +181,18 @@
               //有分组
               const index = this.groupList[this.groupList.length - 1].group.findIndex(g => g.groupId === v.groupId)
               if (index > -1) {
-                this.groupList[this.groupList.length - 1].group[index].stuList.push({accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)})
+                this.groupList[this.groupList.length - 1].group[index].stuList.push({accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)})
               } else {
                 this.groupList[this.groupList.length - 1].group.unshift({
                   groupName: v.groupName,
                   groupId: v.groupId,
                   avgScore: '',
-                  stuList: [{accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)}]
+                  stuList: [{accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)}]
                 })
               }
             } else {
               //未分组
-              this.groupList[this.groupList.length - 1].group[this.groupList[this.groupList.length - 1].group.length - 1].stuList.push({accountNo: v.accountNo, name: getStudentName(v.accountNo,this.$route.params.info.classId)})
+              this.groupList[this.groupList.length - 1].group[this.groupList[this.groupList.length - 1].group.length - 1].stuList.push({accountNo: v.accountNo, name: this.isfEducation? getParentName(v.accountNo,this.$route.params.info.classId):getStudentName(v.accountNo,this.$route.params.info.classId)})
             }
           }
         })

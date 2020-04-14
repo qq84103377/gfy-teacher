@@ -103,7 +103,7 @@ export default {
       this.common.goBack(this)
     },
     goEdit(item) {
-      this.$router.push({ path: '/editMyCourse', query: { currentTchCourseInfo: item, from: 'fEducation' } })
+      this.$router.push({ path: '/editMyCourse', query: { currentTchCourseInfo: item, isfEducation: true } })
     },
     goto(item) {
       this.$router.push({        path: '/courseDetail', query: {
