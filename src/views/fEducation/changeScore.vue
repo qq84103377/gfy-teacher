@@ -166,7 +166,7 @@ export default {
       }
 
       if (this.form.score > 20 || this.form.score < 0) {
-        this.$toast('分值错误!')
+        this.$toast('请输入分值在0~20之间')
         done(false)
         return
       }
