@@ -22,13 +22,13 @@
 
       <div v-else>
         <van-cell title="查看范围" style="background: #f5f5f5;color: #999" />
-        <van-cell title="年级" >
+        <van-cell title="年级">
           <div class="blue">{{$route.query.gradeName}}</div>
         </van-cell>
-        <van-cell title="班级" >
+        <van-cell title="班级">
           <div class="blue">{{$route.query.className}}</div>
         </van-cell>
-        <van-cell >
+        <van-cell>
           <div slot="title" class="aic jcsb">
             <div>时间</div>
             <div class="blue">{{$route.query.startDate}}--{{$route.query.endDate}}</div>
@@ -97,7 +97,7 @@
       </div>
     </van-popup>
 
-    <share-bar :show.sync="shareBarShow" :title="filterTime.start+'--'+filterTime.end+$route.query.isParent ?'家长':'学生'+'积分统计'" :link="link" :desc="'这是'+filterTime.start+'--'+filterTime.end+title+'统计详情，请家长及时查看'"></share-bar>
+    <share-bar :show.sync="shareBarShow" :title="filterTime.start+'--'+filterTime.end+title+'统计'" :link="link" :desc="'这是'+filterTime.start+'--'+filterTime.end+title+'统计详情，请家长及时查看'"></share-bar>
   </section>
 </template>
 
@@ -148,7 +148,7 @@ export default {
       if (this.$route.query.isShare) {
         return
       }
-      return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${this.gradeSubjectList[this.gradeIndex].gradeName}&className=${this.classList[this.classIndex].className}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}&title=${this.filterTime.start}--${this.filterTime.end}${this.$route.query.isParent ?'家长':'学生'}积分统计`
+      return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${this.gradeSubjectList[this.gradeIndex].gradeName}&className=${this.classList[this.classIndex].className}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
     },
     isApp() {
       return 'cordova' in window
@@ -194,7 +194,7 @@ export default {
       this.currentDate = new Date(this.filterTime.start)
       this.$store.commit('setTeachStatFilterTime', { start: this.filterTime.start, end: this.filterTime.end })
     }
-    this.rangeList.forEach((v,i) => {
+    this.rangeList.forEach((v, i) => {
       v.active = this.$store.getters.getTimeRangeActive === i
     })
     if (this.$store.getters.getInterlGradeList) {
@@ -358,7 +358,7 @@ export default {
         v.active = false
       })
       this.rangeList[index].active = true
-      this.$store.commit('setTimeRangeActive',index)
+      this.$store.commit('setTimeRangeActive', index)
       if (this.filterTime.type) {
         this.currentDate = new Date(this.filterTime.start)
       } else {
