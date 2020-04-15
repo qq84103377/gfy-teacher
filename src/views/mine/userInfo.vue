@@ -560,5 +560,8 @@
   body @{deep} .van-toast {
     min-height: 40px !important;
   }
+  @{deep} .van-action-sheet {
+     overflow-y:scroll;
+  }
 
 </style>
