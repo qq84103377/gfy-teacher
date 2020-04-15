@@ -4,7 +4,7 @@
       v-if="$route.path === '/teachStat/'"
       title="教学统计">
     </van-nav-bar>
-    <div class="teach-stat-wrap__filter">
+    <div class="teach-stat-wrap__filter" v-if="$route.path.indexOf('integral')<=0">
       <van-cell title="筛选" style="background: #f5f5f5;color: #999"/>
       <van-cell v-if="!isMaster" @click="openGradePop" title="年级学科" is-link>
         <div class="blue">{{gradeSubjectList[gradeIndex].gradeName}}{{gradeSubjectList[gradeIndex].teacherInfoList[subjectIndex].subjectName}}</div>

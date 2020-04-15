@@ -124,7 +124,7 @@ export default {
       maxDate: new Date(),
       gradeSubjectList: [],
       gradeIndex: 0,
-      classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
+      // classIndex: Object.keys(JSON.parse(localStorage.getItem("classMap")))[0],
       classList: JSON.parse(localStorage.getItem("classMap")),
       filterTime: {
         start: '',
@@ -152,6 +152,14 @@ export default {
     },
     isApp() {
       return 'cordova' in window
+    },
+    classIndex: {
+      get() {
+        return this.$store.getters.getClassIndex
+      },
+      set(v) {
+        this.$store.commit('setClassIndex', v)
+      }
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -172,6 +180,7 @@ export default {
     }
   },
   activated() {
+    console.log("actived")
     if (this.$route.path == '/integralDetail') {
       if (this.$route.query.isParent) {
         this.title = '家长积分'
@@ -183,11 +192,13 @@ export default {
     }
 
     if (this.$store.getters.getTeachStatFilterTime) {
+      console.log("有设置过时间")
       //有设置过时间
       this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
       this.filterTime.end = this.$store.getters.getTeachStatFilterTime.end
       this.currentDate = new Date(this.filterTime.start)
     } else {
+      console.log("没有设置过时间")
       let time = new Date()
       time.setMonth(time.getMonth() - 1)
       this.filterTime.start = generateTimeReqestNumber(time)
@@ -203,9 +214,22 @@ export default {
       this.gradeIndex = index > -1 ? index : 0
     }
 
-    if (this.$store.getters.getInterlClassIndex) {
-      this.classIndex = this.$store.getters.getInterlClassIndex
+    // if (this.$store.getters.getInterlClassIndex) {
+    //   this.classIndex = this.$store.getters.getInterlClassIndex
+    //   for (const key in this.classList) {
+    //     this.classList[key].active = false
+    //   }
+    //   this.classList[this.classIndex].active = true
+    // }
+
+    for (const key in this.classList) {
+      // this.classList[key].active = false
+      this.$set(this.classList[key], 'active', false)
     }
+    this.$set(this.classList[this.classIndex], 'active', true)
+    // this.classList[this.classIndex].active = true
+
+    this.init()
 
   },
   methods: {
@@ -309,8 +333,8 @@ export default {
       for (let key in arr) {
         this.$set(arr[key], 'active', false)
       }
+      this.$set(item, 'active', true)
       item.active = true
-
     },
     handleClose(arr) {
       this.gradePop = false
@@ -386,6 +410,16 @@ export default {
       this.$set(this.classList[this.classIndex], 'active', true)
     },
     confirmDate() {
+      if (!this.$route.query.isShare) {
+        if (!this.isAnotherPost) {
+          if (!this.$route.query.isParent && !this.isMaster) {
+            this.$toast('该班级学生积分只有班主任有权查看!')
+            this.list = []
+            this.showTime = false
+            return
+          }
+        }
+      }
       //判断结束时间时候小于结束时间
       let time1 = new Date(this.filterTime.start)
       let time2 = new Date(this.filterTime.end)
@@ -421,10 +455,22 @@ export default {
 
     if (this.$store.getters.getInterlClassIndex) {
       this.classIndex = this.$store.getters.getInterlClassIndex
+    } else {
+      this.classIndex = Object.keys(this.classList)[0]
     }
 
-    this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
-    this.filterTime.end = this.$store.getters.getTeachStatFilterTime.end
+    if (this.$store.getters.getTeachStatFilterTime.start) {
+      console.log("111111111")
+      this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
+    }
+
+    if (this.$store.getters.getTeachStatFilterTime.end) {
+      console.log("22222222")
+      this.filterTime.end = this.$store.getters.getTeachStatFilterTime.end
+    }
+
+    // this.filterTime.start = this.$store.getters.getTeachStatFilterTime.start
+    // this.filterTime.end = this.$store.getters.getTeachStatFilterTime.end
     this.currentDate = new Date(this.filterTime.start)
 
 
@@ -440,7 +486,7 @@ export default {
       this.openfEduction = true
     }
 
-    this.init()
+    // this.init()
 
   },
 
