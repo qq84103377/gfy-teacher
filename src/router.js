@@ -602,6 +602,29 @@ export default new Router({
               title: '学情'
             },
           },
+          {
+            path: "/integralStat",
+            name: "integralStat",
+            component: () => import("./views/teachStat/integralStat.vue"),
+    
+            children: [{
+              path: '/',
+              name: 'integralStat',
+              component: () => import('./views/teachStat/integralStatList.vue'),
+            },
+              {
+                path: '/integralDetail',
+                name: 'integralDetail',
+                component: () => import('./views/teachStat/integralDetail.vue'),
+              },
+    
+            ]
+          },
+          {
+            path: '/integralOrigin',
+            name: 'integralOrigin',
+            component: () => import('./views/teachStat/integralOrigin.vue')
+          },
         ]
       },
       {
@@ -729,29 +752,7 @@ export default new Router({
         name: "setInfo",
         component: () => import("./views/qrCodeToClass/settings.vue")
       },
-      {
-        path: "/integralStat",
-        name: "integralStat",
-        component: () => import("./views/teachStat/integralStat.vue"),
-
-        children: [{
-          path: '/',
-          name: 'integralStat',
-          component: () => import('./views/teachStat/integralStatList.vue'),
-        },
-          {
-            path: '/integralDetail',
-            name: 'integralDetail',
-            component: () => import('./views/teachStat/integralDetail.vue'),
-          },
-
-        ]
-      },
-      {
-        path: '/integralOrigin',
-        name: 'integralOrigin',
-        component: () => import('./views/teachStat/integralOrigin.vue')
-      },
+      
     ]
   },
     {
