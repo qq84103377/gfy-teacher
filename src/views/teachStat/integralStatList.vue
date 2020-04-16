@@ -1,7 +1,8 @@
 <template>
   <div>
     <van-cell title="统计类型" style="background: #f5f5f5;color: #999" />
-    <van-cell title="学生积分" is-link @click="goTo(0)" />
+    <!-- <van-cell title="学生积分" is-link @click="goTo(0)" /> -->
+    <van-cell title="学生积分" is-link @click="$toast('敬请期待')" />
     <van-cell title="家长积分" is-link @click="goTo(1)" />
   </div>
 </template>
