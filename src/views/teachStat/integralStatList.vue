@@ -31,6 +31,15 @@ export default {
             belongSchoolId: this.$store.getters.schoolId,
           }
         })
+      } else {
+        this.$router.push({
+          path: '/integralDetail',
+          query: {
+            isParent,
+            operateAccountNo: this.$store.getters.getUserInfo.accountNo,
+            belongSchoolId: this.$store.getters.schoolId,
+          }
+        })
       }
     },
 
