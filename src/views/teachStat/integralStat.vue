@@ -1,7 +1,7 @@
 <template>
   <section class="integral-stat-wrap">
     <van-nav-bar :title="title" @click-left="goBack" :left-arrow='!isShare'>
-      <img v-if="!isShare&&title!=='积分统计'" src="../../assets/img/icon-fenxiang.png" alt="" slot="right" @click="shareBarShow=true">
+      <img v-if="!isShare&&title!=='积分统计'&&isApp" src="../../assets/img/icon-fenxiang.png" alt="" slot="right" @click="shareBarShow=true">
     </van-nav-bar>
     <div class="integral-stat-wrap-body" ref='body' @scroll="scroll">
       <div v-if='!isShare'>
@@ -148,7 +148,7 @@ export default {
       if (this.$route.query.isShare) {
         return
       }
-      return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${this.gradeSubjectList[this.gradeIndex].gradeName}&className=${this.classList[this.classIndex].className}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
+      return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
     },
     isApp() {
       return 'cordova' in window

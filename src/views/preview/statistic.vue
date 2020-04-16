@@ -1520,10 +1520,16 @@
           }
         }
 
-        > img,
-        > video {
+        > img {
           width: 100%;
           // height: 350px;
+        }
+
+        > video {
+          display: block;
+        width: 340px;
+        height: 200px;
+        margin: 0 auto;
         }
 
         > iframe {
@@ -1531,9 +1537,11 @@
           height: 350px;
         }
 
-        > audio {
-          height: 95px;
-          width: 100%;
+        > .audio {
+          display: block;
+        width: 340px;
+        height: 200px;
+        margin: 0 auto;
         }
 
         .cover {
@@ -1574,10 +1582,7 @@
         }
       }
 
-      > video {
-        width: 100%;
-        height: 200px;
-      }
+      
 
       &-tab {
         display: flex;
