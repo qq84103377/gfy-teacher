@@ -30,7 +30,7 @@ export default {
     return {
       classList: JSON.parse(localStorage.classMap),
       activeNames: ['1'],
-      showfEduction:localStorage.getItem('showfEduction')
+      showfEduction: localStorage.getItem('showfEduction')
     }
   },
 
@@ -49,6 +49,7 @@ export default {
   }
   @{deep}.van-collapse-item__content {
     padding-top: 0;
+    padding-bottom: 0;
   }
 }
 </style>

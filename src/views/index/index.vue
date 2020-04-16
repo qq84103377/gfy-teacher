@@ -198,31 +198,30 @@ export default {
           for (let key in this.parentClassList) {
             this.parentClassList[key].classStudent = {}
             this.parentClassList[key].allClassStudent = {}
-            this.parentClassList[key].groupInfo.forEach(e => {
-              if (e.tchSubGroupParent !== null) {
-                e.alltchSubGroupParent=JSON.parse(JSON.stringify(e.tchSubGroupParent)) 
-                e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
-                  if (i.parentAccountNo&&i.parentAccountNo!==null) {
-                    return i
-                  }
-                })
-                if (e.alltchSubGroupParent.length) {
-                  e.alltchSubGroupParent.forEach(s => {
-                    if (s.parentAccountNo&&s.parentAccountNo!==null) {
-                      this.parentClassList[key].allClassStudent[s.parentAccountNo] = s
+            if (this.parentClassList[key].groupInfo) {
+              this.parentClassList[key].groupInfo.forEach(e => {
+                if (e.tchSubGroupParent !== null) {
+                  e.alltchSubGroupParent = JSON.parse(JSON.stringify(e.tchSubGroupParent))
+                  e.tchSubGroupStudent = e.tchSubGroupParent = e.tchSubGroupParent.filter(i => {
+                    if (i.parentAccountNo && i.parentAccountNo !== null) {
+                      return i
                     }
                   })
+                  if (e.alltchSubGroupParent.length) {
+                    e.alltchSubGroupParent.forEach(s => {
+                      if (s.parentAccountNo && s.parentAccountNo !== null) {
+                        this.parentClassList[key].allClassStudent[s.parentAccountNo] = s
+                      }
+                    })
+                  }
+                  if (e.tchSubGroupStudent.length) {
+                    e.tchSubGroupStudent.forEach(s => {
+                      this.parentClassList[key].classStudent[s.parentAccountNo] = s
+                    })
+                  }
                 }
-                if (e.tchSubGroupStudent.length) {
-                  e.tchSubGroupStudent.forEach(s => {
-                    this.parentClassList[key].classStudent[s.parentAccountNo] = s
-                  })
-
-                  
-                }
-              }
-
-            })
+              })
+            }
           }
           localStorage.setItem('parentClassList', JSON.stringify(this.parentClassList))
         }
@@ -459,7 +458,7 @@ export default {
                       that.subjectTypeList[obj2.subjectType] = obj2.subjectName
                     } else {
                       this.showfEduction = true
-                      localStorage.setItem("showfEduction", 1) 
+                      localStorage.setItem("showfEduction", 1)
                     }
                   })
                 }

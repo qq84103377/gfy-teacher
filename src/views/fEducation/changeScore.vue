@@ -34,18 +34,15 @@
       <van-field label-class="gfy-label" required label="请输入分值:">
         <div slot="input" class="input-wrap">
           <input type='number' maxlength="2" v-model.trim="form.score" @focus="showMask = true" style="width: 50%;" />
-          <span class="num-tip fs14">0≤分值≤20</span>
-        </div>
-      </van-field>
-      <van-cell class='van-cell--required'>
-        <div slot="title" class="gfy-label">
-          <div class="jcsb aic">
-            <span>请输入{{addScore?'加分':'减分'}}原因:</span>
-            <span class="fs14" style="color: red">{{200 - form.desc.length}}</span>
-          </div>
-          <textarea :placeholder='`请输入${addScore?"加分":"减分"}原因，字数在200字内`' maxlength="200" v-model.trim="form.desc" class="gfy-textarea" rows="3"></textarea>
-        </div>
-      </van-cell>
+          <span class="num-tip fs14">0&lt;分值≤20</span> </div> </van-field> <van-cell class='van-cell--required'>
+              <div slot="title" class="gfy-label">
+                <div class="jcsb aic">
+                  <span>请输入{{addScore?'加分':'减分'}}原因:</span>
+                  <span class="fs14" style="color: red">{{200 - form.desc.length}}</span>
+                </div>
+                <textarea :placeholder='`请输入${addScore?"加分":"减分"}原因，字数在200字内`' maxlength="200" v-model.trim="form.desc" class="gfy-textarea" rows="3"></textarea>
+              </div>
+              </van-cell>
     </van-dialog>
   </section>
 </template>
@@ -131,6 +128,8 @@ export default {
         return total
       }, [])
       if (studentList.length) {
+        this.form.score = ''
+        this.form.desc = ''
         this.showAddBox = true
       } else {
         this.$toast('请选择家长!')
@@ -165,7 +164,7 @@ export default {
         return
       }
 
-      if (this.form.score > 20 || this.form.score < 0) {
+      if (this.form.score > 20 || this.form.score <= 0) {
         this.$toast('请输入分值在0~20之间')
         done(false)
         return
