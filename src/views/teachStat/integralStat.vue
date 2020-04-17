@@ -191,6 +191,10 @@ export default {
       this.title = '积分统计'
     }
 
+    if (this.$route.query.isShare) {
+      return
+    }
+
     if (this.$store.getters.getTeachStatFilterTime) {
       console.log("有设置过时间")
       //有设置过时间
@@ -243,7 +247,7 @@ export default {
       this.postList = JSON.parse(localStorage.getItem("postList"))
       if (this.postList) {
         let list1 = ['P01', 'P02', 'P03', 'P04', 'P05', 'P06', 'P07', 'P12']
-//'P01'"校长"'P02'"副校长"'P03'"教导主任"'P04'"教务主任"'P05'"备课组长"'P06'"年级组长"'P07'"教研组长"'P12'"教研员
+        //'P01'"校长"'P02'"副校长"'P03'"教导主任"'P04'"教务主任"'P05'"备课组长"'P06'"年级组长"'P07'"教研组长"'P12'"教研员
         this.isAnotherPost = false
         list1.forEach(element => {
           if (this.postList.includes(element)) {
