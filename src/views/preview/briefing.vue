@@ -56,7 +56,7 @@ export default {
     link() {
       const { taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId, isfEducation } = this.$route.query
       if (this.isfEducation) {
-        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}&isfEducation=1`
+        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&isfEducation=1&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       } else {
         return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       }

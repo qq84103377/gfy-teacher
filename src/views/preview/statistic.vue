@@ -194,7 +194,7 @@
                   class="btn" :class="{'disabled':isDisabled}" type="info" @click="modifyScore">
         加分/减分
       </van-button>
-      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId,isfEducation:isfEducation}})">
+      <van-button class="btn" type="info" @click="$router.push({path:`/briefing`,query:{taskType:$route.query.taskType,resourceType:$route.query.resourceType,testPaperId:$route.query.testPaperId, subjectTypeName:subjectTypeName,title:info.taskName,taskId:info.taskId,classId:info.tchClassTastInfo.find(t => t.active).classId,operateAccountNo:$store.getters.getUserInfo.accountNo,belongSchoolId:$store.getters.schoolId,isfEducation:$route.query.isfEducation}})">
         分享报告
       </van-button>
     </div>
