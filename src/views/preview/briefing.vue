@@ -54,7 +54,12 @@ export default {
     },
     link() {
       const { taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId, isfEducation } = this.$route.query
-      return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}${isfEducation?'&isfEducation=true':''}`
+      if (this.isfEducation) {
+        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}&isfEducation=true`
+      } else {
+        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+      }
+
     },
     isApp() {
       return 'cordova' in window
@@ -114,7 +119,7 @@ export default {
       if (this.isfEducation) {
         const item = this.classParentList.find(v => v.parentAccountNo == accountNo)
         if (item) {
-          return item.parentLoginName?item.parentLoginName:item.parentAccountNo
+          return item.parentLoginName ? item.parentLoginName : item.parentAccountNo
         } else {
           return '--'
         }
