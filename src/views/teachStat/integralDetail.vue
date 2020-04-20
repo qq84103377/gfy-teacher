@@ -80,6 +80,7 @@
 
 <script>
 import { statClassCounterByOrigin } from '@/api/index'
+import { generateTimeReqestNumber } from '@/utils/filter'
 export default {
   name: 'integralDetail',
   data() {
@@ -104,8 +105,8 @@ export default {
           }
         }
         if (JSON.stringify(nv) == JSON.stringify(ov)) return
-        console.log("JSON.stringify(nv) ",JSON.stringify(nv) )
-        console.log("JSON.stringify(ov) ",JSON.stringify(ov) )
+        console.log("JSON.stringify(nv) ", JSON.stringify(nv))
+        console.log("JSON.stringify(ov) ", JSON.stringify(ov))
 
         this.statClassCounterByOrigin()
       },
@@ -182,6 +183,14 @@ export default {
     }
   },
   mounted() {
+    console.log(this.$route.query.isShare,this.$route.query.isIOS)
+    if (this.$route.query.isShare && this.$route.query.isIOS) {
+      this.$parent.filterTime.start = generateTimeReqestNumber(new Date(parseInt(this.$route.query.startDate)))
+      this.$parent.filterTime.end = generateTimeReqestNumber(new Date(parseInt(this.$route.query.endDate)))
+    }
+     console.log(this.$parent.filterTime.start,'this.$parent.filterTime.start')
+      console.log(this.$parent.filterTime.end,'this.$parent.filterTime.start')
+
     this.statClassCounterByOrigin()
   },
 }

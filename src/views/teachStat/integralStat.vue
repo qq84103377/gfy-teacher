@@ -31,7 +31,8 @@
         <van-cell>
           <div slot="title" class="aic jcsb">
             <div>时间</div>
-            <div class="blue">{{$route.query.startDate}}--{{$route.query.endDate}}</div>
+            <div class="blue" v-if='$route.query.isIOS'>{{filterTime.start}}--{{filterTime.end}}</div>
+            <div class="blue" v-else>{{$route.query.startDate}}--{{$route.query.endDate}}</div>
           </div>
         </van-cell>
       </div>
@@ -148,10 +149,25 @@ export default {
       if (this.$route.query.isShare) {
         return
       }
-      return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
+      if (this.isIOS) {
+        let start = new Date(this.filterTime.start).getTime()
+        let end = new Date(this.filterTime.end).getTime()
+        return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${start}&endDate=${end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}&isIOS=1`
+      } else {
+        return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
+      }
+
     },
     isApp() {
       return 'cordova' in window
+    },
+    isIOS() {
+      if ('cordova' in window) {
+        var platform = device.platform;
+        return platform === 'iOS'
+      } else {
+        return true
+      }
     },
     classIndex: {
       get() {
@@ -192,8 +208,19 @@ export default {
     }
 
     if (this.$route.query.isShare) {
+      // console.log(this.$route.query.startDate)
+      // console.log(this.$route.query.endDate) 
+      console.log(this.$route.query.isShare,this.$route.query.isIOS)
+      if (this.$route.query.isIOS) {
+        
+        this.filterTime.start = generateTimeReqestNumber(new Date(parseInt(this.$route.query.startDate)))
+        this.filterTime.end = generateTimeReqestNumber(new Date(parseInt(this.$route.query.endDate)))
+      }
+      console.log(this.filterTime.start,'this.filterTime.start')
+      console.log(this.filterTime.end,'this.filterTime.start')
       return
     }
+
 
     if (this.$store.getters.getTeachStatFilterTime) {
       console.log("有设置过时间")
