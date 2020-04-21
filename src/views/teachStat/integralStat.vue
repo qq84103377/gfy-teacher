@@ -152,9 +152,9 @@ export default {
       if (this.isIOS) {
         let start = new Date(this.filterTime.start).getTime()
         let end = new Date(this.filterTime.end).getTime()
-        return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${start}&endDate=${end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}&isIOS=1`
+        return `${process.env.VUE_APP_HOST}/?1=1#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${start}&endDate=${end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}&isIOS=1`
       } else {
-        return `${process.env.VUE_APP_HOST}/#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
+        return `${process.env.VUE_APP_HOST}/?1=1#/integralDetail?isShare=true${this.$route.query.isParent ? '&isParent=true' : ''}&gradeName=${encodeURI(this.gradeSubjectList[this.gradeIndex].gradeName)}&className=${encodeURI(this.classList[this.classIndex].className)}&classGrade=${this.gradeSubjectList[this.gradeIndex].classGrade}&classId=${this.classList[this.classIndex].classId}&startDate=${this.filterTime.start}&endDate=${this.filterTime.end}&operateAccountNo=${this.$store.getters.getUserInfo.accountNo}&belongSchoolId=${this.$store.getters.schoolId}`
       }
 
     },
@@ -531,6 +531,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
+  height: 100%;
 
   @{deep} .van-nav-bar__right {
     height: 100%;

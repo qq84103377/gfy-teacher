@@ -142,7 +142,7 @@
       },
       link() {
         const {subject,isMaster,stuName,accountNo,classId,classGrade,startDate,endDate,operateAccountNo,belongSchoolId} = this.$route.query
-        return `${process.env.VUE_APP_HOST}/#/reportAll?subject=${subject}&isMaster=${isMaster}&stuName=${encodeURI(stuName)}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/?1=1#/reportAll?subject=${subject}&isMaster=${isMaster}&stuName=${encodeURI(stuName)}&accountNo=${accountNo}&classId=${classId}&classGrade=${classGrade}&startDate=${startDate}&endDate=${endDate}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       },
       isApp() {
         return 'cordova' in window

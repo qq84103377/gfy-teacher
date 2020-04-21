@@ -13,7 +13,7 @@
           <div>最高分为<span class="orange">{{info.maxScore||0}}分</span></div>
           <div>最低分为<span class="orange">{{info.minScore||0}}分</span></div>
         </div>
-        <div v-if='!isfEducation&&!$route.query.isfEdu' class="fs10 red">请家长及时关注孩子的完成情况，未提交练习的提醒补做</div>
+        <div v-if='!isfEducation' class="fs10 red">请家长及时关注孩子的完成情况，未提交练习的提醒补做</div>
         <div v-else class="fs10 red">请各位家长注意任务时间，及时完成家庭教育任务</div>
       </div>
       <div class="briefing-wrap__body-ctn-wrap" v-for="(item,index) in scoreSpan" :key="index">
@@ -25,7 +25,7 @@
     <div v-if="isApp" class="briefing-wrap__footer">
       <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
     </div>
-    <share-bar v-if='isfEducation||$route.query.isfEdu' :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="'请各位家长注意任务时间，及时完成家庭教育任务'" :link="link"></share-bar>
+    <share-bar v-if='isfEducation' :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="'请各位家长注意任务时间，及时完成家庭教育任务'" :link="link"></share-bar>
     <share-bar v-else :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="'请家长配合督促学生认真完成练习,表现好的同学给予表扬!'" :link="link"></share-bar>
   </section>
 </template>
@@ -56,9 +56,9 @@ export default {
     link() {
       const { taskType, resourceType, testPaperId, subjectTypeName, title, taskId, classId, operateAccountNo, belongSchoolId, isfEducation } = this.$route.query
       if (isfEducation) {
-        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&isfEdu=1&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/?1=1#/briefing?taskType=${taskType}&isfEducation=1&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       } else {
-        return `${process.env.VUE_APP_HOST}/#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
+        return `${process.env.VUE_APP_HOST}/?1=1#/briefing?taskType=${taskType}&resourceType=${resourceType}&testPaperId=${testPaperId}&subjectTypeName=${encodeURI(subjectTypeName)}&taskId=${taskId}&classId=${classId}&operateAccountNo=${operateAccountNo}&belongSchoolId=${belongSchoolId}`
       }
 
     },
@@ -69,7 +69,7 @@ export default {
   async created() {
     this.$store.commit('setVanLoading', true)
     // if (!('cordova' in window)) {
-    if (this.isfEducation || this.$route.query.isfEdu) {
+    if (this.isfEducation) {
       await this.getParentRelationStudent()
     } else {
       await this.getClassStudent()
@@ -117,7 +117,7 @@ export default {
       this.common.goBack(this)
     },
     handleStudentName(accountNo) {
-      if (this.isfEducation || this.$route.query.isfEdu) {
+      if (this.isfEducation) {
         const item = this.classParentList.find(v => v.parentAccountNo == accountNo)
         if (item) {
           return item.parentLoginName ? item.parentLoginName : item.parentAccountNo

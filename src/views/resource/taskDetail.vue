@@ -114,7 +114,7 @@ export default {
     },
     link() {
       const { tchCourseId, taskId, accountNo, subjectTypeName } = this.$route.query
-      return `${process.env.VUE_APP_HOST}/#taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${encodeURI(subjectTypeName)}&remark=${encodeURI(this.remark)}`
+      return `${process.env.VUE_APP_HOST}/?1=1#/taskDetail?tchCourseId=${tchCourseId}&taskId=${taskId}&accountNo=${accountNo}&subjectTypeName=${encodeURI(subjectTypeName)}&remark=${encodeURI(this.remark)}`
     },
     isApp() {
       return 'cordova' in window
