@@ -1372,17 +1372,27 @@
       align-items: center;
 
       &-item {
-        display: inline-block;
-        background: #ddd;
-        border-radius: 11px;
-        font-size: 12px;
-        color: #999;
-        padding: 0 8px;
-        line-height: 22px;
-        margin-left: 10px;
+        // display: inline-block;
+        // background: #ddd;
+        // border-radius: 11px;
+        // font-size: 12px;
+        // color: #999;
+        // padding: 0 8px;
+        // line-height: 22px;
+        // margin-left: 10px;
         /*&:last-child{*/
         /*  margin-right: 0;*/
         /*}*/
+        height: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        padding: 0 8px;
+        line-height: 22px;
+        border-radius: 11px;
+        background-color: #ddd;
+        margin-left: 10px;
 
         &.active {
           background: linear-gradient(0deg,
