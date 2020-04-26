@@ -1,8 +1,8 @@
 <template>
   <section class="img-correct-wrap">
-    <i v-if="!isHide&&(currentImgIndex>0)" class="iconGFY icon-circle-arrow" @click="toggle(0)"></i>
+    <i v-if="!isHide&&(currentImgIndex>0)" class="iconGFY icon-circle-arrow" @click="toggle(0,'imgCorrectToggle')"></i>
     <i v-if="!isHide&&((currentImgIndex<imgArr.length-1)||!finished)" class="iconGFY icon-circle-arrow rotate"
-       @click="toggle(1)"></i>
+       @click="toggle(1,'imgCorrectToggle')"></i>
     <div class="img-correct-wrap__header" v-show="!isHide">
       <van-icon @click="$router.back()" name="arrow-left"/>
       <span>{{isfEducation?getParentName(list[stuIndex].appraiseAccountNo,classId):getStudentName(list[stuIndex].appraiseAccountNo,classId)}}({{list[stuIndex].score}})</span>
@@ -28,14 +28,14 @@
       </div>
     </div>
     <div class="img-correct-wrap__bottom" id="tools-bar">
-      <i @click="isPen=true;isRubber=false;isHide=true" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
-      <i @click="isRubber=true;isPen=false;isHide=true" class="iconGFY icon-rubber"
+      <i @click="clickPen" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
+      <i @click="clickRubber" class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
       <i class="iconGFY icon-save" @click="save"></i>
       <i class="updo" @click="upDo">
         <img src="../../assets/img/updo.png" alt="">
       </i>
-      <van-icon class="close" name="cross" @click="isHide=false;isPen=false;isRubber=false;"></van-icon>
+      <van-icon class="close" name="cross" @click="handleFold"></van-icon>
     </div>
     <div ref="swipe" v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">
       <div v-for="(item,index) in imgArr" :key="index" class="img-correct-wrap__swipe-item" @click="selectImg(item)">
@@ -168,6 +168,24 @@
       }
     },
     methods: {
+      handleFold(){
+        try{MobclickAgent.onEvent('imgCorrectFold')}catch(e){console.log(e)}
+        this.isHide = false
+        this.isPen = false
+        this.isRubber = false;
+      },
+      clickRubber(){
+        try{MobclickAgent.onEvent('imgCorrectRubber')}catch(e){console.log(e)}
+        this.isRubber = true
+        this.isPen = false
+        this.isHide = true
+      },
+      clickPen(){
+        try{MobclickAgent.onEvent('imgCorrectPen')}catch(e){console.log(e)}
+        this.isPen = true
+        this.isRubber = false
+        this.isHide = true
+      },
       handleError(item) {
         this.$set(item,'fail',true)
       },
@@ -407,7 +425,10 @@
         }
         return count
       },
-      async toggle(type) {
+      async toggle(type,eve) {
+        if(eve){
+          try{MobclickAgent.onEvent(eve)}catch(e){console.log(e)}
+        }
         if (type) {
           // 下一个
           if (this.currentImgIndex < this.imgArr.length - 1) {
@@ -434,21 +455,26 @@
          }else{
             this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '?&' + Math.random()
          }
-        
+
       },
       save() {
+        try{MobclickAgent.onEvent('imgCorrectSave')}catch(e){console.log(e)}
         this.$refs['drawBoard'].save()
       },
       upDo() {
+        try{MobclickAgent.onEvent('imgCorrectWithDraw')}catch(e){console.log(e)}
         this.$refs['drawBoard'].upDo()
       },
       rotateLeft() {
+        try{MobclickAgent.onEvent('imgCorrectRotate')}catch(e){console.log(e)}
         this.$refs['drawBoard'].rotateLeft()
       },
       rotateRight() {
+        try{MobclickAgent.onEvent('imgCorrectRotate')}catch(e){console.log(e)}
         this.$refs['drawBoard'].rotateRight()
       },
       handleComment() {
+        try{MobclickAgent.onEvent('imgCorrectCommentSubmit')}catch(e){console.log(e)}
         if(this.delReplyId) {
           //有删除评论的操作
           this.delReply()
@@ -507,6 +533,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('imgCorrectAddSubScore')}catch(e){console.log(e)}
         saveRewardScore(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
@@ -534,6 +561,7 @@
         } else {
           api = essAppraise
         }
+        try{MobclickAgent.onEvent('imgCorrectEss')}catch(e){console.log(e)}
         api(obj).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
@@ -561,6 +589,7 @@
         } else {
           api = topAppraise
         }
+        try{MobclickAgent.onEvent('imgCorrectTop')}catch(e){console.log(e)}
         api(obj).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
@@ -593,6 +622,7 @@
             objectTypeCd: 'P01',
           }
         }
+        try{MobclickAgent.onEvent('imgCorrectGood')}catch(e){console.log(e)}
         api(obj).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {

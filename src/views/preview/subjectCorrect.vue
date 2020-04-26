@@ -522,6 +522,7 @@
           appraisedAccountNo: this.stuArr[this.stuIndex].accountNo,
           objectId: this.stuArr[this.stuIndex].answer[this.aswIndex].seqId
         }
+        try{MobclickAgent.onEvent('subjectCommentSubmit')}catch(e){console.log(e)}
         addAppraise(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
