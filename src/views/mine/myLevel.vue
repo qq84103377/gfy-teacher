@@ -2,7 +2,7 @@
   <section class="level-wrap">
     <van-sticky>
       <van-nav-bar title="我的等级" left-arrow @click-left="$router.replace('/mine')">
-        <div slot="right" class="tips" @click="showTips = true">如何获取经验？</div>
+        <div slot="right" class="tips" @click="handleTip">如何获取经验？</div>
       </van-nav-bar>
     </van-sticky>
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
@@ -101,11 +101,15 @@
       if (this.showTips) {
         this.showTips = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
     methods: {
+      handleTip(){
+        try{MobclickAgent.onEvent('clickMineLevelExplain')}catch(e){console.log(e)}
+        this.showTips = true
+      },
       onLoad() {
         console.log('onload')
         this.loading = true;
@@ -187,6 +191,7 @@
       }
     },
     created() {
+      try{MobclickAgent.onEvent('clickMineLevel')}catch(e){console.log(e)}
       this.getMylevelInfo();
       // this.getUserCounterDetailGroupByDay()
     }

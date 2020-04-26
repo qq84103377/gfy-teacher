@@ -2,7 +2,7 @@
   <section class="coin-wrap">
     <van-sticky>
       <van-nav-bar title="我的朗币" left-arrow @click-left="goBack">
-        <div slot="right" class="tips" @click="showTips = true">如何赚取朗币？</div>
+        <div slot="right" class="tips" @click="handleTip">如何赚取朗币？</div>
       </van-nav-bar>
     </van-sticky>
     <div class="coin-wrap-total">
@@ -139,6 +139,10 @@
       }
     },
     methods: {
+      handleTip() {
+        try{MobclickAgent.onEvent('clickEarnCoin')}catch(e){console.log(e)}
+        this.showTips = true
+      },
       goBack() {
         this.common.goBack(this)
       },
@@ -284,6 +288,7 @@
       },
     },
     created() {
+      try{MobclickAgent.onEvent('clickMineShopCoin')}catch(e){console.log(e)}
       this.getMyCoinInfo();
       // 没有存积分信息时重新调接口获取
       if (window.localStorage.getItem('counterSummary')) {

@@ -68,6 +68,11 @@
     methods: {
       handleChange(item) {
         if (item.path) {
+          if(item.path === '/resCentre') {
+            try{MobclickAgent.onEvent('clickResCenter')}catch(e){console.log(e)}
+          }else if (item.path === '/teachStat/') {
+            try{MobclickAgent.onEvent('clickTeachStat')}catch(e){console.log(e)}
+          }
           this.$store.commit('setTeachStatFilterTime', '')
           this.$store.commit('setTimeRangeActive', 1)
           this.$router.replace(item.path);

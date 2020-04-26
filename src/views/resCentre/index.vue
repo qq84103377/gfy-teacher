@@ -418,7 +418,7 @@
                        @filter="handleFilter"></res-course-filter>
     <add-course-pop @success="saveRecord" :isSendTask="isSendTask" :resourceType="resourceType" :resourceId="resourceId"
                     :resName="resName"
-                    :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm"
+                    :listKey="listKey" :list="courseList" :gradeTerm="gradeTerm" :tabIndex="tabIndex"
                     :visible.sync="addCourseShow"></add-course-pop>
     <share-filter :label.sync="shareLabel" :visible.sync="shareFilterShow" @filter="v => shareType = v"></share-filter>
   </section>
@@ -785,9 +785,30 @@
       selectResource(num) {
         if (this.tabIndex) {
           this.priSourceIndex = num
+          if(num === 1) {
+            //私人资源--微课
+            try{MobclickAgent.onEvent('clickResCenterPriLesson')}catch(e){console.log(e)}
+          }else if (num === 2) {
+            //私人资源--素材
+            try{MobclickAgent.onEvent('clickResCenterPriMaterial')}catch(e){console.log(e)}
+          }else if (num === 3) {
+            //私人资源--试卷
+            try{MobclickAgent.onEvent('clickResCenterPriExam')}catch(e){console.log(e)}
+          }
         } else {
           this.resourceIndex = num
+          if(num === 1) {
+            //平台资源--微课
+            try{MobclickAgent.onEvent('clikcResCenterPlatLesson')}catch(e){console.log(e)}
+          }else if (num === 2) {
+            //平台资源--素材
+            try{MobclickAgent.onEvent('clickResCenterPlatMaterial')}catch(e){console.log(e)}
+          }else if (num === 3) {
+            //平台资源--试卷
+            try{MobclickAgent.onEvent('clickResCenterPlatExam')}catch(e){console.log(e)}
+          }
         }
+
         if (!this[`${this.curKey}Init`]) {
           this.onLoad()
         }
@@ -851,6 +872,7 @@
         })
       },
       async download(srcUrl, name, item) {
+        try{MobclickAgent.onEvent(this.tabIndex?'resCenterPriMaterialDownload':'resCenterPlatMaterialDownload')}catch(e){console.log(e)}
         let url = srcUrl;
         if (url.indexOf("pubquanlang") > -1) {
           this.accessUrl = url;
@@ -1023,6 +1045,9 @@
       },
       toggleTab(value) {
         if (this.tabIndex == value) return
+        if(value === 1) {
+          try{MobclickAgent.onEvent('clickResCenterPri')}catch(e){console.log(e)}
+        }
         this.tabIndex = value
         if (!this.firstClickPri) {
           this[`${this.curKey}Init`] = true
@@ -1035,15 +1060,19 @@
           //有左上角返回按钮的时候
           if (this.$route.query.from === 'examDetail') {
             if (this.tabIndex) {
+              try{MobclickAgent.onEvent('clickResCenterPriQuestion')}catch(e){console.log(e)}
               this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&year=${this.handleYearSection()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
             } else {
+              try{MobclickAgent.onEvent('clickResCenterPlatQuestion')}catch(e){console.log(e)}
               this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=examDetail&isRes=1&areaCode=&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}&shareType=${this.shareType}`)
             }
           } else if (this.$route.query.from === 'questionList') {
             this.$store.commit('setIsRevert', true)
             if (this.tabIndex) {
+              try{MobclickAgent.onEvent('clickResCenterPriQuestion')}catch(e){console.log(e)}
               this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&from=questionList&year=${this.handleYearSection()}&tchCourseId=${this.$route.query.tchCourseId}&sysCourseId=${this.$route.query.sysCourseId}&relationCourseId=${this.$route.query.relationCourseId}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
             } else {
+              try{MobclickAgent.onEvent('clickResCenterPlatQuestion')}catch(e){console.log(e)}
               this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&tchCourseId=${this.$route.query.tchCourseId}&sysCourseId=${this.$route.query.sysCourseId}&relationCourseId=${this.$route.query.relationCourseId}&from=questionList&isRes=1&areaCode=&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}&shareType=${this.shareType}`)
             }
             // this.$emit('viewRes',1)
@@ -1051,8 +1080,10 @@
           }
         } else {
           if (this.tabIndex) {
+            try{MobclickAgent.onEvent('clickResCenterPriQuestion')}catch(e){console.log(e)}
             this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&year=${this.handleYearSection()}&isRes=1&isPri=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}`)
           } else {
+            try{MobclickAgent.onEvent('clickResCenterPlatQuestion')}catch(e){console.log(e)}
             this.$router.push(`/questionList?subjectType=${localStorage.currentSubjectType}&isRes=1&areaCode=${this.areaCode}&courseId=${this.courseId}&courseName=${this.courseLabel}&classGrade=${this.gradeTerm.split('|')[0]}&termType=${this.gradeTerm.split('|')[1]}&shareType=${this.shareType}`)
           }
         }
@@ -1244,6 +1275,14 @@
           } else {
             this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
           }
+
+          if(this.listKey === 'priLessonList'){
+            try{MobclickAgent.onEvent('resCenterPriLessonAddCourse')}catch(e){console.log(e)}
+          }else if (this.listKey === 'priMaterialList'){
+            try{MobclickAgent.onEvent('resCenterPriMaterialAddCourse')}catch(e){console.log(e)}
+          }else if (this.listKey === 'priExamList'){
+            try{MobclickAgent.onEvent('resCenterPriExamAddCourse')}catch(e){console.log(e)}
+          }
         } else {
           let item = {}
           if (this.listKey === 'examList') {
@@ -1256,6 +1295,14 @@
             item.record.push(`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`)
           } else {
             this.$set(item, 'record', [`${getGradeName(this.gradeTerm.split('|')[0])}${getSubjectName(localStorage.getItem("currentSubjectType"))}《${courseName}》`])
+          }
+
+          if(this.listKey === 'lessonList'){
+            try{MobclickAgent.onEvent('resCenterPlatLessonAddCourse')}catch(e){console.log(e)}
+          }else if (this.listKey === 'materialList'){
+            try{MobclickAgent.onEvent('resCenterPlatMaterialAddCourse')}catch(e){console.log(e)}
+          }else if (this.listKey === 'examList'){
+            try{MobclickAgent.onEvent('resCenterPlatExamAddCourse')}catch(e){console.log(e)}
           }
         }
       },
@@ -1357,6 +1404,17 @@
       },
       collect(item, objectId, statusCd, index, bol) {
         this.$store.commit('setVanLoading', true)
+        if(this.tabIndex) {
+
+        }else {
+          if(this.curKey === 'lessonList') {
+            try{MobclickAgent.onEvent('resCenterPlatCollectLesson')}catch(e){console.log(e)}
+          }else if (this.curKey === 'materialList') {
+            try{MobclickAgent.onEvent('resCenterPlatMaterialCollect')}catch(e){console.log(e)}
+          }else if (this.curKey === 'examList') {
+            try{MobclickAgent.onEvent('resCenterPlatExamCollect')}catch(e){console.log(e)}
+          }
+        }
         if (this.tabIndex ? item.collect_id : item.collectId) {
           let obj = {
             "interUser": "runLfb",

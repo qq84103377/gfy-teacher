@@ -115,6 +115,7 @@
           validateCode: this.vailcode,
           phoneNo: this.phoneNo
         };
+        try{MobclickAgent.onEvent('mineSettingUpdateMobile')}catch(e){console.log(e)}
         userApi.checkPhoneValidateCode(json).then(respone => {
           console.log("respone", respone);
           if (!respone.flag) {

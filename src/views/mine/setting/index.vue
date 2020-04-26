@@ -80,10 +80,12 @@ export default {
     }
   },
   mounted() {
+    try{MobclickAgent.onEvent('clickMineSetting')}catch(e){console.log(e)}
     this.getVersion()
   },
   methods: {
     clearCache() {
+      try{MobclickAgent.onEvent('mineSettingClearCache')}catch(e){console.log(e)}
       cordova.exec(null, null, "ClearCache", "clearCacheInfo", null);
     },
     getVersion() {
@@ -100,6 +102,7 @@ export default {
       }, false)
     },
     checkVersion() {
+      try{MobclickAgent.onEvent('mineSettingUpgrade')}catch(e){console.log(e)}
       if (this.checkDone) {
         if (!this.hasNew) {
           // 没有新版本

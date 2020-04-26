@@ -465,6 +465,8 @@
       }
     },
     created: function () {
+      try{MobclickAgent.onEvent('clickMineUserInfo')}catch(e){console.log(e)}
+
       this.initUserInfo();
       this.getMySchoolInfo();
       this.getOSSKey();

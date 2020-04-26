@@ -11,7 +11,7 @@
         <van-list v-model="listLoading" :finished="finished" :finished-text="list.length?'没有更多了':'当前没有课程,快去新建吧!'" @load="onLoad" :offset='80'>
           <list-item ref='listItem'  @clickTo="goto(item)" class="mgt10" style="background: #fff;" :fold="item.fold" @del="deleteTeachCourse(item,index)" @clickDel='clickDel(index)' v-for="(item,index) in list" :key="index" :itemTitle="item.tchCourseInfo.courseName" :class-info-list="item.tchCourseInfo.tchClassCourseInfo" :can-slide="true">
             <div slot="btn" class="btn-group van-hairline--top">
-              <div @click="item.tchCourseInfo.tchClassCourseInfo.length>2?$set(item,'fold',!item.fold):''">
+              <div @click="handleFold(item)">
                 <i class="iconGFY" :class="{fold:item.fold,'icon-arrow':item.tchCourseInfo.tchClassCourseInfo.length>2,'icon-arrow-grey':item.tchCourseInfo.tchClassCourseInfo.length<=2}"></i>
                 <span>班级查看</span>
               </div>
@@ -24,14 +24,14 @@
         </van-list>
       </van-pull-refresh>
       <div v-if="!listLoading && !list.length" class="empty-btn">
-        <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+        <van-button class="add-course" type="info" @click="$router.push(`/addCourse?from=myCourse`)">新建课</van-button>
       </div>
     </div>
     <div v-if="list.length" class="my-course-list__footer van-hairline--top">
-      <van-button class="add-course" type="info" @click="$router.push(`/addCourse`)">新建课</van-button>
+      <van-button class="add-course" type="info" @click="$router.push(`/addCourse?from=myCourse`)">新建课</van-button>
     </div>
 
-    <course-filter ref="courseFilter" @confirm="(a,b,c) => {finished=false;currentPage=1;getClassTeachCourseInfo(a,b,c)}" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
+    <course-filter ref="courseFilter" @confirm="handleConfirm" :visible.sync="filterShow" :sysCourseId.sync="sysCourseId" type="myCourse"></course-filter>
   </section>
 </template>
 
@@ -91,6 +91,18 @@ export default {
     })
   },
   methods: {
+    handleFold(item) {
+      if(item.tchCourseInfo.tchClassCourseInfo.length>2){
+        try{MobclickAgent.onEvent('clickMyCourseViewClass')}catch(e){console.log(e)}
+        this.$set(item,'fold',!item.fold)
+      }
+    },
+    handleConfirm(a,b,c) {
+      this.finished = false
+      this.currentPage = 1
+      try{MobclickAgent.onEvent('myCourseFilterSubmit')}catch(e){console.log(e)}
+      this.getClassTeachCourseInfo(a,b,c)
+    },
      clickDel(index){
       this.clickIndex=index
     },

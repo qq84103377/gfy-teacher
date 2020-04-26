@@ -228,9 +228,8 @@
 
       }
     },
-    mounted() {
-      // this.getNotice('S01')
-
+    created() {
+      try{MobclickAgent.onEvent('clickMineNotice')}catch(e){console.log(e)}
     }
   }
 </script>
@@ -263,7 +262,7 @@
       display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden; 
+    overflow: hidden;
 
       .van-tabs__wrap {
         width: 50%;

@@ -272,6 +272,7 @@
       });
     },
     mounted() {
+      try{MobclickAgent.onEvent('clickMineShop')}catch(e){console.log(e)}
       this.getSysDictList();
     },
     activated() {

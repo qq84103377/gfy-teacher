@@ -221,6 +221,8 @@ export default {
     }
   },
   mounted() {
+    try{MobclickAgent.onEvent('clickMineShopRecord')}catch(e){console.log(e)}
+
     eventBus.$off("convertRecordRefresh")
     eventBus.$on("convertRecordRefresh", (data) => {
       this.onRefresh();

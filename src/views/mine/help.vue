@@ -2,7 +2,7 @@
   <section class="help">
     <van-collapse v-model="activeName" accordion class="help-collapse">
       <van-collapse-item title="账号密码" name="1">
-        <van-collapse v-model="activeName1" accordion>
+        <van-collapse @change="buryPoint" v-model="activeName1" accordion>
           <van-collapse-item title="老师忘记密码怎么找回？" name="11">
             <div class="content">
               <p>1. 您好，请您在登录界面点击【忘记密码】按提示输入绑定的手机号码就可以找回密码。</p>
@@ -39,7 +39,7 @@
       </div>
 
       <van-collapse-item title="朗币使用说明" name="3">
-        <van-collapse v-model="activeName3" accordion>
+        <van-collapse @change="buryPoint" v-model="activeName3" accordion>
           <van-collapse-item title="什么是朗币？" name="31">
            <div class="content">
              朗币是教师、学生在使用高分云平台过程中获得的虚拟奖励，可以用来在积分商城换取相应价值的礼品，不可转增、兑现。
@@ -93,7 +93,13 @@
     methods:{
       showTips(){
         this.$toast.fail('敬请期待')
+      },
+      buryPoint() {
+        try{MobclickAgent.onEvent('clickUseHelpTab')}catch(e){console.log(e)}
       }
+    },
+    created() {
+      try{MobclickAgent.onEvent('clickMineUseHelp')}catch(e){console.log(e)}
     }
   }
 </script>

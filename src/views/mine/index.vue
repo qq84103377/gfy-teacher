@@ -170,20 +170,22 @@
       if (this.showLoginOut) {
         this.showLoginOut = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
     methods: {
        cancel(){
         this.showLoginOut=false
-        this.loginOut()
+         try{MobclickAgent.onEvent('loginOut')}catch(e){console.log(e)}
+         this.loginOut()
       },
       confirm(){
-        this.showLoginOut=false 
+        this.showLoginOut=false
       },
       jumpTo(url) {
         if (url == 'loginOut') {
+          try{MobclickAgent.onEvent('clickMineLoginOut')}catch(e){console.log(e)}
           this.showLoginOut=true;
         } else {
           this.$router.push(url)

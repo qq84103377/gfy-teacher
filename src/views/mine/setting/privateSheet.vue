@@ -18,7 +18,8 @@ export default {
     }
   },
   mounted() {
-    this.getContent() 
+    try{MobclickAgent.onEvent('mineSettingPrivateSheet')}catch(e){console.log(e)}
+    this.getContent()
   },
   methods: {
     getContent() {

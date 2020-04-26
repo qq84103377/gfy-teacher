@@ -649,7 +649,14 @@ export default {
       }
       console.log("新建课参数：", params)
       this.loadingSubmit = true
-      try{MobclickAgent.onEvent('addCourse')}catch(e){console.log(e)}
+      if(this.$route.query.from === 'myCourse'){
+        try{MobclickAgent.onEvent('myCourseAddCourseSubmit')}catch(e){console.log(e)}
+      }else if (this.isfEducation) {
+        try{MobclickAgent.onEvent('familyEduAddCourseSubmit')}catch(e){console.log(e)}
+      }
+      else {
+        try{MobclickAgent.onEvent('addCourse')}catch(e){console.log(e)}
+      }
       createTeachCourse(params).then(res => {
         if (res.flag) {
           this.$toast("创建成功")
@@ -875,6 +882,7 @@ export default {
       }
       console.log("修改课程", params)
       this.loadingEdit = true
+      try{MobclickAgent.onEvent(this.isfEducation?'familyEditCourseSubmit':'editMyCourseSubmit')}catch(e){console.log(e)}
       modifyTeachCourse(params).then(res => {
         this.loadingEdit = false
         if (res) {

@@ -171,6 +171,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('mineSettingUpadatePsw')}catch(e){console.log(e)}
 
         resetPassword(params).then(res => {
           console.log(res);

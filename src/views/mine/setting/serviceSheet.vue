@@ -18,6 +18,7 @@ export default {
     }
   },
   mounted() {
+    try{MobclickAgent.onEvent('mineSettingServiceSheet')}catch(e){console.log(e)}
     this.getContent()
   },
   methods: {

@@ -335,6 +335,7 @@
     },
     methods: {
       viewTaskInfo(item) {
+        try{MobclickAgent.onEvent('clickBeforeClassStat')}catch(e){console.log(e)}
         this.$router.push({path:'/beforeClassTask',query:{classId: this.masterFilterParams.classId,classGrade:this.masterFilterParams.classGrade,teacherNo:item.teacherNo,teacherName:item.teacherName}})
       },
       init() {
@@ -346,17 +347,21 @@
         this.tabIndex = index
         switch (index) {
           case 1 :
-           await this.statCourseByTeacher()
+            try{MobclickAgent.onEvent('clickTeachStatStu')}catch(e){console.log(e)}
+            await this.statCourseByTeacher()
             this.drawPie()
             this.drawHistogram()
                 break
           case 2 :
+            try{MobclickAgent.onEvent('clickTeachStatTeacher')}catch(e){console.log(e)}
             this.statByTeacher()
                 break
           case 3 :
+            try{MobclickAgent.onEvent('clickTeachStatClass')}catch(e){console.log(e)}
             this.statByClass()
                 break
           case 4 :
+            try{MobclickAgent.onEvent('clickTeachStatPerson')}catch(e){console.log(e)}
             this.statByPersonal()
         }
       },
@@ -506,6 +511,7 @@
 
       exportExcel() {
         this.$store.commit('setVanLoading',true)
+        try{MobclickAgent.onEvent('stuStatExcelDownload')}catch(e){console.log(e)}
         require.ensure([], () => {
           let tHeader = ['姓名', '总任务数', '完成总任务数', '完成微课程任务数', '完成素材任务数', '完成试卷任务数', '完成讨论任务数', '做题正确率', '任务完成率'];
           let filterVal = ['stuName', 'total_count', 'total_finish', 'tv_count', 'T04_count', 'paper_count', 'discuss_count', 'accuracy', 'finish_precent'];
@@ -640,6 +646,7 @@
       selectClassCount(item) {
         if (item.classroomCount <= 0) return this.$toast('此老师未上课,暂无详情')
         if (item.active) return
+        try{MobclickAgent.onEvent('clickTeacherStatClass')}catch(e){console.log(e)}
         this.showClassDetail = true
         this.showMutual = false
         this.tchStatInfo.forEach(v => {

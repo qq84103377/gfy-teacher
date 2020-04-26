@@ -246,7 +246,7 @@
       }else if (this.showDrop) {
         this.close()
         next(false)
-      }else{  
+      }else{
       next();
       }
     },
@@ -426,6 +426,7 @@
         };
         console.log(json);
         this.btnLoading = true;
+        try{MobclickAgent.onEvent('mineFeedbackSubmit')}catch(e){console.log(e)}
         pubApi.uploadFeedback(json).then(data => {
           if (data.flag) {
             this.$store.state.feedBackList = null;

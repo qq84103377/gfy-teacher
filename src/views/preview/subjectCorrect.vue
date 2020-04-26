@@ -9,8 +9,8 @@
       <i @click="zoom(0)" class="iconGFY icon-reduce"></i>
       <i class="iconGFY icon-rotate-left" @click="rotateLeft"></i>
       <i class="iconGFY icon-rotate-right" @click="rotateRight"></i>
-      <span @click="isShowTitle=true;viewSubject=true">看原题</span>
-      <span @click="stuInfo=!stuInfo">阅卷情况</span>
+      <span @click="viewOriginExam">看原题</span>
+      <span @click="viewStuInfo">阅卷情况</span>
       <span class="action-btn" @click="saveRewardScore('T01')">加分</span>
       <span class="action-btn" style="background: #FABC73;" @click="saveRewardScore('T02')">减分</span>
       <span @click="clickComment" class="action-btn comment-btn"
@@ -18,21 +18,21 @@
     </div>
     <i v-if="!(aswIndex==0&&stuIndex==0&&imgIndex==0)&&!isFold" class="iconGFY icon-circle-arrow"
        @click="toggle(0)"></i>
-    <i v-if="!isFold" class="iconGFY icon-circle-arrow rotate" @click="submit"></i>
+    <i v-if="!isFold" class="iconGFY icon-circle-arrow rotate" @click="next"></i>
     <div class="correct-wrap__side" v-show="!isFold">
       <div class="correct-wrap__side-top">
         <div class="score-btn"
-             @click="selectScore(aswIndex,stuArr[stuIndex].answer[aswIndex].examScore,stuArr[stuIndex].answer[aswIndex])">
+             @click="fullScore">
           满分
         </div>
         <div class="score-btn" style="background: #FA7373;"
-             @click="selectScore(aswIndex,0,stuArr[stuIndex].answer[aswIndex])">零分
+             @click="zeroScore">零分
         </div>
       </div>
       <div class="correct-wrap__side-step">
         <div style="flex: 1">步长: </div><i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip"></i>
-        <div @click="step=0.5" class="correct-wrap__side-step__btn" :class="{active:step===0.5}">0.5</div>
-        <div @click="step=1" class="correct-wrap__side-step__btn" :class="{active:step===1}">1</div>
+        <div @click="setStep(0.5)" class="correct-wrap__side-step__btn" :class="{active:step===0.5}">0.5</div>
+        <div @click="setStep(1)" class="correct-wrap__side-step__btn" :class="{active:step===1}">1</div>
       </div>
       <div class="correct-wrap__side-center">
         <div v-for="(asw,ai) in stuArr[stuIndex].answer" :key="ai" class="dropdown-group"><span>{{$route.params.examNum}}{{info.groupExamList.length?`(${ai+1})`:``}}</span>
@@ -52,8 +52,8 @@
       </div>
       <div class="correct-wrap__side-bottom">
         <div class="auto-submit" :class="{'is-active':autoSubmit}" @click="autoSubmit = !autoSubmit"></div>
-        <div @click="autoSubmit = !autoSubmit">自动提交</div>
-        <div class="submit fs10" @click="submit">提交</div>
+        <div @click="handleAuto">自动提交</div>
+        <div class="submit fs10" @click="clickSubmit">提交</div>
       </div>
     </div>
 
@@ -74,14 +74,14 @@
 
 
     <div class="correct-wrap__bottom" id="tools-bar">
-      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isPen=!isPen;isRubber=false"
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="clickPen"
          class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
-      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="isRubber=!isRubber;isPen=false"
+      <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="clickRubber"
          class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
       <i v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length" @click="clearCanvas" class="iconGFY icon-del"></i>
       <i @click="updateExamQuality" class="iconGFY icon-good" :class="{'icon-good-active':stuArr[stuIndex].answer[aswIndex].qualityType === 'Q01'}"></i>
-      <i @click="isFold=!isFold" class="iconGFY icon-hide" :class="{'icon-hide-active':isFold}"></i>
+      <i @click="handleFold" class="iconGFY icon-hide" :class="{'icon-hide-active':isFold}"></i>
     </div>
     <div class="correct-wrap__body">
       <!--      <div class="correct-wrap__body__text" :style="{flex: stuArr[stuIndex].answer[aswIndex].imgArr.length? '0 0 35%':'none'}" ref="text" v-if="stuArr[stuIndex].answer[aswIndex].text" >-->
@@ -89,7 +89,7 @@
            :class="{ellipsis:stuArr[stuIndex].answer[aswIndex].imgArr.length}"
            v-if="stuArr[stuIndex].answer[aswIndex].text">
           <div style="word-break: break-all" class="text-area" v-html="stuArr[stuIndex].answer[aswIndex].text"></div>
-          <div class="more-btn" @click="viewSubject = true;isShowTitle=false"
+          <div class="more-btn" @click="handleShowAnswer"
                v-if="stuArr[stuIndex].answer[aswIndex].imgArr.length">展开答案
           </div>
       </div>
@@ -307,6 +307,58 @@
       this.figure()
     },
     methods: {
+      handleShowAnswer(){
+        try{MobclickAgent.onEvent('subjectShowAnswer')}catch(e){console.log(e)}
+        this.viewSubject = true
+        this.isShowTitle = false
+      },
+      clickSubmit(){
+        try{MobclickAgent.onEvent('clickSubjectSubmit')}catch(e){console.log(e)}
+        this.submit()
+      },
+      handleAuto(){
+        try{MobclickAgent.onEvent('subjectAutoSubmit')}catch(e){console.log(e)}
+        this.autoSubmit = !this.autoSubmit
+      },
+      viewStuInfo(){
+        try{MobclickAgent.onEvent('subjectStuInfo')}catch(e){console.log(e)}
+        this.stuInfo = !this.stuInfo
+      },
+      viewOriginExam(){
+        try{MobclickAgent.onEvent('subjectViewExam')}catch(e){console.log(e)}
+        this.isShowTitle = true
+        this.viewSubject = true
+      },
+      setStep(value){
+        try{MobclickAgent.onEvent('clickSubjectStep')}catch(e){console.log(e)}
+        this.step = value
+      },
+      zeroScore() {
+        try{MobclickAgent.onEvent('subjectZeroScore')}catch(e){console.log(e)}
+        this.selectScore(this.aswIndex,0,this.stuArr[this.stuIndex].answer[this.aswIndex])
+      },
+      fullScore(){
+        try{MobclickAgent.onEvent('subjectFullScore')}catch(e){console.log(e)}
+        this.selectScore(this.aswIndex,this.stuArr[this.stuIndex].answer[this.aswIndex].examScore,this.stuArr[this.stuIndex].answer[this.aswIndex])
+      },
+      handleFold(){
+        try{MobclickAgent.onEvent('clickSubjectFold')}catch(e){console.log(e)}
+        this.isFold = !this.isFold
+      },
+      clickRubber(){
+        try{MobclickAgent.onEvent('clickSubjectRubber')}catch(e){console.log(e)}
+        this.isRubber = !this.isRubber
+        this.isPen = false
+      },
+      clickPen(){
+        try{MobclickAgent.onEvent('clickSubjectPen')}catch(e){console.log(e)}
+        this.isPen = !this.isPen
+        this.isRubber = false
+      },
+      next(){
+        try{MobclickAgent.onEvent('subjectToggleExam')}catch(e){console.log(e)}
+        this.submit()
+      },
       scorePopShow(asw,ai) {
         if(ai !== this.aswIndex) return
         this.aswItem = asw
@@ -339,13 +391,15 @@
         }else{
           this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] = this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr[this.imgIndex] + '?&' + Math.random()
         }
-        
+
         this.toggle(1)
       },
       rotateLeft() {
+        try{MobclickAgent.onEvent('subjectRotate')}catch(e){console.log(e)}
         this.$refs['drawBoard'].rotateLeft()
       },
       rotateRight() {
+        try{MobclickAgent.onEvent('subjectRotate')}catch(e){console.log(e)}
         this.$refs['drawBoard'].rotateRight()
       },
       updateExamQuality() {
@@ -360,6 +414,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('clickSubjectGood')}catch(e){console.log(e)}
         updateExamQuality(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if(res.flag) {
@@ -370,6 +425,7 @@
         })
       },
       clearCanvas() {
+        try{MobclickAgent.onEvent('clickSubjectClear')}catch(e){console.log(e)}
         this.$refs['drawBoard'].clear()
       },
       async examResultScroe() {
@@ -508,6 +564,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('subjectAddSubScore')}catch(e){console.log(e)}
         saveRewardScore(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
@@ -520,6 +577,7 @@
       },
       zoom(type) {
         if(this.stuArr[this.stuIndex].answer[this.aswIndex].imgArr.length) {
+          try{MobclickAgent.onEvent(type?'subjectEnlarge':'subjectNarrow')}catch(e){console.log(e)}
           this.scale = this.$refs['drawBoard'].scale
           this.scale += type ? 0.1 : -0.1
           this.$refs['drawBoard'].handleZoom(this.scale)
@@ -569,6 +627,7 @@
             }
           }
         } else {
+          try{MobclickAgent.onEvent('subjectToggleExam')}catch(e){console.log(e)}
           //上一个
           if (this.imgIndex > 0) {
             //上一个图片

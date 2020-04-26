@@ -86,19 +86,19 @@
           <i class="iconGFY icon-user"></i>
           <span>我的班级</span>
         </div>
-        <div @click="$router.push(`/myCourseList`)">
+        <div @click="viewMyCourse">
           <i class="iconGFY icon-tv"></i>
           <span>我的课程</span>
         </div>
-        <div @click="$router.push(`/errorBook`)">
+        <div @click="viewErrorBook">
           <i class="iconGFY icon-errors"></i>
           <span>错题集</span>
         </div>
-        <div @click="$router.push(`/specialExer`)">
+        <div @click="viewSpecialExer">
           <i class="iconGFY icon-special"></i>
           <span>专项练习</span>
         </div>
-        <div v-if='showfEduction' @click="$router.push('/fEducation')">
+        <div v-if='showfEduction' @click="viewFamilyEdu">
           <i class="iconGFY icon-cap"></i>
           <span>家庭教育</span>
         </div>
@@ -160,6 +160,22 @@ export default {
     }
   },
   methods: {
+    viewFamilyEdu() {
+      try{MobclickAgent.onEvent('clickFamilyEdu')}catch(e){console.log(e)}
+      this.$router.push(`/fEducation`)
+    },
+    viewSpecialExer() {
+      try{MobclickAgent.onEvent('clickSpecialExer')}catch(e){console.log(e)}
+      this.$router.push(`/specialExer`)
+    },
+    viewErrorBook() {
+      try{MobclickAgent.onEvent('clickErrorBook')}catch(e){console.log(e)}
+      this.$router.push(`/errorBook`)
+    },
+    viewMyCourse() {
+      try{MobclickAgent.onEvent('clickMyCourse')}catch(e){console.log(e)}
+      this.$router.push(`/myCourseList`)
+    },
     viewMyClass() {
       try{MobclickAgent.onEvent('clickMyClass')}catch(e){console.log(e)}
       this.$router.push(`/myClassList`)

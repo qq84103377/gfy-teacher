@@ -36,6 +36,9 @@
           this.common.goBack(this)
         },
     },
+    created() {
+      try{MobclickAgent.onEvent('clickMineShopRule')}catch(e){console.log(e)}
+    }
   }
 </script>
 

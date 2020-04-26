@@ -1812,17 +1812,71 @@
           if(this.form.layer) {
             try{MobclickAgent.onEvent('addTaskLayerSubmit')}catch(e){console.log(e)}
           }
-          if(this.$route.query.type === 'lesson'){
-            try{MobclickAgent.onEvent('lessonAddTaskSubmit')}catch(e){console.log(e)}
-          }else if(this.$route.query.type === 'material'){
-            try{MobclickAgent.onEvent('materialAddTaskSubmit')}catch(e){console.log(e)}
-          }else if(this.$route.query.type === 'exam'){
-            try{MobclickAgent.onEvent('examAddTaskSubmit')}catch(e){console.log(e)}
-          }else if(this.$route.query.type === 'discuss'){
-            try{MobclickAgent.onEvent('discussAddTaskSubmit')}catch(e){console.log(e)}
-          }else if(this.$route.query.type === 'spoken'){
-            try{MobclickAgent.onEvent('spokenAddTaskSubmit')}catch(e){console.log(e)}
+          if(this.isfEducation){
+            //家庭教育 -- 发任务
+            try{MobclickAgent.onEvent('familyEduAddTaskSubmit')}catch(e){console.log(e)}
+          }else {
+            if(this.$route.query.type === 'lesson'){
+              if(this.$route.query.isRes){
+                if(this.$route.query.isPri){
+                  try{MobclickAgent.onEvent('resCenterPriLessonAddTask')}catch(e){console.log(e)}
+                }else {
+                  try{MobclickAgent.onEvent('resCenterPlatLessonAddTaskSubmit')}catch(e){console.log(e)}
+                }
+              }else {
+                try{MobclickAgent.onEvent('lessonAddTaskSubmit')}catch(e){console.log(e)}
+              }
+            }else if(this.$route.query.type === 'material'){
+              if(this.$route.query.isRes){
+                if(this.$route.query.isPri){
+                  try{MobclickAgent.onEvent('resCenterPriMaterialAddTask')}catch(e){console.log(e)}
+                }else {
+                  try{MobclickAgent.onEvent('resCenterPlatMaterialAddTaskSubmit')}catch(e){console.log(e)}
+                }
+              }else {
+                try{MobclickAgent.onEvent('materialAddTaskSubmit')}catch(e){console.log(e)}
+              }
+            }else if(this.$route.query.type === 'exam'){
+              if(this.$route.query.isRes) {
+                if(this.$route.query.isPri){
+                  if(this.$route.query.isQuesList){
+                    //资源中心--私人资源--试题列表--生成试卷--发任务
+                    try{MobclickAgent.onEvent('resCenterPriQuestionAddTask')}catch(e){console.log(e)}
+                  }else{
+                    //资源中心--私人资源--试卷--生成试卷--发任务
+                    try{MobclickAgent.onEvent('resCenterPriExamAddTask')}catch(e){console.log(e)}
+                  }
+                }else {
+                  if(this.$route.query.isQuesList){
+                    //资源中心--平台资源--试题列表--生成试卷--发任务
+                    try{MobclickAgent.onEvent('resCenterPlatQuestionAddTask')}catch(e){console.log(e)}
+                  }else{
+                    //资源中心--平台资源--试卷--生成试卷--发任务
+                    try{MobclickAgent.onEvent('resCenterPlatExamAddTaskSubmit')}catch(e){console.log(e)}
+                  }
+                }
+              }else {
+                if(this.$route.query.isErrorBook == 1) {
+                  //错题本--生成试卷--发任务
+                  try{MobclickAgent.onEvent('errorbookAddTaskSubmit')}catch(e){console.log(e)}
+                }else if (this.$route.query.isQuestionType == 1){
+                  //专项题型--题型专项--生成试卷--发任务
+                  try{MobclickAgent.onEvent('specialExerTypeAddTask')}catch(e){console.log(e)}
+                }else if (this.$route.query.isKnowledgePoint == 1){
+                  //专项题型--知识点专项--生成试卷--发任务
+                  try{MobclickAgent.onEvent('specialKngAddTask')}catch(e){console.log(e)}
+                }
+                else {
+                  try{MobclickAgent.onEvent('examAddTaskSubmit')}catch(e){console.log(e)}
+                }
+              }
+            }else if(this.$route.query.type === 'discuss'){
+              try{MobclickAgent.onEvent('discussAddTaskSubmit')}catch(e){console.log(e)}
+            }else if(this.$route.query.type === 'spoken'){
+              try{MobclickAgent.onEvent('spokenAddTaskSubmit')}catch(e){console.log(e)}
+            }
           }
+
 
           createCourseTask(params).then(res => {
             if (res) {

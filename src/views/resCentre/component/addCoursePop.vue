@@ -38,7 +38,7 @@
 
   export default {
     name: "addCoursePop",
-    props: ['visible', 'gradeTerm', 'list', 'resName','resourceId','resourceType','isSendTask','listKey'],
+    props: ['visible', 'gradeTerm', 'list', 'resName','resourceId','resourceType','isSendTask','listKey','tabIndex'],
     data() {
       return {
         // radio: ''
@@ -72,9 +72,9 @@
           this.$store.commit("setTchCourseInfo", this.list[this.listIndex].arr[this.list[this.listIndex].radio].tchCourseInfo)
           this.$store.commit("setTaskClassInfo", '')
           if(this.listKey === 'exam') {
-            this.$router.push(`/addTask?type=exam&_t=new&isRes=1`)
+            this.$router.push(`/addTask?type=exam&_t=new&isRes=1&isPri=${this.tabIndex}`)
           }else {
-            this.$router.push(`/addTask?type=${this.listKey}&_t=new&isRes=1`)
+            this.$router.push(`/addTask?type=${this.listKey}&_t=new&isRes=1&isPri=${this.tabIndex}`)
           }
         }else {
           this.$store.commit('setVanLoading',true)

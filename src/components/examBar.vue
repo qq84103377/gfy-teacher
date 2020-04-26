@@ -338,7 +338,23 @@
           }
         }
         if(this.$route.path === '/questionList') {
-          try{MobclickAgent.onEvent('questionAddExamSubmit')}catch(e){console.log(e)}
+          if(this.$route.query.isRes) {
+            if(this.$route.query.isPri) {
+              try{MobclickAgent.onEvent('resCenterPriQustionAddExam')}catch(e){console.log(e)}
+            }else {
+              try{MobclickAgent.onEvent('resCenterPlatQustionAddExam')}catch(e){console.log(e)}
+            }
+          }else {
+            try{MobclickAgent.onEvent('questionAddExamSubmit')}catch(e){console.log(e)}
+          }
+        }else if (this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
+          try{MobclickAgent.onEvent('errorbookAddExamSubmit')}catch(e){console.log(e)}
+        }else if (this.$route.query.isQuestionType) {
+          //专项练习--题型专项--生成试卷
+          try{MobclickAgent.onEvent('specialExerTypeAddExam')}catch(e){console.log(e)}
+        }else if (this.$route.query.isKnowledgePoint) {
+          //专项练习--知识点专项--生成试卷
+          try{MobclickAgent.onEvent('specialKngAddExam')}catch(e){console.log(e)}
         }
         let params = {
           requestJson: JSON.stringify(obj)
@@ -484,6 +500,7 @@
                   classGrade: this.$store.getters.getErrorFilterParams.classGrade,
                   title: name,
                   isfEducation: this.isfEducation,
+                  isErrorBook: 1, //标记为从错题本生成的试卷
                 }
               })
             }else {
@@ -503,6 +520,11 @@
                       classGrade: this.$route.query.classGrade,
                       title: name,
                        isfEducation: this.isfEducation,
+                      isQuestionType: this.$route.query.isQuestionType?1:0,
+                      isKnowledgePoint: this.$route.query.isKnowledgePoint?1:0,
+                      isRes: this.$route.query.isRes || '',
+                      isPri: this.$route.query.isPri || '',
+                      isQuesList: (this.$route.path === '/questionList' && this.$route.query.isRes)?1:0, //是否从资源中心的试题列表组卷
                     }
                   })
                 }
@@ -571,7 +593,7 @@
         this.listIndex = listIndex
         if(this.type === 'task') {
           this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
-          this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}`)
+          this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}&isErrorBook=${this.$route.query.isErrorBook}&isQuestionType=${this.$route.query.isQuestionType}&isKnowledgePoint=${this.$route.query.isKnowledgePoint}&isRes=${this.$route.query.isRes}&isPri=${this.$route.query.isPri}&isQuesList=${this.$route.query.isQuesList}`)
         }else {
           if(item.tchCourseInfo.sysCourseId) {
             this.$store.commit('setTchCourseInfo',item.tchCourseInfo)
@@ -593,7 +615,7 @@
               await this.getClassTeachCourseInfo()
               this.showFilter()
             }else {
-              this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}${this.isfEducation?'&isfEducation=true':''}`)
+              this.$router.push(`/addTask?type=exam&_t=new&from=${this.$route.name}${this.isfEducation?'&isfEducation=true':''}&isErrorBook=${this.$route.query.isErrorBook}&isQuestionType=${this.$route.query.isQuestionType}&isKnowledgePoint=${this.$route.query.isKnowledgePoint}&isRes=${this.$route.query.isRes}&isPri=${this.$route.query.isPri}&isQuesList=${this.$route.query.isQuesList}`)
             }
           }
         } else if(this.$route.query.from === 'examDetail') {

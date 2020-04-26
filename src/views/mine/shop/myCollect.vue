@@ -75,6 +75,7 @@
       });
     },
     mounted() {
+      try{MobclickAgent.onEvent('clickMineShopCollect')}catch(e){console.log(e)}
       eventBus.$off("collectListRefresh")
       eventBus.$on("collectListRefresh", (data) => {
         this.onRefresh();

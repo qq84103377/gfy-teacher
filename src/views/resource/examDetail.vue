@@ -89,6 +89,7 @@
     },
     /**
      * $route.query.flag 是否能选择添加到课程(只有资源中心的试题详情和错题本试题详情和未结束任务的试卷详情才能显示)
+     * $route.query.isErrorBook 标记是否从错题本生成的试卷
      */
     data() {
       return {

@@ -36,7 +36,7 @@
       if (this.showDialog) {
         this.showDialog = false
         next(false)
-      } else{  
+      } else{
       next();
       }
     },
@@ -46,6 +46,7 @@
       },
       confirm(){
         this.showDialog=true
+        try{MobclickAgent.onEvent('mineSettingCall')}catch(e){console.log(e)}
         this.$refs["telBox"].click();
       },
       handelClick() {
@@ -105,6 +106,7 @@
       },
     },
     mounted() {
+      try{MobclickAgent.onEvent('clickMineService')}catch(e){console.log(e)}
       this.getMySchoolInfo();
     }
   }
