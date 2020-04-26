@@ -179,6 +179,7 @@
 
       },
       jump(item) {
+        try{MobclickAgent.onEvent('viewStuExamDetail')}catch(e){console.log(e)}
         if (this.isSpoken) {
           let info = this.info.finishResultBySplit.reduce((t, v) => {
             let answer = v.splitInfoStudentAnswers.find(value => value.accountNo === item.accountNo)
