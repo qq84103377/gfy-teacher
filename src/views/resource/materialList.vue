@@ -166,6 +166,7 @@
         })
       },
       async download(item) {
+        try{MobclickAgent.onEvent('resourceMaterialDownload')}catch(e){console.log(e)}
         let url = item.srcUrl;
         if (url.indexOf("pubquanlang") > -1) {
           this.accessUrl = url;
@@ -373,6 +374,7 @@
         console.log("发任务：", obj.coursewareName)
         this.$store.commit('setResourceInfo', obj)
         this.$store.commit("setTaskClassInfo", '')
+        try{MobclickAgent.onEvent('materialAddTask')}catch(e){console.log(e)}
         this.$router.push(`/addTask?type=material&_t=new${this.isfEducation?'&isfEducation=true':''}`)
       },
     }

@@ -423,6 +423,7 @@
         formData.append('signature', this.wareOSSObject.signature)
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
+        try{MobclickAgent.onEvent('uploadLessonSubmit')}catch(e){console.log(e)}
         uploadApi.doUpLoad(this.wareOSSObject.host, formData).then(data => {
           console.log('doUpLoad', data);
           this.$store.commit('setVanLoading',false)

@@ -167,6 +167,7 @@ export default {
       this.clickIndex=index
     },
     viewResource() {
+      try{MobclickAgent.onEvent('clickPreviewAddTask')}catch(e){console.log(e)}
       this.$router.push({        path: `/resource`, query: {
           from: 'preview',
           currCourse: this.courseList[this.courseIndex],

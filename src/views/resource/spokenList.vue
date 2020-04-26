@@ -411,6 +411,7 @@ export default {
       console.log("发任务：", obj.spokenTitle)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
+      try{MobclickAgent.onEvent('spokenAddTask')}catch(e){console.log(e)}
       this.$router.push(`/addTask?type=spoken&_t=new`)
     }
 

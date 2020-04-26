@@ -522,6 +522,7 @@ export default {
       console.log("发任务：", obj.testPaperName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
+      try{MobclickAgent.onEvent('examAddTask')}catch(e){console.log(e)}
       this.$router.push(`/addTask?type=exam&_t=new&from=examList${this.isfEducation ? '&isfEducation=true' : ''}`)
     },
   }

@@ -16,13 +16,13 @@
       <div v-if="courseList.length || firstFlag">
         <van-cell class="fs16"
                   :title="`讲义(${handleCount('R12_C01')})`"
-                  is-link @click="goto('/lectureList')"/>
+                  is-link @click="goto('/lectureList','clickInClassLecture')"/>
         <van-cell class="fs16"
                   :title="`白板(${handleCount('R12_C02')})`"
-                  is-link @click="goto('/boardClassList')"/>
+                  is-link @click="goto('/boardClassList','clickInClassBoard')"/>
         <van-cell class="fs16"
                   :title="`堂测统计(${handleCount('R12_C03')})`"
-                  is-link @click="goto('/classStatSelectList')"/>
+                  is-link @click="goto('/classStatSelectList','clickInClassStat')"/>
       </div>
     </div>
   </section>
@@ -114,10 +114,11 @@
           }
         })
       },
-      goto(path) {
+      goto(path,event) {
         if(path === '/classStatSelectList') {
           localStorage.setItem('taskTchCourseInfo', JSON.stringify(this.courseList[this.index].tchCourseInfo))
         }
+        try{MobclickAgent.onEvent(event)}catch(e){console.log(e)}
         const {tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, termType, courseName} = this
         this.$router.push({path,
           query: {
@@ -134,6 +135,7 @@
         })
       },
       async changeCourse(type) {
+        try{MobclickAgent.onEvent('clickInClassToggleClass')}catch(e){console.log(e)}
         if (type) {
           //下一题
           if (this.index >= this.courseList.length - 1) {

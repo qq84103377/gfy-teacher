@@ -649,6 +649,7 @@ export default {
       }
       console.log("新建课参数：", params)
       this.loadingSubmit = true
+      try{MobclickAgent.onEvent('addCourse')}catch(e){console.log(e)}
       createTeachCourse(params).then(res => {
         if (res.flag) {
           this.$toast("创建成功")

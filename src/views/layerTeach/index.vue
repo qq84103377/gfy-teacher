@@ -209,6 +209,7 @@
   },
     methods: {
       editLayer() {
+        try{MobclickAgent.onEvent('clickEditLayer')}catch(e){console.log(e)}
         this.isEdit = !this.isEdit
         if(!this.isEdit) {
           this.taskInfo.layerInfo.layerGroupInfoList.forEach(layer => {
@@ -238,6 +239,7 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('createLayerExam')}catch(e){console.log(e)}
         createLayerTestPaper(params).then(res => {
           this.$store.commit('setVanLoading', false)
           if (res.flag) {
@@ -263,6 +265,7 @@
         if (name) {
           this.$toast(`${name}没有存在学生名单,请手动删除该分层`)
         } else {
+          try{MobclickAgent.onEvent('clickUseLayer')}catch(e){console.log(e)}
           this.bindLayeringGroupByTchCourse()
         }
       },
@@ -314,6 +317,7 @@
             }
           }
         })
+        try{MobclickAgent.onEvent('layerMoveStuSubmit')}catch(e){console.log(e)}
         this.updateTchTeachLayerInfo()
       },
       selectStuMoveList(item) {
@@ -403,6 +407,7 @@
           }
         }
         if (!flag) {
+          try{MobclickAgent.onEvent('updateLayerScoreSubmit')}catch(e){console.log(e)}
           this.updateTchTeachLayerInfo()
         }
       },
@@ -416,6 +421,7 @@
       },
       addLayer() {
         if (this.tempLayerList.length >= 6) return
+        try{MobclickAgent.onEvent('addLayerScoreLevel')}catch(e){console.log(e)}
         this.tempLayerList.push({
           layerGroupStudentList: [],
           layerGroupInfo: {

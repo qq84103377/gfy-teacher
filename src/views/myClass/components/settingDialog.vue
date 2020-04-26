@@ -63,7 +63,8 @@
       },
       methods: {
          async handleConfirm() {
-            // this.show=false    this.studentInfo.identityType === this.stuInfo.identityType
+           try{MobclickAgent.onEvent('setLeaderNumSubmit')}catch(e){console.log(e)}
+// this.show=false    this.studentInfo.identityType === this.stuInfo.identityType
            if(this.studentInfo.cadreType === this.stuInfo.cadreType && this.stuNum === this.stuInfo.studentNumber) {
              //班长没有任何变化并且学号没有任何变化
            }else {

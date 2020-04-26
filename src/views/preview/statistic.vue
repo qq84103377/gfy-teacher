@@ -50,19 +50,19 @@
       </div>
       <div class="statistic-wrap__view">
         <div class="statistic-wrap__view-tab">
-          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="$route.query.taskType === 'T04'">学资源详情
+          <div :class="{active:tabIndex === 0}" @click="viewDetail('clickResDetail')" v-if="$route.query.taskType === 'T04'">学资源详情
           </div>
-          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0"
+          <div :class="{active:tabIndex === 0}" @click="viewDetail('clickLessonDetail')"
                v-if="['T01','T02'].includes($route.query.taskType)">微课详情
           </div>
-          <div :class="{active:tabIndex === 0}" @click="tabIndex = 0" v-if="['T06'].includes($route.query.taskType)">
+          <div :class="{active:tabIndex === 0}" @click="viewDetail('clickDiscussDetail')" v-if="['T06'].includes($route.query.taskType)">
             论题内容
           </div>
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T02','T04'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}心得详情
           </div>
           <div :class="{active:tabIndex === 1}" @click="tabIndex = 1" v-if="['T06'].includes($route.query.taskType)&&!isTestPaper">{{isfEducation?'家长':'学生'}}讨论详情
           </div>
-          <div :class="{active:tabIndex === 1}" @click="tabIndex = 1"
+          <div :class="{active:tabIndex === 1}" @click="viewExam"
                v-if="isTestPaper || $route.query.taskType === 'T13' || $route.query.resourceType === 'R03'">按题目查看
           </div>
           <div @click="viewStu" v-if="isTestPaper|| ['T01','T02','T13'].includes($route.query.taskType) || $route.query.resourceType === 'R03'">按{{isfEducation?'家长':'学生'}}查看
@@ -325,6 +325,18 @@
       }
     },
     methods: {
+      viewExam() {
+        if(!this.isfEducation){
+          try{MobclickAgent.onEvent('viewStuExamCount')}catch(e){console.log(e)}
+        }
+        this.tabIndex = 1
+      },
+      viewDetail(event) {
+        if(!this.isfEducation){
+          try{MobclickAgent.onEvent(event)}catch(e){console.log(e)}
+        }
+        this.tabIndex = 0
+      },
       delReply(replyId,replyIndex) {
         this.$store.commit('setVanLoading', true)
         delReplyV2({replyId}).then(res => {
@@ -360,6 +372,7 @@
         this.$store.commit('setResourceInfo', this.info)
         this.$store.commit("setTchCourseInfo", tchCourseInfo)
         this.$store.commit("setTaskClassInfo", '')
+        try{MobclickAgent.onEvent('resendTask')}catch(e){console.log(e)}
         this.$router.push({
           path: '/addTask?_t=new',
           query: {
@@ -431,6 +444,7 @@
       },
       saveDailyReminder() {
         if (this.isDisabled || this.remind || this.taskFinishInfo.studentUnfinishList.length === 0) return
+        try{MobclickAgent.onEvent('reminderSubmit')}catch(e){console.log(e)}
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -480,6 +494,9 @@
       },
       handleComment(replyContent, item,parentReplyId) {
         if (!replyContent) return
+        if(!this.isfEducation) {
+          try{MobclickAgent.onEvent('resDetailComment')}catch(e){console.log(e)}
+        }
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -504,6 +521,9 @@
         })
       },
       handleScore(item, type) {
+        if(!this.isfEducation) {
+          try{MobclickAgent.onEvent(type === 'T01' ? 'resDetailAddScore' : 'resDetailSubScore')}catch(e){console.log(e)}
+        }
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -542,6 +562,9 @@
         })
       },
       handleTop(item) {
+        if(!this.isfEducation) {
+          try{MobclickAgent.onEvent('resDetailTop')}catch(e){console.log(e)}
+        }
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -577,6 +600,9 @@
         })
       },
       handleEss(item) {
+        if(!this.isfEducation) {
+          try{MobclickAgent.onEvent('resDetailEss')}catch(e){console.log(e)}
+        }
         this.$store.commit('setVanLoading', true)
         let obj = {
           "interUser": "runLfb",
@@ -612,6 +638,9 @@
         })
       },
       handlePraise(item) {
+        if(!this.isfEducation) {
+          try{MobclickAgent.onEvent('resDetailGood')}catch(e){console.log(e)}
+        }
         this.$store.commit('setVanLoading', true)
         let obj, api
         if (item.good) {
@@ -738,7 +767,7 @@
           }else{
              v.imgArr.push(imgArr[i].src + '?&' + Math.random())
           }
-         
+
           let parent = imgArr[i].parentElement
           parent.removeChild(imgArr[i])
         }
@@ -899,6 +928,7 @@
         })
       },
       viewAnalyse() {
+        try{MobclickAgent.onEvent('clickExamAnalyse')}catch(e){console.log(e)}
         this.$router.push(`/examAnalyse?taskId=${this.info.taskId}&classId=${this.info.tchClassTastInfo.find(t => t.active).classId}&testPaperId=${this.$route.query.testPaperId}&finishStudent=${this.taskFinishInfo.finishStudent}${this.isfEducation?'&isfEducation=true':''}`)
       },
       async statTaskStat(classId = this.info.tchClassTastInfo[0].classId) {
@@ -1063,7 +1093,7 @@
                 })
               })
               }
-             
+
             } else if (params.name === '已完成') {
               if (this.isfEducation) {
                  this.taskFinishInfo.finishStudent.reduce((t, v) => {
@@ -1078,7 +1108,7 @@
                 return t
               }, this.stuStatInfo.stu)
               }
-             
+
             } else if (params.name === '进行中') {
               if (this.isfEducation) {
                 this.taskFinishInfo.studentUnfinishList.forEach(v => {
@@ -1095,7 +1125,7 @@
                 })
               })
               }
-              
+
             }
 
             this.stuStatInfo.statDialog = true
@@ -1322,8 +1352,8 @@
         next()
       }
     },
-    async created() {
-
+    created() {
+      try{MobclickAgent.onEvent('clickStatistic')}catch(e){console.log(e)}
     }
   }
 </script>
@@ -1592,7 +1622,7 @@
         }
       }
 
-      
+
 
       &-tab {
         display: flex;

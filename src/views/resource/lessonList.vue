@@ -265,6 +265,7 @@ export default {
       console.log("发任务：", obj.coursewareName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
+      try{MobclickAgent.onEvent('lessonAddTask')}catch(e){console.log(e)}
       this.$router.push(`/addTask?type=lesson&_t=new${this.isfEducation?'&isfEducation=true':''}`)
     }
   }

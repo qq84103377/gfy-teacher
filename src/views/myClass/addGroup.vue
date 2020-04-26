@@ -158,6 +158,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
+      try{MobclickAgent.onEvent(this.isClassParent?'myClassParentAddGroupSubmit':'addGroupSubmit')}catch(e){console.log(e)}
       createClassSubGroup(params).then(res => {
         this.btnLoading = false
         if (res.flag) {

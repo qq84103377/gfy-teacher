@@ -31,7 +31,7 @@
       </van-pull-refresh>
     </div>
     <div class="lecture-list__footer">
-      <van-button type="info" class="btn" @click="popShow=true">选择课件</van-button>
+      <van-button type="info" class="btn" @click="handleSelect">选择课件</van-button>
     </div>
 
     <ware-filter :visible.sync="popShow" @confirm="selectCourse"></ware-filter>
@@ -83,6 +83,10 @@ export default {
     });
   },
   methods: {
+    handleSelect() {
+      try{MobclickAgent.onEvent('clickLectureSelectWare')}catch(e){console.log(e)}
+      this.popShow = true
+    },
     handleBackground(item) {
       const type = this.handleIcon(item.ClassTeachingData)
       if(['icon-video','icon-audio'].includes(type)) {

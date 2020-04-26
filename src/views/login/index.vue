@@ -316,7 +316,7 @@
           requestJson: JSON.stringify(json)
         }
         this.loginBtnLoading = true
-        try{MobclickAgent.onEvent('login')}catch(e){}
+        try{MobclickAgent.onEvent('login')}catch(e){console.log(e)}
         doUserLogin(params).then(res => {
           this.loginBtnLoading = false
           console.log(res)

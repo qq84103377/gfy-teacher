@@ -195,6 +195,7 @@
       },
       handleType(item) {
         if (item.active) return
+        try{MobclickAgent.onEvent('clickSelectWareType')}catch(e){console.log(e)}
         this.currentTypeName = item.name
         this.typeList.forEach(v => {
           this.$set(v, 'active', false)

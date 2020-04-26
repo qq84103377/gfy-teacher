@@ -109,6 +109,7 @@
         let params ={
           requestJson: JSON.stringify(obj)
         }
+        try{MobclickAgent.onEvent('copyTeacherGroupSubmit')}catch(e){console.log(e)}
         copyGroupByTeacherInfo(params).then(res => {
           this.btnLoading = false
           if(res.flag) {

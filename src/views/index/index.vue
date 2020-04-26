@@ -39,11 +39,11 @@
           <div class="icon-wrap green"><i class="iconGFY icon-play1"></i></div>
           <div>课中</div>
         </div>
-        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/resource`)">
+        <div class="index-content-wrap__body__main-icon-item" @click="viewResource">
           <div class="icon-wrap yellow"><i class="iconGFY icon-res"></i></div>
           <div>资源</div>
         </div>
-        <div class="index-content-wrap__body__main-icon-item" @click="$router.push(`/layerTaskList`)">
+        <div class="index-content-wrap__body__main-icon-item" @click="viewLayer">
           <div class="icon-wrap orange"><i class="iconGFY icon-layer"></i></div>
           <div>分层</div>
         </div>
@@ -82,7 +82,7 @@
       </van-skeleton>
       <div class="divider-title">教学工具</div>
       <div class="icon-group">
-        <div @click="$router.push(`/myClassList`)">
+        <div @click="viewMyClass">
           <i class="iconGFY icon-user"></i>
           <span>我的班级</span>
         </div>
@@ -160,6 +160,18 @@ export default {
     }
   },
   methods: {
+    viewMyClass() {
+      try{MobclickAgent.onEvent('clickMyClass')}catch(e){console.log(e)}
+      this.$router.push(`/myClassList`)
+    },
+    viewLayer() {
+      try{MobclickAgent.onEvent('clickLayer')}catch(e){console.log(e)}
+      this.$router.push(`/layerTaskList`)
+    },
+    viewResource() {
+      try{MobclickAgent.onEvent('clickResource')}catch(e){console.log(e)}
+      this.$router.push(`/resource`)
+    },
     async getSubGroupParent(classId) {
       let obj = {
         "interUser": "runLfb",

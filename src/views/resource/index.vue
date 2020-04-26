@@ -21,12 +21,12 @@
         </div>
       </div>
       <div v-if="courseList.length || firstFlag">
-        <van-cell class="fs16" :title="`微课(${handleCount('R01_1')})`" is-link @click="goto('/lessonList')" />
-        <van-cell class="fs16" :title="`素材(${handleCount('R01_2')})`" is-link @click="goto('/materialList')" />
-        <van-cell class="fs16" :title="`试卷(${handleCount('R02')})`" is-link @click="goto('/examList')" />
-        <van-cell class="fs16" :title="`试题(${handleCount('R03')})`" is-link @click="goto('/questionList')" />
-        <van-cell class="fs16" :title="`讨论(${handleCount('R04')})`" is-link @click="goto('/discussList')" />
-        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${handleCount('R08')})`" is-link @click="goto('/spokenList')" />
+        <van-cell class="fs16" :title="`微课(${handleCount('R01_1')})`" is-link @click="goto('/lessonList','clickResourceLesson')" />
+        <van-cell class="fs16" :title="`素材(${handleCount('R01_2')})`" is-link @click="goto('/materialList','clickResourceMaterial')" />
+        <van-cell class="fs16" :title="`试卷(${handleCount('R02')})`" is-link @click="goto('/examList','clickResourceExam')" />
+        <van-cell class="fs16" :title="`试题(${handleCount('R03')})`" is-link @click="goto('/questionList','clickResourceQuestion')" />
+        <van-cell class="fs16" :title="`讨论(${handleCount('R04')})`" is-link @click="goto('/discussList','clickResourceDiscuss')" />
+        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${handleCount('R08')})`" is-link @click="goto('/spokenList','clickResourceSpoken')" />
       </div>
     </div>
   </section>
@@ -114,6 +114,7 @@ export default {
       })
     },
     async changeCourse(type) {
+      try{MobclickAgent.onEvent('resourceToggleClass')}catch(e){console.log(e)}
       if (type) {
         //下一题
         if (this.index >= this.courseList.length - 1) {
@@ -161,8 +162,9 @@ export default {
         }
       }
     },
-    goto(path) {
+    goto(path,event) {
       this.$store.commit("setTchCourseInfo", this.tchCourseInfo)
+      try{MobclickAgent.onEvent(event)}catch(e){console.log(e)}
       const { tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, courseName } = this
       this.$router.push({ path, query: { tchCourseId, sysCourseId, relationCourseId, subjectType, classId, tchClassCourseInfo, classGrade, courseName , isfEducation:this.isfEducation} })
 

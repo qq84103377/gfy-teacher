@@ -23,7 +23,7 @@
       </div>
     </div>
     <div v-if="isApp" class="briefing-wrap__footer">
-      <van-button type="info" class="share-btn" @click="shareBarShow=true">分享</van-button>
+      <van-button type="info" class="share-btn" @click="handleShare">分享</van-button>
     </div>
     <share-bar v-if='isfEducation' :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="'请各位家长注意任务时间，及时完成家庭教育任务'" :link="link"></share-bar>
     <share-bar v-else :show.sync="shareBarShow" :title="`${decodeURI($route.query.subjectTypeName)}练习--《${info.taskName}》完成情况简报--请家长及时查看`" :desc="'请家长配合督促学生认真完成练习,表现好的同学给予表扬!'" :link="link"></share-bar>
@@ -85,6 +85,12 @@ export default {
     this.$store.commit('setVanLoading', false)
   },
   methods: {
+    handleShare() {
+      this.shareBarShow = true
+      if(!this.isfEducation){
+        try{MobclickAgent.onEvent('shareBriefing')}catch(e){console.log(e)}
+      }
+    },
     async getParentRelationStudent(classId) {
       let obj = {
         "interUser": "runLfb",

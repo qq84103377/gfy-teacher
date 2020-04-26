@@ -202,6 +202,9 @@
         if (!localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`] ||  JSON.parse(localStorage[`subGroup_${localStorage.currentSubjectType}_${this.info.classId}`]).length === 0) {
           return this.$toast('该班级未分组,无法进行小组查看')
         }
+        if(!this.isfEducation){
+          try{MobclickAgent.onEvent('viewStuExamCount')}catch(e){console.log(e)}
+        }
         this.classView = bol
       },
     }

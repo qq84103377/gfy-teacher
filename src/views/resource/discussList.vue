@@ -184,6 +184,7 @@ export default {
         if(this.imgList.length + result.images.length > 9) {
           return this.$toast('不能超过9张图片')
         }
+        try{MobclickAgent.onEvent('addDiscussImg')}catch(e){console.log(e)}
         this.multipleUpload(result)
       }, (err) => {
         // alert(err);
@@ -341,6 +342,8 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
+      try{MobclickAgent.onEvent('addDiscussSubmit')}catch(e){console.log(e)}
+
       addDiscussInfo(params).then(res => {
         this.form.btnLoading = false
         if (res.flag) {
@@ -546,6 +549,7 @@ export default {
       console.log("发任务：", obj.discussName)
       this.$store.commit('setResourceInfo', obj)
       this.$store.commit("setTaskClassInfo", '')
+      try{MobclickAgent.onEvent('discussAddTask')}catch(e){console.log(e)}
 
       this.$router.push(`/addTask?type=discuss&_t=new${this.isfEducation?'&isfEducation=true':''}`)
     },

@@ -87,6 +87,7 @@
           this.$store.commit("setTchCourseInfo", this.courseList[this.index].tchCourseInfo)
         }
         this.$store.commit('setVanLoading', true)
+        try{MobclickAgent.onEvent('clickLayerStat')}catch(e){console.log(e)}
         this.$router.push({
           path: '/layerTeach',
           query: {

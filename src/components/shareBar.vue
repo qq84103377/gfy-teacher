@@ -61,6 +61,8 @@ export default {
     share(item) {
       let _this = this
       if (item.type === 'wx' || item.type === 'timeline') {
+        try{MobclickAgent.onEvent(item.type === 'wx' ? 'shareBriefingWX' : 'shareBriefingFriend')}catch(e){console.log(e)}
+
         Wechat.share({
           message: {
             title: _this.title,
@@ -81,6 +83,7 @@ export default {
           this.$toast(reason)
         })
       } else if (item.type === 'copy-link') {
+        try{MobclickAgent.onEvent('shareBriefingCopyLink')}catch(e){console.log(e)}
         let clipboard = new clipboardJs('.icon-copy-link');
         //成功回调
         clipboard.on('success', e => {
@@ -90,6 +93,7 @@ export default {
         });
       } else {
         console.log("分享地址：",this.link)
+        try{MobclickAgent.onEvent(item.type === 'qq' ? 'shareBriefingQQ' : 'shareBriefingQzoon')}catch(e){console.log(e)}
         var args = {}
         args.client = QQSDK.ClientType.QQ//QQSDK.ClientType.QQ,QQSDK.ClientType.TIM;
         args.scene = item.type === 'qq' ? QQSDK.Scene.QQ : QQSDK.Scene.QQZone//QQSDK.Scene.QQZone,QQSDK.Scene.Favorite

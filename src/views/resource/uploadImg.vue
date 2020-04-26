@@ -130,6 +130,7 @@
           if(this.imgList.length + result.images.length > 9) {
             return this.$toast('不能超过9张图片')
           }
+          try{MobclickAgent.onEvent('uploadImgSubmit')}catch(e){console.log(e)}
           this.multipleUpload(result)
         }, (err) => {
           // alert(err);

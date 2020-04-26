@@ -480,16 +480,16 @@
         if (this.form.object == 1) {
           //按班
            console.log(JSON.parse(JSON.stringify(item.classStudent)) ,'item.classStudent??')
-          
+
             return Object.keys(item.classStudent).reduce((t, v) => {
             if (item.classStudent[v].active) t++
             return t
           }, 0)
-          
-          
+
+
         } else {
           //按组
-         
+
             return item.tchSubGroup.reduce((total, v) => {
             if (v.tchClassSubGroupStudent && v.tchClassSubGroupStudent.tchSubGroupStudent) {
               total += v.tchClassSubGroupStudent.tchSubGroupStudent.reduce((t, s) => {
@@ -499,8 +499,8 @@
             }
             return total
           }, 0)
-          
-          
+
+
         }
       },
       async getSubGroupParent(classId) {
@@ -1769,7 +1769,14 @@
         this.showLoading = true
         if (this.isEdit) {
           // 编辑或重发任务
-          let api = this.$route.query.isResend ? redoCourseTask : modifyCourseTask
+          let api;
+          if(this.$route.query.isResend){
+            api = redoCourseTask
+            try{MobclickAgent.onEvent('resendTaskSubmit')}catch(e){console.log(e)}
+          }else {
+            api = modifyCourseTask
+            try{MobclickAgent.onEvent('editTaskSubmit')}catch(e){console.log(e)}
+          }
           api(params).then(res => {
             if (res) {
               this.showLoading = false
@@ -1802,6 +1809,21 @@
             this.showLoading = false
           })
         } else {
+          if(this.form.layer) {
+            try{MobclickAgent.onEvent('addTaskLayerSubmit')}catch(e){console.log(e)}
+          }
+          if(this.$route.query.type === 'lesson'){
+            try{MobclickAgent.onEvent('lessonAddTaskSubmit')}catch(e){console.log(e)}
+          }else if(this.$route.query.type === 'material'){
+            try{MobclickAgent.onEvent('materialAddTaskSubmit')}catch(e){console.log(e)}
+          }else if(this.$route.query.type === 'exam'){
+            try{MobclickAgent.onEvent('examAddTaskSubmit')}catch(e){console.log(e)}
+          }else if(this.$route.query.type === 'discuss'){
+            try{MobclickAgent.onEvent('discussAddTaskSubmit')}catch(e){console.log(e)}
+          }else if(this.$route.query.type === 'spoken'){
+            try{MobclickAgent.onEvent('spokenAddTaskSubmit')}catch(e){console.log(e)}
+          }
+
           createCourseTask(params).then(res => {
             if (res) {
               this.showLoading = false
@@ -1837,6 +1859,9 @@
       }
     },
     created() {
+      if(this.$route.query.isEdit) {
+        try{MobclickAgent.onEvent('editTask')}catch(e){console.log(e)}
+      }
     },
     watch: {
       '$route'() {

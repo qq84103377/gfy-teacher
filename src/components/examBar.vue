@@ -236,6 +236,8 @@
             this.$router.push(`/resCentreWrap?from=examDetail`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }else if (this.$route.path === '/questionList') {
+            try{MobclickAgent.onEvent('clickQuestionSelectOther')}catch(e){console.log(e)}
+
             this.$router.push(`/resCentreWrap?from=questionList&tchCourseId=${this.$route.query.tchCourseId}&sysCourseId=${this.$route.query.sysCourseId}&relationCourseId=${this.$route.query.relationCourseId}`)
             this.$store.commit('setResQuestionSelect',this.selectList)
           }
@@ -334,6 +336,9 @@
             "duration": 10,//试卷时长
             "statusCd": "S01"//状态
           }
+        }
+        if(this.$route.path === '/questionList') {
+          try{MobclickAgent.onEvent('questionAddExamSubmit')}catch(e){console.log(e)}
         }
         let params = {
           requestJson: JSON.stringify(obj)

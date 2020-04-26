@@ -196,6 +196,7 @@ export default {
       let params = {
         requestJson: JSON.stringify(obj)
       }
+      try{MobclickAgent.onEvent('myClassParentScoreSubmit')}catch(e){console.log(e)}
       saveParentRewardScore(params).then(res => {
         console.log("saveParentRewardScore res", res)
         if (res.flag) {
