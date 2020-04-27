@@ -26,7 +26,7 @@
         <van-cell class="fs16" :title="`试卷(${handleCount('R02')})`" is-link @click="goto('/examList','clickResourceExam')" />
         <van-cell class="fs16" :title="`试题(${handleCount('R03')})`" is-link @click="goto('/questionList','clickResourceQuestion')" />
         <van-cell class="fs16" :title="`讨论(${handleCount('R04')})`" is-link @click="goto('/discussList','clickResourceDiscuss')" />
-        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${handleCount('R08')})`" is-link @click="goto('/spokenList','clickResourceSpoken')" />
+        <van-cell v-if="currentSubjectType === 'S03'" class="fs16" :title="`口语(${handleCount('R08')})`" is-link @click="goto('/spokenList','clickResouceSpoken')" />
       </div>
     </div>
   </section>

@@ -338,9 +338,17 @@
           }
         }
         if(this.$route.path === '/questionList') {
+          if (this.$route.query.isQuestionType) {
+            //专项练习--题型专项--生成试卷
+            try{MobclickAgent.onEvent('specialExerTypeAddExam')}catch(e){console.log(e)}
+          }else if (this.$route.query.isKnowledgePoint) {
+            //专项练习--知识点专项--生成试卷
+            try{MobclickAgent.onEvent('specialKngAddExam')}catch(e){console.log(e)}
+          }
+
           if(this.$route.query.isRes) {
             if(this.$route.query.isPri) {
-              try{MobclickAgent.onEvent('resCenterPriQustionAddExam')}catch(e){console.log(e)}
+              try{MobclickAgent.onEvent('resCenterPriQuestionAddExam')}catch(e){console.log(e)}
             }else {
               try{MobclickAgent.onEvent('resCenterPlatQustionAddExam')}catch(e){console.log(e)}
             }
@@ -349,12 +357,6 @@
           }
         }else if (this.$route.path === '/errorBook' || this.$route.path === '/errorQuestionDetail') {
           try{MobclickAgent.onEvent('errorbookAddExamSubmit')}catch(e){console.log(e)}
-        }else if (this.$route.query.isQuestionType) {
-          //专项练习--题型专项--生成试卷
-          try{MobclickAgent.onEvent('specialExerTypeAddExam')}catch(e){console.log(e)}
-        }else if (this.$route.query.isKnowledgePoint) {
-          //专项练习--知识点专项--生成试卷
-          try{MobclickAgent.onEvent('specialKngAddExam')}catch(e){console.log(e)}
         }
         let params = {
           requestJson: JSON.stringify(obj)

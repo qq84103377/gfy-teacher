@@ -1817,8 +1817,8 @@
             try{MobclickAgent.onEvent('familyEduAddTaskSubmit')}catch(e){console.log(e)}
           }else {
             if(this.$route.query.type === 'lesson'){
-              if(this.$route.query.isRes){
-                if(this.$route.query.isPri){
+              if(this.$route.query.isRes == 1){
+                if(this.$route.query.isPri == 1){
                   try{MobclickAgent.onEvent('resCenterPriLessonAddTask')}catch(e){console.log(e)}
                 }else {
                   try{MobclickAgent.onEvent('resCenterPlatLessonAddTaskSubmit')}catch(e){console.log(e)}
@@ -1827,8 +1827,8 @@
                 try{MobclickAgent.onEvent('lessonAddTaskSubmit')}catch(e){console.log(e)}
               }
             }else if(this.$route.query.type === 'material'){
-              if(this.$route.query.isRes){
-                if(this.$route.query.isPri){
+              if(this.$route.query.isRes == 1){
+                if(this.$route.query.isPri == 1){
                   try{MobclickAgent.onEvent('resCenterPriMaterialAddTask')}catch(e){console.log(e)}
                 }else {
                   try{MobclickAgent.onEvent('resCenterPlatMaterialAddTaskSubmit')}catch(e){console.log(e)}
@@ -1837,9 +1837,9 @@
                 try{MobclickAgent.onEvent('materialAddTaskSubmit')}catch(e){console.log(e)}
               }
             }else if(this.$route.query.type === 'exam'){
-              if(this.$route.query.isRes) {
-                if(this.$route.query.isPri){
-                  if(this.$route.query.isQuesList){
+              if(this.$route.query.isRes == 1) {
+                if(this.$route.query.isPri == 1){
+                  if(this.$route.query.isQuesList == 1){
                     //资源中心--私人资源--试题列表--生成试卷--发任务
                     try{MobclickAgent.onEvent('resCenterPriQuestionAddTask')}catch(e){console.log(e)}
                   }else{
@@ -1847,7 +1847,7 @@
                     try{MobclickAgent.onEvent('resCenterPriExamAddTask')}catch(e){console.log(e)}
                   }
                 }else {
-                  if(this.$route.query.isQuesList){
+                  if(this.$route.query.isQuesList == 1){
                     //资源中心--平台资源--试题列表--生成试卷--发任务
                     try{MobclickAgent.onEvent('resCenterPlatQuestionAddTask')}catch(e){console.log(e)}
                   }else{
