@@ -51,7 +51,7 @@
         </div>
       </div>
       <div class="correct-wrap__side-bottom">
-        <div class="auto-submit" :class="{'is-active':autoSubmit}" @click="autoSubmit = !autoSubmit"></div>
+        <div class="auto-submit" :class="{'is-active':autoSubmit}" @click="handleAuto"></div>
         <div @click="handleAuto">自动提交</div>
         <div class="submit fs10" @click="clickSubmit">提交</div>
       </div>

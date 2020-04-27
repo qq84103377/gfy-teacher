@@ -462,7 +462,7 @@
         this.$refs['drawBoard'].save()
       },
       upDo() {
-        try{MobclickAgent.onEvent('imgCorrectWithDraw')}catch(e){console.log(e)}
+        try{MobclickAgent.onEvent('imgCorrectWithdraw')}catch(e){console.log(e)}
         this.$refs['drawBoard'].upDo()
       },
       rotateLeft() {
