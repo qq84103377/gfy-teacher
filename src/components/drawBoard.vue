@@ -204,7 +204,7 @@ export default {
       // this.changeImg.src = changeValue + '&' + Math.random();
       // this.changeImg.src = 'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/17493_1583462496_SoBss.png?x-oss-process=style/max_width_1000';
       this.changeImg.src = changeValue;
-      this.changeImg.onload = () => { 
+      this.changeImg.onload = () => {
         this.initTime++
         let scaleRange = 1   // 缩放显示比例
 
@@ -450,61 +450,77 @@ export default {
       })
     },
     async compositeGraph(imgArray) {
-      console.log('compositeGraph()');
-      // 下载后的文件名
-      let filename = 'canvas_' + (new Date()).getTime() + '.png';
-
       let compositeCanvas = document.createElement('canvas');
       compositeCanvas.width = this.canvas.width;
       compositeCanvas.height = this.canvas.height;
       let compositeCtx = compositeCanvas.getContext('2d');
+      compositeCtx.fillStyle="#fff";
+      compositeCtx.fillRect(0,0,compositeCanvas.width,compositeCanvas.height);
       document.getElementsByClassName('offImgs')[0].innerHTML = ''
-      // $('.offImgs').empty()
-      imgArray.forEach(v => {
-        let img = new Image()
-        img.src = v
-        document.getElementsByClassName('offImgs')[0].appendChild(img)
-      })
-      Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
-
-        let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
-        if (compositeImg.length > 307200) {
-          //大于300kb需要压缩
-          compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
+      console.log(imgArray,'图片数组');
+      let img = new Image()
+      img.src = imgArray[0]
+      img.onload = () => {
+        compositeCtx.drawImage(img, 0, 0);
+        console.log('原图渲染完成');
+        let img2 = new Image()
+        img2.src = imgArray[1]
+        img2.onload = async () => {
+          compositeCtx.drawImage(img2, 0, 0);
+          console.log('涂鸦痕迹渲染完成');
+          let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
+          if(compositeImg === 'data:,') {
+            console.log('canvas转base64失败');
+            alert('canvas转base64失败')
+            return
+          }
+          console.log(compositeImg.length,'合成图大小(未压缩)');
+          if (compositeImg.length > 307200) {
+            //大于300kb需要压缩
+            compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
+          }
+          await this.getOSSKey()
+          let arr = compositeImg.split(","),
+            mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]),
+            n = bstr.length,
+            u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          this.curFile = new Blob([u8arr], { type: mime });
+          this.uploadIMG(this.curFile);
         }
+      }
 
-        await this.getOSSKey()
 
-        let arr = compositeImg.split(","),
-          mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]),
-          n = bstr.length,
-          u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        this.curFile = new Blob([u8arr], { type: mime });
-        this.uploadIMG(this.curFile);
-      })
-      // for (let i = 0; i < document.querySelectorAll('.offImgs img').length; i++) {
-      //     const item = document.querySelectorAll('.offImgs img')[i];
-      //     let promise = new Promise((resolve,reject) => {
-      //       item.onload = () => {
-      //         console.log(i,'====================================');
-      //         compositeCtx.drawImage(item, 0, 0); // 循环绘制图片到离屏画布
-      //         resolve()
-      //       }
-      //       item.onerror = () => {
-      //         console.log('sssssssssssss');
-      //       }
-      //     })
-      //    let bb = await promise
-      //   console.log(bb);
-      // }
-
-      // if (i >= document.querySelectorAll('.offImgs img').length - 1) {
-
-      // }
+      return
+      // imgArray.forEach(v => {
+      //   let img = new Image()
+      //   img.src = v
+      //   document.getElementsByClassName('offImgs')[0].appendChild(img)
+      // })
+      // Promise.all([this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[0]), this.loadImg(compositeCtx, document.querySelectorAll('.offImgs img')[1])]).then(async res => {
+      //
+      //   let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
+      //   if (compositeImg.length > 307200) {
+      //     //大于300kb需要压缩
+      //     compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
+      //   }
+      //
+      //   await this.getOSSKey()
+      //
+      //   let arr = compositeImg.split(","),
+      //     mime = arr[0].match(/:(.*?);/)[1],
+      //     bstr = atob(arr[1]),
+      //     n = bstr.length,
+      //     u8arr = new Uint8Array(n);
+      //   while (n--) {
+      //     u8arr[n] = bstr.charCodeAt(n);
+      //   }
+      //   this.curFile = new Blob([u8arr], { type: mime });
+      //   this.uploadIMG(this.curFile);
+      // })
     },
     uploadIMG(curFile) {
       console.log('uploadIMG()');
