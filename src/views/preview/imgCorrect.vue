@@ -450,7 +450,7 @@
       submitCb() {
         this.isPen = false
         this.isRubber = false
-         if (imgArr[i].src.indexOf('?')>-1) {
+         if (imgArr[this.currentImgIndex].src.indexOf('?')>-1) {
             this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '&' + Math.random()
          }else{
             this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '?&' + Math.random()
