@@ -46,7 +46,7 @@
 <!--            </van-dropdown-item>-->
 <!--          </van-dropdown-menu>-->
           <div @click="scorePopShow(asw,ai)" class="select-score" :class="{'red':asw.value === 0 || asw.value || asw.isMark==='I01','disabled':ai !== aswIndex}">
-            {{((asw.isMark==='I01'&&asw.value===undefined)?asw.score:((asw.value === 0 || asw.value)? asw.value : asw.score)) + '分'}}
+            {{((asw.isMark==='I01'&&asw.value===undefined)?(asw.score||0):((asw.value === 0 || asw.value)? asw.value : (asw.score||0))) + '分'}}
           </div>
         </div>
       </div>
