@@ -491,8 +491,15 @@ export default {
           this.curFile = new Blob([u8arr], { type: mime });
           this.uploadIMG(this.curFile);
         }
+        img2.onerror = (err) => {
+          this.$store.commit('setVanLoading', false)
+          console.log(err,'涂鸦痕迹加载错误');
+        }
       }
-
+      img.onerror = (err) => {
+        this.$store.commit('setVanLoading', false)
+        console.log(err,'原图加载错误');
+      }
 
       return
       // imgArray.forEach(v => {
