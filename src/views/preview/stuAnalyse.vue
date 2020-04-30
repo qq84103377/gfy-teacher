@@ -20,10 +20,12 @@
           <div v-if="bigExamList.bigExamAnswerList[curIndex].score||(bigExamList.bigExamAnswerList[curIndex].score===0)" style="color: #e90707;text-align: right;" class="fs18">{{bigExamList.bigExamAnswerList[curIndex].score}}分</div>
           <div v-else style="color: #e90707;text-align: right;" class="fs18">等待老师批改</div>
           <div v-html="info.questionList[curIndex].examQuestion.title"></div>
-          <div>正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>
+          <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">正确答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.answer"></span></div>
           <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">{{isfEducation?'家长':'学生'}}答案: <span class="blue" v-html="info.questionList[curIndex].examQuestion.studentAnswer"></span></div>
-          <div>答案解析:</div>
-          <div v-html="info.questionList[curIndex].examQuestion.examExplain"></div>
+          <div v-if="!info.questionList[curIndex].testPaperExamGroup.length">
+            <div>答案解析:</div>
+            <div v-html="info.questionList[curIndex].examQuestion.examExplain"></div>
+          </div>
           <div v-for="(item,index) in info.questionList[curIndex].testPaperExamGroup" :key="index">
             <div v-html="item.groupExamInfo.title"></div>
             <div>正确答案: <span class="blue" v-html="item.groupExamInfo.answer"></span></div>
