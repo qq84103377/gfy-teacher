@@ -121,6 +121,7 @@
         top: 2px;
       }
       @{deep} .van-dropdown-menu__title{
+        background: #e0fffc;
         text-align: center;
         padding-right: 10px;
         width: 170px;
