@@ -32,7 +32,7 @@
     "postcss-write-svg": "^3.0.1",
     "qrcodejs2": "0.0.2",
     "qs": "^6.7.0",
-    "vant": "^2.7.1",
+    "vant": "^2.4.2",
     "vconsole": "^3.3.2",
     "viewport-units-buggyfill": "^0.6.2",
     "vue": "^2.6.10",
