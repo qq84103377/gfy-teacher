@@ -1,10 +1,10 @@
 <template>
-  <section class="img-correct-wrap">
+  <section class="img-correct-wrap" id="img-correct-wrap">
     <i v-if="!isHide&&(currentImgIndex>0)" class="iconGFY icon-circle-arrow" @click="toggle(0,'imgCorrectToggle')"></i>
     <i v-if="!isHide&&((currentImgIndex<imgArr.length-1)||!finished)" class="iconGFY icon-circle-arrow rotate"
        @click="toggle(1,'imgCorrectToggle')"></i>
     <div class="img-correct-wrap__header" v-show="!isHide">
-      <van-icon @click="$router.back()" name="arrow-left"/>
+      <van-icon @click="handleBack" name="arrow-left"/>
       <span>{{isfEducation?getParentName(list[stuIndex].appraiseAccountNo,classId):getStudentName(list[stuIndex].appraiseAccountNo,classId)}}({{list[stuIndex].score}})</span>
       <span>{{currentImgIndex + 1}}/{{imgArr.length}}</span>
       <i class="iconGFY icon-rotate-left" @click="rotateLeft"></i>
@@ -28,6 +28,11 @@
       </div>
     </div>
     <div class="img-correct-wrap__bottom" id="tools-bar">
+      <div class="auto-save">
+        <div class="iconGFY icon-double-narrow-right" :class="{'icon-double-narrow-left':!aotuSaveShow}" @click="aotuSaveShow = !aotuSaveShow"></div>
+        <div class="auto-save__checkbox" v-show="aotuSaveShow" :class="{'is-active':autoSave}" @click="toggleAutoSave"></div>
+        <div class="auto-save__label" v-show="aotuSaveShow" @click="toggleAutoSave">自动保存</div>
+      </div>
       <i @click="clickPen" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
       <i @click="clickRubber" class="iconGFY icon-rubber"
          :class="{'icon-rubber-active':isRubber}"></i>
@@ -99,6 +104,7 @@
     name: "imgCorrect",
     data() {
       return {
+        aotuSaveShow: true,
         delReplyId: '',
         isHide: false,
         isPen: false,
@@ -137,6 +143,9 @@
         studentStatList: this.$route.params.studentStatList,
         listLoading: false,
         isfEducation: this.$route.params.isfEducation,
+        saveType: '', //是否点击保存按钮
+        thumbnailItem: {}, //记录点击缩略图的item
+        autoSave: localStorage.autoSave === undefined || localStorage.autoSave === 'true',
       }
     },
     created() {
@@ -168,6 +177,29 @@
       }
     },
     methods: {
+      toggleAutoSave(){
+        this.autoSave = !this.autoSave
+        localStorage.autoSave = this.autoSave
+      },
+      handleBack(){
+        if(this.autoSave && this.$refs['drawBoard'].drawFlag){
+          this.$dialog.confirm({
+            title: "",
+            message: "当前的涂鸦没有保存,是否保存?",
+            cancelButtonText: "取消",
+            confirmButtonText: "确定",
+            className: 'finish-dialog',
+            getContainer: '#img-correct-wrap'
+          }).then(() => {
+            this.saveType = 'back'
+            this.$refs['drawBoard'].save()
+          }).catch(() => {
+            this.$router.back()
+          })
+        }else{
+          this.$router.back()
+        }
+      },
       handleFold(){
         try{MobclickAgent.onEvent('imgCorrectFold')}catch(e){console.log(e)}
         this.isHide = false
@@ -429,6 +461,12 @@
         if(eve){
           try{MobclickAgent.onEvent(eve)}catch(e){console.log(e)}
         }
+        if(this.autoSave && this.$refs['drawBoard'].drawFlag && !this.saveType){
+          this.saveType = type?'next':'pre'
+          this.$refs['drawBoard'].save()
+          return
+        }
+        this.saveType = ''
         if (type) {
           // 下一个
           if (this.currentImgIndex < this.imgArr.length - 1) {
@@ -456,8 +494,22 @@
             this.imgArr[this.currentImgIndex].src = this.imgArr[this.currentImgIndex].src.split('&')[0] + '?&' + Math.random()
          }
 
+         if(this.saveType === 'next' || this.saveType === 'pre'){
+           //点击箭头的提交
+           this.toggle(this.saveType === 'next')
+         }else if (this.saveType === 'thumbnail'){
+            //点击缩略图的提交
+          this.selectImg(this.thumbnailItem)
+         }else if (this.saveType === 'back'){
+            //点击返回按钮的提交
+          this.$router.back()
+         }else {
+           //点击保存按钮的提交
+           this.saveType = ''
+         }
       },
       save() {
+        this.saveType = 'saveButton'
         try{MobclickAgent.onEvent('imgCorrectSave')}catch(e){console.log(e)}
         this.$refs['drawBoard'].save()
       },
@@ -643,6 +695,14 @@
       },
       selectImg(item) {
         if (item.active) return
+        if(this.autoSave && this.$refs['drawBoard'].drawFlag && !this.saveType){
+          this.thumbnailItem = item
+          this.saveType = 'thumbnail'
+          this.$refs['drawBoard'].save()
+          return
+        }
+        this.saveType = ''
+
         this.imgArr.forEach(v => {
           v.active = false
         })
@@ -663,7 +723,18 @@
   .img-correct-wrap {
     background: rgb(205, 236, 211);
     overflow-y: hidden;
-
+    @{deep} .finish-dialog.van-dialog {
+      .van-dialog__message {
+        font-size: 10px;
+        padding: 10px;
+      }
+      .van-button {
+        height: 20px;
+        line-height: 20px;
+        font-size: 10px;
+      }
+      width: 130px;
+    }
     .icon-circle-arrow {
       position: absolute;
       z-index: 10;
@@ -737,6 +808,38 @@
       align-items: center;
       padding: 0 10px;
 
+      .auto-save{
+        position: absolute;
+        width: -moz-max-content;
+        width: max-content;
+        padding-left: 5px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        border-radius: 8px 0 0 8px;
+        background: #e6f7f1;
+        font-size: 8px;
+        top: 50%;
+        right: 100%;
+        transform: translateY(-50%);
+
+        &__checkbox {
+          width: 9px;
+          height: 9px;
+          border: 1px solid @blue;
+          margin-right: 2px;
+
+          &.is-active {
+            background: url("../../assets/img/icon-check.png") no-repeat center center;
+            background-size: contain;
+          }
+        }
+        &__label{
+          white-space: nowrap;
+          line-height: 18px;
+          padding-right: 5px;
+        }
+      }
       .updo {
         width: 10px;
         height: 10px;

@@ -12,9 +12,9 @@
       <div class="statistic-wrap__pie-chart">
         <i @click="showTip=true" style="vertical-align: baseline" class="iconGFY icon-tip psa"></i>
         <div class="statistic-wrap__pie-chart-label divider" v-if='!isFromClassStatList'>任务完成情况:
-          <van-button class="notice-btn" :class="{remind: isDisabled}" v-if="isTaskEnd" @click="sendTask">一键重发
+          <van-button class="notice-btn mgr10" :class="{remind: isDisabled}" @click="sendTask">一键重发
           </van-button>
-          <van-button class="notice-btn" v-else
+          <van-button class="notice-btn"
                       :class="{remind: isDisabled || remind || (taskFinishInfo.studentUnfinishList&&taskFinishInfo.studentUnfinishList.length===0)}"
                       @click="saveDailyReminder">{{remind?'今日已提醒':'一键提醒'}}
           </van-button>
@@ -317,9 +317,9 @@
       subjectTypeName() {
         return this.isfEducation?'家庭教育':localStorage.currentSubjectTypeName
       },
-      isTaskEnd() {
-        return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g, "/")).getTime()
-      },
+      // isTaskEnd() {
+      //   return new Date().getTime() >= new Date(this.info.tchClassTastInfo.find(t => t.active).endDate.replace(/-/g, "/")).getTime()
+      // },
       isDisabled() {
         return this.$route.query.disabled == 1
       }

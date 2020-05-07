@@ -261,8 +261,7 @@
         info: JSON.parse(JSON.stringify(this.$route.params.info)),
         scale: 1,
         timer: null,
-        // filterStuList: [],
-        autoSubmit: true,
+        autoSubmit: localStorage.autoSubmit === undefined || localStorage.autoSubmit === 'true',
         selectScoreFlag: false, //是否选择过分数
         scorePanel: false, //打分面板
         scoreList: [],
@@ -319,6 +318,7 @@
       handleAuto(){
         try{MobclickAgent.onEvent('subjectAutoSubmit')}catch(e){console.log(e)}
         this.autoSubmit = !this.autoSubmit
+        localStorage.autoSubmit = this.autoSubmit
       },
       viewStuInfo(){
         try{MobclickAgent.onEvent('subjectStuInfo')}catch(e){console.log(e)}
