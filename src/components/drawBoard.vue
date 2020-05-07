@@ -259,17 +259,23 @@ export default {
         this.swordEle.rotateZ = 90
         // let bbox = this.swordEle.getBoundingClientRect();
         let bbox = this.canvas.getBoundingClientRect();
+        console.log(this.initTime, 'initTime')
         console.log(bbox, 'bbox')
         console.log(bbox.left, 'bbox.left')
         console.log(bbox.top, 'bbox.top')
         //初始化是会触发两次 所以在次数为2的时候拒绝赋值
-        if (this.isApp && this.initTime !== 2) {
-          this.lastLeft = bbox.left
-          this.lastTop = bbox.top
-        }  else if (!this.isApp) {
-          this.lastLeft = bbox.left
-          this.lastTop = bbox.top
-        }
+        // if (this.isApp && this.initTime !== 2) {
+        //   this.lastLeft = bbox.left
+        //   this.lastTop = bbox.top
+        // }  else if (!this.isApp) {
+        //   this.lastLeft = bbox.left
+        //   this.lastTop = bbox.top
+        // }
+
+        this.lastLeft = bbox.left
+        this.lastTop = bbox.top
+
+
         this.rotate = 0
         this.swordEle.rotateZ = 0
         //*************************************************************************//
@@ -454,10 +460,10 @@ export default {
       compositeCanvas.width = this.canvas.width;
       compositeCanvas.height = this.canvas.height;
       let compositeCtx = compositeCanvas.getContext('2d');
-      compositeCtx.fillStyle="#fff";
-      compositeCtx.fillRect(0,0,compositeCanvas.width,compositeCanvas.height);
+      compositeCtx.fillStyle = "#fff";
+      compositeCtx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
       document.getElementsByClassName('offImgs')[0].innerHTML = ''
-      console.log(imgArray,'图片数组');
+      console.log(imgArray, '图片数组');
       let img = new Image()
       img.src = imgArray[0]
       img.onload = () => {
@@ -469,12 +475,12 @@ export default {
           compositeCtx.drawImage(img2, 0, 0);
           console.log('涂鸦痕迹渲染完成');
           let compositeImg = compositeCanvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream');
-          if(compositeImg === 'data:,') {
+          if (compositeImg === 'data:,') {
             console.log('canvas转base64失败');
             alert('canvas转base64失败')
             return
           }
-          console.log(compositeImg.length,'合成图大小(未压缩)');
+          console.log(compositeImg.length, '合成图大小(未压缩)');
           if (compositeImg.length > 307200) {
             //大于300kb需要压缩
             compositeImg = compositeCanvas.toDataURL('image/jpeg', 0.95).replace('image/jpeg', 'image/octet-stream'); // 图片格式jpeg或webp可以选0-1质量区间
@@ -493,12 +499,12 @@ export default {
         }
         img2.onerror = (err) => {
           this.$store.commit('setVanLoading', false)
-          console.log(err,'涂鸦痕迹加载错误');
+          console.log(err, '涂鸦痕迹加载错误');
         }
       }
       img.onerror = (err) => {
         this.$store.commit('setVanLoading', false)
-        console.log(err,'原图加载错误');
+        console.log(err, '原图加载错误');
       }
 
       return
@@ -922,7 +928,7 @@ export default {
       console.log('苹果设备');
       this.isIphone = true
     }
-    window.addEventListener('resize', this.handleResize)
+    // window.addEventListener('resize', this.handleResize)
     this.figure()
 
     let _this = this
