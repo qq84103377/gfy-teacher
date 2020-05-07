@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0" id="container">
+  <div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0;overflow: hidden" id="container">
     <div id="layout">
       <div class="wrapper" id="test">
         <canvas class="offCanvas"></canvas>
