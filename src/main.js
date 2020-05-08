@@ -112,6 +112,12 @@ if ("fundebug" in window) {
   fundebug.filters = [
     {
       type: /^unhandledrejection$/
+    },
+    {
+      req: {
+        method: /^POST$/,
+        url: 'http://119.23.113.71:8080/service-soa/teachNew/statTaskStat'
+      }
     }
   ]
 }
