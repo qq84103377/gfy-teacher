@@ -117,8 +117,7 @@
         photoList: [],
         curFile: null,
         oSSObject: null,
-        // imgList: [],
-        imgList: [{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122722_4psTM.jpg?x-oss-process=style/max_width_1000',name:'11'},{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122755_zBKyK.jpg?x-oss-process=style/max_width_1000',name:'22'}],
+        imgList: [],
          isfEducation: this.$route.query.isfEducation,
       }
     },
@@ -137,11 +136,11 @@
           // alert(err);
         });
       },
-      previewImg(startPosition) {
+      previewImg(index) {
         ImagePreview({
-          images: this.imgList.map(v => v.src),
+          images: [this.imgList[index].src],
           className: 'img-preview-init',
-          startPosition,
+          // startPosition,
           onClose() {
             // do something
             console.log("close");
