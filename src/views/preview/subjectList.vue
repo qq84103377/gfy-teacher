@@ -152,6 +152,32 @@
       this.getExamFinishInfo(this.examId)
     },
     methods: {
+      //排序学生,将未批改的学生置顶
+      sortStuArr(arr){
+        let sortArr = []
+        let isMarkStuIndex = -1
+        arr.forEach(v => {
+          if(v.answer.some(a => a.isMark === 'I02')){
+            //未批改的学生需要置顶
+            if(isMarkStuIndex > -1){
+              // 有已批改完的学生,插入到已批改的学生前面
+              sortArr.splice(isMarkStuIndex,0,v)
+              isMarkStuIndex++
+            }else{
+              //还没有已批改完的学生,就接着排下去
+              sortArr.push(v)
+            }
+          }else{
+            //已批改的学生
+            sortArr.push(v)
+            if(isMarkStuIndex === -1){
+              //找出首个已批改完的学生的下标
+              isMarkStuIndex = sortArr.findIndex(s => s.answer.every(a => a.isMark === 'I01'))
+            }
+          }
+        })
+        return sortArr
+      },
       async statTaskStat() {
         this.$store.commit('setVanLoading', true)
         let obj = {
@@ -319,7 +345,7 @@
                   }else{
                     res.data[0][key][k].imgArr.push(imgArr[i].src + '?&' + Math.random())
                   }
-                  
+
                   let parent = imgArr[i].parentElement
                   parent.removeChild(imgArr[i])
                 }
@@ -342,7 +368,10 @@
               }
             })
             this.info = res.data[0]
-            this.stuArr = stuArr
+
+            //置顶未批改的学生名单
+            this.stuArr = this.sortStuArr(stuArr)
+
             this.$nextTick(() => {
               //去掉题目内容的audio下载按钮
               let dom = this.$refs['title'].querySelectorAll('audio')
