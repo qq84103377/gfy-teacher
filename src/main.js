@@ -115,8 +115,10 @@ if ("fundebug" in window) {
     },
     {
       req: {
-        method: /^POST$/,
-        url: 'http://119.23.113.71:8080/service-soa/teachNew/statTaskStat'
+        method: /^POST$/
+      },
+      res: {
+        status: /^0$/
       }
     }
   ]
