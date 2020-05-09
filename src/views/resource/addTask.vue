@@ -1,7 +1,7 @@
 <template>
   <section class="add-task">
 
-    <van-nav-bar :title="isEdit?'编辑':handleTitle()" @click-left="goBack" left-arrow>
+    <van-nav-bar :title="handleTitle()" @click-left="goBack" left-arrow>
     </van-nav-bar>
     <div class="add-task__body">
       <van-cell class="add-task__body__cell">
@@ -1003,7 +1003,11 @@
         }
       },
       handleTitle() {
-        if (this.$route.query.type === 'lesson') {
+        if(this.$route.query.isResend) {
+          return '重发任务'
+        }else if (this.isEdit){
+          return '编辑'
+        }else if (this.$route.query.type === 'lesson') {
           return '微课任务'
         } else if (this.$route.query.type === 'material') {
           return '学资源任务'
