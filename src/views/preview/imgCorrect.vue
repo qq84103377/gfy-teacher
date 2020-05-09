@@ -34,12 +34,12 @@
         <div class="auto-save__label" v-show="aotuSaveShow" @click="toggleAutoSave">自动保存</div>
       </div>
       <i @click="clickPen" class="iconGFY icon-pen" :class="{'icon-pen-active':isPen}"></i>
-      <i @click="clickRubber" class="iconGFY icon-rubber"
-         :class="{'icon-rubber-active':isRubber}"></i>
-      <i class="iconGFY icon-save" @click="save"></i>
+<!--      <i @click="clickRubber" class="iconGFY icon-rubber"-->
+<!--         :class="{'icon-rubber-active':isRubber}"></i>-->
       <i class="updo" @click="upDo">
         <img src="../../assets/img/updo.png" alt="">
       </i>
+      <i class="iconGFY icon-save" @click="save"></i>
       <van-icon class="close" name="cross" @click="handleFold"></van-icon>
     </div>
     <div ref="swipe" v-show="!isHide" class="img-correct-wrap__swipe" @scroll="handleScroll">

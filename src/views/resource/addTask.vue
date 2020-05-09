@@ -36,7 +36,7 @@
             <span v-if='!isEdit' class="pdlt10">{{this.resourceInfo.coursewareName}}</span>
             <span v-if='isEdit' class="pdlt10">{{this.resourceInfo.taskName}}</span>
           </div>
-          <van-checkbox v-if='!isfEducation' class="allow-fast" v-model="form.allowFast"
+          <van-checkbox v-if='!isfEducation && !$route.query.isResend' class="allow-fast" v-model="form.allowFast"
                         v-show="['lesson'].includes($route.query.type)||($route.query.taskType=='T01'||$route.query.taskType=='T02')">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许快进
@@ -71,7 +71,7 @@
                         :class="{ccc:form.comment}" name="add"/>
             </div>
           </div>
-          <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="(form.exam||isReinforce)&&!isfEducation"
+          <van-checkbox class="allow-fast mgt10" v-model="form.allowEdit" v-if="(form.exam||isReinforce)&&!isfEducation&&!$route.query.isResend"
                         :name="form.allowEdit">
             <i slot="icon" slot-scope="props" :class="['iconGFY','icon-check',{'normal':!props.checked}]"></i>
             允许学生交卷后重新修改答案
@@ -170,7 +170,7 @@
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 统一设置
               </van-radio>
-              <van-radio name="2" class="mgr10"><i slot="icon" slot-scope="props"
+              <van-radio v-if="!$route.query.isResend" name="2" class="mgr10"><i slot="icon" slot-scope="props"
                                                    :class="['iconGFY','icon-radio-active',{'radio-normal':!props.checked}]"></i>
                 分班设置
               </van-radio>
@@ -195,9 +195,9 @@
         <div slot="title">
           <div class="jcsb">
             <div>描述:</div>
-            <span class="red">{{200 - form.desc.length}}</span>
+            <span class="red">{{500 - form.desc.length}}</span>
           </div>
-          <textarea maxlength="200" v-model="form.desc" type="text" placeholder="请输入描述,字数在200字内"/>
+          <textarea maxlength="500" v-model="form.desc" type="text" placeholder="请输入描述,字数在500字内"/>
         </div>
       </van-cell>
     </div>

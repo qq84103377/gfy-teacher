@@ -70,13 +70,6 @@
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
     </div>
 
-    <!--    <van-action-sheet-->
-    <!--      v-model="showActionSheet"-->
-    <!--      :actions="actions"-->
-    <!--      cancel-text="取消"-->
-    <!--      @select="handleSelect"-->
-    <!--      @cancel="showActionSheet=false"-->
-    <!--    />-->
   </section>
 </template>
 
@@ -118,7 +111,8 @@
         curFile: null,
         oSSObject: null,
         imgList: [],
-         isfEducation: this.$route.query.isfEducation,
+        // imgList: [{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122722_4psTM.jpg?x-oss-process=style/max_width_1000',name:'11'},{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122755_zBKyK.jpg?x-oss-process=style/max_width_1000',name:'22'}],
+        isfEducation: this.$route.query.isfEducation,
       }
     },
     mounted() {
