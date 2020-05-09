@@ -322,12 +322,12 @@
                 examScore = res.data[0].groupExamList.find(v => v.examGroupId == examId).examScore
                 if (errorArr.length) {
                   let errorItem = errorArr.find(v => v.accountNo == accountNo)
-                  if (errorItem) errorPercent = errorItem.errorPercent * 100 + '%'
+                  if (errorItem) errorPercent = (errorItem.errorPercent * 100).toFixed(2) + '%'
                 }
               } else {
                 if (res.data[0].examErrorPercentInfo.length) {
                   let errorItem = res.data[0].examErrorPercentInfo.find(v => v.accountNo == accountNo)
-                  if (errorItem) errorPercent = errorItem.errorPercent * 100 + '%'
+                  if (errorItem) errorPercent = (errorItem.errorPercent * 100).toFixed(2) + '%'
                 }
                 examScore = res.data[0].examScore
               }

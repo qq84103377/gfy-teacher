@@ -7,7 +7,8 @@
       <van-cell class="add-task__body__cell">
         <div slot="title" class="add-task__body__cell-ctn mgl5" :class="{ccc:$route.query.isResend}">
           <div><span class="red">*</span>名称:</div>
-          <input :disabled="$route.query.isResend" v-model="form.name" type="text" maxlength="64"
+<!--          因为IOS的输入框禁用状态下会自动变灰色,如果再设置字体灰色则会看不到字体,所以IOS禁用状态下字体要设置为黑色,这样显示出来为灰色-->
+          <input :class="{black:isIos&&$route.query.isResend}" :disabled="$route.query.isResend" v-model="form.name" type="text" maxlength="64"
                  placeholder="请输入名称,字数在64字内">
           <span class="red">{{64 - form.name.length}}</span>
           <van-icon v-show="form.name.length && !$route.query.isResend" @click="form.name = ''" class="close"
@@ -24,7 +25,8 @@
       <van-cell class="add-task__body__cell">
         <div slot="title" class="add-task__body__cell-ctn mgl5" :class="{ccc:$route.query.isResend}">
           <div><span class="red">*</span>时长:</div>
-          <input :disabled="$route.query.isResend" v-model="form.duration" type="number" placeholder="请输入时长">
+          <!--          因为IOS的输入框禁用状态下会自动变灰色,如果再设置字体灰色则会看不到字体,所以IOS禁用状态下字体要设置为黑色,这样显示出来为灰色-->
+          <input :class="{black:isIos&&$route.query.isResend}" :disabled="$route.query.isResend" v-model="form.duration" type="number" placeholder="请输入时长">
           <span class="grey9">分钟</span>
         </div>
       </van-cell>
@@ -1914,6 +1916,14 @@
     computed: {
       teamList() {
         return this.$store.getters.getTeamList
+      },
+      isIos(){
+        try{
+          let platform = device.platform
+           return platform == "iOS"
+        }catch(err){
+          return false
+        }
       }
     },
     created() {
