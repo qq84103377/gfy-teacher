@@ -825,6 +825,7 @@
 
         &__checkbox {
           width: 9px;
+          flex: 0 0 9px;
           height: 9px;
           border: 1px solid @blue;
           margin-right: 2px;
