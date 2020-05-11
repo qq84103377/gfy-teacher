@@ -18,7 +18,7 @@
             <!--              style="display: none;"-->
             <!--            />-->
           </div>
-          <draggable class="img-group" v-model="imgList" :options="{handle:'.img-group-item'}">
+          <draggable class="img-group" v-model="imgList" :options="{handle:'.icon-drag'}">
             <div class="img-group-item" v-for="(item,index) in imgList" :key="index">
               <img @click="previewImg(index)" :src="item.src" alt="">
               <div class="img-group-item__name" v-if="!item.edit" @click="changeName(item)">{{item.name}}</div>
@@ -27,6 +27,7 @@
                                                                          type="text"><span class="red">{{64 - item.name.length}}</span>
               </div>
               <van-icon style="border-radius: 50%;background: #fff;" @click="imgList.splice(index, 1)" class="clear" name="clear"/>
+              <i class="iconGFY icon-drag"></i>
             </div>
           </draggable>
         </div>
@@ -65,6 +66,10 @@
           </van-radio-group>
         </div>
       </van-cell>
+      <div class="pd10 fs10 red">
+        <div>注:</div>
+        <div>1.点击图片上的<i class="iconGFY icon-drag"></i>并进行拖拽,可移动图片位置。</div>
+      </div>
     </div>
     <div class="upload-img__footer">
       <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="btn" @click="submit">提交</van-button>
@@ -463,6 +468,12 @@
             .clear {
               position: absolute;
               top: -5px;
+              right: -5px;
+            }
+
+            .icon-drag{
+              position: absolute;
+              top: 60px;
               right: -5px;
             }
 
