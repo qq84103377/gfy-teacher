@@ -115,8 +115,8 @@
         photoList: [],
         curFile: null,
         oSSObject: null,
-        imgList: [],
-        // imgList: [{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122722_4psTM.jpg?x-oss-process=style/max_width_1000',name:'11'},{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122755_zBKyK.jpg?x-oss-process=style/max_width_1000',name:'22'}],
+        // imgList: [],
+        imgList: [{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122722_4psTM.jpg?x-oss-process=style/max_width_1000',name:'11'},{src:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/test_answer/202003/12077_1585122755_zBKyK.jpg?x-oss-process=style/max_width_1000',name:'22'}],
         isfEducation: this.$route.query.isfEducation,
       }
     },
@@ -497,8 +497,10 @@
               background: #F5F6FA;
               padding: 3px 5px;
               text-align: center;
-              width: 100%;
-              word-break: break-all;
+              width: 107px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             &:nth-child(3n) {
