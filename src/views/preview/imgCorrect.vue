@@ -182,7 +182,7 @@
         localStorage.autoSave = this.autoSave
       },
       handleBack(){
-        if(this.autoSave && this.$refs['drawBoard'].drawFlag){
+        if(this.autoSave && this.$refs['drawBoard'].canvasHistory.length){ //canvasHistory
           this.$dialog.confirm({
             title: "",
             message: "当前的涂鸦没有保存,是否保存?",
@@ -461,7 +461,7 @@
         if(eve){
           try{MobclickAgent.onEvent(eve)}catch(e){console.log(e)}
         }
-        if(this.autoSave && this.$refs['drawBoard'].drawFlag && !this.saveType){
+        if(this.autoSave && this.$refs['drawBoard'].canvasHistory.length && !this.saveType){
           this.saveType = type?'next':'pre'
           this.$refs['drawBoard'].save()
           return
@@ -695,7 +695,7 @@
       },
       selectImg(item) {
         if (item.active) return
-        if(this.autoSave && this.$refs['drawBoard'].drawFlag && !this.saveType){
+        if(this.autoSave && this.$refs['drawBoard'].canvasHistory.length && !this.saveType){
           this.thumbnailItem = item
           this.saveType = 'thumbnail'
           this.$refs['drawBoard'].save()
