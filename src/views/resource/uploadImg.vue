@@ -469,6 +469,7 @@
               position: absolute;
               top: -5px;
               right: -5px;
+              font-size: 15px;
             }
 
             .icon-drag{
