@@ -122,7 +122,7 @@
                 </van-radio>
               </van-radio-group>
             </div>
-            <div class="aic" v-show="form.object == '1'"><span class="mgr10 fs12">按学号排序</span>
+            <div class="aic" v-if="!isfEducation" v-show="form.object == '1'"><span class="mgr10 fs12">按学号排序</span>
               <van-switch @change="switchChange" active-color="#39F0DD" size="16px" v-model="numSort"/>
             </div>
           </div>
