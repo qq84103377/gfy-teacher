@@ -127,6 +127,7 @@
         isChoose: false,
         accountList: [],
         radio: '',
+        script: null,
       }
     },
     computed: {
@@ -143,6 +144,11 @@
       }
     },
     mounted() {
+     // this.getIP().then(res => {
+     //   console.log(JSON.stringify(returnCitySN),'====');
+     //   document.getElementsByTagName('head')[0].removeChild(this.script);
+     // })
+
       // chcp.getVersionInfo((err, data) => {
       //   this.version = data
       //   alert(JSON.stringify(data))
@@ -164,6 +170,16 @@
       }, false)
     },
     methods: {
+      getIP() {
+        return new Promise((resolve,reject) => {
+          this.script = document.createElement("script");
+          this.script.type = "text/javascript";
+          this.script.src = "https://pv.sohu.com/cityjson?ie=utf-8";
+          document.getElementsByTagName("head")[0].appendChild(this.script);
+          this.script.onload = resolve
+          this.script.onerror = reject
+        })
+      },
       update() {
         chcp.fetchUpdate(function (error, data) {
           if (!error) {
