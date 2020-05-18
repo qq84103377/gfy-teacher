@@ -370,12 +370,7 @@
             this.info = res.data[0]
 
 
-            /**
-             * 下个版本再发
-             //置顶未批改的学生名单
-             this.stuArr = this.sortStuArr(stuArr)
-             */
-            this.stuArr = stuArr
+            this.stuArr = this.sortStuArr(stuArr)
 
             this.$nextTick(() => {
               //去掉题目内容的audio下载按钮

@@ -900,17 +900,13 @@
         })
       },
       viewSubjectList(item) {
-        /**
-         * 下个版本再发
-         *
-         const id = this.info.tchClassTastInfo.find(t => t.active).classId
-         const classItem = this.info.tchClassTastInfo.find(v => v.classId == id)
-         if(this.info.modifyAfterSubmit === 'M01' && classItem && (new Date(classItem.endDate).getTime() > new Date().getTime())){
+        const id = this.info.tchClassTastInfo.find(t => t.active).classId
+        const classItem = this.info.tchClassTastInfo.find(v => v.classId == id)
+        if(this.info.modifyAfterSubmit === 'M01' && classItem && (new Date(classItem.endDate).getTime() > new Date().getTime())){
           //允许学生修改答案并且任务未结束
           this.$toast('学生可修改答案且任务未结束,不能批改');
           return
-          }
-         */
+        }
 
         let questionList = []
         if (this.$route.query.resourceType === 'R03') {
