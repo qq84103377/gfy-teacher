@@ -24,7 +24,7 @@
           </div>
           <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled" @click="login">登录
           </van-button>
-          <span class="service-text">注册表示同意相关《<i @click="$router.push('/serviceSheet')">用户协议</i>》和《<i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
+          <span class="service-text"><span>注册表示同意相关《</span><i @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-detail" v-else>
           <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入用户名" />
@@ -39,7 +39,7 @@
           </div>
           <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled2" @click="userLogin">登录
           </van-button>
-          <span class="service-text">注册表示同意相关《<i @click="$router.push('/serviceSheet')">用户协议</i>》和《<i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
+          <span class="service-text"><span>注册表示同意相关《</span><i @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-footer fs10">
           <span @click="$toast.fail('敬请期待')">注册帮助</span>
@@ -69,7 +69,6 @@
       </div>
       <van-button class="btn-save custom-btn" type="info" @click.native="complete">确定</van-button>
     </div>
-
   </div>
 </template>
 
@@ -80,7 +79,7 @@
   import { hex_md5 } from '@/utils/md5'
   // import { checkUpgrade } from "@/utils/upgrade"
   import { getVailCode, doMobileLogin, doUserLogin } from '@/api/login'
-
+  // import {getFinger} from '@/utils/getFinger'
   import axios from 'axios'
 
   // 正则手机号
@@ -144,7 +143,11 @@
       }
     },
     mounted() {
-     // this.getIP().then(res => {
+      // getFinger().then(mur => {
+      //   console.log(mur);
+      //   console.log('mur');
+      // })
+      // this.getIP().then(res => {
      //   console.log(JSON.stringify(returnCitySN),'====');
      //   document.getElementsByTagName('head')[0].removeChild(this.script);
      // })

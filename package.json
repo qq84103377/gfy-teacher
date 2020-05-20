@@ -20,6 +20,7 @@
     "cssnano-preset-advanced": "^4.0.7",
     "echarts": "^4.2.1",
     "file-saver": "^2.0.2",
+    "fingerprintjs2": "^2.1.0",
     "fundebug-javascript": "^1.8.2",
     "fundebug-vue": "0.0.1",
     "pdfjs-dist": "^2.1.266",
