@@ -25,7 +25,7 @@
           </van-checkbox>
           <div v-if="isfEducation!=='true'" class="team-select-wrap__body__group-wrap">
             <div @click="handleSelectGroupStudent(s,g,item)" v-for="(s,si) in g.tchClassSubGroupStudent.tchSubGroupStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
-              <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>
+<!--              <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>-->
               {{s.accountNo| getStudentName(item.classId)}}
             </div>
           </div>
@@ -49,7 +49,7 @@
         </div>
         <div v-if="isfEducation!=='true'" v-show="c.open" class="team-select-wrap__body__group-wrap">
           <div @click="handleSelectChild(s,c)" v-for="(s,si) in c.classStudent" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
-            <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>
+<!--            <span v-if="s.studentNumber>0">{{s.studentNumber}}</span>-->
             {{s.accountNo|getStudentName(c.classId)}}
           </div>
         </div>
