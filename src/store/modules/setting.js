@@ -23,6 +23,7 @@ const state = {
   filterSubject: '', //筛选科目
   filterSubjectLabel:'',
   teachStatFilterTime: '', //教学统计时间筛选
+  taskFinishInfo: '', //学生任务成绩
 }
 
 const mutations = {
@@ -106,6 +107,9 @@ const mutations = {
   setTeachStatFilterTime(state,data) {
     state.teachStatFilterTime = data
   },
+  setTaskFinishInfo(state, data) {
+    state.taskFinishInfo = data
+  },
 }
 
 const actions = {
@@ -142,6 +146,7 @@ const getters = {
   getFilterYear: state => state.filterYear || localStorage.getItem('filterYear') ? JSON.parse(localStorage.getItem('filterYear')) : '',
   getFilterSubject: state => state.filterSubject ||  localStorage.getItem('filterSubject') ?JSON.parse(localStorage.getItem('filterSubject')):'',
   getFilterSubjectLabel: state => state.filterSubjectLabel ||  localStorage.getItem('filterSubjectLabel') ?JSON.parse(localStorage.getItem('filterSubjectLabel')):'',
+  getTaskFinishInfo: state => state.taskFinishInfo,
 };
 
 export default {

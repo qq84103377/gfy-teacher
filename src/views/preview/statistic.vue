@@ -372,6 +372,7 @@
         this.$store.commit('setResourceInfo', this.info)
         this.$store.commit("setTchCourseInfo", tchCourseInfo)
         this.$store.commit("setTaskClassInfo", '')
+        this.$store.commit("setTaskFinishInfo", JSON.stringify(this.taskFinishInfo))
         try{MobclickAgent.onEvent('resendTask')}catch(e){console.log(e)}
         this.$router.push({
           path: '/addTask?_t=new',

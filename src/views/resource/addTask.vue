@@ -324,7 +324,9 @@
         finishCount: 0,//完成任务数据个数
         countNum: 0,  //判断是否存在删除数据
         delGroId: {},//所删除分组数据
-        delStuId: {},//所删除学生数据
+        delStuId: {},//所删除学生数据,
+        taskFinishInfo:{},
+        isSwitchChange:false
       }
     },
     beforeRouteLeave(to, from, next) {
@@ -587,6 +589,7 @@
 
       },
       switchChange(bol) {
+        this.isSwitchChange=bol
         this.classList.forEach(v => {
           v.classStudent = Object.keys(v.classStudent).map(s => {
             return {...v.classStudent[s]}
@@ -594,6 +597,11 @@
           v.classStudent = this.bubbleSort(v.classStudent, bol ? 'studentNumber' : 'accountNo')
         })
         console.log(this.classList);
+
+       if (this.taskFinishInfo.studentStatList) {
+            this.taskFinishInfo.studentStatList = this.bubbleSort(this.taskFinishInfo.studentStatList, bol ? 'studentNumber' : 'accountNo')
+         this.$store.commit("setTaskFinishInfo", JSON.stringify(this.taskFinishInfo))
+       }
       },
       goBack() {
         this.common.goBack(this)
@@ -680,6 +688,7 @@
           let subjectType = this.tchCourseInfo.subjectType
 
           if (this.isfEducation) {
+            this.$store.commit('setVanLoading', true)
             for (let i = 0; i < this.classList.length; i++) {
               await this.getSubGroupParent(this.classList[i].classId)
             }
@@ -699,6 +708,7 @@
                     element.tchSubGroupStudent.forEach(s => {
                       this.$set(s, 'active', true)
                       ele.classStudent[s.parentAccountNo] = s
+                      console.log(s.parentAccountNo,'s.parentAccountNo')
                     })
                   }
                   if (element.tchClassSubGroup.subgroupName != '未分组') {
@@ -722,7 +732,8 @@
               ele.startDate = this.form.time1
               ele.endDate = this.form.time2
             })
-
+            this.$store.commit('setVanLoading', false)
+          
           } else {
             this.sendTaskClassStudent = this.$store.getters.getSendTaskClassStudent
             //获取分组信息
@@ -977,6 +988,21 @@
             })
             console.log(this.classList, 'this.classList////////');
           }
+
+          if (this.$route.query.isResend) {
+           let taskFinishInfo = this.$store.getters.getTaskFinishInfo
+         if (taskFinishInfo) {
+         this.taskFinishInfo = JSON.parse(taskFinishInfo);
+         }
+         this.taskFinishInfo.studentStatList.forEach(ele=>{
+           //27070 this.classList么有
+           if (this.classList[0].classStudent[ele.accountNo]) {
+             ele.studentNumber=this.classList[0].classStudent[ele.accountNo].studentNumber
+           }else{
+             ele.studentNumber=null
+           }
+         })
+        }
         } else {
           this.$toast("课程信息错误,请重新选择课程")
           return
@@ -1209,8 +1235,10 @@
       toSelectStudent() {
         //设置学生
         this.$store.commit("setTaskClassInfo", JSON.stringify(this.classList))
+        //设置学生课程
+        this.$store.commit("setTaskClassInfo", JSON.stringify(this.classList))
         let type = this.form.object == 1 ? 'class' : 'team'
-        this.$router.push(`/teamSelect?type=` + type + '&isfEducation=' + this.isfEducation)
+        this.$router.push({path:'/teamSelect',query:{type,isfEducation:this.isfEducation,isResend:this.$route.query.isResend,taskFinishInfo:this.$route.query.taskFinishInfo,testPaperId:this.testPaperId,isSwitchChange:this.isSwitchChange}})
       },
       selectTestPaper() {
         if (this.form.comment) return
@@ -1352,6 +1380,8 @@
         if (this.isfEducation) {
           obj.courseType = this.tchCourseInfo.courseType
         }
+
+         this.$store.commit('setVanLoading', true)
         //发布任务的学生
         let classListSelect = []
         if (this.form.object == "2") {
@@ -1384,7 +1414,7 @@
           });
 
           obj['classCount'] = classListSelect.length
-
+          this.$store.commit('setVanLoading', false)
         } else if (this.form.object === "1") {
           //按照班级
           let index = 1
@@ -1577,6 +1607,8 @@
         if (this.isfEducation) {
           obj.courseType = this.tchCourseInfo.courseType
         }
+
+        this.$store.commit('setVanLoading', true)
         //发布任务的学生
         let classListSelect = []
         console.log(this.resourceInfo.tchClassTastInfo, '编辑前的数据情况')
@@ -1616,8 +1648,9 @@
           });
 
           obj['classCount'] = classListSelect.length
-
+          this.$store.commit('setVanLoading', false)
         } else if (this.form.object === "1") {
+          this.$store.commit('setVanLoading', true)
           //按照班级
           let index = 1
           this.classList.forEach((item) => {
@@ -1645,7 +1678,7 @@
           });
 
           obj['classCount'] = classListSelect.length
-
+          this.$store.commit('setVanLoading', false)
         } else {
           this.$toast("发任务对象错误")
           return
@@ -1930,6 +1963,8 @@
       if(this.$route.query.isEdit) {
         try{MobclickAgent.onEvent('editTask')}catch(e){console.log(e)}
       }
+
+        
     },
     watch: {
       '$route'() {
