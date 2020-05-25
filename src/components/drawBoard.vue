@@ -82,16 +82,6 @@ import AlloyPaper from 'alloyfinger/asset/alloy_paper.js'
 import * as uploadApi from "@/api/upload";
 // import '../utils/canvas/jquery.min'
 // import '../assets/handWriting'
-// 底部操作栏和弹出框交互函数
-function animatePanel(fName, fHeight, sName, sHeight) {
-  // $(fName).slideUp(300);
-  // $('.footer').animate({'bottom': fHeight}, 300);
-  // let timer = setTimeout(function() {
-  $(sName).slideDown(500);
-  //     $('.footer').animate({'bottom': 0, 'height': sHeight}, 500);
-  //     timer = null;
-  // }, 0);
-}
 
 export default {
   name: "drawBoard",
@@ -795,8 +785,14 @@ export default {
         },
         touchEnd: function () {
           console.log('touchEnd()');
-          _this.canvasHistory.push(_this.canvas.toDataURL())
-          _this.$forceUpdate()
+          console.log(_this);
+
+          if(_this.$parent.$refs.swipe && _this.isPen){
+            _this.canvasHistory.push(_this.canvas.toDataURL())
+            _this.$forceUpdate()
+          }
+
+
           // let strArr = swordEle.style.transform.split(',')
           // _this.rotateX = strArr[0].split('matrix3d(')[1]
           // _this.rotateY = strArr[5]

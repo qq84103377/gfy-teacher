@@ -113,30 +113,29 @@
       handleList() {
         //口语的总分都按100分来算
         if (this.$route.params.info.testPaperScore >= 20) {
-          const key = this.$route.params.info.testPaperScore > 100 ? 'ceil' : 'floor'
           //总分不小于20
           this.scoreSpan = [
             {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
             {
-              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.9, 0)}-${Math[key](calculate.mul(this.$route.params.info.testPaperScore, 0.99, 2))}分`,
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.9, 0)}-${Math.floor(this.$route.params.info.testPaperScore*0.999)}分`,
               min: 0.9,
               max: 1,
               stu: []
             },
             {
-              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.8, 0)}-${Math[key](calculate.mul(this.$route.params.info.testPaperScore, 0.89, 2))}分`,
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.8, 0)}-${Math.floor(this.$route.params.info.testPaperScore*0.899)}分`,
               min: 0.8,
               max: 0.9,
               stu: []
             },
             {
-              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.7, 0)}-${Math[key](calculate.mul(this.$route.params.info.testPaperScore, 0.79, 2))}分`,
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.7, 0)}-${Math.floor(this.$route.params.info.testPaperScore*0.799)}分`,
               min: 0.7,
               max: 0.8,
               stu: []
             },
             {
-              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math[key](calculate.mul(this.$route.params.info.testPaperScore, 0.69, 2))}分`,
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math.floor(this.$route.params.info.testPaperScore*0.699)}分`,
               min: 0.6,
               max: 0.7,
               stu: []
@@ -149,7 +148,7 @@
           this.scoreSpan = [
             {name: `满分${this.$route.params.info.testPaperScore}`, min: 1, max: 2, stu: []},
             {
-              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math.floor(calculate.mul(this.$route.params.info.testPaperScore, 0.99, 2))}分`,
+              name: `${calculate.mul(this.$route.params.info.testPaperScore, 0.6, 0)}-${Math.floor(this.$route.params.info.testPaperScore*0.999)}分`,
               min: 0.6,
               max: 1,
               stu: []

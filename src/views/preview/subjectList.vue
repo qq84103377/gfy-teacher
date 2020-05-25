@@ -369,7 +369,7 @@
             })
             this.info = res.data[0]
 
-            //置顶未批改的学生名单
+
             this.stuArr = this.sortStuArr(stuArr)
 
             this.$nextTick(() => {
