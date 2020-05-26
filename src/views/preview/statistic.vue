@@ -438,7 +438,7 @@
             termType: this.$route.query.termType,
             isDisabled: this.isDisabled ? 1 : '',
           isfEducation:this.isfEducation,
-            isTest:(this.$route.query.testPaperId > 0 || this.$route.query.resourceType === 'R03')?1:0
+            isTest:(this.$route.query.testPaperId > 0 || this.$route.query.resourceType === 'R03' || this.$route.query.taskType === 'T13')?1:0
           }
         })
         // }

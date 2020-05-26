@@ -11,7 +11,7 @@
     <div class="scroll-area">
       <div class="row" v-for="(item,index) in list" :key="index">
         <div class="col">{{index+1}}</div>
-        <div class="col ex-width pd5" v-if="type == 'statistic'">{{item.splitSentence.sentenceContent}}</div>
+        <div class="col ex-width pd5" style="word-break: break-all" v-if="type == 'statistic'">{{item.splitSentence.sentenceContent}}</div>
         <div class="col ex-width pd5" v-if="type == 'personal'">{{item.sentenceContent}}</div>
         <div class="col blue" v-if="type == 'statistic'" @click="jump(index)">{{item.splitSentence.spliteSentenAverage || 0}} ></div>
         <div class="col ex-width" v-if="type == 'analyse'">{{getStudentName(item.accountNo,classId)}}</div>
