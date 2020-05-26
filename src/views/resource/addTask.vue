@@ -705,11 +705,41 @@
                   })
                   //  console.log(element.tchSubGroupStudent, 'newArr')
                   if (element.tchSubGroupStudent && element.tchSubGroupStudent.length) {
-                    element.tchSubGroupStudent.forEach(s => {
+                    if (this.$route.query.isResend) {
+                      const reTaskInfo = JSON.parse(JSON.stringify(this.$route.query.taskFinishInfo))
+                      let tg=false
+                      reTaskInfo.studentStatList.forEach(p=>{
+                        tg=false
+                        element.tchSubGroupStudent.some(s => {
+                          if (p.accountNo==s.parentAccountNo) {
+                            tg=true
+                            this.$set(s, 'active', true)
+                            ele.classStudent[s.parentAccountNo] = s
+                            // console.log(s.parentAccountNo,'s.parentAccountNo=========')
+                            return true
+                          }
+                        })
+                        if (!tg) {
+                          ele.classStudent[p.accountNo] = {
+                            parentAccountNo: p.accountNo,
+                            parentName: "",
+                            registerDate: null,
+                            related: '',
+                            studentAccountNo: null,
+                            studentName: null,
+                          }
+                        }
+                        // ele.classStudent[p.accountNo] = p
+                      })
+                      
+                    }else{
+                      element.tchSubGroupStudent.forEach(s => {
                       this.$set(s, 'active', true)
                       ele.classStudent[s.parentAccountNo] = s
-                      console.log(s.parentAccountNo,'s.parentAccountNo')
+                      // console.log(s.parentAccountNo,'s.parentAccountNo')
                     })
+                    }
+                   
                   }
                   if (element.tchClassSubGroup.subgroupName != '未分组') {
                     ele.tchSubGroup.push({
