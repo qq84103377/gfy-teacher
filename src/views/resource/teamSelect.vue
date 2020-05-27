@@ -72,7 +72,7 @@
               </div>
               <div class="team-select-wrap__body__group-wrap">
                 <div @click="handleSelectScoreChild(s,sc,c)" v-for="(s,si) in sc.stu" :key="si" :class="['team-select-wrap__body__group-wrap-item',{active:s.active}]">
-                  {{s.name}} {{s.isFinish=="S03"?s.score+'分':(s.score?s.score+'分':'--分')}}
+                  {{s.name}} {{s.isFinish=="S03"?s.score+'分':'--分'}}
                 </div>
               </div>
             </div>
