@@ -830,7 +830,27 @@
                 }
 
                 console.log("发任务的班级学生信息；", this.sendTaskClassStudent)
-                item.classStudent = classStudent
+                if (this.$route.query.isResend) {
+                  item.classStudent ={}
+                  const reTaskInfo = JSON.parse(JSON.stringify(this.$route.query.taskFinishInfo))
+                  let tg=false
+                  reTaskInfo.studentStatList.forEach(p=>{
+                    tg=false
+                    for (const key in classStudent) {
+                      if (p.accountNo==classStudent[key].accountNo) {
+                        tg=true
+                        this.$set(classStudent[key], 'active', true)
+                        item.classStudent[classStudent[key].accountNo] = classStudent[key]
+                        break
+                      }
+                    }
+                    if (!tg) {
+                       item.classStudent[p.accountNo] = p
+                    }
+                  })
+                }else{
+                  item.classStudent = classStudent
+                }
               } else {
                 item.classStudent = []
               }
