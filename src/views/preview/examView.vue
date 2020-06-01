@@ -54,7 +54,7 @@
               name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
               // duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`,
               duration: formathms(v.duration),
-              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate).getTime() - new Date(v.tvStartDate).getTime()) / 1000) : '--'
+              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate.replace(/-/g, "/").split('.0')[0]).getTime() - new Date(v.tvStartDate.replace(/-/g, "/").split('.0')[0]).getTime()) / 1000) : '--'
             })
           }
           return t
@@ -70,7 +70,7 @@
               name: this.isfEducation?getParentName(v.accountNo, this.info.classId):getStudentName(v.accountNo, this.info.classId),
               // duration: Math.floor(v.duration / 60) > 0 ? `${Math.floor(v.duration / 60)}分${v.duration % 60}秒` : `${v.duration % 60}秒`
               duration: formathms(v.duration),
-              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate).getTime() - new Date(v.tvStartDate).getTime()) / 1000) : '--'
+              tvTime: (v.tvEndDate && v.tvStartDate) ? formathms((new Date(v.tvEndDate.replace(/-/g, "/").split('.0')[0]).getTime() - new Date(v.tvStartDate.replace(/-/g, "/").split('.0')[0]).getTime()) / 1000) : '--'
             }
             if (index > -1) {
               // 已存在相同组
