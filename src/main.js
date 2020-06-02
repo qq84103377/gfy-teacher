@@ -95,9 +95,9 @@ fundebug.apikey =
     "2091a697df9cede7b8df8f5b6d37126230448548399ed1e5227851515fa006eb"
 fundebugVue(fundebug, Vue)
 
-if (process.env.NODE_ENV != "production") {
+// if (process.env.NODE_ENV != "production") {
   let vConsole = new VConsole()
-}
+// }
 //集成环境或者正式环境才收集错误信息
 if (process.env.NODE_ENV == "sit" || process.env.NODE_ENV == "production") {
   fundebug.silentDev = false

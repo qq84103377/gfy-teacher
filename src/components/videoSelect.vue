@@ -65,7 +65,7 @@
       },
       videoChange(e) {
         let file = e.target.files[0]
-        this.uploadVideo(file, file.type,file.name)
+        this.uploadVideo(file, '.mp4',file.name)
       },
       onSelect(item) {
         if (item.name === '录像') {
@@ -107,6 +107,7 @@
         }, {duration: 600});
       },
       takeVideoSuccess(mediaFiles) {
+        this.$store.commit('setVanLoading', true)
         console.log(JSON.stringify(mediaFiles[0]));
         let _this = this
         if (device.platform === 'Android') {
@@ -126,56 +127,59 @@
                     if (s.hasPermission) {
                       console.log('申请成功');
                       //申请成功
-                      _this.transcoding(mediaFiles[0].fullPath,mediaFiles[0].name)
-
+                      _this.handleAndroidVideo(mediaFiles[0])
                     } else {
                       console.log('申请失败');
                       _this.$toast('写入权限失败')
                     }
                   },
                   function (error) {
+                    _this.$store.commit('setVanLoading', false)
                   }
                 )
               } else {
                 console.log('有权限');
                 //拥有权限
-                // _this.transcoding(mediaFiles[0].fullPath,mediaFiles[0].name)
-                window.resolveLocalFileSystemURL(mediaFiles[0].fullPath, fileEntry => {
-                  fileEntry.file(file => {
-                    console.log('转码后大小');
-                    console.log(file.size);
-                    // var reader = new FileReader()
-                    // reader.onloadend = (e) => {
-                    //   let arr = e.target.result.split(","),
-                    //     mime = arr[0].match(/:(.*?);/)[1],
-                    //     bstr = atob(arr[1]),
-                    //     n = bstr.length,
-                    //     u8arr = new Uint8Array(n);
-                    //   while (n--) {
-                    //     u8arr[n] = bstr.charCodeAt(n);
-                    //   }
-                    //   // let curFile = new Blob([u8arr], {type: mime});
-                    //   let curFile = new File([u8arr],mediaFiles[0].name, { type: mime });
-                      _this.uploadVideo(file, '.mp4',mediaFiles[0].name)
-                    // }
-                    // reader.readAsDataURL(file)
-                  }, err1 => {
-                    console.log('fileEntry.file失败');
-                    console.log(JSON.stringify(err1));
-                  })
-                }, err => {
-                  console.log('resolveLocalFileSystemURL失败');
-                  console.log(JSON.stringify(err));
-                })
+                _this.handleAndroidVideo(mediaFiles[0])
               }
             },
             function (error) {
+              _this.$store.commit('setVanLoading', false)
             }
           )
         } else {
           this.transcoding(mediaFiles[0].fullPath,mediaFiles[0].name)
         }
 
+      },
+      handleAndroidVideo(mediaFiles){
+        window.resolveLocalFileSystemURL(mediaFiles.fullPath, fileEntry => {
+          fileEntry.file(file => {
+            var reader = new FileReader()
+            reader.onloadend = (e) => {
+              let arr = e.target.result.split(","),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+              while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+              }
+              let curFile = new Blob([u8arr], {type: mime});
+              // let curFile = new File([u8arr],mediaFiles[0].name, { type: mime });
+              this.uploadVideo(curFile, '.mp4',mediaFiles.name)
+            }
+            reader.readAsDataURL(file)
+          }, err1 => {
+            console.log('fileEntry.file失败');
+            this.$store.commit('setVanLoading', false)
+            console.log(JSON.stringify(err1));
+          })
+        }, err => {
+          console.log('resolveLocalFileSystemURL失败');
+          this.$store.commit('setVanLoading', false)
+          console.log(JSON.stringify(err));
+        })
       },
       transcoding(curfile,fileName) {
         let ts = new Date().getTime()
@@ -198,23 +202,26 @@
                   while (n--) {
                     u8arr[n] = bstr.charCodeAt(n);
                   }
-                  // let curFile = new Blob([u8arr], {type: mime});
-                  let curFile = new File([u8arr],fileName, { type: mime });
+                  let curFile = new Blob([u8arr], {type: mime});
+                  // let curFile = new File([u8arr],fileName, { type: mime });
                   this.uploadVideo(curFile, '.mp4',fileName)
                 }
                 reader.readAsDataURL(file)
               }, err1 => {
                 console.log('fileEntry.file失败');
                 console.log(JSON.stringify(err1));
+                this.$store.commit('setVanLoading', false)
               })
             }, err => {
               console.log('resolveLocalFileSystemURL失败');
               console.log(JSON.stringify(err));
+              this.$store.commit('setVanLoading', false)
             })
           }, // success cb
           error => {
             console.log('转码失败');
             console.log(JSON.stringify(error));
+            this.$store.commit('setVanLoading', false)
           }, // error cb
           {
             fileUri: curfile, // the path to the video on the device
