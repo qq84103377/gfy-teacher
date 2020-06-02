@@ -22,12 +22,15 @@
         <div slot="title" class="upload-lesson__body__cell-ctn mgl5">
           <div><span class="red">*</span>音视频:</div>
           <div class="pdlt10" style="flex:1">{{wareName}}</div>
-         <!-- <van-icon @click="fileSelect" class="add" name="add"/>
-         <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
-          <van-uploader
-            accept="video/*,audio/*" :before-read="read">
-            <van-icon @click="" class="add" name="add"/>
-          </van-uploader>
+          <!-- <van-icon @click="fileSelect" class="add" name="add"/>
+          <input type="file" id="fileSelect" accept="video/*" style="display: none;"> -->
+          <!--          <van-uploader-->
+          <!--            accept="video/*,audio/*" :before-read="read">-->
+          <!--            <van-icon @click="" class="add" name="add"/>-->
+          <!--          </van-uploader>-->
+          <video-select @uploadCb="getUrl" :visible.sync="uploadSelect">
+            <van-icon @click="uploadSelect = true" class="add" name="add"/>
+          </video-select>
         </div>
       </van-cell>
       <van-cell class="upload-lesson__body__cell">
@@ -86,7 +89,8 @@
       </div>
     </div>
     <div class="upload-lesson__footer">
-      <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="submit" @click="submit">提交</van-button>
+      <van-button :loading="form.btnLoading" loading-text="提交" type="info" class="submit" @click="submit">提交
+      </van-button>
     </div>
 
     <van-action-sheet
@@ -103,12 +107,15 @@
   import {generateTimeReqestNumber, randomString} from "@/utils/filter";
   import * as uploadApi from "@/api/upload";
   import {addCourseWare, createCourseSummitInfo, addImportTask, addTeachCourseRes} from '@/api/index'
-  import { ImagePreview } from "vant";
+  import {ImagePreview} from "vant";
+  import videoSelect from '../../components/videoSelect'
 
   export default {
     name: "uploadLesson",
+    components: {videoSelect},
     data() {
       return {
+        uploadSelect: false,
         form: {
           share: 'S02',
           relate: '2',
@@ -135,36 +142,40 @@
       this.getOSSKey();
     },
     methods: {
+      getUrl(url,name){
+        this.wareName = name
+        this.wareUrl = url
+      },
       read(file, detail) {
         console.log(file.name, 'file.name');
-        console.log( file.type, 'file.type');
-        console.log( file, 'file');
-        console.log( file.size, 'file.size');
+        console.log(file.type, 'file.type');
+        console.log(file, 'file');
+        console.log(file.size, 'file.size');
 
-          if (['.mp3','.mp4','.wmv','.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
-            if(file.size > 0) {
-              this.wareFile = file;
-              this.form.name = file.name.split('.')[0]
-              this.wareSize = file.size
-              this.uploadWare(file);
-            }else {
-              this.$toast('文件大小为0')
-            }
-
+        if (['.mp3', '.mp4', '.wmv', '.avi'].includes(file.name.substr(file.name.lastIndexOf('.')))) {
+          if (file.size > 0) {
+            this.wareFile = file;
+            this.form.name = file.name.split('.')[0]
+            this.wareSize = file.size
+            this.uploadWare(file);
           } else {
-            this.$toast('请上传MP3、MP4、WMV、AVI格式的音视频文件')
+            this.$toast('文件大小为0')
           }
+
+        } else {
+          this.$toast('请上传MP3、MP4、WMV、AVI格式的音视频文件')
+        }
       },
       previewImg(startPosition) {
-          ImagePreview({
-            images: this.imgList.map(v => v.url),
-            className: 'img-preview-init',
-            startPosition,
-            onClose() {
-              // do something
-              console.log("close");
-            }
-          });
+        ImagePreview({
+          images: this.imgList.map(v => v.url),
+          className: 'img-preview-init',
+          startPosition,
+          onClose() {
+            // do something
+            console.log("close");
+          }
+        });
       },
       createCourseSummitInfo(resourceId) {
         this.form.btnLoading = true
@@ -189,18 +200,18 @@
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       return createCourseSummitInfo(params)
+        return createCourseSummitInfo(params)
       },
       fileSelect() {
         this.myPhoto("fileSelect").then((obj) => {
           console.log(obj.curFile.name, 'file.name');
-        console.log( obj.curFile.type, 'file.type');
-        console.log( obj.curFile, 'file');
-        console.log( obj.curFile.size, 'file.size');
+          console.log(obj.curFile.type, 'file.type');
+          console.log(obj.curFile, 'file');
+          console.log(obj.curFile.size, 'file.size');
 
           const fileType = obj.curFile.name.substr(obj.curFile.name.lastIndexOf('.'))
-          console.log(fileType,'ttttttttttttttttttttttttt');
-          if(['.mov'].includes(fileType.toLowerCase())) return this.$toast('请上传MP4、WMV、AVI格式的视频文件')
+          console.log(fileType, 'ttttttttttttttttttttttttt');
+          if (['.mov'].includes(fileType.toLowerCase())) return this.$toast('请上传MP4、WMV、AVI格式的视频文件')
           this.wareFile = obj.curFile;
           this.form.name = obj.curFile.name.split('.')[0]
           this.wareSize = obj.curFile.size
@@ -284,31 +295,31 @@
           this.form.btnLoading = false
           if (res.flag) {
             this.addImportTask(res.coursewareIdList[0])
-            if(this.form.relate === '3') {
+            if (this.form.relate === '3') {
               // 关联课中
               this.form.btnLoading = true
               Promise.all([this.addTeachCourseRes(res.coursewareIdList[0]), this.createCourseSummitInfo(res.coursewareIdList[0])]).then(respone => {
                 this.form.btnLoading = false
-                if(respone.every(v => v.flag)) {
+                if (respone.every(v => v.flag)) {
                   this.$toast('添加成功')
                   this.$store.commit('setIsAddWare', true)
                   this.$router.back()
-                }else {
+                } else {
                   this.$toast(respone.find(v => !v.flag).msg)
                 }
               }).catch(err => {
                 throw Error(err)
               })
-            }else {
+            } else {
               //仅资源
               this.form.btnLoading = true
               let data = await this.addTeachCourseRes(res.coursewareIdList[0])
               this.form.btnLoading = false
-              if(data.flag) {
+              if (data.flag) {
                 this.$toast('添加成功')
-                this.$store.commit('setIsAddWare',true)
+                this.$store.commit('setIsAddWare', true)
                 this.$router.back()
-              }else {
+              } else {
                 this.$toast(data.msg)
               }
             }
@@ -323,18 +334,18 @@
           "interPwd": "7829b380bd1a1c4636ab735c6c7428bc",
           "operateAccountNo": this.$store.getters.getUserInfo.accountNo,
           "belongSchoolId": this.$store.getters.schoolId,
-          "operateRoleType":"A02",
+          "operateRoleType": "A02",
           "tchCourseId": this.$route.query.tchCourseId,
           sysCourseId: this.$route.query.sysCourseId,
           relationSeqId: this.$route.query.relationCourseId,
-          "resourceType":"R01",
+          "resourceType": "R01",
           resourceId,
-          "statusCd":"S04"
+          "statusCd": "S04"
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       return  addTeachCourseRes(params)
+        return addTeachCourseRes(params)
       },
       addImportTask(resourceId) {
         let obj = {
@@ -347,22 +358,22 @@
           taskType: 'T04',
           fileName: this.wareUrl.split(this.wareOSSObject.key)[1],
           // fileName: '12134_1569724019_sdyBZ.mp4',
-          "belongType":"B02",
-          "belongId":"0",
+          "belongType": "B02",
+          "belongId": "0",
           fileKey: this.wareUrl.split(this.wareOSSObject.host)[1],
           // fileKey: '/video/201909/12134_1569724019_sdyBZ.mp4',
-          "sourceUrl":this.wareUrl,
-          "dstUrl":this.wareUrl,
+          "sourceUrl": this.wareUrl,
+          "dstUrl": this.wareUrl,
           // "sourceUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
           // "dstUrl": 'http://quanlang.oss-cn-shenzhen.aliyuncs.com/video/201909/12134_1569724019_sdyBZ.mp4',
-          "shareType":this.form.share,
+          "shareType": this.form.share,
           resourceId: resourceId + '',
-          "resourceType":"R01"
+          "resourceType": "R01"
         }
         let params = {
           requestJson: JSON.stringify(obj)
         }
-       return addImportTask(params)
+        return addImportTask(params)
       },
       getOSSKey(type) {
         let json = {
@@ -375,11 +386,11 @@
             sysTypeCd: "T01"
           })
         };
-        this.$store.commit('setVanLoading',true)
+        this.$store.commit('setVanLoading', true)
         console.log('getOSSKey json', json);
         uploadApi.stsAuthCoverAccessUrl(json).then(data => {
           console.log('stsAuthCoverAccessUrl', data.data[0]);
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
           var obj = data.data[0].tokenInfo;
           var tmpSignatureObj = {
             host: obj.host,
@@ -406,7 +417,7 @@
         this.showActionSheet = !this.showActionSheet
       },
       uploadWare(curFile) {
-        this.$store.commit('setVanLoading',true)
+        this.$store.commit('setVanLoading', true)
         console.log("开始上传")
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
@@ -417,16 +428,20 @@
         );
         console.log(this.wareOSSObject.key + this.$store.getters.getUserInfo.accountNo +
           filetime +
-          randomStr + '.' + curFile.type.split('/')[1],'路径');
+          randomStr + '.' + curFile.type.split('/')[1], '路径');
         formData.append('policy', this.wareOSSObject.policyBase64)
         formData.append('OSSAccessKeyId', this.wareOSSObject.accessid)
         formData.append('signature', this.wareOSSObject.signature)
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
-        try{MobclickAgent.onEvent('uploadLessonSubmit')}catch(e){console.log(e)}
+        try {
+          MobclickAgent.onEvent('uploadLessonSubmit')
+        } catch (e) {
+          console.log(e)
+        }
         uploadApi.doUpLoad(this.wareOSSObject.host, formData).then(data => {
           console.log('doUpLoad', data);
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
           this.wareName = curFile.name
           this.wareUrl =
             this.wareOSSObject.host +
@@ -435,13 +450,13 @@
             filetime + '_' +
             randomStr + '.' + curFile.type.split('/')[1]
         }).catch(err => {
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
         })
       },
       uploadIMG(curFile) {
         console.log("开始上传")
         console.log(this.oSSObject)
-        this.$store.commit('setVanLoading',true)
+        this.$store.commit('setVanLoading', true)
         var filetime = generateTimeReqestNumber();
         let randomStr = randomString(5);
         let formData = new FormData();
@@ -456,7 +471,7 @@
         formData.append('file', curFile)
         formData.append('success_action_status', '200')
         uploadApi.doUpLoad(this.oSSObject.host, formData).then(data => {
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
           console.log('doUpLoad', data);
           var imgUrl =
             this.oSSObject.host +
@@ -469,7 +484,7 @@
           };
           this.imgList.push(imgObj);
         }).catch(err => {
-          this.$store.commit('setVanLoading',false)
+          this.$store.commit('setVanLoading', false)
         })
       },
       handleSelect(item, index) {
