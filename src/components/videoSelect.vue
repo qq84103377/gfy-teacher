@@ -1,7 +1,7 @@
 <template>
   <section class="video-select">
     <slot></slot>
-    <van-action-sheet v-model="show" :actions="actions" @select="onSelect"/>
+    <van-action-sheet get-container="#app" v-model="show" :actions="actions" @select="onSelect"/>
     <input id="videoInput" @change="videoChange" type="file" accept="video/*" style="display: none">
   </section>
 </template>
@@ -166,7 +166,6 @@
                 u8arr[n] = bstr.charCodeAt(n);
               }
               let curFile = new Blob([u8arr], {type: mime});
-              // let curFile = new File([u8arr],mediaFiles[0].name, { type: mime });
               this.uploadVideo(curFile, '.mp4',mediaFiles.name)
             }
             reader.readAsDataURL(file)
@@ -203,8 +202,8 @@
                     u8arr[n] = bstr.charCodeAt(n);
                   }
                   let curFile = new Blob([u8arr], {type: mime});
-                  // let curFile = new File([u8arr],fileName, { type: mime });
-                  this.uploadVideo(curFile, '.mp4',fileName)
+                  //转码后的fileName要将原本.mov改成.mp4
+                  this.uploadVideo(curFile, '.mp4',`${fileName.splice('.')[0]}.mp4`)
                 }
                 reader.readAsDataURL(file)
               }, err1 => {
