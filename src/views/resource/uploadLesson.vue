@@ -138,7 +138,7 @@
       }
     },
     mounted() {
-      this.getOSSKey(1);
+      // this.getOSSKey(1);
       this.getOSSKey();
     },
     methods: {
