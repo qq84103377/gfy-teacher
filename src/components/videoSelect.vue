@@ -203,7 +203,7 @@
                   }
                   let curFile = new Blob([u8arr], {type: mime});
                   //转码后的fileName要将原本.mov改成.mp4
-                  this.uploadVideo(curFile, '.mp4',`${fileName.splice('.')[0]}.mp4`)
+                  this.uploadVideo(curFile, '.mp4',`${fileName.split('.')[0]}.mp4`)
                 }
                 reader.readAsDataURL(file)
               }, err1 => {
