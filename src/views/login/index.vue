@@ -7,39 +7,49 @@
       </h1>
       <div class="form">
         <div class="form-detail" v-if='isMobileLogin===true'>
-          <van-field class="custom-input" v-model="mobile" type='tel' @input.native="mobileChange" placeholder="请输入手机号码" />
+          <van-field class="custom-input" v-model="mobile" type='tel' @input.native="mobileChange"
+                     placeholder="请输入手机号码"/>
 
           <div class="vailcode">
             <div class="code-input">
-              <van-field class="custom-input" type='tel' @input.native="mobileChange" placeholder="请输入6位验证码" v-model="vailcode" />
+              <van-field class="custom-input" type='tel' @input.native="mobileChange" placeholder="请输入6位验证码"
+                         v-model="vailcode"/>
               <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">密码登录</span>
             </div>
             <div>
-              <van-button class="btn-vailcode" v-if="!timer" type="info" :loading="codeBtnLoading" loading-text="获取验证码" @click="getVailCode">获取验证码
+              <van-button class="btn-vailcode" v-if="!timer" type="info" :loading="codeBtnLoading" loading-text="获取验证码"
+                          @click="getVailCode">获取验证码
               </van-button>
               <van-button class="btn-vailcode" v-else :disabled="disabled" type="info" @click="getVailCode">
                 {{second}}秒后重新获取
               </van-button>
             </div>
           </div>
-          <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled" @click="login">登录
+          <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录"
+                      :disabled="loginDisabled" @click="login">登录
           </van-button>
-          <span class="service-text"><span>注册表示同意相关《</span><i @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
+          <span class="service-text"><span>注册表示同意相关《</span><i
+            @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-detail" v-else>
-          <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable placeholder="请输入用户名" />
+          <van-field class="custom-input" @input.native="userChange(1)" v-model.trim="username" clearable
+                     placeholder="请输入用户名"/>
           <div class="vailcode">
             <div class="code-input">
-              <van-field class="custom-input" @input.native="userChange(0)" v-model="password" :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'" @click-right-icon="eye=!eye">
+              <van-field class="custom-input" @input.native="userChange(0)" v-model="password"
+                         :type="eye?'text':'password'" placeholder="请输入密码" :right-icon="eye?'eye':'closed-eye'"
+                         @click-right-icon="eye=!eye">
                 <!--              <div slot="right-icon">123</div>-->
               </van-field>
               <span class="btn-pwd-login" @click="isMobileLogin=!isMobileLogin">手机验证码登录</span>
               <span class="btn-reset-pwd" @click="$router.push(`/forgetPwd`)">忘记密码</span>
             </div>
           </div>
-          <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录" :disabled="loginDisabled2" @click="userLogin">登录
+          <van-button class="btn-login" type="info" :loading="loginBtnLoading" loading-text="登录"
+                      :disabled="loginDisabled2" @click="userLogin">登录
           </van-button>
-          <span class="service-text"><span>注册表示同意相关《</span><i @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
+          <span class="service-text"><span>注册表示同意相关《</span><i
+            @click="$router.push('/serviceSheet')">用户协议</i><span>》和《</span><i @click="$router.push('/privateSheet')">隐私政策</i>》</span>
         </div>
         <div class="form-footer fs10">
           <span @click="$toast.fail('敬请期待')">注册帮助</span>
@@ -55,14 +65,16 @@
     </div>
 
     <div class="choose-box" v-else>
-      <van-nav-bar title="登录" left-arrow @click-left="isChoose=!isChoose" />
+      <van-nav-bar title="登录" left-arrow @click-left="isChoose=!isChoose"/>
       <div class="bd">
         <p class="tips">您的手机号码关联以下账号,请选择其中一个账号使用手机登录</p>
 
         <van-radio-group class="group" v-model="radio">
           <van-cell-group>
-            <van-cell v-for="item in accountList" :key="item.accountNo" :title="item.loginName" clickable :icon="item.iconUrl?item.iconUrl:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201909/20190912043018_aZGfS_Default-Avatar-blue.png'" @click="radio = item.accountNo">
-              <van-radio slot="right-icon" :name='item.accountNo' />
+            <van-cell v-for="item in accountList" :key="item.accountNo" :title="item.loginName" clickable
+                      :icon="item.iconUrl?item.iconUrl:'http://pubquanlang.oss-cn-shenzhen.aliyuncs.com/crm_file/information/201909/20190912043018_aZGfS_Default-Avatar-blue.png'"
+                      @click="radio = item.accountNo">
+              <van-radio slot="right-icon" :name='item.accountNo'/>
             </van-cell>
           </van-cell-group>
         </van-radio-group>
@@ -73,13 +85,12 @@
 </template>
 
 
-
 <script>
   import bg from '@/assets/img/login_background.png'
-  import { hex_md5 } from '@/utils/md5'
+  import {hex_md5} from '@/utils/md5'
   // import { checkUpgrade } from "@/utils/upgrade"
-  import { getVailCode, doMobileLogin, doUserLogin } from '@/api/login'
-  // import {getFinger} from '@/utils/getFinger'
+  import {getVailCode, doMobileLogin, doUserLogin} from '@/api/login'
+  import {getFinger} from '@/utils/getFinger'
   import axios from 'axios'
 
   // 正则手机号
@@ -127,12 +138,13 @@
         accountList: [],
         radio: '',
         script: null,
+        userDeviceInfo: {}
       }
     },
     computed: {
       isApp() {
         return "cordova" in window;
-      },
+      }
     },
     created() {
       if (localStorage.loginInfo) {
@@ -148,9 +160,9 @@
       //   console.log('mur');
       // })
       // this.getIP().then(res => {
-     //   console.log(JSON.stringify(returnCitySN),'====');
-     //   document.getElementsByTagName('head')[0].removeChild(this.script);
-     // })
+      //   console.log(JSON.stringify(returnCitySN),'====');
+      //   document.getElementsByTagName('head')[0].removeChild(this.script);
+      // })
 
       // chcp.getVersionInfo((err, data) => {
       //   this.version = data
@@ -174,7 +186,7 @@
     },
     methods: {
       getIP() {
-        return new Promise((resolve,reject) => {
+        return new Promise((resolve, reject) => {
           this.script = document.createElement("script");
           this.script.type = "text/javascript";
           this.script.src = "https://pv.sohu.com/cityjson?ie=utf-8";
@@ -182,6 +194,31 @@
           this.script.onload = resolve
           this.script.onerror = reject
         })
+      },
+      async handleDeviceInfo() {
+        let deviceInfo
+        try {
+          deviceInfo = device
+        } catch (err) {
+          deviceInfo = {}
+        }
+        this.userDeviceInfo = {
+          moduleType: this.isIOS ? 'T10' : 'T09', //模块类型
+          app_performance_mode: 'M02', //应用表现模式
+          macAddress: deviceInfo.uuid || await getFinger(), //mac地址
+          appVersionName: this.version, //APP版本名称
+          appVersionCode: this.version, //APP版本码
+          deviceManufacturer: deviceInfo.manufacturer, //设备厂家
+          deviceModel: deviceInfo.model, //设备型号
+          deviceSerialNumber: deviceInfo.serial, //设备序列号
+          browserName: deviceInfo.version, //系统版本
+        }
+        console.log(this.userDeviceInfo.macAddress,'macAddress');
+        await this.getIP().then(res => {
+          console.log(JSON.stringify(returnCitySN), '====');
+          document.getElementsByTagName('head')[0].removeChild(this.script);
+          this.userDeviceInfo.ipAddress = returnCitySN.cip //IP地址
+        }).catch(err =>{})
       },
       update() {
         chcp.fetchUpdate(function (error, data) {
@@ -249,7 +286,7 @@
       },
 
       // 手机登录
-      login() {
+      async login() {
         if (!this.mobile) {
           this.$toast('请输入手机号!')
           return
@@ -272,10 +309,14 @@
           'roleType': 'A02'
         }
 
+
+        this.loginBtnLoading = true
+
+        await this.handleDeviceInfo()
+        json.userDeviceInfo = this.userDeviceInfo
         let params = {
           requestJson: JSON.stringify(json),
         }
-        this.loginBtnLoading = true
         doMobileLogin(params).then(res => {
           this.loginBtnLoading = false
           console.log(res)
@@ -289,7 +330,7 @@
 
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
             localStorage.setItem("isLogin", true);
-            localStorage.setItem("loginInfo", JSON.stringify({ userName: this.username, pwd: this.password }));
+            localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
             this.$router.replace('/index')
 
           } else {
@@ -316,7 +357,7 @@
       },
 
       // 手机/用户名登录
-      userLogin() {
+      async userLogin() {
         if (this.password.length < 6 || this.password.length > 16) {
           this.$toast('密码长度在6~16位！')
           return
@@ -331,11 +372,19 @@
           'roleType': 'A02'
         }
 
-        let params = {
-          requestJson: JSON.stringify(json)
-        }
         this.loginBtnLoading = true
-        try{MobclickAgent.onEvent('login')}catch(e){console.log(e)}
+
+        await this.handleDeviceInfo()
+        json.userDeviceInfo = this.userDeviceInfo
+        let params = {
+          requestJson: JSON.stringify(json),
+        }
+
+        try {
+          MobclickAgent.onEvent('login')
+        } catch (e) {
+          console.log(e)
+        }
         doUserLogin(params).then(res => {
           this.loginBtnLoading = false
           console.log(res)
@@ -347,7 +396,7 @@
             }
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
             localStorage.setItem("isLogin", true);
-            localStorage.setItem("loginInfo", JSON.stringify({ userName: this.username, pwd: this.password }));
+            localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
             this.$router.replace('/index')
 
           } else {
@@ -369,7 +418,7 @@
       },
 
       //选择账户
-      choose(oldAccountNo, isNeedCreate) {
+      async choose(oldAccountNo, isNeedCreate) {
         this.$store.commit('setVanLoading', true)
         let json = {
           interUser: 'runLfb',
@@ -382,11 +431,12 @@
           isNeedCreate
         }
 
+        this.loginBtnLoading = true
+        await this.handleDeviceInfo()
+        json.userDeviceInfo = this.userDeviceInfo
         let params = {
           requestJson: JSON.stringify(json),
         }
-
-        this.loginBtnLoading = true
         doMobileLogin(params).then(res => {
           this.loginBtnLoading = false
           console.log(res)
@@ -394,7 +444,7 @@
 
             this.$store.commit('setUserInfo', res.data[0].loginInfoVo.usrInfo)
             localStorage.setItem("isLogin", true);
-            localStorage.setItem("loginInfo", JSON.stringify({ userName: this.username, pwd: this.password }));
+            localStorage.setItem("loginInfo", JSON.stringify({userName: this.username, pwd: this.password}));
             this.$router.replace('/index')
 
             // if (res.data[0].loginInfoVo.usrThirdPartyInfo.alreadyUpdateLoginName === 'A02') {
@@ -423,16 +473,20 @@
       position: relative;
       .column;
     }
+
     .choose-box {
       height: 100vh;
       position: relative;
       background-color: #f5f5f5;
+
       .add-account {
         padding-top: 0;
         padding-bottom: 0;
         height: 60px;
+
         @{deep} .van-cell__left-icon {
           height: 100%;
+
           &::before {
             width: 0px;
             height: 0px;
@@ -444,8 +498,10 @@
             content: "\F000";
           }
         }
+
         @{deep} .van-cell__right-icon {
           height: 100%;
+
           &::before {
             width: 0px;
             height: 0px;
@@ -458,14 +514,17 @@
           }
         }
       }
+
       .bd {
         padding-top: 15px;
         // background-color: #f5f5f5;
         padding-bottom: 60px;
+
         .tips {
           margin: 0 10px 15px;
           font-weight: bold;
         }
+
         .group {
           @{deep} .van-cell__left-icon {
             width: 40px;
@@ -474,11 +533,13 @@
             overflow: hidden;
           }
         }
+
         @{deep} .van-icon__image {
           width: 40px;
           height: 40px;
           border-radius: 50%;
         }
+
         @{deep} .van-cell__title {
           display: flex;
           flex-direction: column;
@@ -486,6 +547,7 @@
           justify-content: center;
         }
       }
+
       .btn-save {
         margin-left: 50%;
         transform: translateX(-50%);
@@ -552,16 +614,19 @@
       padding: 25px;
       display: flex;
       flex-direction: column;
+
       &-footer {
         color: #666;
         flex: 0 0 40px;
         display: flex;
         align-items: center;
         justify-content: center;
+
         > span {
           padding: 0 10px;
         }
       }
+
       .title {
         font-size: 18px;
         font-weight: 600;
@@ -579,9 +644,11 @@
         flex: 1;
         // margin-top: 30px;
         margin-top: 4.5vh;
+
         @{deep} .van-cell:not(:last-child)::after {
           left: 0;
         }
+
         .vailcode {
           display: flex;
         }
