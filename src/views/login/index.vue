@@ -203,7 +203,7 @@
           deviceInfo = {}
         }
         this.userDeviceInfo = {
-          moduleType: this.isIOS ? 'T10' : 'T09', //模块类型
+          moduleType: deviceInfo.platform === 'iOS' ? 'T10' : 'T09', //模块类型
           app_performance_mode: 'M02', //应用表现模式
           macAddress: deviceInfo.uuid || await getFinger(), //mac地址
           appVersionName: this.version, //APP版本名称
