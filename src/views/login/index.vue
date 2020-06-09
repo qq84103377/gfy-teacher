@@ -211,7 +211,7 @@
           deviceManufacturer: deviceInfo.manufacturer, //设备厂家
           deviceModel: deviceInfo.model, //设备型号
           deviceSerialNumber: deviceInfo.serial, //设备序列号
-          browserName: deviceInfo.version, //系统版本
+          systemVersion: deviceInfo.version, //系统版本
         }
         console.log(this.userDeviceInfo.macAddress,'macAddress');
         await this.getIP().then(res => {
