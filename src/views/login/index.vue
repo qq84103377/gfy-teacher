@@ -304,7 +304,7 @@
           'interUser': 'runLfb',
           'interPwd': '25d55ad283aa400af464c76d713c07ad',
           'phoneNo': this.mobile,
-          'sysType': 'S03',
+          'sysType': 'S01',
           'validateCode': this.vailcode,
           'roleType': 'A02'
         }
@@ -367,7 +367,7 @@
           'interUser': 'runLfb',
           'interPwd': '25d55ad283aa400af464c76d713c07ad',
           'phoneNoOrName': this.username,
-          'sysType': 'S03',
+          'sysType': 'S01',
           'passwordNo': hex_md5(this.password),
           'roleType': 'A02'
         }
@@ -424,7 +424,7 @@
           interUser: 'runLfb',
           interPwd: '25d55ad283aa400af464c76d713c07ad',
           phoneNo: this.mobile,
-          sysType: 'S03',
+          sysType: 'S01',
           validateCode: this.vailcode,
           roleType: 'A02',
           oldAccountNo,
