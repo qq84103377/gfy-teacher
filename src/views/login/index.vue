@@ -207,7 +207,7 @@
           app_performance_mode: 'M02', //应用表现模式
           macAddress: deviceInfo.uuid || await getFinger(), //mac地址
           appVersionName: this.version, //APP版本名称
-          appVersionCode: this.version, //APP版本码
+          appVersionCode: '', //APP版本码
           deviceManufacturer: deviceInfo.manufacturer, //设备厂家
           deviceModel: deviceInfo.model, //设备型号
           deviceSerialNumber: deviceInfo.serial, //设备序列号
